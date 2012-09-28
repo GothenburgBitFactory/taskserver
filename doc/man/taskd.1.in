@@ -1,0 +1,84 @@
+.TH taskd 1 2012-07-03 "${PACKAGE_STRING}" "User Manuals"
+
+.SH NAME
+taskd \- Task Server
+
+.SH SYNOPSIS
+.B taskd <command> [options] [<args>]
+.br
+.B taskd --version
+
+.SH DESCRIPTION
+Taskd is ...
+
+.SH COMMANDS
+Taskd supports several fixed commands, which perform high level functionality,
+which can be extended via plugins to add functionality.
+
+The commands are:
+
+.TP
+.B taskd init [--nohooks] [OPTIONS]
+Performs a one-time initialization of the project.  Detects the SCM system in
+use, which includes 'none'.  Creates local data structures.
+
+.TP
+.B taskd help <command> [OPTIONS]
+
+.TP
+.B taskd config [<name> [<value>]]
+
+.TP
+.B taskd status [OPTIONS]
+
+.TP
+.B taskd server [OPTIONS]
+Starts the daemon.
+
+.SH COMMON OPTIONS
+Most commands support the following options:
+
+.TP
+.B --NAME=VALUE
+Temporary configuration override.
+
+.TP
+.B --quiet
+Suppresses verbose output.
+
+.SH CONFIGURATION
+Configuration files can be found ...
+
+Note that any configuration variable may be overridden on the command line using
+this syntax:
+
+  $ taskd build --NAME=VALUE
+
+In all commands but one, this will _temporarily_ override the value, but with
+the 'init' command, which creates a config file, overrides are made permanent.
+
+.SH EXAMPLES
+
+.SH "CREDITS & COPYRIGHTS"
+Copyright (C) 2010 - 2012, Göteborg Bit Factory.
+
+Taskd is distributed under the MIT license. See
+http://www.opensource.org/licenses/mit-license.php for more information.
+
+.TP
+The official site at
+<http://taskwarrior.org>
+
+.TP
+The official code repository at
+<git://tasktools.org/taskd.git/>
+
+.TP
+You can contact the project by emailing
+<support@taskwarrior.org>
+
+.SH REPORTING BUGS
+.TP
+Bugs in taskd may be reported to the issue-tracker at
+<http://taskwarrior.org
+

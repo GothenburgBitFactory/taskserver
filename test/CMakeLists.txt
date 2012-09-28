@@ -1,0 +1,34 @@
+cmake_minimum_required (VERSION 2.8)
+include_directories (${CMAKE_SOURCE_DIR}
+                     ${CMAKE_SOURCE_DIR}/src
+                     ${CMAKE_SOURCE_DIR}/test
+                     ${TASKD_INCLUDE_DIRS})
+
+set (test_SRCS color.t config.t date.t directory.t duration.t file.t msg.t
+               nibbler.t path.t rx.t text.t util.t)
+
+add_custom_target (test ./run_all --verbose
+                        DEPENDS ${test_SRCS}
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+
+add_custom_target (build_tests DEPENDS ${test_SRCS}
+                               WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+
+foreach (src_FILE ${test_SRCS})
+  add_executable (${src_FILE} "${src_FILE}.cpp"
+                              ../src/Color.cpp
+                              ../src/ConfigFile.cpp
+                              ../src/Date.cpp
+                              ../src/Directory.cpp
+                              ../src/Duration.cpp
+                              ../src/File.cpp
+                              ../src/Msg.cpp
+                              ../src/Nibbler.cpp
+                              ../src/Path.cpp
+                              ../src/RX.cpp
+                              ../src/text.cpp
+                              ../src/utf8.cpp
+                              ../src/util.cpp
+                              test.cpp)
+endforeach (src_FILE)
+

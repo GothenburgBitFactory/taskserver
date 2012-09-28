@@ -1,0 +1,41 @@
+/* cmake.h.in. Creates cmake.h during a cmake run */
+
+/* Package information */
+#define PACKAGE           "${PACKAGE}"
+#define VERSION           "${VERSION}"
+#define PACKAGE_BUGREPORT "${PACKAGE_BUGREPORT}"
+#define PACKAGE_NAME      "${PACKAGE_NAME}"
+#define PACKAGE_TARNAME   "${PACKAGE_TARNAME}"
+#define PACKAGE_VERSION   "${PACKAGE_VERSION}"
+#define PACKAGE_STRING    "${PACKAGE_STRING}"
+
+/* Installation details */
+#define TASKD_EXTDIR "${CMAKE_INSTALL_PREFIX}/${TASKD_EXTDIR}"
+
+/* git information */
+#cmakedefine HAVE_COMMIT
+
+/* cmake information */
+#cmakedefine HAVE_CMAKE
+#define CMAKE_VERSION "${CMAKE_VERSION}"
+
+/* Compiling platform */
+#cmakedefine LINUX
+#cmakedefine DARWIN
+#cmakedefine CYGWIN
+#cmakedefine FREEBSD
+#cmakedefine OPENBSD
+#cmakedefine NETBSD
+#cmakedefine HAIKU
+#cmakedefine SOLARIS
+#cmakedefine UNKNOWN
+
+/* Found the pthread library */
+#cmakedefine HAVE_LIBPTHREAD
+
+/* Found tm.tm_gmtoff struct member */
+#cmakedefine HAVE_TM_GMTOFF
+
+/* Found st.st_birthtime struct member */
+#cmakedefine HAVE_ST_BIRTHTIME
+
