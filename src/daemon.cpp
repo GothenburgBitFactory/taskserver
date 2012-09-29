@@ -263,6 +263,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
   bool verbose     = true;
   bool debug       = false;
   bool daemon      = false;
+  bool ssl         = true;
   std::string root = "";
 
   std::vector <std::string>::const_iterator i;
@@ -272,6 +273,8 @@ int command_server (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("--debug",  *i, 3)) debug   = true;
     else if (closeEnough ("--daemon", *i, 3)) daemon  = true;
     else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
+    else if (closeEnough ("--ssl",    *i, 3)) ssl     = true;
+    else if (closeEnough ("--nossl",  *i, 3)) ssl     = false;
     else if (taskd_applyOverride (config, *i))   ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";

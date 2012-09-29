@@ -62,13 +62,18 @@ int command_help (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("server", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd server [options]\n"
+                << "taskd server --data <root> [options]\n"
                 << "\n"
-                << "Runs the server.\n"
+                << "Runs the server.  Requires that the location of the data "
+                << "is specified:\n"
+                << "  --data         Specifies data location\n"
                 << "\n"
                 << "Options:\n"
-                << "  --daemon       Runs central as a daemon\n"
+                << "  --daemon       Runs server as a daemon\n"
+                << "  --ssl          Uses SSL encryption (default)\n"
+                << "  --nossl        Plaintext, no encryption\n"
                 << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Debug mode generates lots of diagnostics\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
