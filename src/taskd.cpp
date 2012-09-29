@@ -99,6 +99,11 @@ int main (int argc, const char** argv)
         else if (closeEnough ("status",    args[0], 3)) status = command_status    (config, args);
         else if (closeEnough ("help",      args[0], 3)) status = command_help      (config, args);
         else if (closeEnough ("server",    args[0], 3)) status = command_server    (config, args);
+
+        else if (closeEnough ("add",       args[0], 3)) status = command_add       (config, args);
+        else if (closeEnough ("remove",    args[0], 3)) status = command_remove    (config, args);
+        else if (closeEnough ("suspend",   args[0], 3)) status = command_suspend   (config, args);
+        else if (closeEnough ("resume",    args[0], 3)) status = command_resume    (config, args);
         else
         {
           File subcommand (std::string (TASKD_EXTDIR) + "/taskd_" + args[0]);

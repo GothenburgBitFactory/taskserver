@@ -98,6 +98,10 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "init           One-time project initialization\n"
               << "server         Run the server\n"
               << "status         Display taskd status\n"
+              << "add            Add org/group/user\n"
+              << "remove         Remove org/group/user\n"
+              << "suspend        Suspend org/group/user\n"
+              << "resume         Resume org/group/user\n"
               << "\n";
   }
 

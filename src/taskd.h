@@ -40,6 +40,10 @@ int command_config    (Config&, const std::vector <std::string>&);
 int command_status    (Config&, const std::vector <std::string>&);
 int command_help      (Config&, const std::vector <std::string>&);
 int command_server    (Config&, const std::vector <std::string>&);
+int command_add       (Config&, const std::vector <std::string>&);
+int command_remove    (Config&, const std::vector <std::string>&);
+int command_suspend   (Config&, const std::vector <std::string>&);
+int command_resume    (Config&, const std::vector <std::string>&);
 
 // api.cpp
 bool taskd_applyOverride (Config&, const std::string&);
