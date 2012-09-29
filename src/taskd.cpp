@@ -113,6 +113,113 @@ int main (int argc, const char** argv)
           << "\n"
           << "\n";
     }
+    else if (args[0] == "-d" || closeEnough ("--diagnostics", args[0], 3))
+    {
+      std::cout << "\n[1m" << PACKAGE_STRING << "[0m\n";
+
+      std::cout << "  Platform: "
+                <<
+#if defined (DARWIN)
+                   "Darwin"
+#elif defined (SOLARIS)
+                   "Solaris"
+#elif defined (CYGWIN)
+                   "Cygwin"
+#elif defined (OPENBSD)
+                   "OpenBSD"
+#elif defined (HAIKU)
+                   "Haiku"
+#elif defined (FREEBSD)
+                   "FreeBSD"
+#elif defined (NETBSD)
+                   "netbsd"
+#elif defined (LINUX)
+                   "Linux"
+#else
+                   "<unknown>"
+#endif
+                << "\n\n";
+
+  // Compiler.
+      std::cout << "[1mCompiler[0m\n"
+#ifdef __VERSION__
+                << "   Version: " << __VERSION__ << "\n"
+#endif
+                << "      Caps:"
+#ifdef __STDC__
+                << " +stdc"
+#endif
+#ifdef __STDC_HOSTED__
+                << " +stdc_hosted"
+#endif
+#ifdef __STDC_VERSION__
+                << " +" << __STDC_VERSION__
+#endif
+#ifdef _POSIX_VERSION
+                << " +" << _POSIX_VERSION
+#endif
+#ifdef _POSIX2_C_VERSION
+                << " +" << _POSIX2_C_VERSION
+#endif
+#ifdef _ILP32
+                << " +ILP32"
+#endif
+#ifdef _LP64
+                << " +LP64"
+#endif
+                << " +c" << sizeof (char)
+                << " +i" << sizeof (int)
+                << " +l" << sizeof (long)
+                << " +vp" << sizeof (void*)
+                << "\n\n";
+
+      std::cout << "[1mBuild Features[0m\n"
+      // Build date.
+                << "     Built: " << __DATE__ << " " << __TIME__ << "\n"
+#ifdef HAVE_COMMIT
+                << "    Commit: " << COMMIT << "\n"
+#endif
+#ifdef CMAKE_VERSION
+                << "     CMake: " << CMAKE_VERSION << "\n"
+#endif
+                << "      Caps:"
+#ifdef HAVE_LIBPTHREAD
+                << " +pthreads"
+#else
+                << " -pthreads"
+#endif
+
+#ifdef HAVE_SRANDOM
+                << " +srandom"
+#else
+                << " -srandom"
+#endif
+
+#ifdef HAVE_RANDOM
+                << " +random"
+#else
+                << " -random"
+#endif
+
+#ifdef HAVE_UUID
+                << " +uuid"
+#else
+                << " -uuid"
+#endif
+
+#ifdef HAVE_OPENSSL
+                << " +ssl"
+#else
+                << " -ssl"
+#endif
+                << "\n\n";
+
+      std::cout << "[1mExternal Libraries[0m\n"
+#ifdef HAVE_OPENSSL
+                << "   OpenSSL: " << OPENSSL_VERSION_TEXT << "\n"
+#endif
+                << "\n";
+    }
     else
     {
       try
