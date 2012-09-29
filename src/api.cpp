@@ -66,35 +66,6 @@ bool taskd_applyOverride (Config& config, const std::string& arg)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Look for a <dir> in:
-//   .
-//   ..
-//   ../..
-//   ../../..
-//   etc until /
-bool taskd_locateDir (const std::string& dir, std::string& result)
-{
-  Directory d (Directory::cwd ());
-  int safety_valve = 20;
-
-  do
-  {
-    if (--safety_valve < 1)
-      break;
-
-    Directory taskd (d._data + "/" + dir);
-    if (taskd.exists () && taskd.is_directory ())
-    {
-      result = taskd._data;
-      return true;
-    }
-  }
-  while (d.up ());
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 int taskd_execute (const std::string& command, std::string& output)
 {
   int status = 0;

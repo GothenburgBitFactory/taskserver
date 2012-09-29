@@ -47,7 +47,6 @@ int command_resume    (Config&, const std::vector <std::string>&);
 
 // api.cpp
 bool taskd_applyOverride (Config&, const std::string&);
-bool taskd_locateDir (const std::string&, std::string&);
 int taskd_execute (const std::string&, std::string&);
 int taskd_runExtension (const std::string&, const std::string&, Config&, bool);
 int taskd_runExtension (const std::string&, const std::string&, std::string&, Config&);
