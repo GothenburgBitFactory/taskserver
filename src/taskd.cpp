@@ -28,15 +28,35 @@
 #include <iostream>
 #include <cstring>
 #include <stdio.h>
+#include <stdlib.h>
+#ifdef CYGWIN
+#include <time.h>
+#else
+#include <sys/time.h>
+#endif
 #include <Directory.h>
 #include <Color.h>
 #include <text.h>
 #include <taskd.h>
 #include <cmake.h>
+#include <commit.h>
+
+#ifdef HAVE_SRANDOM
+#define srand(x) srandom(x)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, const char** argv)
 {
+  // Set up randomness.
+#ifdef CYGWIN
+  srand (time (NULL));
+#else
+  struct timeval tv;
+  gettimeofday (&tv, NULL);
+  srand (tv.tv_usec);
+#endif
+
   int status = 0;
 
   // Create a vector of args.
