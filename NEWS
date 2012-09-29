@@ -1,7 +1,8 @@
 
 New Features in taskd 0.7.0
 
-  - 
+  - Optional SSL support.  May be turned off for debugging or private use, but
+    is not a good idea.
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
