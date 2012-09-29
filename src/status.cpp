@@ -47,7 +47,7 @@ int status_statistics (Config& config)
   request.set ("time", Date ().toISO ());
 
   Msg response;
-  if (taskd_sendMessage (config, "central.server", request, response, false))
+  if (taskd_sendMessage (config, "central.server", request, response))
   {
     std::vector <std::string> names;
     response.all (names);

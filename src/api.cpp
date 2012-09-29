@@ -263,8 +263,7 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 bool taskd_sendMessage (
   Config& config,
   const std::string& to,
-  const Msg& out,
-  bool spool /* = true */)
+  const Msg& out)
 {
   std::string destination = config.get (to);
   std::string::size_type colon = destination.find (':');
@@ -293,8 +292,6 @@ bool taskd_sendMessage (
 
   catch (std::string& error)
   {
-    if (spool)
-      taskd_spoolMessage (config, to, out);
   }
 
   // Indicate message spooled.
@@ -306,8 +303,7 @@ bool taskd_sendMessage (
   Config& config,
   const std::string& to,
   const Msg& out,
-  Msg& in,
-  bool spool /* = true */)
+  Msg& in)
 {
   std::string destination = config.get (to);
   std::string::size_type colon = destination.find (':');
@@ -335,22 +331,12 @@ bool taskd_sendMessage (
 
   catch (std::string& error)
   {
-    if (spool)
-      taskd_spoolMessage (config, to, out);
   }
 
   // Indicate message spooled.
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void taskd_spoolMessage (Config& config, const std::string& to, const Msg& out)
-{
-  Directory outbox (
-    Directory (config.get ("scm.config.dir")).parent () + "/.taskd/outbox");
-  File spool (outbox._data + "/" + to + "." + Date ().toISO () + ".msg");
-  spool.write (out.serialize ());
-}
 ////////////////////////////////////////////////////////////////////////////////
 bool taskd_resendMessage (Config& config, const std::string& msgFile)
 {
