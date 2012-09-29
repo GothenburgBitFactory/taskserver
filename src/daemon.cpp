@@ -280,6 +280,14 @@ int command_server (Config& config, const std::vector <std::string>& args)
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
   }
 
+  // Verify that root exists.
+  if (root == "")
+    throw std::string ("The '--data' option is required.");
+
+  Directory root_dir (root);
+  if (!root_dir.exists ())
+    throw std::string ("The '--data' path does not exist.");
+
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);
   config.set ("debug", debug);
