@@ -48,9 +48,34 @@ int command_init (Config& config, const std::vector <std::string>& args)
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
 
-    // TODO --data=...
+    // Verify that root exists.
+    if (root == "")
+      throw std::string ("The '--data' option is required.");
 
+    Directory root_dir (root);
+    if (!root_dir.exists ())
+      throw std::string ("The '--data' path does not exist.");
 
+    if (!root_dir.is_directory ())
+      throw std::string ("The '--data' path is not a directory.");
+ 
+    if (!root_dir.readable ())
+      throw std::string ("The '--data' directory is not readable.");
+ 
+    if (!root_dir.writable ())
+      throw std::string ("The '--data' directory is not writable.");
+ 
+    if (!root_dir.executable ())
+      throw std::string ("The '--data' directory is not executable.");
+ 
+    // Create the data structure.
+    Directory sub (root_dir);
+    sub.cd ();
+    sub += "orgs";
+    if (!sub.create ())
+      throw std::string ("Could not create '") + sub._data + "'.";
+
+    // TODO Dump the config file?
   }
 
   return status;
