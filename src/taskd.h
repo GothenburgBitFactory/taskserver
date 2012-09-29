@@ -52,7 +52,6 @@ int taskd_runExtension (const std::string&, const std::string&, Config&, bool);
 int taskd_runExtension (const std::string&, const std::string&, std::string&, Config&);
 int taskd_runHook (const std::string&, const std::string&, Log&, Config&);
 
-void taskd_requireConfiguration (Config&);
 void taskd_requireSetting (Config&, const std::string&);
 void taskd_requireVersion (const Msg&, const std::string&);
 bool taskd_at_least (const std::string&, const std::string&);

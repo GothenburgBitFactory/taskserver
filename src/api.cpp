@@ -218,15 +218,6 @@ int taskd_runHook (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fail is no configuration exists.
-void taskd_requireConfiguration (Config& config)
-{
-  if (config._original_file._data == "" ||
-      !config._original_file.exists ())
-    throw std::string ("ERROR: No configuration file found - you must first initialize this project.");
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void taskd_requireSetting (Config& config, const std::string& name)
 {
   if (config.get (name) == "")
@@ -422,8 +413,6 @@ bool taskd_resendMessage (Config& config, const std::string& msgFile)
 ////////////////////////////////////////////////////////////////////////////////
 void taskd_resume (Config& config)
 {
-  taskd_requireConfiguration (config);
-
   // Get a list of spooled messages, in send order.
   Directory outbox (
     Directory (config.get ("scm.config.dir")).parent () + "/.taskd/outbox");
