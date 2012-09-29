@@ -76,7 +76,14 @@ int command_init (Config& config, const std::vector <std::string>& args)
   if (!sub.create ())
     throw std::string ("ERROR: Could not create '") + sub._data + "'.";
 
-  // TODO Dump the config file?
+  // Dump the config file?
+  config._original_file = root_dir._data + "/config";
+  if (config.dirty ())
+  {
+    config.save ();
+    if (verbose)
+      std::cout << "Created " << std::string (config._original_file) << "\n";
+  }
 
   return status;
 }
