@@ -47,7 +47,7 @@ int status_statistics (Config& config)
   request.set ("time", Date ().toISO ());
 
   Msg response;
-  if (taskd_sendMessage (config, "central.server", request, response))
+  if (taskd_sendMessage (config, "server", request, response))
   {
     std::vector <std::string> names;
     response.all (names);
@@ -69,7 +69,7 @@ int status_statistics (Config& config)
   }
   else
   {
-    std::cout << Color ("red").colorize ("ERROR: Central server not responding.") << "\n";
+    std::cout << Color ("red").colorize ("ERROR: Task server not responding.") << "\n";
     status = 1;
   }
 */

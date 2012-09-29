@@ -128,7 +128,7 @@ void Daemon::handler (const std::string& input, std::string& output)
          !input[3]))
       throw 401;
 
-    unsigned int request_limit = (unsigned) _config.getInteger ("central.request.limit");
+    unsigned int request_limit = (unsigned) _config.getInteger ("request.limit");
     if (request_limit > 0 &&
         input.length () >= request_limit)
       throw 504;
@@ -296,7 +296,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
   try
   {
-    log.setFile (config.get ("central.log"));
+    log.setFile (config.get ("log"));
     log.write (std::string ("==== ")
                + PACKAGE_STRING
                + " "
@@ -309,26 +309,26 @@ int command_server (Config& config, const std::vector <std::string>& args)
     if (debug)
       log.write ("Debug mode");
 
-    std::string centralServer = config.get ("central.server");
-    std::string::size_type colon = centralServer.find (':');
+    std::string serverDetails = config.get ("server");
+    std::string::size_type colon = serverDetails.find (':');
     if (colon == std::string::npos)
-      throw std::string ("ERROR: Malformed configuration setting 'central.server'");
+      throw std::string ("ERROR: Malformed configuration setting 'server'");
 
-    int port = strtoimax (centralServer.substr (colon + 1).c_str (), NULL, 10);
+    int port = strtoimax (serverDetails.substr (colon + 1).c_str (), NULL, 10);
 
     // Create a taskd server object.
     Daemon server       (config);
     server.setLog        (&log);
     server.setPort       (port);
-    server.setQueueSize  (config.getInteger ("central.queue"));
-    server.setLimit      (config.getInteger ("central.request.limit"));
-    server.setLogClients (config.getBoolean ("central.ip.log"));
+    server.setQueueSize  (config.getInteger ("queue.size"));
+    server.setLimit      (config.getInteger ("request.limit"));
+    server.setLogClients (config.getBoolean ("ip.log"));
 
     // Optional daemonization.
     if (daemon)
     {
       server.setDaemon   ();
-      server.setPidFile  (config.get ("central.pid.file"));
+      server.setPidFile  (config.get ("pid.file"));
     }
 
     // It just runs until you kill it.

@@ -69,6 +69,14 @@ int command_init (Config& config, const std::vector <std::string>& args)
   if (!root_dir.executable ())
     throw std::string ("ERROR: The '--data' directory is not executable.");
  
+  // Provide some defaults and overrides.
+  if (config.get ("log")            == "") config.set ("log",            "/tmp/taskd.log");
+  if (config.get ("server")         == "") config.set ("server",         "localhost:6544");
+  if (config.get ("queue.size")     == "") config.set ("queue.size",     "10");
+  if (config.get ("pid.file")       == "") config.set ("pid.file",       "/tmp/taskd.pid");
+  if (config.get ("ip.log")         == "") config.set ("ip.log",         "on");
+  if (config.get ("request.limit")  == "") config.set ("request.limit",  "1048576");
+
   // Create the data structure.
   Directory sub (root_dir);
   sub.cd ();
