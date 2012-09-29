@@ -256,8 +256,6 @@ int command_server (Config& config, const std::vector <std::string>& args)
 {
   int status = 0;
 
-  taskd_resume (config);
-
   // Standard argument processing.
   bool verbose     = true;
   bool debug       = false;

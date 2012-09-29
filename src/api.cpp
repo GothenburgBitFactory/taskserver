@@ -411,20 +411,6 @@ bool taskd_resendMessage (Config& config, const std::string& msgFile)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void taskd_resume (Config& config)
-{
-  // Get a list of spooled messages, in send order.
-  Directory outbox (
-    Directory (config.get ("scm.config.dir")).parent () + "/.taskd/outbox");
-  std::vector <std::string> spooled = outbox.list ();
-  std::sort (spooled.begin (), spooled.end ());
-
-  std::vector <std::string>::iterator i;
-  for (i = spooled.begin (); i != spooled.end (); ++i)
-    taskd_resendMessage (config, *i);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void taskd_renderMap (
   const std::map <std::string, std::string>& data,
   const std::string& title1,
