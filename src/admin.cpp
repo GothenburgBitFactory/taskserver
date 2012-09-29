@@ -131,11 +131,11 @@ int command_add (Config& config, const std::vector <std::string>& args)
 
   // Verify that root exists.
   if (root == "")
-    throw std::string ("The '--data' option is required.");
+    throw std::string ("ERROR: The '--data' option is required.");
 
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string ("The '--data' path does not exist.");
+    throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (positional.size () < 1)
     throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
