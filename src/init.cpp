@@ -51,30 +51,30 @@ int command_init (Config& config, const std::vector <std::string>& args)
 
   // Verify that root exists.
   if (root == "")
-    throw std::string ("The '--data' option is required.");
+    throw std::string ("ERROR: The '--data' option is required.");
 
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string ("The '--data' path does not exist.");
+    throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (!root_dir.is_directory ())
-     throw std::string ("The '--data' path is not a directory.");
+     throw std::string ("ERROR: The '--data' path is not a directory.");
  
   if (!root_dir.readable ())
-    throw std::string ("The '--data' directory is not readable.");
+    throw std::string ("ERROR: The '--data' directory is not readable.");
  
   if (!root_dir.writable ())
-    throw std::string ("The '--data' directory is not writable.");
+    throw std::string ("ERROR: The '--data' directory is not writable.");
  
   if (!root_dir.executable ())
-    throw std::string ("The '--data' directory is not executable.");
+    throw std::string ("ERROR: The '--data' directory is not executable.");
  
   // Create the data structure.
   Directory sub (root_dir);
   sub.cd ();
   sub += "orgs";
   if (!sub.create ())
-    throw std::string ("Could not create '") + sub._data + "'.";
+    throw std::string ("ERROR: Could not create '") + sub._data + "'.";
 
   // TODO Dump the config file?
 
