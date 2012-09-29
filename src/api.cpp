@@ -453,69 +453,6 @@ void taskd_renderMap (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool taskd_allow (
-  const std::string& project,
-  const std::vector <std::string>& allow,
-  const std::vector <std::string>& deny,
-  Log& log,
-  Config& config)
-{
-  std::vector <std::string>::const_iterator i;
-  for (i = deny.begin (); i != deny.end (); ++i)
-  {
-    // If deny contains 'none', pass.
-    if (compare (*i, "none", false))
-      break;
-
-    // If deny contains 'all', fail and return.
-    if (compare (*i, "all", false))
-    {
-      if (config.getBoolean ("debug"))
-        log.format ("DEBUG work '%s' denied by 'all'", project.c_str ());
-      return false;
-    }
-
-    // If project is specifically denied.
-    if (compare (*i, project, false))
-    {
-      if (config.getBoolean ("debug"))
-        log.format ("DEBUG work '%s' denied", project.c_str ());
-      return false;
-    }
-  }
-
-  for (i = allow.begin (); i != allow.end (); ++i)
-  {
-    // If allow contains 'none', stop.
-    if (compare (*i, "none", false))
-    {
-      if (config.getBoolean ("debug"))
-        log.format ("DEBUG work '%s' not allowed by 'none'", project.c_str ());
-      return false;
-    }
-
-    // If allow contains 'all', or matches the project, pass.
-    if (compare (*i, "all", false))
-    {
-      if (config.getBoolean ("debug"))
-        log.format ("DEBUG work '%s' allowed by 'all'", project.c_str ());
-      return true;
-    }
-
-    if (compare (*i, project, false))
-    {
-      if (config.getBoolean ("debug"))
-        log.format ("DEBUG work '%s' allowed", project.c_str ());
-      return true;
-    }
-  }
-
-  if (config.getBoolean ("debug"))
-    log.format ("DEBUG work neither denied nor allowed '%s'", project.c_str ());
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // In order to match, the two messages must not differ in the intersection.
 bool taskd_match (
   const Msg& project,
