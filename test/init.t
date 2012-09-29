@@ -28,7 +28,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # Check for required --data option.
 my $output = qx{../src/taskd init 2>&1};
@@ -58,8 +58,9 @@ like ($output, qr/^ERROR: The '--data' directory is not executable\./, "'taskd i
 qx{chmod +x $data};
 $output = qx{../src/taskd init --data $data 2>&1};
 unlike ($output, qr/^ERROR/, "'taskd init --data $data' - no errors");
-ok (-d $data, "$data exists and is a directory");
-ok (-d $data.'/orgs', "$data/orgs exists and is a directory");
+ok (-d $data,                "$data exists and is a directory");
+ok (-d $data.'/orgs',        "$data/orgs exists and is a directory");
+ok (-f $data.'/config',      "$data/config exists and is a file");
 
 # Cleanup.
 qx{rm -rf $data};
