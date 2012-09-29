@@ -75,6 +75,10 @@ int main (int argc, const char** argv)
       Color bold ("bold");
       std::cout << "\n"
                 << bold.colorize (PACKAGE_STRING)
+#ifdef HAVE_COMMIT
+                << " "
+                << COMMIT
+#endif
                 << " built for "
 
 #if defined (DARWIN)
