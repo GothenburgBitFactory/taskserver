@@ -50,7 +50,7 @@ public:
 
   static std::string cwd ();
   bool up ();
-  int cd () const;
+  bool cd () const;
 
 private:
   void list (const std::string&, std::vector <std::string>&, bool);
