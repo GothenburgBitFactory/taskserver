@@ -88,12 +88,15 @@ Daemon::Daemon (Config& settings)
   _errors[401] = "Unsupported encoding";
   //_errors[420] = "Server temporarily unavailable";
   //_errors[430] = "Access denied";
+  //_errors[431] = "Account suspended";
+  //_errors[432] = "Account terminated";
 
   _errors[500] = "Syntax error in request";
   //_errors[501] = "Syntax error, illegal parameters";
   _errors[502] = "Not implemented";
   //_errors[503] = "Command parameter not implemented";
   _errors[504] = "Request too big";
+  _errors[531] = "Account terminated";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +263,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
   bool verbose     = true;
   bool debug       = false;
   bool daemon      = false;
-  bool ssl         = true;
+  bool use_ssl     = true;
   std::string root = "";
 
   std::vector <std::string>::const_iterator i;
@@ -270,8 +273,8 @@ int command_server (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("--debug",  *i, 3)) debug   = true;
     else if (closeEnough ("--daemon", *i, 3)) daemon  = true;
     else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (closeEnough ("--ssl",    *i, 3)) ssl     = true;
-    else if (closeEnough ("--nossl",  *i, 3)) ssl     = false;
+    else if (closeEnough ("--ssl",    *i, 3)) use_ssl = true;
+    else if (closeEnough ("--nossl",  *i, 3)) use_ssl = false;
     else if (taskd_applyOverride (config, *i))   ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
@@ -328,7 +331,24 @@ int command_server (Config& config, const std::vector <std::string>& args)
       server.setPidFile  (config.get ("central.pid.file"));
     }
 
-    server.beginServer ();
+    // It just runs until you kill it.
+/*
+    if (use_ssl)
+    {
+      // Resolve paths that may include ~.
+      File cert (config.get ("certificate_file"));
+      server.setCertFile (cert._data);
+
+      File key (config.get ("key_file"));
+      server.setKeyFile (key._data);
+
+      server.beginSSLServer ();
+    }
+    else
+*/
+    {
+      server.beginServer ();
+    }
   }
 
   catch (std::string& error)
