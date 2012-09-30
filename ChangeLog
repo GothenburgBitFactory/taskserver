@@ -8,14 +8,16 @@
 
 0.8.0 ()
 
+------ current release ---------------------------
+
 0.7.0 ()
 - Added program shell.
 - Added SSL support.
 - Added server command, responding to 'statistics' and 'sync' requests.
 - Added debug 'client' command.
-- Equaled functionality of original codebase.
+- Added 'add' command.
+- Equalled functionality of original codebase.
 
------- current release ---------------------------
 ------ old releases ------------------------------
 
 Project restarted 2012-09-26

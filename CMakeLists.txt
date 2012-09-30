@@ -6,7 +6,7 @@ include (CheckStructHasMember)
 set (HAVE_CMAKE true)
 
 project (taskd)
-set (PROJECT_VERSION "0.7.0")
+set (PROJECT_VERSION "0.8.0")
 
 SET (TASKD_MAN1DIR share/man/man1  CACHE STRING "Installation directory for man pages, section 1")
 SET (TASKD_DOCDIR  share/doc/taskd CACHE STRING "Installation directory for doc files")

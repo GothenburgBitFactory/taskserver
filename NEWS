@@ -1,5 +1,5 @@
 
-New Features in taskd 0.7.0
+New Features in taskd 0.8.0
 
   - Optional SSL support.  May be turned off for debugging or private use, but
     is not a good idea.
@@ -7,7 +7,7 @@ New Features in taskd 0.7.0
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
-New configuration options in taskd 0.7.0
+New configuration options in taskd 0.8.0
 
   - They are all new
 
@@ -15,7 +15,7 @@ New configuration options in taskd 0.7.0
 
 Taskd has been built and tested on the following configurations:
 
-  * OS X 10.8 Mountain Lion
+  * OS X 10.7 Lion
 
 ---
 
