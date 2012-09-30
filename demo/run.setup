@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo '# Cleanup'
+DATA=/tmp/taskd.data
+rm -rf $DATA
+mkdir $DATA
+
+echo
+echo '# taskd init --data $DATA'
+./taskd init --data $DATA
+find $DATA
+
+echo
+echo '# taskd add --data $DATA org ORG'
+./taskd add --data $DATA org ORG
+find $DATA
+
+echo
+echo '# taskd add --data $DATA org "ABC Corp"'
+./taskd add --data $DATA org 'ABC Corp'
+find $DATA
+
+# Install the cert and key.
+echo
+echo '# Cert and key installation'
+echo "certificate=$DATA/server.crt" >> $DATA/config
+echo "key=$DATA/server.key"         >> $DATA/config
+cp ../cert/server.crt $DATA
+cp ../cert/server.key $DATA
+find $DATA
+
+echo
+echo "# $DATA/config"
+cat $DATA/config
+

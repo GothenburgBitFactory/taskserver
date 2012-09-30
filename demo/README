@@ -1,0 +1,44 @@
+Demonstration
+-------------
+
+This is used for development, testing and debugging.  There are scripts:
+
+  run.setup
+    Sets up a task server instance using /tmp/taskd.data as the data root, and
+    /tmp/taskd.log as the log file.  Listens on post 6544, in plaintext mode.
+
+  run.server
+    Clears the log file, and launches the server.
+
+There are also data files, which are used as requests and send as-is to a
+running server instance.  The files are:
+
+  stats.0
+    Requests server statistics.
+
+  sync.1
+    Requests a sync, but provides no synch key, and no transactions, therefore
+    simulating an existing client user that is syncing for the first time.
+
+The data files are numbered (*.0, *.1 ...) which indicates the sequence in which
+they are expected to be sent as requests.  They are sent using the 'client'
+command:
+
+  taskd client localhost:6544 stats.0
+  taskd client localhost:6544 sync.1
+
+Example Session
+---------------
+
+Follow these commands for a sample session:
+
+  $ ./run.setup
+  $ ./run.server &
+  $ taskd client localhost:6544 stats.0
+  ...
+  $ taskd client localhost:6544 sync.1
+  ...
+  $ fg
+  ^C
+
+---
