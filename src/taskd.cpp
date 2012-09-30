@@ -140,7 +140,7 @@ int main (int argc, const char** argv)
 #endif
                 << "\n\n";
 
-  // Compiler.
+      // Compiler.
       std::cout << "[1mCompiler[0m\n"
 #ifdef __VERSION__
                 << "   Version: " << __VERSION__ << "\n"

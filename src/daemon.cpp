@@ -263,7 +263,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
   bool verbose     = true;
   bool debug       = false;
   bool daemon      = false;
-  bool use_ssl     = true;
+  bool use_ssl     = false;
   std::string root = "";
 
   std::vector <std::string>::const_iterator i;
@@ -288,6 +288,9 @@ int command_server (Config& config, const std::vector <std::string>& args)
   if (!root_dir.exists ())
     throw std::string ("ERROR: The '--data' path does not exist.");
 
+  // Load the config file.
+  config.load (root_dir._data + "/config");
+
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);
   config.set ("debug", debug);
@@ -311,13 +314,14 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
     std::string serverDetails = config.get ("server");
     std::string::size_type colon = serverDetails.find (':');
+
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'");
 
     int port = strtoimax (serverDetails.substr (colon + 1).c_str (), NULL, 10);
 
     // Create a taskd server object.
-    Daemon server       (config);
+    Daemon server        (config);
     server.setLog        (&log);
     server.setPort       (port);
     server.setQueueSize  (config.getInteger ("queue.size"));
@@ -332,9 +336,9 @@ int command_server (Config& config, const std::vector <std::string>& args)
     }
 
     // It just runs until you kill it.
-/*
     if (use_ssl)
     {
+/*
       // Resolve paths that may include ~.
       File cert (config.get ("certificate_file"));
       server.setCertFile (cert._data);
@@ -343,9 +347,10 @@ int command_server (Config& config, const std::vector <std::string>& args)
       server.setKeyFile (key._data);
 
       server.beginSSLServer ();
+*/
+      std::cout << "ERROR: SSL not implemented.\n";
     }
     else
-*/
     {
       server.beginServer ();
     }
