@@ -114,6 +114,20 @@ int command_help (Config& config, const std::vector <std::string>& args)
                   << "  --NAME=VALUE   Temporary configuration override\n"
                   << "\n";
     }
+    else if (closeEnough ("add", args[1], 3))
+    {
+        std::cout << "\n"
+                  << "taskd add [options] org <org>\n"
+                  << "taskd add [options] group <org> <group>\n"
+                  << "taskd add [options] user <org> <user>\n"
+                  << "\n"
+                  << "Creates a new organization, group or user.\n"
+                  << "\n"
+                  << "Options:\n"
+                  << "  --quiet        Turns off verbose output\n"
+                  << "  --NAME=VALUE   Temporary configuration override\n"
+                  << "\n";
+    }
     else
       std::cout << "No help for '" << args[1] << "'.\n";
   }

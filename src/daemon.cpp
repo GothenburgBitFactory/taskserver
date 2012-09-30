@@ -234,7 +234,9 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
                   _client_address.c_str (),
                   _client_port);
 
-  // TODO Logic goes here.
+
+  // TODO Sync logic goes here.
+
 
   out.set ("code",   502);
   out.set ("status", taskd_error (502));

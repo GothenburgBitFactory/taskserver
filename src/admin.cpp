@@ -93,7 +93,13 @@ static bool add_group (
   const std::string& org,
   const std::string& group)
 {
-  return false;
+  Directory new_group (root);
+  new_group += "orgs";
+  new_group += org;
+  new_group += "groups";
+  new_group += group;
+
+  return new_group.create ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,11 +108,39 @@ static bool add_user (
   const std::string& org,
   const std::string& user)
 {
+  Directory new_user (root);
+  new_user += "orgs";
+  new_user += org;
+  new_user += "users";
+  new_user += user;
+
+  if (new_user.create ())
+  {
+    // TODO Generate new KEY
+    // TODO Store KEY in <new_user>/config
+
+    return true;
+  }
+
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd add {org,group,user} name
+static bool suspend_node (const Directory& node)
+{
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static bool unsuspend_node (const Directory& node)
+{
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// taskd add org   <org>
+// taskd add group <org> <group>
+// taskd add user  <org> <user>
 int command_add (Config& config, const std::vector <std::string>& args)
 {
   int status = 0;
@@ -140,30 +174,62 @@ int command_add (Config& config, const std::vector <std::string>& args)
   if (positional.size () < 1)
     throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
 
+  // Create an organization.
+  //   org <org>
   if (closeEnough ("org", positional[0], 3))
   {
     if (positional.size () < 2)
-      throw std::string ("ERROR: Organization name(s) not specified.");
+      throw std::string ("Usage: taskd add [options] org <org>");
 
     for (int i = 1; i < positional.size (); ++i)
     {
       if (is_org (root_dir, positional[i]))
-        throw std::string ("ERROR: Organization '") + positional[1] + "' already exists.";
+        throw std::string ("ERROR: Organization '") + positional[i] + "' already exists.";
 
       if (!add_org (root_dir, positional[i]))
-        throw std::string ("ERROR: Failed to create organization '") + positional[1] + "'.";
+        throw std::string ("ERROR: Failed to create organization '") + positional[i] + "'.";
     }
   }
 
-/*
+  // Create a group.
+  //   group <org> <group>
   else if (closeEnough ("group", positional[0], 3))
   {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd add [options] group <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (is_group (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Group '") + positional[i] + "' already exists.";
+
+      if (!add_group (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Failed to create group '") + positional[i] + "'.";
+    }
   }
 
+  // Create a user.
+  //   user <org> <user>
   else if (closeEnough ("user", positional[0], 3))
   {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd add [options] user <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (is_user (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: User '") + positional[i] + "' already exists.";
+
+      if (!add_user (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Failed to create user '") + positional[i] + "'.";
+    }
   }
-*/
 
   else
     throw std::string ("ERROR: Unrecognized argument '") + positional[0] + "'";
