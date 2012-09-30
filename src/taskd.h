@@ -60,7 +60,6 @@ bool taskd_createDirectory (Directory&, bool);
 
 bool taskd_sendMessage (Config&, const std::string&, const Msg&);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
-bool taskd_resendMessage (Config&, const std::string&);
 void taskd_renderMap (const std::map <std::string, std::string>&, const std::string&, const std::string&);
 
 #endif

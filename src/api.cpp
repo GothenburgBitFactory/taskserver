@@ -273,7 +273,9 @@ bool taskd_sendMessage (
   std::string server = destination.substr (0, colon);
   int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
 
+/*
   try
+*/
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
@@ -290,9 +292,11 @@ bool taskd_sendMessage (
     return true;
   }
 
+/*
   catch (std::string& error)
   {
   }
+*/
 
   // Indicate message spooled.
   return false;
@@ -313,7 +317,9 @@ bool taskd_sendMessage (
   std::string server = destination.substr (0, colon);
   int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
 
+/*
   try
+*/
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
@@ -329,70 +335,13 @@ bool taskd_sendMessage (
     return true;
   }
 
+/*
   catch (std::string& error)
   {
   }
+*/
 
   // Indicate message spooled.
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool taskd_resendMessage (Config& config, const std::string& msgFile)
-{
-  std::string to = "";
-  std::string::size_type last_slash = msgFile.rfind ('/');
-  if (last_slash != std::string::npos)
-  {
-    std::string::size_type second_last_dot = msgFile.rfind ('.');
-    if (second_last_dot != std::string::npos)
-    {
-      second_last_dot = msgFile.rfind ('.', second_last_dot - 1);
-      if (second_last_dot != std::string::npos)
-        to = msgFile.substr (last_slash + 1, second_last_dot - last_slash - 1);
-    }
-  }
-
-  if (to == "")
-    return false;  // TODO Error?
-
-  // Read the message from the file.
-  std::string message;
-  File::read (msgFile, message);
-
-  std::string destination = config.get (to);
-  std::string::size_type colon = destination.find (':');
-  if (colon == std::string::npos)
-    throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
-
-  std::string server = destination.substr (0, colon);
-  int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
-
-  try
-  {
-    Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    s.connect (server, port);
-    s.write (message + "\r\n");
-
-    std::string response;
-    s.read (response);
-    s.close ();
-
-    Msg in;
-    in.parse (response);
-
-    File::remove (msgFile);
-
-    // Indicate message sent.
-    return true;
-  }
-
-  catch (std::string& error)
-  {
-    // No need to spool, no need to delete.
-  }
-
-  // Indicate message not resent.
   return false;
 }
 
