@@ -27,6 +27,42 @@ command:
   taskd client localhost:6544 stats.0
   taskd client localhost:6544 sync.1
 
+
+Build / Install
+---------------
+
+Follow these command to build and install taskd.  Note that the tests are all
+expected to pass.  If they do not all pass, do not install taskd.
+
+  $ git clone git://tasktools.org/taskd.git taskd.git
+  ...
+  $ cd task.git
+  $ cmake .
+  ...
+  $ make
+  ...
+  $ cd test
+  $ make
+  ...
+  $ ./run_all
+  ...
+  $ cd ..
+  $ sudo make install
+
+Run these commands to verify your installation:
+
+  $ taskd --version
+  ...
+  $ taskd --diagnostics
+  ...
+  $ taskd
+  ...
+
+You should see a version, copyright and license information.  The diagnostics
+option provides details about the build environment.  The last command should
+present a list of commands that can be run.
+
+
 Example Session
 ---------------
 
