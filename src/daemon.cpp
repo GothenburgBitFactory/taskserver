@@ -148,8 +148,8 @@ void Daemon::handler (const std::string& input, std::string& output)
 
     // Handle or reject all message types.
     std::string type = in.get ("type");
-         if (type == "statistics")      handle_statistics      (in, out);
-    else if (type == "sync")            handle_sync            (in, out);
+         if (type == "statistics") handle_statistics (in, out);
+    else if (type == "sync")       handle_sync       (in, out);
     else
       throw 500;
 

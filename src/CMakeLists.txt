@@ -6,6 +6,7 @@ include_directories (${CMAKE_SOURCE_DIR}
 add_executable (taskd_executable taskd.cpp
                                  admin.cpp
                                  api.cpp
+                                 client.cpp
                                  Color.cpp      Color.h
                                  ConfigFile.cpp ConfigFile.h
                                  config.cpp
