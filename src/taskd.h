@@ -64,5 +64,7 @@ bool taskd_sendMessage (Config&, const std::string&, const Msg&);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
 void taskd_renderMap (const std::map <std::string, std::string>&, const std::string&, const std::string&);
 
+std::string taskd_error (const int);
+
 #endif
 ////////////////////////////////////////////////////////////////////////////////

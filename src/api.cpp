@@ -41,6 +41,42 @@
 #include <cmake.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+static struct
+{
+  int code;
+  std::string error;
+} errors[] =
+{
+  // 2xx Success.
+  { 200, "Ok" },
+  { 201, "No change"},
+  { 202, "Decline"},
+
+  // 3xx Partial success.
+  { 300, "Deprecated request type"},
+  { 301, "Redirect"},
+  { 302, "Retry"},
+
+  // 4xx Client error.
+  { 401, "Failure"},
+  { 400, "Malformed data"},
+  { 401, "Unsupported encoding"},
+  { 420, "Server temporarily unavailable"},
+  { 430, "Access denied"},
+  { 431, "Account suspended"},
+  { 432, "Account terminated"},
+
+  // 5xx Server error.
+  { 500, "Syntax error in request"},
+  { 501, "Syntax error, illegal parameters"},
+  { 502, "Not implemented"},
+  { 503, "Command parameter not implemented"},
+  { 504, "Request too big"},
+};
+
+#define NUM_ERRORS (sizeof (errors) / sizeof (errors[0]))
+
+////////////////////////////////////////////////////////////////////////////////
 bool taskd_applyOverride (Config& config, const std::string& arg)
 {
   // If the arg looks like '--NAME=VALUE' or '--NAME:VALUE', apply it to config.
@@ -393,6 +429,16 @@ void taskd_renderMap (
 
     std::cout << "\n";
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string taskd_error (const int code)
+{
+  for (int i = 0; i < NUM_ERRORS; ++i)
+    if (code == errors[i].code)
+      return errors[i].error;
+
+  return "[Missing error code]";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -61,7 +61,6 @@ private:
   double _max_time;
   long _bytes_in;
   long _bytes_out;
-  std::map <int, std::string> _errors;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,28 +74,6 @@ Daemon::Daemon (Config& settings)
 , _bytes_in (0)
 , _bytes_out (0)
 {
-  _errors[200] = "Ok";
-  _errors[201] = "No change";
-  _errors[202] = "Decline";
-
-  //_errors[300] = "Deprecated request type";
-  //_errors[301] = "Redirect";
-  //_errors[302] = "Retry";
-
-  //_errors[401] = "Failure";
-  //_errors[400] = "Malformed data";
-  _errors[401] = "Unsupported encoding";
-  //_errors[420] = "Server temporarily unavailable";
-  //_errors[430] = "Access denied";
-  //_errors[431] = "Account suspended";
-  //_errors[432] = "Account terminated";
-
-  _errors[500] = "Syntax error in request";
-  //_errors[501] = "Syntax error, illegal parameters";
-  _errors[502] = "Not implemented";
-  //_errors[503] = "Command parameter not implemented";
-  _errors[504] = "Request too big";
-  _errors[531] = "Account terminated";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,11 +148,11 @@ void Daemon::handler (const std::string& input, std::string& output)
     ++_error_count;
     Msg err;
     err.set ("code", e);
-    err.set ("status", _errors[e]);
+    err.set ("status", taskd_error (e));
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] ERROR %d %s", _txn_count, e, _errors[e].c_str ());
+      _log->format ("[%d] ERROR %d %s", _txn_count, e, taskd_error (e).c_str ());
   }
 
   // Handlers can throw a string, for a 500 code with specific text.
@@ -241,7 +218,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   out.set ("tps",                          tps);
 
   out.set ("code",                         200);
-  out.set ("status",                       _errors[200]);
+  out.set ("status",                       taskd_error (200));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +235,9 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
                   _client_port);
 
   // TODO Logic goes here.
+
+  out.set ("code",   502);
+  out.set ("status", taskd_error (502));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
