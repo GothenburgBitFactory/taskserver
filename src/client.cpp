@@ -54,6 +54,7 @@ int command_client (Config& config, const std::vector <std::string>& args)
     File file (args[i]);
     std::string contents;
     file.read (contents);
+    std::cout << ">>> " << args[i] << "\n";
 
     Msg request;
     request.parse (contents);
@@ -63,7 +64,8 @@ int command_client (Config& config, const std::vector <std::string>& args)
     if (! taskd_sendMessage (config, "server", request, response))
       throw std::string ("ERROR: Task server not responding.");
 
-    std::cout << response.serialize ();
+    std::cout << "<<<\n"
+              << response.serialize ();
   }
 
   return 0;
