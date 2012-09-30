@@ -20,6 +20,16 @@ echo '# taskd add --data $DATA org "ABC Corp"'
 ../src/taskd add --data $DATA org 'ABC Corp'
 find $DATA
 
+echo
+echo '# taskd add --data $DATA group "ORG" "Group Name"'
+../src/taskd add --data $DATA group 'ORG' 'Group Name'
+find $DATA
+
+echo
+echo '# taskd add --data $DATA user "ORG" "User Name"'
+../src/taskd add --data $DATA user 'ORG' 'User Name'
+find $DATA
+
 # Install the cert and key.
 echo
 echo '# Cert and key installation'
