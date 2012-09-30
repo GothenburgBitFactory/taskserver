@@ -7,6 +7,8 @@ taskd \- Task Server
 .B taskd <command> [options] [<args>]
 .br
 .B taskd --version
+.br
+.B taskd --diagnostics
 
 .SH DESCRIPTION
 Taskd is ...
@@ -18,9 +20,9 @@ which can be extended via plugins to add functionality.
 The commands are:
 
 .TP
-.B taskd init [--nohooks] [OPTIONS]
-Performs a one-time initialization of the project.  Detects the SCM system in
-use, which includes 'none'.  Creates local data structures.
+.B taskd init --data <root> [OPTIONS]
+Performs a one-time initialization of the task server instance.  Creates the
+bare data structure.
 
 .TP
 .B taskd help <command> [OPTIONS]
@@ -34,6 +36,38 @@ use, which includes 'none'.  Creates local data structures.
 .TP
 .B taskd server [OPTIONS]
 Starts the daemon.
+
+.TP
+.B taskd add --data <root> org <org> 
+.TP
+.B taskd add --data <root> group <org> <group>
+.TP
+.B taskd add --data <root> user <org> <user>
+Adds organizations, groups and users.
+
+.TP
+.B taskd remove --data <root> org <org> 
+.TP
+.B taskd remove --data <root> group <org> <group>
+.TP
+.B taskd remove --data <root> user <org> <user>
+Removes organizations, groups and users.
+
+.TP
+.B taskd suspend --data <root> org <org> 
+.TP
+.B taskd suspend --data <root> group <org> <group>
+.TP
+.B taskd suspend --data <root> user <org> <user>
+Suspends organizations, groups and users.
+
+.TP
+.B taskd resume --data <root> org <org> 
+.TP
+.B taskd resume --data <root> group <org> <group>
+.TP
+.B taskd resume --data <root> user <org> <user>
+Resumes organizations, groups and users.
 
 .SH COMMON OPTIONS
 Most commands support the following options:

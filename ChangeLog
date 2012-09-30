@@ -1,7 +1,19 @@
+1.0.0 ()
+
+1.0.0beta ()
+
+1.0.0alpha ()
+
+0.9.0 ()
+
+0.8.0 ()
 
 0.7.0 ()
 - Added program shell.
 - Added SSL support.
+- Added server command, responding to 'statistics' and 'sync' requests.
+- Added debug 'client' command.
+- Equaled functionality of original codebase.
 
 ------ current release ---------------------------
 ------ old releases ------------------------------
