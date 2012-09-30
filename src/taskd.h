@@ -58,6 +58,8 @@ void taskd_requireVersion (const Msg&, const std::string&);
 bool taskd_at_least (const std::string&, const std::string&);
 bool taskd_createDirectory (Directory&, bool);
 
+bool taskd_authenticate (Config&, Log&, const Msg&, Msg&);
+
 bool taskd_sendMessage (Config&, const std::string&, const Msg&);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
 void taskd_renderMap (const std::map <std::string, std::string>&, const std::string&, const std::string&);

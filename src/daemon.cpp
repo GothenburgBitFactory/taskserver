@@ -199,6 +199,9 @@ void Daemon::handler (const std::string& input, std::string& output)
 // Statistics request from dev.
 void Daemon::handle_statistics (const Msg& in, Msg& out)
 {
+  if (! taskd_authenticate (_config, *_log, in, out))
+    return;
+
   if (_log)
     _log->format ("[%d] 'statistics' from %s:%d",
                   _txn_count,
@@ -245,6 +248,9 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
 // Sync request.
 void Daemon::handle_sync (const Msg& in, Msg& out)
 {
+  if (! taskd_authenticate (_config, *_log, in, out))
+    return;
+
   if (_log)
     _log->format ("[%d] 'sync' from %s:%d",
                   _txn_count,
@@ -290,6 +296,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
   // Load the config file.
   config.load (root_dir._data + "/config");
+  config.set ("root", root_dir._data);
 
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);

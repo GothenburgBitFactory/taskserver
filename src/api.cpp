@@ -260,6 +260,22 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// If authentication fails, throws an exception, otherwise says nothing.
+bool taskd_authenticate (
+  Config& config,
+  Log& log,
+  const Msg& request,
+  Msg& response)
+{
+  // TODO Assert org exists.
+  // TODO Assert user exists.
+  // TODO Assert key matches.
+  // TODO Set status and code on error.
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool taskd_sendMessage (
   Config& config,
   const std::string& to,
@@ -273,9 +289,7 @@ bool taskd_sendMessage (
   std::string server = destination.substr (0, colon);
   int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
 
-/*
   try
-*/
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
@@ -292,11 +306,9 @@ bool taskd_sendMessage (
     return true;
   }
 
-/*
   catch (std::string& error)
   {
   }
-*/
 
   // Indicate message spooled.
   return false;
@@ -317,9 +329,7 @@ bool taskd_sendMessage (
   std::string server = destination.substr (0, colon);
   int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
 
-/*
   try
-*/
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
@@ -335,11 +345,9 @@ bool taskd_sendMessage (
     return true;
   }
 
-/*
   catch (std::string& error)
   {
   }
-*/
 
   // Indicate message spooled.
   return false;
