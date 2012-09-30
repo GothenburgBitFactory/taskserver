@@ -7,17 +7,17 @@ mkdir $DATA
 
 echo
 echo '# taskd init --data $DATA'
-./taskd init --data $DATA
+../src/taskd init --data $DATA
 find $DATA
 
 echo
 echo '# taskd add --data $DATA org ORG'
-./taskd add --data $DATA org ORG
+../src/taskd add --data $DATA org ORG
 find $DATA
 
 echo
 echo '# taskd add --data $DATA org "ABC Corp"'
-./taskd add --data $DATA org 'ABC Corp'
+../src/taskd add --data $DATA org 'ABC Corp'
 find $DATA
 
 # Install the cert and key.

@@ -38,6 +38,18 @@ int command_help (Config& config, const std::vector <std::string>& args)
   {
     if (closeEnough ("init", args[1], 3))
     {
+      std::cout << "\n"
+                << "taskd init --data <root> [options]\n"
+                << "\n"
+                << "Initializes a server instance at <root>.  Runs the server. "
+                << "Requires that the location of the data is specified:\n"
+                << "  --data         Specifies data location\n"
+                << "\n"
+                << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Debug mode generates lots of diagnostics\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("config", args[1], 3))
     {
@@ -89,6 +101,19 @@ int command_help (Config& config, const std::vector <std::string>& args)
                   << "  --NAME=VALUE   Temporary configuration override\n"
                   << "\n";
     }
+    else if (closeEnough ("client", args[1], 3))
+    {
+        std::cout << "\n"
+                  << "taskd client [options] <host:port> <file> [<file> ...]\n"
+                  << "\n"
+                  << "Sends <file> to task server on <host:port> and displays "
+                  << "the response.\n"
+                  << "\n"
+                  << "Options:\n"
+                  << "  --quiet        Turns off verbose output\n"
+                  << "  --NAME=VALUE   Temporary configuration override\n"
+                  << "\n";
+    }
     else
       std::cout << "No help for '" << args[1] << "'.\n";
   }
@@ -98,15 +123,16 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "taskd - Task Server\n"
               << VERSION << "\n"
               << "\n"
+              << "add            Add org/group/user\n"
+              << "client         Debug client\n"
               << "config         Modify and inspect configuration\n"
               << "help           Show detailed help\n"
               << "init           One-time project initialization\n"
+              << "remove         Remove org/group/user\n"
+              << "resume         Resume org/group/user\n"
               << "server         Run the server\n"
               << "status         Display taskd status\n"
-              << "add            Add org/group/user\n"
-              << "remove         Remove org/group/user\n"
               << "suspend        Suspend org/group/user\n"
-              << "resume         Resume org/group/user\n"
               << "\n";
   }
 
