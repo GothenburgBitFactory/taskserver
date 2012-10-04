@@ -135,13 +135,15 @@ static bool add_user (
 ////////////////////////////////////////////////////////////////////////////////
 static bool suspend_node (const Directory& node)
 {
-  return false;
+  File semaphore (node._data + "/suspended");
+  return semaphore.create ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool unsuspend_node (const Directory& node)
+static bool resume_node (const Directory& node)
 {
-  return false;
+  File semaphore (node._data + "/suspended");
+  return semaphore.remove ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +247,9 @@ int command_add (Config& config, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// taskd remove org   <org>
+// taskd remove group <org> <group>
+// taskd remove user  <org> <user>
 int command_remove (Config& config, const std::vector <std::string>& args)
 {
 
@@ -252,20 +257,203 @@ int command_remove (Config& config, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd add org   <org>
-// taskd add group <org> <group>
-// taskd add user  <org> <user>
+// taskd suspend org   <org>
+// taskd suspend group <org> <group>
+// taskd suspend user  <org> <user>
 int command_suspend (Config& config, const std::vector <std::string>& args)
 {
+  int status = 0;
 
-  return 0;
+  // Standard argument processing.
+  bool verbose     = true;
+  bool debug       = false;
+  std::string root = "";
+
+  std::vector <std::string> positional;
+
+  std::vector <std::string>::const_iterator i;
+  for (i = ++(args.begin ()); i != args.end (); ++i)
+  {
+         if (closeEnough ("--quiet",  *i, 3)) verbose = false;
+    else if (closeEnough ("--debug",  *i, 3)) debug   = true;
+    else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
+    else if (taskd_applyOverride (config, *i))   ;
+    else
+      positional.push_back (*i);
+  }
+
+  // Verify that root exists.
+  if (root == "")
+    throw std::string ("ERROR: The '--data' option is required.");
+
+  Directory root_dir (root);
+  if (!root_dir.exists ())
+    throw std::string ("ERROR: The '--data' path does not exist.");
+
+  if (positional.size () < 1)
+    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+
+  // Suspend an organization.
+  //   org <org>
+  if (closeEnough ("org", positional[0], 3))
+  {
+    if (positional.size () < 2)
+      throw std::string ("Usage: taskd suspend [options] org <org>");
+
+    for (int i = 1; i < positional.size (); ++i)
+    {
+      if (! is_org (root_dir, positional[i]))
+        throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
+
+      if (! suspend_node (root_dir._data + "/orgs/" + positional[i]))
+        throw std::string ("ERROR: Failed to suspend organization '") + positional[i] + "'.";
+    }
+  }
+
+  // Suspend a group.
+  //   group <org> <group>
+  else if (closeEnough ("group", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd suspend [options] group <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (! is_group (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
+
+      if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+        throw std::string ("ERROR: Failed to suspend group '") + positional[i] + "'.";
+    }
+  }
+
+  // Suspend a user.
+  //   user <org> <user>
+  else if (closeEnough ("user", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd suspend [options] user <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (! is_user (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
+
+      if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+        throw std::string ("ERROR: Failed to suspend user '") + positional[i] + "'.";
+    }
+  }
+
+  else
+    throw std::string ("ERROR: Unrecognized argument '") + positional[0] + "'";
+
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// taskd resume org   <org>
+// taskd resume group <org> <group>
+// taskd resume user  <org> <user>
 int command_resume (Config& config, const std::vector <std::string>& args)
 {
+  int status = 0;
 
-  return 0;
+  // Standard argument processing.
+  bool verbose     = true;
+  bool debug       = false;
+  std::string root = "";
+
+  std::vector <std::string> positional;
+
+  std::vector <std::string>::const_iterator i;
+  for (i = ++(args.begin ()); i != args.end (); ++i)
+  {
+         if (closeEnough ("--quiet",  *i, 3)) verbose = false;
+    else if (closeEnough ("--debug",  *i, 3)) debug   = true;
+    else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
+    else if (taskd_applyOverride (config, *i))   ;
+    else
+      positional.push_back (*i);
+  }
+
+  // Verify that root exists.
+  if (root == "")
+    throw std::string ("ERROR: The '--data' option is required.");
+
+  Directory root_dir (root);
+  if (!root_dir.exists ())
+    throw std::string ("ERROR: The '--data' path does not exist.");
+
+  if (positional.size () < 1)
+    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+
+  // Resume an organization.
+  //   org <org>
+  if (closeEnough ("org", positional[0], 3))
+  {
+    if (positional.size () < 2)
+      throw std::string ("Usage: taskd resume [options] org <org>");
+
+    for (int i = 1; i < positional.size (); ++i)
+    {
+      if (! is_org (root_dir, positional[i]))
+        throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
+
+      if (! resume_node (root_dir._data + "/orgs/" + positional[i]))
+        throw std::string ("ERROR: Failed to resume organization '") + positional[i] + "'.";
+    }
+  }
+
+  // Resume a group.
+  //   group <org> <group>
+  else if (closeEnough ("group", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd resume [options] group <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (! is_group (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
+
+      if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+        throw std::string ("ERROR: Failed to resume group '") + positional[i] + "'.";
+    }
+  }
+
+  // Resume a user.
+  //   user <org> <user>
+  else if (closeEnough ("user", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd resume [options] user <org> <user>");
+
+    if (! is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (int i = 2; i < positional.size (); ++i)
+    {
+      if (! is_user (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
+
+      if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+        throw std::string ("ERROR: Failed to resume user '") + positional[i] + "'.";
+    }
+  }
+
+  else
+    throw std::string ("ERROR: Unrecognized argument '") + positional[0] + "'";
+
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
