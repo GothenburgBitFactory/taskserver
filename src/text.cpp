@@ -26,11 +26,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <sstream>
+#include <iomanip>
 #include <algorithm>
 #include <strings.h>
 #include <string.h>
+#include <math.h>
 #include <utf8.h>
 #include <text.h>
+
+static void replace_positional (std::string&, const std::string&, const std::string&);
 
 ////////////////////////////////////////////////////////////////////////////////
 // UTF-8
@@ -311,6 +315,22 @@ std::string ucFirst (const std::string& input)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+const std::string str_replace (
+  std::string &str,
+  const std::string& search,
+  const std::string& replacement)
+{
+  std::string::size_type pos = 0;
+  while ((pos = str.find (search, pos)) != std::string::npos)
+  {
+    str.replace (pos, search.length (), replacement);
+    pos += replacement.length ();
+  }
+
+  return str;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 std::string printable (const std::string& input)
 {
   // Sanitize 'message'.
@@ -393,6 +413,95 @@ bool closeEnough (
     return compare (reference.substr (0, attempt.length ()), attempt, false);
 
   return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string::size_type find (
+  const std::string& text,
+  const std::string& pattern,
+  bool sensitive /*= true*/)
+{
+  // Implement a sensitive find, which is really just a loop withing a loop,
+  // comparing lower-case versions of each character in turn.
+  if (!sensitive)
+  {
+    // Handle empty pattern.
+    const char* p = pattern.c_str ();
+    size_t len = pattern.length ();
+    if (len == 0)
+      return 0;
+
+    // Evaluate these once, for performance reasons.
+    const char* t = text.c_str ();
+    const char* start = t;
+    const char* end = start + text.size ();
+
+    for (; t <= end - len; ++t)
+    {
+      int diff = 0;
+      for (size_t i = 0; i < len; ++i)
+        if ((diff = tolower (t[i]) - tolower (p[i])))
+          break;
+
+      // diff == 0 means there was no break from the loop, which only occurs
+      // when a difference is detected.  Therefore, the loop terminated, and
+      // diff is zero.
+      if (diff == 0)
+        return t - start;
+    }
+
+    return std::string::npos;
+  }
+
+  // Otherwise, just use std::string::find.
+  return text.find (pattern);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string::size_type find (
+  const std::string& text,
+  const std::string& pattern,
+  std::string::size_type begin,
+  bool sensitive /*= true*/)
+{
+  // Implement a sensitive find, which is really just a loop withing a loop,
+  // comparing lower-case versions of each character in turn.
+  if (!sensitive)
+  {
+    // Handle empty pattern.
+    const char* p = pattern.c_str ();
+    size_t len = pattern.length ();
+    if (len == 0)
+      return 0;
+
+    // Handle bad begin.
+    if (begin >= text.length ())
+      return std::string::npos;
+
+    // Evaluate these once, for performance reasons.
+    const char* start = text.c_str ();
+    const char* t = start + begin;
+    const char* end = start + text.size ();
+
+    for (; t <= end - len; ++t)
+    {
+      int diff = 0;
+      for (size_t i = 0; i < len; ++i)
+        if ((diff = tolower (t[i]) - tolower (p[i])))
+          break;
+
+      // diff == 0 means there was no break from the loop, which only occurs
+      // when a difference is detected.  Therefore, the loop terminated, and
+      // diff is zero.
+      if (diff == 0)
+        return t - start;
+    }
+
+    return std::string::npos;
+  }
+
+  // Otherwise, just use std::string::find.
+  return text.find (pattern, begin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -479,6 +588,15 @@ const std::string format (float value, int width, int precision)
   std::stringstream s;
   s.width (width);
   s.precision (precision);
+  if (0 < value && value < 1)
+  {
+    // For value close to zero, width - 2 (2 accounts for the first zero and
+    // the dot) is the number of digits after zero that are significant
+    double factor = 1;
+    for (int i = 2; i < width; i++)
+      factor *= 10;
+    value = roundf (value * factor) / factor;
+  }
   s << value;
   return s.str ();
 }
@@ -489,6 +607,15 @@ const std::string format (double value, int width, int precision)
   std::stringstream s;
   s.width (width);
   s.precision (precision);
+  if (0 < value && value < 1)
+  {
+    // For value close to zero, width - 2 (2 accounts for the first zero and
+    // the dot) is the number of digits after zero that are significant
+    double factor = 1;
+    for (int i = 2; i < width; i++)
+      factor *= 10;
+    value = round (value * factor) / factor;
+  }
   s << value;
   return s.str ();
 }
@@ -620,4 +747,42 @@ const std::string format (
   replace_positional (output, "{3}", arg3);
   return output;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+std::string leftJustify (const int input, const int width)
+{
+  std::stringstream s;
+  s << input;
+  std::string output = s.str ();
+  return output + std::string (width - output.length (), ' ');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string leftJustify (const std::string& input, const int width)
+{
+  return input + std::string (width - utf8_text_length (input), ' ');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string rightJustifyZero (const int input, const int width)
+{
+  std::stringstream s;
+  s << std::setw (width) << std::setfill ('0') << input;
+  return s.str ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string rightJustify (const int input, const int width)
+{
+  std::stringstream s;
+  s << std::setw (width) << std::setfill (' ') << input;
+  return s.str ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string rightJustify (const std::string& input, const int width)
+{
+  return std::string (width - utf8_text_length (input), ' ') + input;
+}
+
 ////////////////////////////////////////////////////////////////////////////////

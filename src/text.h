@@ -46,11 +46,14 @@ std::string commify (const std::string&);
 std::string lowerCase (const std::string&);
 std::string upperCase (const std::string&);
 std::string ucFirst (const std::string&);
+const std::string str_replace (std::string&, const std::string&, const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
 bool digitsOnly (const std::string&);
 bool compare (const std::string&, const std::string&, bool sensitive = true);
 bool closeEnough (const std::string&, const std::string&, unsigned int minLength = 0);
+std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
+std::string::size_type find (const std::string&, const std::string&, std::string::size_type, bool sensitive = true);
 int damerau_levenshtein (const char*, const char*);
 const std::string format (char);
 const std::string format (int);
@@ -67,6 +70,12 @@ const std::string format (const std::string&, int, const std::string&);
 const std::string format (const std::string&, int, int);
 const std::string format (const std::string&, int, double);
 const std::string format (const std::string&, const std::string&, const std::string&, const std::string&);
+
+std::string leftJustify (const int, const int);
+std::string leftJustify (const std::string&, const int);
+std::string rightJustifyZero (const int, const int);
+std::string rightJustify (const int, const int);
+std::string rightJustify (const std::string&, const int);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////

@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (137);
+  UnitTest t (187);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -198,6 +198,24 @@ int main (int argc, char** argv)
   t.is (unquoteText ("'x'"),      "x",    "unquoteText ''x'' -> 'x'");
   t.is (unquoteText ("\"x\""),    "x",    "unquoteText '\"x\"' -> 'x'");
 
+  // std::string commify (const std::string& data)
+  t.is (commify (""),           "",              "commify '' -> ''");
+  t.is (commify ("1"),          "1",             "commify '1' -> '1'");
+  t.is (commify ("12"),         "12",            "commify '12' -> '12'");
+  t.is (commify ("123"),        "123",           "commify '123' -> '123'");
+  t.is (commify ("1234"),       "1,234",         "commify '1234' -> '1,234'");
+  t.is (commify ("12345"),      "12,345",        "commify '12345' -> '12,345'");
+  t.is (commify ("123456"),     "123,456",       "commify '123456' -> '123,456'");
+  t.is (commify ("1234567"),    "1,234,567",     "commify '1234567' -> '1,234,567'");
+  t.is (commify ("12345678"),   "12,345,678",    "commify '12345678' -> '12,345,678'");
+  t.is (commify ("123456789"),  "123,456,789",   "commify '123456789' -> '123,456,789'");
+  t.is (commify ("1234567890"), "1,234,567,890", "commify '1234567890' -> '1,234,567,890'");
+
+  t.is (commify ("pre"),         "pre",          "commify 'pre' -> 'pre'");
+  t.is (commify ("pre1234"),     "pre1,234",     "commify 'pre1234' -> 'pre1,234'");
+  t.is (commify ("1234post"),    "1,234post",    "commify '1234post' -> '1,234post'");
+  t.is (commify ("pre1234post"), "pre1,234post", "commify 'pre1234post' -> 'pre1,234post'");
+
   // std::string lowerCase (const std::string& input)
   t.is (lowerCase (""),            "",            "lowerCase '' -> ''");
   t.is (lowerCase ("pre01_:POST"), "pre01_:post", "lowerCase 'pre01_:POST' -> 'pre01_:post'");
@@ -242,6 +260,37 @@ int main (int argc, char** argv)
   t.ok    (compare ("FOO", "foo", false),  "FOO == foo (caseless)");
   t.ok    (compare ("FOO", "FOO", false),  "FOO == FOO (caseless)");
 
+  // std::string::size_type find (const std::string&, const std::string&, bool caseless = false);
+  // Make sure degenerate cases are handled.
+  t.is ((int) find ("foo", ""), (int) 0,                 "foo !contains ''");
+  t.is ((int) find ("", "foo"), (int) std::string::npos, "'' !contains foo");
+
+  // Make sure the default is case-sensitive.
+  t.is ((int) find ("foo", "fo"), 0,                       "foo contains fo");
+  t.is ((int) find ("foo", "FO"), (int) std::string::npos, "foo !contains fo");
+
+  // Test case-sensitive.
+  t.is ((int) find ("foo", "xx", true), (int) std::string::npos, "foo !contains xx");
+  t.is ((int) find ("foo", "oo", true), 1,                       "foo contains oo");
+
+  t.is ((int) find ("foo", "fo", true), 0,                       "foo contains fo");
+  t.is ((int) find ("foo", "FO", true), (int) std::string::npos, "foo !contains fo");
+  t.is ((int) find ("FOO", "fo", true), (int) std::string::npos, "foo !contains fo");
+  t.is ((int) find ("FOO", "FO", true), 0,                       "foo contains fo");
+
+  // Test case-insensitive.
+  t.is ((int) find ("foo", "xx", false),  (int) std::string::npos, "foo !contains xx (caseless)");
+  t.is ((int) find ("foo", "oo", false),  1,                       "foo contains oo (caseless)");
+
+  t.is ((int) find ("foo", "fo", false),  0, "foo contains fo (caseless)");
+  t.is ((int) find ("foo", "FO", false),  0, "foo contains FO (caseless)");
+  t.is ((int) find ("FOO", "fo", false),  0, "FOO contains fo (caseless)");
+  t.is ((int) find ("FOO", "FO", false),  0, "FOO contains FO (caseless)");
+
+  // Test start offset.
+  t.is ((int) find ("one two three", "e",  3, true), (int) 11, "offset obeyed");
+  t.is ((int) find ("one two three", "e", 11, true), (int) 11, "offset obeyed");
+
   // TODO bool closeEnough (const std::string&, const std::string&);
 
   // std::string format (char);
@@ -268,6 +317,28 @@ int main (int argc, char** argv)
   t.is (format (2444238.56789, 12, 11), "2444238.5679", "format (2444238.56789, 12, 11) -> 2444238.5679");
 
   // std::string format (double, int, int);
+
+  // std::string leftJustify (const std::string&, const int);
+  t.is (leftJustify (123, 3), "123",   "leftJustify 123,3 -> '123'");
+  t.is (leftJustify (123, 4), "123 ",  "leftJustify 123,4 -> '123 '");
+  t.is (leftJustify (123, 5), "123  ", "leftJustify 123,5 -> '123  '");
+
+  // std::string leftJustify (const std::string&, const int);
+  t.is (leftJustify ("foo", 3), "foo",   "leftJustify foo,3 -> 'foo'");
+  t.is (leftJustify ("foo", 4), "foo ",  "leftJustify foo,4 -> 'foo '");
+  t.is (leftJustify ("foo", 5), "foo  ", "leftJustify foo,5 -> 'foo  '");
+  t.is (leftJustify ("föo", 5), "föo  ", "leftJustify föo,5 -> 'föo  '");
+
+  // std::string rightJustify (const std::string&, const int);
+  t.is (rightJustify (123, 3), "123",   "rightJustify 123,3 -> '123'");
+  t.is (rightJustify (123, 4), " 123",  "rightJustify 123,4 -> ' 123'");
+  t.is (rightJustify (123, 5), "  123", "rightJustify 123,5 -> '  123'");
+
+  // std::string rightJustify (const std::string&, const int);
+  t.is (rightJustify ("foo", 3), "foo",   "rightJustify foo,3 -> 'foo'");
+  t.is (rightJustify ("foo", 4), " foo",  "rightJustify foo,4 -> ' foo'");
+  t.is (rightJustify ("foo", 5), "  foo", "rightJustify foo,5 -> '  foo'");
+  t.is (rightJustify ("föo", 5), "  föo", "rightJustify föo,5 -> '  föo'");
 
   // int utf8_length (const std::string&);
   t.is (utf8_length ("Çirçös"),            6, "utf8_length (Çirçös) == 6");
