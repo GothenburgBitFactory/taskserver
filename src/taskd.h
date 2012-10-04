@@ -59,6 +59,7 @@ bool taskd_at_least (const std::string&, const std::string&);
 bool taskd_createDirectory (Directory&, bool);
 
 bool taskd_authenticate (Config&, Log&, const Msg&, Msg&);
+std::string taskd_generate_key ();
 
 bool taskd_sendMessage (Config&, const std::string&, const Msg&);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
