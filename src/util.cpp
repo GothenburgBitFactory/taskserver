@@ -28,6 +28,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <text.h>
 #include <util.h>
 
