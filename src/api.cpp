@@ -441,7 +441,7 @@ void taskd_renderMap (
 ////////////////////////////////////////////////////////////////////////////////
 std::string taskd_error (const int code)
 {
-  for (int i = 0; i < NUM_ERRORS; ++i)
+  for (unsigned int i = 0; i < NUM_ERRORS; ++i)
     if (code == errors[i].code)
       return errors[i].error;
 

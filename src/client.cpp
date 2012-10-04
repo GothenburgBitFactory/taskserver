@@ -48,7 +48,7 @@ int command_client (Config& config, const std::vector <std::string>& args)
 
   config.set ("server", args[1]);
 
-  for (int i = 2; i < args.size (); ++i)
+  for (unsigned int i = 2; i < args.size (); ++i)
   {
     // Read file.
     File file (args[i]);
