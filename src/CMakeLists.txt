@@ -17,6 +17,7 @@ add_executable (taskd_executable taskd.cpp
                                  File.cpp       File.h
                                  help.cpp
                                  init.cpp
+                                 JSON.cpp       JSON.h
                                  Log.cpp        Log.h
                                  Msg.cpp        Msg.h
                                  Nibbler.cpp    Nibbler.h
