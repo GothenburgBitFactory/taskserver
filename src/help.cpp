@@ -124,7 +124,32 @@ int command_help (Config& config, const std::vector <std::string>& args)
                   << "Creates a new organization, group or user.\n"
                   << "\n"
                   << "Options:\n"
-                  << "  --quiet        Turns off verbose output\n"
+                  << "  --NAME=VALUE   Temporary configuration override\n"
+                  << "\n";
+    }
+    else if (closeEnough ("suspend", args[1], 3))
+    {
+        std::cout << "\n"
+                  << "taskd suspend [options] org <org>\n"
+                  << "taskd suspend [options] group <org> <group>\n"
+                  << "taskd suspend [options] user <org> <user>\n"
+                  << "\n"
+                  << "Suspends an organization, group or user.\n"
+                  << "\n"
+                  << "Options:\n"
+                  << "  --NAME=VALUE   Temporary configuration override\n"
+                  << "\n";
+    }
+    else if (closeEnough ("resume", args[1], 3))
+    {
+        std::cout << "\n"
+                  << "taskd resume [options] org <org>\n"
+                  << "taskd resume [options] group <org> <group>\n"
+                  << "taskd resume [options] user <org> <user>\n"
+                  << "\n"
+                  << "Resumes, or un-suspends an organization, group or user.\n"
+                  << "\n"
+                  << "Options:\n"
                   << "  --NAME=VALUE   Temporary configuration override\n"
                   << "\n";
     }
