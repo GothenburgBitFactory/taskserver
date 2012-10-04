@@ -26,6 +26,7 @@ add_executable (taskd_executable taskd.cpp
                                  Server.cpp     Server.h
                                  Socket.cpp     Socket.h
                                  status.cpp
+                                 Task.cpp       Task.h
                                  text.cpp       text.h
                                  Timer.cpp      Timer.h
                                  utf8.cpp       utf8.h
