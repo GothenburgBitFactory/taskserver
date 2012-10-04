@@ -30,7 +30,7 @@
 
 int main (int argc, char** argv)
 {
-  UnitTest t (8);
+  UnitTest t (13);
 
   File::write ("/tmp/file.t.txt", "This is a test\n");
   File f6 ("/tmp/file.t.txt");
@@ -49,6 +49,17 @@ int main (int argc, char** argv)
 
   // dirname (std::string) const;
   t.is (f6.parent (), "/tmp", "File::dirname /tmp/file.t.txt --> /tmp");
+
+  // bool rename (const std::string&);
+  File f7 ("/tmp/file.t.2.txt");
+  f7.append ("something\n");
+  f7.close ();
+
+  t.ok (f7.rename ("/tmp/file.t.3.txt"), "File::rename did not fail");
+  t.is (f7._data, "/tmp/file.t.3.txt",   "File::rename stored new name");
+  t.ok (f7.exists (),                    "File::rename new file exists");
+  t.ok (f7.remove (),                    "File::remove /tmp/file.t.3.txt good");
+  t.notok (f7.exists (),                 "File::remove new file no longer exists");
 
   return 0;
 }
