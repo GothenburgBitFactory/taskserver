@@ -50,6 +50,11 @@ int main (int argc, char** argv)
   t.is (formatBytes (1000000000), "1.0 GiB", "1000000000 -> 1.0 GiB");
   t.is (formatBytes (1000000001), "1.0 GiB", "1000000001 -> 1.0 GiB");
 
+  // TODO const std::string uuid ();
+
+  // TODO const std::string encode (const std::string& value);
+  // TODO const std::string decode (const std::string& value);
+
   return 0;
 }
 

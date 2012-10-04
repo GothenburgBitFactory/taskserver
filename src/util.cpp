@@ -129,4 +129,145 @@ int autoComplete (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef HAVE_UUID
 
+#ifndef HAVE_UUID_UNPARSE_LOWER
+// Older versions of libuuid don't have uuid_unparse_lower(), only uuid_unparse()
+void uuid_unparse_lower (uuid_t uu, char *out)
+{
+    uuid_unparse (uu, out);
+    // Characters in out are either 0-9, a-z, '-', or A-Z.  A-Z is mapped to
+    // a-z by bitwise or with 0x20, and the others already have this bit set
+    for (size_t i = 0; i < 36; ++i) out[i] |= 0x20;
+}
+#endif
+
+const std::string uuid ()
+{
+  uuid_t id;
+  uuid_generate (id);
+  char buffer[100] = {0};
+  uuid_unparse_lower (id, buffer);
+
+  // Bug found by Steven de Brouwer.
+  buffer[36] = '\0';
+
+  return std::string (buffer);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+#else
+
+#ifdef HAVE_RANDOM
+#define rand() random()
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+const std::string uuid ()
+{
+  uint32_t time_low = ((rand () << 16) & 0xffff0000) | (rand () & 0xffff);
+  uint16_t time_mid = rand () & 0xffff;
+  uint16_t time_high_and_version = (rand () & 0x0fff) | 0x4000;
+  uint16_t clock_seq = (rand () & 0x3fff) | 0x8000;
+  uint8_t node [6];
+  for (size_t i = 0; i < 6; i++)
+    node[i] = rand() & 0xff;
+
+  char buffer[37];
+  sprintf(buffer, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+    time_low, time_mid, time_high_and_version, clock_seq >> 8, clock_seq & 0xff,
+    node[0], node[1], node[2], node[3], node[4], node[5]);
+
+  return std::string (buffer);
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// Encode values prior to serialization.
+//   [  -> &open;
+//   ]  -> &close;
+const std::string encode (const std::string& value)
+{
+  std::string modified = value;
+
+  str_replace (modified, "[",  "&open;");
+  str_replace (modified, "]",  "&close;");
+
+  return modified;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Decode values after parse.
+//   "  <- &dquot;
+//   '  <- &squot; or &quot;
+//   ,  <- &comma;
+//   [  <- &open;
+//   ]  <- &close;
+//   :  <- &colon;
+const std::string decode (const std::string& value)
+{
+  if (value.find ('&') != std::string::npos)
+  {
+    std::string modified = value;
+
+    // Supported encodings.
+    str_replace (modified, "&open;",  "[");
+    str_replace (modified, "&close;", "]");
+
+    // Support for deprecated encodings.  These cannot be removed or old files
+    // will not be parsable.  Not just old files - completed.data can contain
+    // tasks formatted/encoded using these.
+    str_replace (modified, "&dquot;", "\"");
+    str_replace (modified, "&quot;",  "'");
+    str_replace (modified, "&squot;", "'");  // Deprecated 2.0
+    str_replace (modified, "&comma;", ",");  // Deprecated 2.0
+    str_replace (modified, "&colon;", ":");  // Deprecated 2.0
+
+    return modified;
+  }
+
+  return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Escapes any unescaped character of type c within the given string
+// e.g. ' ' -> '\ '
+const std::string escape (const std::string& value, char c)
+{
+  std::string modified = value;
+  char tmp[2] = {c, '\0'};
+  std::string search  = tmp;
+  std::string replace = "\\" + search;
+
+  std::string::size_type pos = modified.find (search);
+  while (pos != std::string::npos) {
+    if ( modified[pos-1] != '\\' )
+      modified.replace (pos, 1, replace);
+
+    pos = modified.find (search, pos+1);
+  }
+
+  return modified;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+#ifndef HAVE_TIMEGM
+time_t timegm (struct tm *tm)
+{
+  time_t ret;
+  char *tz;
+  tz = getenv ("TZ");
+  setenv ("TZ", "UTC", 1);
+  tzset ();
+  ret = mktime (tm);
+  if (tz)
+    setenv ("TZ", tz, 1);
+  else
+    unsetenv ("TZ");
+  tzset ();
+  return ret;
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////

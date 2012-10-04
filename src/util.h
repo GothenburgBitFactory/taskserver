@@ -30,11 +30,29 @@
 
 #include <string>
 #include <vector>
+#include <cmake.h>
+
+#ifdef HAVE_UUID                                                                
+#include <uuid/uuid.h>                                                          
+#endif                                                                          
 
 bool confirm (const std::string&);
 std::string formatBytes (size_t);
 std::string formatTime (time_t);
 int autoComplete (const std::string&, const std::vector<std::string>&, std::vector<std::string>&, int minimum = 1);
+
+#if defined(HAVE_UUID) && !defined(HAVE_UUID_UNPARSE_LOWER)
+void uuid_unparse_lower (uuid_t uu, char *out);
+#endif
+const std::string uuid ();
+
+const std::string encode (const std::string&);
+const std::string decode (const std::string&);
+const std::string escape (const std::string&, char);
+
+#ifndef HAVE_TIMEGM
+  time_t timegm (struct tm *tm);
+#endif
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////
