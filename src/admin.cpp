@@ -190,7 +190,7 @@ int command_add (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 2)
       throw std::string ("Usage: taskd add [options] org <org>");
 
-    for (int i = 1; i < positional.size (); ++i)
+    for (unsigned int i = 1; i < positional.size (); ++i)
     {
       if (is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' already exists.";
@@ -210,7 +210,7 @@ int command_add (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' already exists.";
@@ -230,7 +230,7 @@ int command_add (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' already exists.";
@@ -300,7 +300,7 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 2)
       throw std::string ("Usage: taskd suspend [options] org <org>");
 
-    for (int i = 1; i < positional.size (); ++i)
+    for (unsigned int i = 1; i < positional.size (); ++i)
     {
       if (! is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
@@ -320,7 +320,7 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (! is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
@@ -340,7 +340,7 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (! is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
@@ -400,7 +400,7 @@ int command_resume (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 2)
       throw std::string ("Usage: taskd resume [options] org <org>");
 
-    for (int i = 1; i < positional.size (); ++i)
+    for (unsigned int i = 1; i < positional.size (); ++i)
     {
       if (! is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
@@ -420,7 +420,7 @@ int command_resume (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (! is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
@@ -440,7 +440,7 @@ int command_resume (Config& config, const std::vector <std::string>& args)
     if (! is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
-    for (int i = 2; i < positional.size (); ++i)
+    for (unsigned int i = 2; i < positional.size (); ++i)
     {
       if (! is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
