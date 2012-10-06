@@ -298,6 +298,8 @@ int command_server (Config& config, const std::vector <std::string>& args)
                + " ===="
               );
 
+    log.format ("Serving from %s", root.c_str ());
+
     if (debug)
       log.write ("Debug mode");
 

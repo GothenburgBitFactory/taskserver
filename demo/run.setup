@@ -31,6 +31,11 @@ echo '# taskd add --data $DATA user "ORG" "User Name"'
 find $DATA
 
 echo
+echo '# taskd add --data $DATA user "ORG" "USER"'
+../src/taskd add --data $DATA user 'ORG' 'USER'
+find $DATA
+
+echo
 echo '# taskd suspend --data $DATA org ORG'
 ../src/taskd suspend --data $DATA org ORG
 find $DATA

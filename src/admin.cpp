@@ -123,8 +123,8 @@ int command_add (Config& config, const std::vector <std::string>& args)
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i))   ;
+         if (closeEnough ("--data",   *i, 3))  root = *(++i);
+    else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
   }

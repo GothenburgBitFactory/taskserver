@@ -297,18 +297,44 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 
 ////////////////////////////////////////////////////////////////////////////////
 // If authentication fails, fills in response code and status.
+// Note: information regarding valid/invalid org/user is not revealed.
 bool taskd_authenticate (
   Config& config,
   Log& log,
   const Msg& request,
   Msg& response)
 {
-  
-  // TODO Assert org exists.
-  // TODO Assert user exists.
-  // TODO Assert key matches.
-  // TODO Set status and code on error.
+  Directory root (config.get ("root"));
+  std::string org  = request.get ("org");
+  std::string user = request.get ("user");
+  std::string key  = request.get ("key");
 
+  if (! taskd_is_org (root, org))
+  {
+    log.format ("INFO Auth failure: org '%s'",
+                org.c_str ());
+
+    response.set ("code", 430);
+    response.set ("status", taskd_error (430));
+    return false;
+  }
+
+  // TODO Assert org is not terminated or suspended.
+
+  if (! taskd_is_user (root, org, user))
+  {
+    log.format ("INFO Auth failure: org '%s' user '%s'",
+                org.c_str (),
+                user.c_str ());
+    response.set ("code", 430);
+    response.set ("status", taskd_error (430));
+    return false;
+  }
+
+  // TODO Assert user is not terminated or suspended.
+  // TODO Assert key matches.
+
+  // All checks succeed, user is authenticated.
   return true;
 }
 
