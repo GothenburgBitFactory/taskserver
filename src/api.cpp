@@ -296,13 +296,14 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// If authentication fails, throws an exception, otherwise says nothing.
+// If authentication fails, fills in response code and status.
 bool taskd_authenticate (
   Config& config,
   Log& log,
   const Msg& request,
   Msg& response)
 {
+  
   // TODO Assert org exists.
   // TODO Assert user exists.
   // TODO Assert key matches.
@@ -436,6 +437,45 @@ void taskd_renderMap (
 
     std::cout << "\n";
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_is_org (
+  const Directory& root,
+  const std::string& org)
+{
+  Directory d (root);
+  d += "orgs";
+  d += org;
+  return d.exists ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_is_group (
+  const Directory& root,
+  const std::string& org,
+  const std::string& group)
+{
+  Directory d (root);
+  d += "orgs";
+  d += org;
+  d += "groups";
+  d += group;
+  return d.exists ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_is_user (
+  const Directory& root,
+  const std::string& org,
+  const std::string& user)
+{
+  Directory d (root);
+  d += "orgs";
+  d += org;
+  d += "users";
+  d += user;
+  return d.exists ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

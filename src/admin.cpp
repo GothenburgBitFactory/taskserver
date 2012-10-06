@@ -30,45 +30,6 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool is_org (
-  const Directory& root,
-  const std::string& org)
-{
-  Directory d (root);
-  d += "orgs";
-  d += org;
-  return d.exists ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static bool is_group (
-  const Directory& root,
-  const std::string& org,
-  const std::string& group)
-{
-  Directory d (root);
-  d += "orgs";
-  d += org;
-  d += "groups";
-  d += group;
-  return d.exists ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static bool is_user (
-  const Directory& root,
-  const std::string& org,
-  const std::string& user)
-{
-  Directory d (root);
-  d += "orgs";
-  d += org;
-  d += "users";
-  d += user;
-  return d.exists ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static bool add_org (
   const Directory& root,
   const std::string& org)
@@ -188,7 +149,7 @@ int command_add (Config& config, const std::vector <std::string>& args)
 
     for (unsigned int i = 1; i < positional.size (); ++i)
     {
-      if (is_org (root_dir, positional[i]))
+      if (taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' already exists.";
 
       if (!add_org (root_dir, positional[i]))
@@ -203,12 +164,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd add [options] group <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (is_group (root_dir, positional[1], positional[i]))
+      if (taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' already exists.";
 
       if (!add_group (root_dir, positional[1], positional[i]))
@@ -223,12 +184,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd add [options] user <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (is_user (root_dir, positional[1], positional[i]))
+      if (taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' already exists.";
 
       if (!add_user (root_dir, positional[1], positional[i]))
@@ -294,7 +255,7 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
 
     for (unsigned int i = 1; i < positional.size (); ++i)
     {
-      if (! is_org (root_dir, positional[i]))
+      if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
       if (! suspend_node (root_dir._data + "/orgs/" + positional[i]))
@@ -309,12 +270,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd suspend [options] group <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (! is_group (root_dir, positional[1], positional[i]))
+      if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
       if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
@@ -329,12 +290,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd suspend [options] user <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (! is_user (root_dir, positional[1], positional[i]))
+      if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
       if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
@@ -390,7 +351,7 @@ int command_resume (Config& config, const std::vector <std::string>& args)
 
     for (unsigned int i = 1; i < positional.size (); ++i)
     {
-      if (! is_org (root_dir, positional[i]))
+      if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
       if (! resume_node (root_dir._data + "/orgs/" + positional[i]))
@@ -405,12 +366,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd resume [options] group <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (! is_group (root_dir, positional[1], positional[i]))
+      if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
       if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
@@ -425,12 +386,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
     if (positional.size () < 3)
       throw std::string ("Usage: taskd resume [options] user <org> <user>");
 
-    if (! is_org (root_dir, positional[1]))
+    if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
 
     for (unsigned int i = 2; i < positional.size (); ++i)
     {
-      if (! is_user (root_dir, positional[1], positional[i]))
+      if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
       if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
