@@ -27,6 +27,7 @@
 
 #include <taskd.h>
 #include <text.h>
+#include <cmake.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int command_init (Config& config, const std::vector <std::string>& args)
@@ -68,6 +69,8 @@ int command_init (Config& config, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' directory is not executable.");
  
   // Provide some defaults and overrides.
+  config.set ("extensions", TASKD_EXTDIR);
+
   if (config.get ("log")            == "") config.set ("log",            "/tmp/taskd.log");
   if (config.get ("server")         == "") config.set ("server",         "localhost:6544");
   if (config.get ("queue.size")     == "") config.set ("queue.size",     "10");
