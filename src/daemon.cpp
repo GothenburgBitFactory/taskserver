@@ -39,6 +39,7 @@
 #include <cmake.h>
 #include <commit.h>
 #include <text.h>
+#include <util.h>
 #include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +52,12 @@ public:
 private:
   void handle_statistics (const Msg&, Msg&);
   void handle_sync       (const Msg&, Msg&);
+
+private:
+  void parse_sync_payload (const std::string&, std::vector <std::string>&, std::string&) const;
+  void load_server_data (const std::string&, const std::string&, std::vector <std::string>&) const;
+  unsigned int find_branch_point (const std::vector <std::string>&, const std::string&) const;
+  void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <std::string>&) const;
 
 private:
   Config& _config;
@@ -228,18 +235,149 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   if (! taskd_authenticate (_config, *_log, in, out))
     return;
 
+  // Note: org/user already validated during authentication.
+  std::string org  = in.get ("org");
+  std::string user = in.get ("user");
+
   if (_log)
-    _log->format ("[%d] 'sync' from %s:%d",
+    _log->format ("[%d] 'sync' from %s/%s at %s:%d",
                   _txn_count,
+                  org.c_str (),
+                  user.c_str (),
                   _client_address.c_str (),
                   _client_port);
 
+  // Separate payload into client_data and client_key.
+  std::vector <std::string> client_data;
+  std::string client_key;
+  parse_sync_payload (in.getPayload (), client_data, client_key);
 
-  // TODO Sync logic goes here.
+  // TODO A missing client_key implies first-time sync, which results in all
+  //      data being sent.
 
+  // TODO Use Cases:
+    // TODO Handle: no synch key, no tasks -> return new key
+    // TODO Handle: no synch key, tasks    -> process, new key
+    // TODO Handle: synch key, no tasks    -> process, new key
+    // TODO Handle: synch key, tasks       -> process, new key
+
+  // Load all user data.
+  std::vector <std::string> server_data;
+  load_server_data (org, user, server_data);
+
+  // Find branch point and extract subset.
+  unsigned int branch_point = find_branch_point (server_data, client_key);
+  std::vector <std::string> server_subset;
+  extract_subset (server_data, branch_point, server_subset);
+
+  // TODO For each incoming
+    // TODO If incoming is in subset
+      // TODO Find common ancestor
+      // TODO 3-way merge
+      // TODO append to data
+    // TODO else
+      // TODO append to data
+
+  // Create a new synch-key.
+  std::string new_client_key = uuid ();
+  _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
+
+  // TODO Respond with: subset + additions + new_client_key.
+  std::string payload;
+  // payload += subset;
+  // payload += additions;
+  payload += new_client_key + "\n";
+  //out.setPayload (payload);
 
   out.set ("code",   502);
   out.set ("status", taskd_error (502));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::parse_sync_payload (
+  const std::string& payload,
+  std::vector <std::string>& data,
+  std::string& key) const
+{
+  // Break payload into lines.
+  std::vector <std::string> lines;
+  split (lines, payload, '\n');
+  _log->format ("[%d] Payload contains %d lines", _txn_count, lines.size ());
+
+  // Separate into data and key.
+  // TODO Some syntax checking would be nice.
+  std::vector <std::string>::iterator i;
+  for (i = lines.begin (); i != lines.end (); ++i)
+    if ((*i)[0] == '[')
+      data.push_back (*i);
+    else
+      key = *i;
+
+  _log->format ("[%d] Client key: %s", _txn_count, key.c_str ());
+  
+  for (i = data.begin (); i != data.end (); ++i)
+    _log->format ("[%d] Client data: %s", _txn_count, i->c_str ());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::load_server_data (
+  const std::string& org,
+  const std::string& user,
+  std::vector <std::string>& data) const
+{
+  Directory user_dir (_config.get ("root"));
+  user_dir += "orgs";
+  user_dir += org;
+  user_dir += "users";
+  user_dir += user;
+  File user_data (user_dir._data + "/tx.data");
+
+  if (user_data.exists ())
+    user_data.read (data);
+
+  _log->format ("[%d] Read %u lines of server data", _txn_count, data.size ());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Note: A missing client_key implies first-time sync, which means the earliest
+//       possible branch point is used.
+unsigned int Daemon::find_branch_point (
+  const std::vector <std::string>& data,
+  const std::string& key) const
+{
+  unsigned int branch = 0;
+  if (key == "")
+    return 0;
+
+  bool found = false;
+  std::vector <std::string>::const_iterator i;
+  for (i = data.begin (); i != data.end (); ++i)
+    if (*i == key)    
+    {
+      found = true;
+      break;
+    }
+    else
+      ++branch;
+
+  if (!found)
+    throw std::string ("Client synch key not found.");
+
+  _log->format ("[%d] Branch point: %u", _txn_count, branch);
+  return branch;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::extract_subset (
+  const std::vector <std::string>& data,
+  const unsigned int branch_point,
+  std::vector <std::string>& subset) const
+{
+  if (branch_point < data.size ())
+    for (unsigned int i = branch_point; i < data.size (); ++i)
+      subset.push_back (data[i]);
+
+  _log->format ("[%d] Subset is %u lines", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
