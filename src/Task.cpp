@@ -262,7 +262,7 @@ std::string Task::composeF4 () const
 //   2) To provide suitable warnings about odd states
 //   3) To generate errors when the inconsistencies are not fixable
 //
-void Task::validate (bool applyDefault /* = true */)
+void Task::validate ()
 {
   Task::status status = getStatus ();
 

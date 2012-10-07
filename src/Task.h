@@ -65,7 +65,7 @@ public:
   status getStatus () const;
   void setStatus (status);
 
-  void validate (bool applyDefault = true);
+  void validate ();
 };
 
 #endif

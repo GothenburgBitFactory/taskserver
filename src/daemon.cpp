@@ -36,6 +36,7 @@
 #include <Date.h>
 #include <Duration.h>
 #include <Color.h>
+#include <Task.h>
 #include <cmake.h>
 #include <commit.h>
 #include <text.h>
@@ -57,7 +58,7 @@ private:
   void parse_sync_payload (const std::string&, std::vector <std::string>&, std::string&) const;
   void load_server_data (const std::string&, const std::string&, std::vector <std::string>&) const;
   unsigned int find_branch_point (const std::vector <std::string>&, const std::string&) const;
-  void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <std::string>&) const;
+  void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <Task>&) const;
 
 private:
   Config& _config;
@@ -267,16 +268,30 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
   // Find branch point and extract subset.
   unsigned int branch_point = find_branch_point (server_data, client_key);
-  std::vector <std::string> server_subset;
+  std::vector <Task> server_subset;
   extract_subset (server_data, branch_point, server_subset);
 
-  // TODO For each incoming
-    // TODO If incoming is in subset
+  // For each incoming task...
+  std::vector <std::string>::iterator client_task;
+  for (client_task = client_data.begin ();
+       client_task != client_data.end ();
+       ++client_task)
+  {
+    // Validate task.
+    Task task (*client_task);
+    task.validate ();
+    _log->format ("[%d] Validated: %s '%s'",
+                  _txn_count,
+                  task.get ("uuid").c_str (),
+                  task.get ("description").c_str ());
+
+    // TODO If task is in subset
       // TODO Find common ancestor
       // TODO 3-way merge
       // TODO append to data
     // TODO else
       // TODO append to data
+  }
 
   // Create a new synch-key.
   std::string new_client_key = uuid ();
@@ -371,11 +386,11 @@ unsigned int Daemon::find_branch_point (
 void Daemon::extract_subset (
   const std::vector <std::string>& data,
   const unsigned int branch_point,
-  std::vector <std::string>& subset) const
+  std::vector <Task>& subset) const
 {
   if (branch_point < data.size ())
     for (unsigned int i = branch_point; i < data.size (); ++i)
-      subset.push_back (data[i]);
+      subset.push_back (Task (data[i]));
 
   _log->format ("[%d] Subset is %u lines", _txn_count, subset.size ());
 }
