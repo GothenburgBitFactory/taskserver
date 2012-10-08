@@ -363,7 +363,7 @@ bool taskd_sendMessage (
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
-    s.write (out.serialize () + "\r\n");
+    s.write (out.serialize () + "\n");
 
     std::string response;
     s.read (response);
@@ -403,7 +403,7 @@ bool taskd_sendMessage (
   {
     Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     s.connect (server, port);
-    s.write (out.serialize () + "\r\n");
+    s.write (out.serialize () + "\n");
 
     std::string response;
     s.read (response);

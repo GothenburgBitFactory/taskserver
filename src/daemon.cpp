@@ -55,7 +55,7 @@ private:
   void handle_sync       (const Msg&, Msg&);
 
 private:
-  void parse_sync_payload (const std::string&, std::vector <std::string>&, std::string&) const;
+  void parse_payload (const std::string&, std::vector <std::string>&, std::string&) const;
   void load_server_data (const std::string&, const std::string&, std::vector <std::string>&) const;
   void append_server_data (const std::string&, const std::string&, const std::vector <std::string>&) const;
   unsigned int find_branch_point (const std::vector <std::string>&, const std::string&) const;
@@ -254,16 +254,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   // Separate payload into client_data and client_key.
   std::vector <std::string> client_data;               // Incoming client data.
   std::string client_key;                              // Incoming client key.
-  parse_sync_payload (in.getPayload (), client_data, client_key);
-
-  // TODO A missing client_key implies first-time sync, which results in all
-  //      data being sent back.
-
-  // TODO Use Cases:
-    // TODO Handle: no synch key, no tasks -> return new key
-    // TODO Handle: no synch key, tasks    -> process, new key
-    // TODO Handle: synch key, no tasks    -> process, new key
-    // TODO Handle: synch key, tasks       -> process, new key
+  parse_payload (in.getPayload (), client_data, client_key);
 
   // Load all user data.
   std::vector <std::string> server_data;               // Data loaded on server.
@@ -303,7 +294,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
     else
     {
-      _log->format ("[%d]   No merge needed", _txn_count);
+      _log->format ("[%d]   add", _txn_count);
 
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
@@ -311,26 +302,41 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
   }
 
-  // Create a new synch-key.
-  std::string new_client_key = uuid ();
-  new_server_data.push_back (new_client_key);
-  _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
+  // If the server data changed, or the client will be sent new data, then a new
+  // synch key is generated, and the response is code 200.
+  if (new_server_data.size () || 
+      server_subset.size ()   ||
+      new_client_data.size ())
+  {
+    // Create a new synch-key.
+    std::string new_client_key = uuid ();
+    new_server_data.push_back (new_client_key);
+    _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
 
-  // Append new_server_data to file.
-  append_server_data (org, user, new_server_data);
+    // Append new_server_data to file.
+    append_server_data (org, user, new_server_data);
 
-  out.setPayload (
-    generate_payload (
-      server_subset,
-      new_client_data,
-      new_client_key));
+    out.setPayload (
+      generate_payload (
+        server_subset,
+        new_client_data,
+        new_client_key));
 
-  out.set ("code",   200);
-  out.set ("status", taskd_error (200));
+    out.set ("code",   200);
+    out.set ("status", taskd_error (200));
+  }
+
+  // If no data changed, the response is code 201.
+  else
+  {
+    _log->format ("[%d] No change", _txn_count);
+    out.set ("code",   201);
+    out.set ("status", taskd_error (201));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Daemon::parse_sync_payload (
+void Daemon::parse_payload (
   const std::string& payload,
   std::vector <std::string>& data,
   std::string& key) const
@@ -343,10 +349,15 @@ void Daemon::parse_sync_payload (
   // TODO Some syntax checking would be nice.
   std::vector <std::string>::iterator i;
   for (i = lines.begin (); i != lines.end (); ++i)
-    if ((*i)[0] == '[')
-      data.push_back (*i);
-    else
-      key = *i;
+  {
+    if (*i != "")
+    {
+      if ((*i)[0] == '[')
+        data.push_back (*i);
+      else
+        key = *i;
+    }
+  }
 
   _log->format ("[%d] Client key: %s", _txn_count, key.c_str ());
   
@@ -370,7 +381,7 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Server data: %u lines", _txn_count, data.size ());
+  _log->format ("[%d] Server data: %u line(s)", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -388,7 +399,7 @@ void Daemon::append_server_data (
 
   user_data.append (data);
 
-  _log->format ("[%d] Appended %u lines of server data", _txn_count, data.size ());
+  _log->format ("[%d] Appended %u line(s) to server data", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -399,12 +410,18 @@ unsigned int Daemon::find_branch_point (
   const std::string& key) const
 {
   unsigned int branch = 0;
+
+  // A missing key is either a first-time sync, or a request to get all data.
   if (key == "")
-    return 0;
+  {
+    _log->format ("[%d] Branch point: (no key) --> %u", _txn_count, branch);
+    return branch;
+  }
 
   bool found = false;
   std::vector <std::string>::const_iterator i;
   for (i = data.begin (); i != data.end (); ++i)
+  {
     if (*i == key)    
     {
       found = true;
@@ -412,11 +429,12 @@ unsigned int Daemon::find_branch_point (
     }
     else
       ++branch;
+  }
 
   if (!found)
     throw std::string ("Client synch key not found.");
 
-  _log->format ("[%d] Branch point: %u", _txn_count, branch);
+  _log->format ("[%d] Branch point: %s --> %u", _txn_count, key.c_str (), branch);
   return branch;
 }
 
@@ -428,9 +446,13 @@ void Daemon::extract_subset (
 {
   if (branch_point < data.size ())
     for (unsigned int i = branch_point; i < data.size (); ++i)
-      subset.push_back (Task (data[i]));
+      if (data[i][0] == '[')
+      {
+        _log->format ("[%d] Subset: %s", _txn_count, data[i].c_str ());
+        subset.push_back (Task (data[i]));
+      }
 
-  _log->format ("[%d] Subset: %u lines", _txn_count, subset.size ());
+  _log->format ("[%d] Subset: %u line(s)", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
