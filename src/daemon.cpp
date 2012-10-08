@@ -57,8 +57,11 @@ private:
 private:
   void parse_sync_payload (const std::string&, std::vector <std::string>&, std::string&) const;
   void load_server_data (const std::string&, const std::string&, std::vector <std::string>&) const;
+  void append_server_data (const std::string&, const std::string&, const std::vector <std::string>&) const;
   unsigned int find_branch_point (const std::vector <std::string>&, const std::string&) const;
   void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <Task>&) const;
+  bool contains (const std::vector <Task>&, const Task&) const;
+  std::string generate_payload (const std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
 
 private:
   Config& _config;
@@ -249,12 +252,12 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
                   _client_port);
 
   // Separate payload into client_data and client_key.
-  std::vector <std::string> client_data;
-  std::string client_key;
+  std::vector <std::string> client_data;               // Incoming client data.
+  std::string client_key;                              // Incoming client key.
   parse_sync_payload (in.getPayload (), client_data, client_key);
 
   // TODO A missing client_key implies first-time sync, which results in all
-  //      data being sent.
+  //      data being sent back.
 
   // TODO Use Cases:
     // TODO Handle: no synch key, no tasks -> return new key
@@ -263,8 +266,11 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     // TODO Handle: synch key, tasks       -> process, new key
 
   // Load all user data.
-  std::vector <std::string> server_data;
+  std::vector <std::string> server_data;               // Data loaded on server.
   load_server_data (org, user, server_data);
+
+  std::vector <std::string> new_server_data;           // New tasks for tx.data.
+  std::vector <std::string> new_client_data;           // New tasks for client.
 
   // Find branch point and extract subset.
   unsigned int branch_point = find_branch_point (server_data, client_key);
@@ -285,27 +291,42 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
                   task.get ("uuid").c_str (),
                   task.get ("description").c_str ());
 
-    // TODO If task is in subset
+    // If task is in subset
+    if (contains (server_subset, task))
+    {
+      _log->format ("[%d]   Merge needed", _txn_count);
+
       // TODO Find common ancestor
       // TODO 3-way merge
-      // TODO append to data
-    // TODO else
-      // TODO append to data
+      // TODO append to client data
+      // TODO append to server data
+    }
+    else
+    {
+      _log->format ("[%d]   No merge needed", _txn_count);
+
+      // Task not in subset, therefore can be stored unmodified.  Does not get
+      // returned to client.
+      new_server_data.push_back (*client_task);
+    }
   }
 
   // Create a new synch-key.
   std::string new_client_key = uuid ();
+  new_server_data.push_back (new_client_key);
   _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
 
-  // TODO Respond with: subset + additions + new_client_key.
-  std::string payload;
-  // payload += subset;
-  // payload += additions;
-  payload += new_client_key + "\n";
-  //out.setPayload (payload);
+  // Append new_server_data to file.
+  append_server_data (org, user, new_server_data);
 
-  out.set ("code",   502);
-  out.set ("status", taskd_error (502));
+  out.setPayload (
+    generate_payload (
+      server_subset,
+      new_client_data,
+      new_client_key));
+
+  out.set ("code",   200);
+  out.set ("status", taskd_error (200));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +338,6 @@ void Daemon::parse_sync_payload (
   // Break payload into lines.
   std::vector <std::string> lines;
   split (lines, payload, '\n');
-  _log->format ("[%d] Payload contains %d lines", _txn_count, lines.size ());
 
   // Separate into data and key.
   // TODO Some syntax checking would be nice.
@@ -350,7 +370,25 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Read %u lines of server data", _txn_count, data.size ());
+  _log->format ("[%d] Server data: %u lines", _txn_count, data.size ());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::append_server_data (
+  const std::string& org,
+  const std::string& user,
+  const std::vector <std::string>& data) const
+{
+  Directory user_dir (_config.get ("root"));
+  user_dir += "orgs";
+  user_dir += org;
+  user_dir += "users";
+  user_dir += user;
+  File user_data (user_dir._data + "/tx.data");
+
+  user_data.append (data);
+
+  _log->format ("[%d] Appended %u lines of server data", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,7 +430,43 @@ void Daemon::extract_subset (
     for (unsigned int i = branch_point; i < data.size (); ++i)
       subset.push_back (Task (data[i]));
 
-  _log->format ("[%d] Subset is %u lines", _txn_count, subset.size ());
+  _log->format ("[%d] Subset: %u lines", _txn_count, subset.size ());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Daemon::contains (
+  const std::vector <Task>& subset,
+  const Task& task) const
+{
+  std::string uuid = task.get ("uuid");
+
+  std::vector <Task>::const_iterator i;
+  for (i = subset.begin (); i != subset.end (); ++i)
+    if (uuid == i->get ("uuid"))
+      return true;
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Daemon::generate_payload (
+  const std::vector <Task>& subset,
+  const std::vector <std::string>& additions,
+  const std::string& key) const
+{
+  std::string payload;
+
+  std::vector <Task>::const_iterator t;
+  for (t = subset.begin (); t != subset.end (); ++t)
+    payload += t->composeF4 ();
+
+  std::vector <std::string>::const_iterator s;
+  for (s = additions.begin (); s != additions.end (); ++s)
+    payload += *s + "\n";
+
+  payload += key + "\n";
+
+  return payload;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
