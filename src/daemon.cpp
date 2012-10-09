@@ -62,6 +62,10 @@ private:
   void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <Task>&) const;
   bool contains (const std::vector <Task>&, const Task&) const;
   std::string generate_payload (const std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
+  unsigned int find_common_ancestor (const std::vector <std::string>&, unsigned int, const std::string&) const;
+  void get_client_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
+  void get_server_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&, unsigned int) const;
+  void patch (Task&, const Task&, const Task&) const;
 
 private:
   Config& _config;
@@ -287,10 +291,28 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     {
       _log->format ("[%d]   Merge needed", _txn_count);
 
-      // TODO Find common ancestor
-      // TODO 3-way merge
-      // TODO append to client data
-      // TODO append to server data
+      // Find common ancestor, prior to branch point
+      std::string uuid = task.get ("uuid");
+      unsigned int common_ancestor = find_common_ancestor (server_data,
+                                                           branch_point,
+                                                           uuid);
+
+      // The starting point.
+      Task ancestor (server_data[common_ancestor]);
+      _log->format ("[%d]   ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
+
+      // List the client-side modifications.
+      std::vector <Task> client_mods;
+      get_client_mods (client_mods, client_data, uuid);
+
+      // List the server-side modifications.
+      std::vector <Task> server_mods;
+      get_server_mods (server_mods, server_data, uuid, common_ancestor);
+
+      // TODO Merge sort between client_mods and server_mods, patching ancestor.
+
+      // TODO append combined task to client data
+      // TODO append combined task to server data
     }
     else
     {
@@ -489,6 +511,51 @@ std::string Daemon::generate_payload (
   payload += key + "\n";
 
   return payload;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Starting at branch_point and working backwards, find the first instance of a
+// task matching uuid.
+unsigned int Daemon::find_common_ancestor (
+  const std::vector <std::string>& data,
+  unsigned int branch_point,
+  const std::string& uuid) const
+{
+  for (int i = (int) branch_point; i >= 0; --i)
+  {
+    Task t (data[i]);
+    if (t.get ("uuid") == uuid)
+      return (unsigned int) i;
+  }
+
+  throw std::string ("ERROR: Could not find common ancestor for ") + uuid;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::get_client_mods (
+  std::vector <Task>& mods,
+  const std::vector <std::string>& data,
+  const std::string& uuid) const
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Daemon::get_server_mods (
+  std::vector <Task>& mods,
+  const std::vector <std::string>& data,
+  const std::string& uuid,
+  unsigned int ancestor) const
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Determine the delta between 'from' and 'to', and apply that delta to 'base'.
+// All three tasks have the same uuid.
+void Daemon::patch (
+  Task& base,
+  const Task& from,
+  const Task& to) const
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
