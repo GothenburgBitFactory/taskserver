@@ -1,0 +1,19 @@
+#!/bin/bash
+
+rm pending.data completed.data undo.data backlog.data x
+
+echo 'data.location=.'                 > x
+echo 'taskd.server=localhost:6544'    >> x
+echo 'taskd.credentials=ORG/USER/KEY' >> x
+
+echo '--- add 1, sync ---------------------------------------------------------'
+task rc:x add foo
+task rc:x rc.debug=1 sync
+
+echo '--- nop, sync -----------------------------------------------------------'
+task rc:x rc.debug=1 sync
+
+echo '--- fresh, sync -----------------------------------------------------------'
+rm pending.data completed.data undo.data backlog.data
+task rc:x rc.debug=1 sync
+
