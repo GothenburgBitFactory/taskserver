@@ -59,6 +59,7 @@ public:
   bool has (const std::string&) const;
   std::vector <std::string> all ();
   const std::string get (const std::string&) const;
+  time_t get_date (const std::string&) const;
   void set (const std::string&, const std::string&);
   void remove (const std::string&);
 
