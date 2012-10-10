@@ -65,6 +65,8 @@ private:
   unsigned int find_common_ancestor (const std::vector <std::string>&, unsigned int, const std::string&) const;
   void get_client_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
   void get_server_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&, unsigned int) const;
+  void zipper_walk (const std::vector <Task>&, const std::vector <Task>&, Task&) const;
+  time_t last_modification (const Task&) const;
   void patch (Task&, const Task&, const Task&) const;
 
 private:
@@ -309,10 +311,14 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       std::vector <Task> server_mods;
       get_server_mods (server_mods, server_data, uuid, common_ancestor);
 
-      // TODO Merge sort between client_mods and server_mods, patching ancestor.
+      // Merge sort between client_mods and server_mods, patching ancestor.
+      Task combined (ancestor);
+      zipper_walk (client_mods, server_mods, combined);
+      std::string combined_F4 = combined.composeF4 ();
 
-      // TODO append combined task to client data
-      // TODO append combined task to server data
+      // Append combined task to client and server data.
+      new_server_data.push_back (combined_F4);
+      new_client_data.push_back (combined_F4);
     }
     else
     {
@@ -532,20 +538,72 @@ unsigned int Daemon::find_common_ancestor (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Extract tasks from the client list, with the given UUID, maintaining the
+// sequence.
 void Daemon::get_client_mods (
   std::vector <Task>& mods,
   const std::vector <std::string>& data,
   const std::string& uuid) const
 {
+  std::vector <std::string>::const_iterator line;
+  for (line = data.begin (); line != data.end (); ++line)
+  {
+    Task t (*line);
+    if (t.get ("uuid") == uuid)
+    {
+      mods.push_back (t);
+      std::cout << "# get_client_mods "
+                << uuid
+                << " '"
+                << t.get ("description")
+                << "'\n";
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Extract tasks from the server list, with the given UUID, maintaining the
+// sequence.
 void Daemon::get_server_mods (
   std::vector <Task>& mods,
   const std::vector <std::string>& data,
   const std::string& uuid,
   unsigned int ancestor) const
 {
+  for (unsigned int i = ancestor + 1; i < data.size (); ++i)
+  {
+    Task t (data[i]);
+    if (t.get ("uuid") == uuid)
+    {
+      mods.push_back (t);
+      std::cout << "# get_server_mods "
+                << uuid
+                << " '"
+                << t.get ("description")
+                << "'\n";
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// What a horrible name.
+void Daemon::zipper_walk (
+  const std::vector <Task>& client_mods,
+  const std::vector <Task>& server_mods,
+  Task& combined) const
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the last modication time for a task.  Ideally this is the attribute
+// "modification".  If that is missing (pre taskwarrior 2.2.0), use the later of
+// the "entry", "end", or"start" dates.
+time_t Daemon::last_modification (const Task& task) const
+{
+  return task.has ("modification") ? task.get_date ("modification") :
+         task.has ("end")          ? task.get_date ("end") :
+         task.has ("start")        ? task.get_date ("start") :
+                                     task.get_date ("entry");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
