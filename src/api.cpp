@@ -269,6 +269,17 @@ void taskd_requireVersion (const Msg& message, const std::string& version)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Assert: message.protocol >= version
+void taskd_requireHeader (
+  const Msg& message,
+  const std::string& name,
+  const std::string& value)
+{
+  if (message.get (name) != value)
+    throw format ("ERROR: Message {1} should be '{2}'", name, value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Tests left >= right, where left and right are version number strings.
 // Assumes all versions are Major.Minor.Patch[other], such as '1.0.0' or
 // '1.0.0beta1'

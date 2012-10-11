@@ -55,6 +55,7 @@ int taskd_runHook (const std::string&, const std::string&, Log&, Config&);
 
 void taskd_requireSetting (Config&, const std::string&);
 void taskd_requireVersion (const Msg&, const std::string&);
+void taskd_requireHeader (const Msg&, const std::string&, const std::string&);
 bool taskd_at_least (const std::string&, const std::string&);
 bool taskd_createDirectory (Directory&, bool);
 
