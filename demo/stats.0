@@ -3,5 +3,6 @@ org: ORG
 user: USER
 key: KEY
 version: 0.7.0
+protocol: v1
 
 
