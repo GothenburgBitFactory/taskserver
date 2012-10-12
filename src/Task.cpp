@@ -116,6 +116,14 @@ std::string Task::statusToText (Task::status s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Task::setModified ()                                                       
+{                                                                               
+  char now[16];                                                                 
+  sprintf (now, "%u", (unsigned int) time (NULL));                              
+  set ("modified", now);                                                        
+}                                                                               
+
+////////////////////////////////////////////////////////////////////////////////
 bool Task::has (const std::string& name) const
 {
   Task::const_iterator i = this->find (name);
@@ -161,6 +169,12 @@ void Task::set (const std::string& name, const std::string& value)
 {
   (*this)[name] = value;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void Task::set (const std::string& name, int value)                             
+{                                                                               
+  (*this)[name] = format (value);                                               
+}                                                                               
 
 ////////////////////////////////////////////////////////////////////////////////
 void Task::remove (const std::string& name)
