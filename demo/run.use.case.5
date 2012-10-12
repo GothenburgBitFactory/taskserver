@@ -4,23 +4,29 @@
 # modified the same task twice.
 
 echo '--- modify --------------------------------------------------------------'
-task rc:client2/rc /Two/ modify mod1
+task rc:client2/rc 3 modify mod1
 
 echo '--- modify --------------------------------------------------------------'
+echo sleep 2
 sleep 2
-task rc:client1/rc /Two/ modify mod2
+task rc:client1/rc 2 modify mod2 +tag1
 
 echo '--- modify --------------------------------------------------------------'
+echo sleep 2
 sleep 2
-task rc:client2/rc /Two/ modify mod3
+task rc:client2/rc 3 modify mod3 pro:P
 
 echo '--- modify --------------------------------------------------------------'
+echo sleep 2
 sleep 2
-task rc:client1/rc /Two/ modify mod4
+task rc:client1/rc 2 modify mod4 +tag2
 
 echo '--- sync ----------------------------------------------------------------'
 task rc:client2/rc rc.debug=1 sync
 
 echo '--- sync ----------------------------------------------------------------'
 task rc:client1/rc rc.debug=1 sync
+
+echo '--- sync ----------------------------------------------------------------'
+task rc:client2/rc rc.debug=1 sync
 
