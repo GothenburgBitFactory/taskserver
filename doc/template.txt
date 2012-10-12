@@ -1,6 +1,4 @@
-Göteborg Bit Factory                                             Paul Beckingham
-Request for Comments: wxyz                                    Federico Hernandez
-Category: Informational                                             October 2012
+Göteborg Bit Factory                                               October 2012
 
                                      Title
 

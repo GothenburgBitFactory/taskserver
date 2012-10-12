@@ -1,0 +1,52 @@
+Task Server Protocol
+--------------------
+
+N. The Task Server
+
+  The Task Server is a simple transaction-based server.
+
+
+N. Transactions
+
+  Each transaction is a single incoming message, with a response that is also a
+  single message.  All communication therefore consists of a single 'send',
+  followed by a single 'receive', then termination.
+
+  All messages are required to have a 'type' header that identifies the message
+  type.  Valid types include 'sync' and 'statistics'.
+
+
+N. Message Format
+
+  This format is based on RFC2822, 'Internet Message Format'.  Here is an
+  example message:
+
+    <SIZE>
+    name: value\n
+    name2: value2\n
+    \n
+    payload
+
+  There are three sections.  The first is the size, which is a 4-byte, big-
+  endian, binary byte count of the length of the message, including the 4 bytes
+  for the size.
+
+  The header section is a set of name/value pairs separated by newline
+  characters (U+000D).  The name is separated from the value by ': ' (colon
+  U+003A, space U+0020)  The header section is terminated by two consecutive
+  newline (U+000D) characters.  All text is UTF8.
+
+  The payload section is arbitrary.
+
+
+N. Limitations and Assumptions
+
+  A client may only connect to a single server.  Synchronization among a set of
+  servers is not supported.
+
+  A client should minimize data transfers by maintaining a local store of data.
+
+  A client should minimize data transfers by limiting the frequency of sync
+  requests.
+
+---

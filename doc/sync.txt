@@ -1,1 +1,753 @@
 Task Server Sync Algorithm
+--------------------------
+
+N. Responsibilities of the Client
+
+  All modifications to tasks (add, modify, done, delete ...) are recorded in the
+  form of a fully-composed FF4-format task.  The formatted task is appended to
+  the backlog.data file.  If a task is modified a second time, it is appended
+  again to the backlog.data file - the lines are not combined.  Each task
+  may have a 'modified' date attribute that will help resolve conflicts.
+
+  When a client syncs, it must follow this procedure:
+
+  - send the entire contents of the backlog.data, unmodified
+  - receive one of the following response codes:
+    - 201: This means 'no change', and there is no further action to be taken.
+    - 200: This means 'success', and the message payload contains a set of tasks
+      and a sync key:
+      - the formatted tasks are to be stored as-is.  These tasks will either be
+        appended to the client data or will overwrite existing client data,
+        based on the UUID of the task.  No other logic is necessary.
+      - the sync key will be written to the backlog.data file, overwriting the
+        previous contents, such that it will contain only one line.
+    - 3xx, 4xx, 5xx: The 'status' field contains an error message.
+  - if the response contained any error or warning, the error is required to be
+    shown to the user.  This provides an opportunity for the server to announce
+    downtime, or relocation.
+
+  If no sync key is sent, the server cannot provide an incremental delta, and so
+  will send all task data, which should be stored as above.  This should be the
+  case for a client making its first sync call.
+
+  The Taskwarrior client maintains data in several files (pending.data,
+  completed.data, undo.data) which are not relevant to the server.  Only the
+  backlog.data file is important.
+
+
+N. Responsibilities of the Server
+
+  The server will maintain a set of transactions, in the original sequence,
+  punctuated by sync keys, which are simply UUIDs.  Each sync key represents a
+  non-trivial sync operation by a client.  Each transaction is an FF4-formatted
+  task, followed by a newline (\n) character.  The result is a single file that
+  contains interleaved lines of two types: tasks and sync keys.
+
+  In response to a 'sync' message, the server implements this algorithm:
+
+  a. Ensures incoming message is UTF-8.
+  b. Ensures incoming message does not exceed a configurable size limit.
+  c. Parses the incoming message.
+  d. Identifies the type of incoming message ('sync').
+  e. Authenticates the message by verifying:
+     - <org> exists
+     - <org> is not terminated
+     - <org> is not suspended
+     - <user> exists under <org>
+     - <user> is not terminated
+     - <user> is not suspended
+     - <key> matches <key> in <root>/orgs/<org>/users/<user>/config
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+  i. Processes each task in the incoming message:
+     - Finds the common ancestor prior to the branch point in tx.data.
+     - Extracts all incoming modifications to this task --> 'client mods'.
+     - Extracts all stored modifications to this task after the branch point -->
+       'server mods'.
+     - Walks the 'client mods' and 'server mods' lists in parallel, choosing the
+       oldest of the two each time.  If there is a 'modified' data use that,
+       otherwise use the latest of 'entry', 'end', or 'start' dates.  This is a
+       merge sort.
+     - Merges the common ancestor with the chosen mod.
+  j. Store the merged tasks in tx.data.
+  k. Store new sync key, if tx.data changed, or none was provided.
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+ 
+
+--------------------------------------------------------------------------------
+
+N. Use Case 1: New user, no tasks, with an unused server account.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       +--------+
+
+       tx.data
+       +--------+
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       --> not found, use start of file.
+
+  i. Processes each task in the incoming message:
+
+       --> none
+
+  j. Store the merged tasks in tx.data.
+
+       --> none
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       tx.data
+       +--------+
+       | k1     |
+       +--------+
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       +----------------+
+       | code: 200      |
+       | status: ...    |
+       +----------------+
+       | k1             |
+       +----------------+
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       --> n/a
+
+
+--------------------------------------------------------------------------------
+
+N. Use Case 2: Continuing, nothing changes, and another sync is performed.
+   Nothing is expected to happen.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       | k1     |
+       +--------+
+
+       tx.data
+       +--------+
+       | k1     |
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       | k1             |
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       tx.data
+       +--------+
+       | k1     |   <-- branch point
+       +--------+
+
+  i. Processes each task in the incoming message:
+
+       --> none
+
+  j. Store the merged tasks in tx.data.
+
+       --> none
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       --> n/a
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       --> n/a
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       +----------------+
+       | code: 201      |
+       | status: ...    |
+       +----------------+
+       +----------------+
+
+
+--------------------------------------------------------------------------------
+
+N. Use Case 3: Client adds two tasks, then syncs.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       +--------+
+
+       tx.data
+       +--------+
+       | k1     |
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       | k1             |
+       | task1          |
+       | task2          |
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       tx.data
+       +--------+
+       | k1     |   <-- branch point
+       +--------+
+
+  i. Processes each task in the incoming message:
+     - Finds the common ancestor prior to the branch point in tx.data.
+
+        --> none
+
+     - Extracts all incoming modifications to this task --> 'client mods'.
+
+        --> task1, task2
+
+     - Extracts all stored modifications to this task after the branch point -->
+       'server mods'.
+
+        --> none
+
+     - Walks the 'client mods' and 'server mods' lists in parallel, choosing the
+       oldest of the two each time.  If there is a 'modified' data use that,
+       otherwise use the latest of 'entry', 'end', or 'start' dates.  This is a
+       merge sort.
+
+        --> none
+
+     - Merges the common ancestor with the chosen mod.
+
+        --> no merging
+
+  j. Store the merged tasks in tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       +--------+
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       +--------+
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       +----------------+
+       | code: 200      |
+       | status: ...    |
+       +----------------+
+       | k2             |
+       +----------------+
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       --> n/a
+
+
+--------------------------------------------------------------------------------
+
+N. Use Case 4: Client modifies a task, syncs, and receives a new task from the
+   server, placed there during sync with a different client.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       | k2     |
+       | task1' |
+       +--------+
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       | k2             |
+       | task1'         |
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |   <-- branch point
+       | task3  |
+       | k3     |
+       +--------+
+
+  i. Processes each task in the incoming message:
+     - Finds the common ancestor prior to the branch point in tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |   <-- common ancestor of task1'
+       | task2  |
+       | k2     |   <-- branch point
+       | task3  |
+       | k3     |
+       +--------+
+
+     - Extracts all incoming modifications to this task --> 'client mods'.
+
+       --> task1'
+
+     - Extracts all stored modifications to this task after the branch point -->
+       'server mods'.
+
+       --> none
+
+     - Walks the 'client mods' and 'server mods' lists in parallel, choosing the
+       oldest of the two each time.  If there is a 'modified' data use that,
+       otherwise use the latest of 'entry', 'end', or 'start' dates.  This is a
+       merge sort.
+
+       --> task1
+       --> task1'
+
+     - Merges the common ancestor with the chosen mod.
+
+       --> task1 + task1' = task1'
+
+  j. Store the merged tasks in tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |   <-- common ancestor of task1'
+       | task2  |
+       | k2     |   <-- branch point
+       | task3  |
+       | k3     |
+       | task1' |
+       +--------+
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |   <-- common ancestor of task1'
+       | task2  |
+       | k2     |   <-- branch point
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       +--------+
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       +----------------+
+       | code: 200      |
+       | status: ...    |
+       +----------------+
+       | task3          |
+       | task1'         |
+       | k4             |
+       +----------------+
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       --> n/a
+
+
+
+--------------------------------------------------------------------------------
+
+N. Use Case 5: Client modifies a task, syncs and finds that another client has
+   modified the same task twice times.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       | k4     |
+       | task2' |
+       +--------+
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       | k4             |
+       | task2'         |
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |   <-- branch point
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       +--------+
+
+  i. Processes each task in the incoming message:
+     - Finds the common ancestor prior to the branch point in tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |   <-- common ancestor
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |   <-- branch point
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       +--------+
+
+     - Extracts all incoming modifications to this task --> 'client mods'.
+
+       --> task2'
+
+     - Extracts all stored modifications to this task after the branch point -->
+       'server mods'.
+
+       --> task2"
+       --> task2*
+
+     - Walks the 'client mods' and 'server mods' lists in parallel, choosing the
+       oldest of the two each time.  If there is a 'modified' data use that,
+       otherwise use the latest of 'entry', 'end', or 'start' dates.  This is a
+       merge sort.
+
+       --> task2"
+       --> task2'   <-- client change occurred between the others
+       --> task2*
+
+     - Merges the common ancestor with the chosen mod.
+
+       --> task2 + task2" + task2' + task2* = task2^
+
+  j. Store the merged tasks in tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |   <-- common ancestor
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |   <-- branch point
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       | task2^ |
+       +--------+
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |   <-- common ancestor
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |   <-- branch point
+       | task2" |
+       | k5     |
+       | task2* |
+       | k6     |
+       | task2^ |
+       | k7     |
+       +--------+
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       +----------------+
+       | code: 200      |
+       | status: ...    |
+       +----------------+
+       | task2^         |
+       | k7             |
+       +----------------+
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       --> n/a
+
+
+--------------------------------------------------------------------------------
+
+N. Use Case 6: Client accidentally deletes all data, then runs a sync.
+
+  Initial Conditions:
+
+       backlog.data
+       +--------+
+       +--------+
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       +--------+
+
+  f. Parses the payload of the message, which contains:
+     - optional sync key (UUID)
+     - optional set of FF4-formatted tasks
+
+       +----------------+
+       | type: sync     |
+       | ...            |
+       +----------------+
+       +----------------+
+
+  g. Loads the stored data from <root>/orgs/<org>/users/<user>/tx.data.
+
+       tx.data
+       +--------+
+       | k1     |
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       +--------+
+
+  h. Locates the sync key in the tx.data file.  If a sync key was not provided,
+     uses the start of the file.  This is the branch-point.
+
+       tx.data
+       +--------+
+       | k1     |   <-- branch point
+       | task1  |
+       | task2  |
+       | k2     |
+       | task3  |
+       | k3     |
+       | task1' |
+       | k4     |
+       +--------+
+
+  i. Processes each task in the incoming message:
+
+       --> none
+
+  j. Store the merged tasks in tx.data.
+
+       --> none
+
+  k. Store new sync key, if tx.data changed, or none was provided.
+
+       --> none
+
+  l. Respond to the client with code 200 (Success) with:
+     - New synch key if tx.data changed
+     - All tx.data since the branch point, if changed, plus the merged tasks
+
+       +----------------+
+       | code: 200      |
+       | status: ...    |
+       +----------------+
+       | task1          |
+       | task2          |
+       | task3          |
+       | task1'         |
+       | k4             |
+       +----------------+
+
+  m. Respond to the client with code 201 (No change) if there are no changes to
+     tx.data, and there is no data after the branch point.
+
+       --> n/a
+
+
+N. Terminology
+
+  server      Network-accessible instance of taskd.
+  client      Taskwarrior, or any other taskd client software.  Must obey the
+              taskd server protocol.
+  task        A single task, independent of state.
+  org         An organization, which is an arbitrary set of groups and users.
+  group       An arbitrary set of users within an organization.
+  user        An individual with network access to taskd.
+  key         A user-specific, secret password, in the form of a SHA1 hash.
+  sync key    A transaction-specific identifier, in the form of a UUID.
+
