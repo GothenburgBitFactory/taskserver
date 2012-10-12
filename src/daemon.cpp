@@ -196,6 +196,9 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   if (! taskd_authenticate (_config, *_log, in, out))
     return;
 
+  // Support only task server protocol v1.
+  taskd_requireHeader (in, "protocol", "v1");
+
   if (_log)
     _log->format ("[%d] 'statistics' from %s:%d",
                   _txn_count,
@@ -244,6 +247,9 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 {
   if (! taskd_authenticate (_config, *_log, in, out))
     return;
+
+  // Support only task server protocol v1.
+  taskd_requireHeader (in, "protocol", "v1");
 
   // Note: org/user already validated during authentication.
   std::string org  = in.get ("org");
@@ -298,9 +304,6 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       unsigned int common_ancestor = find_common_ancestor (server_data,
                                                            branch_point,
                                                            uuid);
-
-      // The starting point.
-      Task ancestor (server_data[common_ancestor]);
       _log->format ("[%d]   ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
 
       // List the client-side modifications.
@@ -312,7 +315,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       get_server_mods (server_mods, server_data, uuid, common_ancestor);
 
       // Merge sort between client_mods and server_mods, patching ancestor.
-      Task combined (ancestor);
+      Task combined (server_data[common_ancestor]);
       zipper_walk (client_mods, server_mods, combined);
       std::string combined_F4 = combined.composeF4 ();
 
@@ -332,7 +335,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
   // If the server data changed, or the client will be sent new data, then a new
   // synch key is generated, and the response is code 200.
-  if (new_server_data.size () || 
+  if (new_server_data.size () ||
       server_subset.size ()   ||
       new_client_data.size ())
   {
@@ -388,7 +391,7 @@ void Daemon::parse_payload (
   }
 
   _log->format ("[%d] Client key: %s", _txn_count, key.c_str ());
-  
+
   for (i = data.begin (); i != data.end (); ++i)
     _log->format ("[%d] Client data: %s", _txn_count, i->c_str ());
 }
@@ -450,7 +453,7 @@ unsigned int Daemon::find_branch_point (
   std::vector <std::string>::const_iterator i;
   for (i = data.begin (); i != data.end (); ++i)
   {
-    if (*i == key)    
+    if (*i == key)
     {
       found = true;
       break;
@@ -586,12 +589,56 @@ void Daemon::get_server_mods (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Simultaneously walks two lists, select either the left or the right depending
+// on last modification time.
+//
 // What a horrible name.
 void Daemon::zipper_walk (
-  const std::vector <Task>& client_mods,
-  const std::vector <Task>& server_mods,
+  const std::vector <Task>& left,
+  const std::vector <Task>& right,
   Task& combined) const
 {
+  std::vector <Task> dummy;
+  dummy.push_back (combined);
+
+  std::vector <Task>::const_iterator prev_l = dummy.begin ();
+  std::vector <Task>::const_iterator iter_l = left.begin ();
+
+  std::vector <Task>::const_iterator prev_r = dummy.begin ();
+  std::vector <Task>::const_iterator iter_r = right.begin ();
+
+  while (iter_l != left.end () &&
+         iter_r != right.end ())
+  {
+    time_t mod_l = last_modification (*iter_l);
+    time_t mod_r = last_modification (*iter_r);
+    if (mod_l < mod_r)
+    {
+      patch (combined, *prev_l, *iter_l);
+      prev_l = iter_l;
+      ++iter_l;
+    }
+    else
+    {
+      patch (combined, *prev_r, *iter_r);
+      prev_r = iter_r;
+      ++iter_r;
+    }
+  } 
+
+  while (iter_l != left.end ())
+  {
+    patch (combined, *prev_l, *iter_l);
+    prev_l = iter_l;
+    ++iter_l;
+  }
+
+  while (iter_r != right.end ())
+  {
+    patch (combined, *prev_r, *iter_r);
+    prev_r = iter_r;
+    ++iter_r;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -607,13 +654,43 @@ time_t Daemon::last_modification (const Task& task) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Determine the delta between 'from' and 'to', and apply that delta to 'base'.
-// All three tasks have the same uuid.
+// Determine the delta between 'from' and 'to', and apply only those changes to
+// 'base'.  All three tasks have the same uuid.
 void Daemon::patch (
   Task& base,
   const Task& from,
   const Task& to) const
 {
+  // Determine the different attribute names between from and to.
+  std::vector <std::string> from_atts;
+  Task::const_iterator att;
+  for (att = from.begin (); att != from.end (); ++att)
+    from_atts.push_back (att->first);
+
+  std::vector <std::string> to_atts;
+  for (att = to.begin (); att != to.end (); ++att)
+    to_atts.push_back (att->first);
+
+  std::vector <std::string> from_only;
+  std::vector <std::string> to_only;
+  listDiff (from_atts, to_atts, from_only, to_only);
+
+  std::vector <std::string> common_atts;
+  listIntersect (from_atts, to_atts, common_atts);
+
+  // The from-only attributes must be deleted from base.
+  std::vector <std::string>::iterator i;
+  for (i = from_only.begin (); i != from_only.end (); ++i)
+    base.remove (*i);
+
+  // The to-only attributes must be added to base.
+  for (i = to_only.begin (); i != to_only.end (); ++i)
+    base.set (*i, to.get (*i));
+
+  // The intersecting attributes, if the values differ, are applied.
+  for (i = common_atts.begin (); i != common_atts.end (); ++i)
+    if (from.get (*i) != to.get (*i))
+      base.set (*i, to.get (*i));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
