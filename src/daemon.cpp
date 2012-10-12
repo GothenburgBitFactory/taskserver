@@ -532,9 +532,12 @@ unsigned int Daemon::find_common_ancestor (
 {
   for (int i = (int) branch_point; i >= 0; --i)
   {
-    Task t (data[i]);
-    if (t.get ("uuid") == uuid)
-      return (unsigned int) i;
+    if (data[i][0] == '[')
+    {
+      Task t (data[i]);
+      if (t.get ("uuid") == uuid)
+        return (unsigned int) i;
+    }
   }
 
   throw std::string ("ERROR: Could not find common ancestor for ") + uuid;
@@ -551,15 +554,11 @@ void Daemon::get_client_mods (
   std::vector <std::string>::const_iterator line;
   for (line = data.begin (); line != data.end (); ++line)
   {
-    Task t (*line);
-    if (t.get ("uuid") == uuid)
+    if ((*line)[0] == '[')
     {
-      mods.push_back (t);
-      std::cout << "# get_client_mods "
-                << uuid
-                << " '"
-                << t.get ("description")
-                << "'\n";
+      Task t (*line);
+      if (t.get ("uuid") == uuid)
+        mods.push_back (t);
     }
   }
 }
@@ -575,15 +574,11 @@ void Daemon::get_server_mods (
 {
   for (unsigned int i = ancestor + 1; i < data.size (); ++i)
   {
-    Task t (data[i]);
-    if (t.get ("uuid") == uuid)
+    if (data[i][0] == '[')
     {
-      mods.push_back (t);
-      std::cout << "# get_server_mods "
-                << uuid
-                << " '"
-                << t.get ("description")
-                << "'\n";
+      Task t (data[i]);
+      if (t.get ("uuid") == uuid)
+        mods.push_back (t);
     }
   }
 }
@@ -790,7 +785,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
       server.beginSSLServer ();
 */
-      std::cout << "ERROR: SSL not implemented.\n";
+      throw std::string ("ERROR: SSL not implemented.");
     }
     else
     {
