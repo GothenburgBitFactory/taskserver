@@ -610,12 +610,14 @@ void Daemon::zipper_walk (
     if (mod_l < mod_r)
     {
       patch (combined, *prev_l, *iter_l);
+      combined.set ("modified", (int) mod_l);
       prev_l = iter_l;
       ++iter_l;
     }
     else
     {
       patch (combined, *prev_r, *iter_r);
+      combined.set ("modified", (int) mod_r);
       prev_r = iter_r;
       ++iter_r;
     }
@@ -624,6 +626,7 @@ void Daemon::zipper_walk (
   while (iter_l != left.end ())
   {
     patch (combined, *prev_l, *iter_l);
+    combined.set ("modified", (int) last_modification (*iter_l));
     prev_l = iter_l;
     ++iter_l;
   }
@@ -631,6 +634,7 @@ void Daemon::zipper_walk (
   while (iter_r != right.end ())
   {
     patch (combined, *prev_r, *iter_r);
+    combined.set ("modified", (int) last_modification (*iter_r));
     prev_r = iter_r;
     ++iter_r;
   }
