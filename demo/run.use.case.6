@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Use Case 6: Client accidentally deletes all data, then runs a sync.
+
+echo '--- accident ------------------------------------------------------------'
+rm client1/*.data
+echo '--- sync ----------------------------------------------------------------'
+task rc:client1/rc rc.debug=1 sync
+

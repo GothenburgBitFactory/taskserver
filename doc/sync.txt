@@ -330,7 +330,7 @@ N. Use Case 3: Client adds two tasks, then syncs.
 --------------------------------------------------------------------------------
 
 N. Use Case 4: Client modifies a task, syncs, and receives a new task from the
-   server, placed there during sync with a different client.
+   server, placed there by a different client.
 
   Initial Conditions:
 
@@ -471,7 +471,7 @@ N. Use Case 4: Client modifies a task, syncs, and receives a new task from the
 --------------------------------------------------------------------------------
 
 N. Use Case 5: Client modifies a task, syncs and finds that another client has
-   modified the same task twice times.
+   modified the same task twice.
 
   Initial Conditions:
 
