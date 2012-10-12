@@ -6,20 +6,22 @@
 
 0.9.0 ()
 
-0.8.0 ()
-- 
-
 ------ current release ---------------------------
 
-0.7.0 ()
+0.8.0 (2012-10-11)
+- Functioning sync algorightm.
+- Initial documentation.
+- Demo scripts (early unit tests).
+
+------ old releases ------------------------------
+
+0.7.0 (2012-09-30)
 - Added program shell.
 - Added SSL support.
 - Added server command, responding to 'statistics' and 'sync' requests.
 - Added debug 'client' command.
 - Added 'add' command.
 - Equalled functionality of original codebase.
-
------- old releases ------------------------------
 
 Project restarted 2012-09-26
 Project started 2010-09-22
