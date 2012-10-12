@@ -72,5 +72,77 @@ bool taskd_is_user  (const Directory&root, const std::string&, const std::string
 
 std::string taskd_error (const int);
 
+// list template
+///////////////////////////////////////////////////////////////////////////////
+template <class T> bool listDiff (const T& left, const T& right)
+{
+  if (left.size () != right.size ())
+    return true;
+
+  for (unsigned int i = 0; i < left.size (); ++i)
+    if (left[i] != right[i])
+      return true;
+
+  return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <class T> void listDiff (
+  const T& left, const T& right, T& leftOnly, T& rightOnly)
+{
+  leftOnly.clear ();
+  rightOnly.clear ();
+
+  for (unsigned int l = 0; l < left.size (); ++l)
+  {
+    bool found = false;
+    for (unsigned int r = 0; r < right.size (); ++r)
+    {
+      if (left[l] == right[r])
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found)
+      leftOnly.push_back (left[l]);
+  }
+
+  for (unsigned int r = 0; r < right.size (); ++r)
+  {
+    bool found = false;
+    for (unsigned int l = 0; l < left.size (); ++l)
+    {
+      if (left[l] == right[r])
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found)
+      rightOnly.push_back (right[r]);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template <class T> void listIntersect (const T& left, const T& right, T& join)
+{
+  join.clear ();
+
+  for (unsigned int l = 0; l < left.size (); ++l)
+  {
+    for (unsigned int r = 0; r < right.size (); ++r)
+    {
+      if (left[l] == right[r])
+      {
+        join.push_back (left[l]);
+        break;
+      }
+    }
+  }
+}
+
 #endif
 ////////////////////////////////////////////////////////////////////////////////
