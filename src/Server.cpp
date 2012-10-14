@@ -58,7 +58,7 @@ Server::Server ()
   , _log_clients (false)
   , _client_address ("")
   , _client_port (0)
-  , _port (12345)
+  , _port ("12345")
   , _pool_size (4)
   , _queue_size (10)
   , _daemon (false)
@@ -76,9 +76,9 @@ Server::~Server ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::setPort (int port)
+void Server::setPort (const std::string& port)
 {
-  if (_log) _log->format ("Using port %d", port);
+  if (_log) _log->format ("Using port %s", port.c_str ());
   _port = port;
 }
 
@@ -157,8 +157,8 @@ void Server::beginServer ()
     writePidFile ();
   }
 
-  Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  s.bind (AF_INET, _port);
+  Socket s;
+  s.bind (_port);
   s.listen (_queue_size);
 
   _request_count = 0;
@@ -295,9 +295,7 @@ void Server::beginSSLServer ()
     BIO_get_ssl (bio_ssl, &ssl);
     SSL_set_mode (ssl, SSL_MODE_AUTO_RETRY);
 
-    char port_string[12];
-    sprintf (port_string, "%d", _port);
-    bio_incoming = BIO_new_accept (port_string);
+    bio_incoming = BIO_new_accept (_port.c_str ());
     BIO_set_accept_bios (bio_incoming, bio_ssl);
 
     // First call sets up socket.

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskd - Task Server
+// taskwarrior - a command line task list manager.
 //
-// Copyright 2010 - 2012, Göteborg Bit Factory.
+// Copyright 2006-2012, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,25 +38,32 @@
 class Socket
 {
 public:
-  Socket (int, int, int);
+  Socket ();
   Socket (int);
   ~Socket ();
-  void connect (const std::string&, const int);
-  void close ();
-  void bind (int, int);
+
+  // Client
+  void connect (const std::string&, const std::string&);
+
+  // Server
+  void bind (const std::string&);
   void listen (int queue = 5);
   int accept ();
   void read (std::string&);
   void write (const std::string&);
+
+  void close ();
+
   void limit (int);
   void debug ();
 
 private:
-  int  _port;
-  int  _family;
+  void* get_in_addr (struct sockaddr*);
+
+private:
   int  _socket;
-  bool _debug;
   int  _limit;
+  bool _debug;
 };
 
 #endif

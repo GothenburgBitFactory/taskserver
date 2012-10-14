@@ -759,7 +759,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'");
 
-    int port = strtoimax (serverDetails.substr (colon + 1).c_str (), NULL, 10);
+    std::string port = serverDetails.substr (colon + 1);
 
     // Create a taskd server object.
     Daemon server        (config);

@@ -42,7 +42,7 @@ class Server
 public:
   Server ();
   virtual ~Server ();
-  void setPort (int);
+  void setPort (const std::string&);
   void setPoolSize (int);
   void setQueueSize (int);
   void setDaemon ();
@@ -81,7 +81,7 @@ private:
 #endif
 
 private:
-  int _port;
+  std::string _port;
   int _pool_size;
   int _queue_size;
   bool _daemon;

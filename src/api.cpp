@@ -363,16 +363,16 @@ bool taskd_sendMessage (
   const Msg& out)
 {
   std::string destination = config.get (to);
-  std::string::size_type colon = destination.find (':');
+  std::string::size_type colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
   std::string server = destination.substr (0, colon);
-  int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
+  std::string port   = destination.substr (colon + 1);
 
   try
   {
-    Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    Socket s;
     s.connect (server, port);
     s.write (out.serialize () + "\n");
 
@@ -403,16 +403,16 @@ bool taskd_sendMessage (
   Msg& in)
 {
   std::string destination = config.get (to);
-  std::string::size_type colon = destination.find (':');
+  std::string::size_type colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
   std::string server = destination.substr (0, colon);
-  int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
+  std::string port   = destination.substr (colon + 1);
 
   try
   {
-    Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    Socket s;
     s.connect (server, port);
     s.write (out.serialize () + "\n");
 
