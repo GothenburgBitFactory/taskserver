@@ -4,17 +4,18 @@
 
 1.0.0alpha ()
 
-0.9.0 ()
-- IPv4 and IPv6 support.
-
 ------ current release ---------------------------
 
-0.8.0 (2012-10-11)
-- Functioning sync algorightm.
-- Initial documentation.
-- Demo scripts (early unit tests).
+0.9.0 (2012-10-16)
+- IPv4 and IPv6 support.
+- Sync use cases and test.
 
 ------ old releases ------------------------------
+
+0.8.0 (2012-10-11)
+- Functioning sync algorithm.
+- Initial documentation.
+- Demo scripts (early unit tests).
 
 0.7.0 (2012-09-30)
 - Added program shell.
