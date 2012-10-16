@@ -60,7 +60,7 @@ private:
   void append_server_data (const std::string&, const std::string&, const std::vector <std::string>&) const;
   unsigned int find_branch_point (const std::vector <std::string>&, const std::string&) const;
   void extract_subset (const std::vector <std::string>&, const unsigned int, std::vector <Task>&) const;
-  bool contains (const std::vector <Task>&, const Task&) const;
+  bool contains (const std::vector <Task>&, const std::string&) const;
   std::string generate_payload (const std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
   unsigned int find_common_ancestor (const std::vector <std::string>&, unsigned int, const std::string&) const;
   void get_client_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
@@ -288,23 +288,24 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     // Validate task.
     Task task (*client_task);
+    std::string uuid = task.get ("uuid");
     task.validate ();
+
     _log->format ("[%d] Validated: %s '%s'",
                   _txn_count,
-                  task.get ("uuid").c_str (),
+                  uuid.c_str (),
                   task.get ("description").c_str ());
 
     // If task is in subset
-    if (contains (server_subset, task))
+    if (contains (server_subset, uuid))
     {
-      _log->format ("[%d]   Merge needed", _txn_count);
+      _log->format ("[%d] Merge needed", _txn_count);
 
       // Find common ancestor, prior to branch point
-      std::string uuid = task.get ("uuid");
       unsigned int common_ancestor = find_common_ancestor (server_data,
                                                            branch_point,
                                                            uuid);
-      _log->format ("[%d]   ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
+      _log->format ("[%d] Ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
 
       // List the client-side modifications.
       std::vector <Task> client_mods;
@@ -325,7 +326,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
     else
     {
-      _log->format ("[%d]   add", _txn_count);
+      _log->format ("[%d] Store", _txn_count);
 
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
@@ -489,10 +490,8 @@ void Daemon::extract_subset (
 ////////////////////////////////////////////////////////////////////////////////
 bool Daemon::contains (
   const std::vector <Task>& subset,
-  const Task& task) const
+  const std::string& uuid) const
 {
-  std::string uuid = task.get ("uuid");
-
   std::vector <Task>::const_iterator i;
   for (i = subset.begin (); i != subset.end (); ++i)
     if (uuid == i->get ("uuid"))
@@ -593,6 +592,8 @@ void Daemon::zipper_walk (
   const std::vector <Task>& right,
   Task& combined) const
 {
+  _log->format ("[%d] Zipper", _txn_count);
+  _log->format ("[%d] Zipper before %s", _txn_count, combined.composeF4 ().c_str ());
   std::vector <Task> dummy;
   dummy.push_back (combined);
 
@@ -609,6 +610,7 @@ void Daemon::zipper_walk (
     time_t mod_r = last_modification (*iter_r);
     if (mod_l < mod_r)
     {
+      _log->format ("[%d] applying left %d < %d", _txn_count, mod_l, mod_r);
       patch (combined, *prev_l, *iter_l);
       combined.set ("modified", (int) mod_l);
       prev_l = iter_l;
@@ -616,6 +618,7 @@ void Daemon::zipper_walk (
     }
     else
     {
+      _log->format ("[%d] applying right %d >= %d", _txn_count, mod_l, mod_r);
       patch (combined, *prev_r, *iter_r);
       combined.set ("modified", (int) mod_r);
       prev_r = iter_r;
@@ -623,6 +626,7 @@ void Daemon::zipper_walk (
     }
   } 
 
+  _log->format ("[%d] exhausting left", _txn_count);
   while (iter_l != left.end ())
   {
     patch (combined, *prev_l, *iter_l);
@@ -631,6 +635,7 @@ void Daemon::zipper_walk (
     ++iter_l;
   }
 
+  _log->format ("[%d] exhausting right", _txn_count);
   while (iter_r != right.end ())
   {
     patch (combined, *prev_r, *iter_r);
@@ -638,6 +643,8 @@ void Daemon::zipper_walk (
     prev_r = iter_r;
     ++iter_r;
   }
+
+  _log->format ("[%d] Zipper after %s", _txn_count, combined.composeF4 ().c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -646,10 +653,10 @@ void Daemon::zipper_walk (
 // the "entry", "end", or"start" dates.
 time_t Daemon::last_modification (const Task& task) const
 {
-  return task.has ("modification") ? task.get_date ("modification") :
-         task.has ("end")          ? task.get_date ("end") :
-         task.has ("start")        ? task.get_date ("start") :
-                                     task.get_date ("entry");
+  return task.has ("modified") ? task.get_date ("modified") :
+         task.has ("end")      ? task.get_date ("end") :
+         task.has ("start")    ? task.get_date ("start") :
+                                 task.get_date ("entry");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,6 +667,10 @@ void Daemon::patch (
   const Task& from,
   const Task& to) const
 {
+  _log->format ("[%d] patch %s",
+                _txn_count,
+                base.get ("uuid").substr (0, 8).c_str ());
+
   // Determine the different attribute names between from and to.
   std::vector <std::string> from_atts;
   Task::const_iterator att;
@@ -680,16 +691,25 @@ void Daemon::patch (
   // The from-only attributes must be deleted from base.
   std::vector <std::string>::iterator i;
   for (i = from_only.begin (); i != from_only.end (); ++i)
+  {
+    _log->format ("[%d] patch remove %s", _txn_count, i->c_str ());
     base.remove (*i);
+  }
 
   // The to-only attributes must be added to base.
   for (i = to_only.begin (); i != to_only.end (); ++i)
+  {
+    _log->format ("[%d] patch add %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
     base.set (*i, to.get (*i));
+  }
 
   // The intersecting attributes, if the values differ, are applied.
   for (i = common_atts.begin (); i != common_atts.end (); ++i)
     if (from.get (*i) != to.get (*i))
+    {
+      _log->format ("[%d] patch modify %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
       base.set (*i, to.get (*i));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
