@@ -280,6 +280,9 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::vector <Task> server_subset;
   extract_subset (server_data, branch_point, server_subset);
 
+  // Maintain a list of already-merged task UUIDs.
+  std::vector <std::string> already_seen;
+
   // For each incoming task...
   std::vector <std::string>::iterator client_task;
   for (client_task = client_data.begin ();
@@ -299,6 +302,13 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     // If task is in subset
     if (contains (server_subset, uuid))
     {
+      // Merging a task causes a complete scan, and that picks up all mods to
+      // that same task.  Therefore, there is no need to re-process a UUID.
+      if (std::find (already_seen.begin (), already_seen.end (), uuid) != already_seen.end ())
+        continue;
+
+      already_seen.push_back (uuid);
+
       _log->format ("[%d] Merge needed", _txn_count);
 
       // Find common ancestor, prior to branch point
@@ -318,9 +328,16 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       // Merge sort between client_mods and server_mods, patching ancestor.
       Task combined (server_data[common_ancestor]);
       zipper_walk (client_mods, server_mods, combined);
-      std::string combined_F4 = combined.composeF4 ();
+      std::string combined_F4 = trimRight (combined.composeF4 (), "\n");
 
-      // Append combined task to client and server data.
+      // Append combined task to client and server data, if not already there.
+/*
+      if (std::find (new_server_data.begin (), new_server_data.end (), combined_F4) != new_server_data.end ())
+        new_server_data.push_back (combined_F4);
+
+      if (std::find (new_client_data.begin (), new_client_data.end (), combined_F4) != new_client_data.end ())
+        new_client_data.push_back (combined_F4);
+*/
       new_server_data.push_back (combined_F4);
       new_client_data.push_back (combined_F4);
     }
@@ -334,31 +351,57 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
   }
 
-  // If the server data changed, or the client will be sent new data, then a new
-  // synch key is generated, and the response is code 200.
-  if (new_server_data.size () ||
-      server_subset.size ()   ||
-      new_client_data.size ())
+  // New server data means a new sync key must be generated.  No new server data
+  // means the most recent sync key is reused.
+  std::string new_client_key = "";
+  if (new_server_data.size ())
   {
-    // Create a new synch-key.
-    std::string new_client_key = uuid ();
+    new_client_key = uuid ();
     new_server_data.push_back (new_client_key);
     _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
 
     // Append new_server_data to file.
     append_server_data (org, user, new_server_data);
+  }
+  else
+  {
+    std::vector <std::string>::reverse_iterator i;
+    for (i = server_data.rbegin (); i != server_data.rend (); ++i)
+      if ((*i)[0] != '[')
+      {
+        new_client_key = *i;
+        break;
+      }
 
-    out.setPayload (
-      generate_payload (
-        server_subset,
-        new_client_data,
-        new_client_key));
+    _log->format ("[%d] Using latest synch key: %s", _txn_count, new_client_key.c_str ());
+  }
 
+  // If there is outgoing data, generate payload + key.
+  std::string payload = "";
+  if (server_subset.size () ||
+      new_client_data.size ())
+  {
+    payload = generate_payload (server_subset,
+                                new_client_data,
+                                new_client_key);
+  }
+
+  // No outgoing data, just sent the latest key.
+  else
+  {
+    payload = new_client_key + "\n";
+  }
+
+  // Have payload and key, therefore success.
+  if (payload        != "" &&
+      new_client_key != "")
+  {
+    out.setPayload (payload);
     out.set ("code",   200);
     out.set ("status", taskd_error (200));
   }
 
-  // If no data changed, the response is code 201.
+  // Nothing changed --> 201 is a success code.
   else
   {
     _log->format ("[%d] No change", _txn_count);
@@ -592,7 +635,6 @@ void Daemon::zipper_walk (
   const std::vector <Task>& right,
   Task& combined) const
 {
-  _log->format ("[%d] Zipper", _txn_count);
   _log->format ("[%d] Zipper before %s", _txn_count, combined.composeF4 ().c_str ());
   std::vector <Task> dummy;
   dummy.push_back (combined);
@@ -626,7 +668,6 @@ void Daemon::zipper_walk (
     }
   } 
 
-  _log->format ("[%d] exhausting left", _txn_count);
   while (iter_l != left.end ())
   {
     patch (combined, *prev_l, *iter_l);
@@ -635,7 +676,6 @@ void Daemon::zipper_walk (
     ++iter_l;
   }
 
-  _log->format ("[%d] exhausting right", _txn_count);
   while (iter_r != right.end ())
   {
     patch (combined, *prev_r, *iter_r);
@@ -667,10 +707,6 @@ void Daemon::patch (
   const Task& from,
   const Task& to) const
 {
-  _log->format ("[%d] patch %s",
-                _txn_count,
-                base.get ("uuid").substr (0, 8).c_str ());
-
   // Determine the different attribute names between from and to.
   std::vector <std::string> from_atts;
   Task::const_iterator att;
