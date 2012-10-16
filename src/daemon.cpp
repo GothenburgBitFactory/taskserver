@@ -331,13 +331,6 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       std::string combined_F4 = trimRight (combined.composeF4 (), "\n");
 
       // Append combined task to client and server data, if not already there.
-/*
-      if (std::find (new_server_data.begin (), new_server_data.end (), combined_F4) != new_server_data.end ())
-        new_server_data.push_back (combined_F4);
-
-      if (std::find (new_client_data.begin (), new_client_data.end (), combined_F4) != new_client_data.end ())
-        new_client_data.push_back (combined_F4);
-*/
       new_server_data.push_back (combined_F4);
       new_client_data.push_back (combined_F4);
     }
@@ -358,7 +351,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     new_client_key = uuid ();
     new_server_data.push_back (new_client_key);
-    _log->format ("[%d] New synch key: %s", _txn_count, new_client_key.c_str ());
+    _log->format ("[%d] New sync key: %s", _txn_count, new_client_key.c_str ());
 
     // Append new_server_data to file.
     append_server_data (org, user, new_server_data);
@@ -373,7 +366,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
         break;
       }
 
-    _log->format ("[%d] Using latest synch key: %s", _txn_count, new_client_key.c_str ());
+    _log->format ("[%d] Using latest sync key: %s", _txn_count, new_client_key.c_str ());
   }
 
   // If there is outgoing data, generate payload + key.
@@ -456,7 +449,7 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Server data: %u line(s)", _txn_count, data.size ());
+  _log->format ("[%d] Read server data: %u line(s)", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -488,10 +481,7 @@ unsigned int Daemon::find_branch_point (
 
   // A missing key is either a first-time sync, or a request to get all data.
   if (key == "")
-  {
-    _log->format ("[%d] Branch point: (no key) --> %u", _txn_count, branch);
     return branch;
-  }
 
   bool found = false;
   std::vector <std::string>::const_iterator i;
@@ -507,7 +497,7 @@ unsigned int Daemon::find_branch_point (
   }
 
   if (!found)
-    throw std::string ("Client synch key not found.");
+    throw std::string ("Client sync key not found.");
 
   _log->format ("[%d] Branch point: %s --> %u", _txn_count, key.c_str (), branch);
   return branch;
@@ -522,12 +512,9 @@ void Daemon::extract_subset (
   if (branch_point < data.size ())
     for (unsigned int i = branch_point; i < data.size (); ++i)
       if (data[i][0] == '[')
-      {
-        _log->format ("[%d] Subset: %s", _txn_count, data[i].c_str ());
         subset.push_back (Task (data[i]));
-      }
 
-  _log->format ("[%d] Subset: %u line(s)", _txn_count, subset.size ());
+  _log->format ("[%d] Subset: %u line(s) after branch point", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -635,7 +622,6 @@ void Daemon::zipper_walk (
   const std::vector <Task>& right,
   Task& combined) const
 {
-  _log->format ("[%d] Zipper before %s", _txn_count, combined.composeF4 ().c_str ());
   std::vector <Task> dummy;
   dummy.push_back (combined);
 
@@ -684,7 +670,7 @@ void Daemon::zipper_walk (
     ++iter_r;
   }
 
-  _log->format ("[%d] Zipper after %s", _txn_count, combined.composeF4 ().c_str ());
+  _log->format ("[%d] Zipper result %s", _txn_count, combined.composeF4 ().c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

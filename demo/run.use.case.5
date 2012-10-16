@@ -22,11 +22,11 @@ sleep 2
 task rc:client1/rc 2 modify Two mod4 +tag2
 
 echo '--- sync ----------------------------------------------------------------'
-task rc:client1/rc rc.debug=1 sync
+task rc:client1/rc sync
 
 echo '--- sync ----------------------------------------------------------------'
-task rc:client2/rc rc.debug=1 sync
+task rc:client2/rc sync
 
 echo '--- sync ----------------------------------------------------------------'
-task rc:client1/rc rc.debug=1 sync
+task rc:client1/rc sync
 
