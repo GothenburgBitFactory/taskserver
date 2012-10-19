@@ -39,6 +39,49 @@ N. Message Format
   The payload section is arbitrary.
 
 
+N. Responsibilities of the Client
+
+  All modifications to tasks (add, modify, done, delete ...) are recorded in the
+  form of a fully-composed FF4-format task.  The formatted task is appended to
+  the backlog.data file.  If a task is modified a second time, it is appended
+  again to the backlog.data file - the lines are not combined.  Each task
+  may have a 'modified' date attribute that will help resolve conflicts.
+
+  When a client syncs, it must follow this procedure:
+
+  - send the entire contents of the backlog.data, unmodified
+  - receive one of the following response codes:
+    - 201: This means 'no change', and there is no further action to be taken.
+    - 200: This means 'success', and the message payload contains a set of tasks
+      and a sync key:
+      - the formatted tasks are to be stored as-is.  These tasks will either be
+        appended to the client data or will overwrite existing client data,
+        based on the UUID of the task.  No other logic is necessary.
+      - the sync key will be written to the backlog.data file, overwriting the
+        previous contents, such that it will contain only one line.
+    - 3xx, 4xx, 5xx: The 'status' field contains an error message.
+  - if the response contained any error or warning, the error is required to be
+    shown to the user.  This provides an opportunity for the server to announce
+    downtime, or relocation.
+
+  If no sync key is sent, the server cannot provide an incremental delta, and so
+  will send all task data, which should be stored as above.  This should be the
+  case for a client making its first sync call.
+
+  The Taskwarrior client maintains data in several files (pending.data,
+  completed.data, undo.data) which are not relevant to the server.  Only the
+  backlog.data file is important.
+
+
+N. Responsibilities of the Server
+
+  The server will maintain a set of transactions, in the original sequence,
+  punctuated by sync keys, which are simply UUIDs.  Each sync key represents a
+  non-trivial sync operation by a client.  Each transaction is an FF4-formatted
+  task, followed by a newline (\n) character.  The result is a single file that
+  contains interleaved lines of two types: tasks and sync keys.
+
+
 N. Limitations and Assumptions
 
   A client may only connect to a single server.  Synchronization among a set of
