@@ -25,19 +25,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-//#include <sstream>
-//#include <stdlib.h>
-//#include <math.h>
-//#include <algorithm>
-//#include <Nibbler.h>
-//#include <Date.h>
+#include <stdlib.h>
 #include <Duration.h>
 #include <Task.h>
 #include <JSON.h>
-//#include <RX.h>
 #include <text.h>
 #include <util.h>
-//#include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 Task::Task ()
