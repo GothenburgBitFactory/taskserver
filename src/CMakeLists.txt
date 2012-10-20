@@ -28,6 +28,7 @@ add_executable (taskd_executable taskd.cpp
                                  status.cpp
                                  Task.cpp       Task.h
                                  text.cpp       text.h
+                                 Thread.cpp     Thread.h
                                  Timer.cpp      Timer.h
                                  utf8.cpp       utf8.h
                                  util.cpp       util.h)
