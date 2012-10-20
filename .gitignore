@@ -7,3 +7,4 @@ CPackSourceConfig.cmake
 install_manifest.txt
 cmake.h
 commit.h
+cert
