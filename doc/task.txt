@@ -1,0 +1,466 @@
+Göteborg Bit Factory                                               October 2012
+
+                            Taskwarrior Data Format
+                                   Version 1
+                                    Draft 1
+
+
+Status of this Memo
+
+   This document provides information for the Internet community.  It does not
+   specify an Internet standard of any kind.  Distribution of this document is
+   not restricted.
+
+
+Copyright Notice
+
+   Copyright (C) 2012, Göteborg Bit Factory
+
+
+Abstract
+
+   The Taskwarrior Data Format describes the structure and semantics for tasks
+   stored by Taskwarrior, and transmitted to/from the Task Server.
+
+
+Table of Contents
+
+   1       Introduction
+   1.1     Requirements
+   2       General Format
+   2.1     Data Types
+   2.1.1   Data Type: String
+   2.1.2   Data Type: Literal String
+   2.1.3   Data Type: UUID
+   2.1.4   Data Type: Integer
+   2.1.5   Data Type: Date
+   2.2     The Fields
+   2.3     Additional Fields
+   3       Field Details
+   3.1     Field: status
+   3.2     Field: uuid
+   3.3     Field: entry
+   3.4     Field: description
+   3.5     Field: start
+   3.6     Field: end
+   3.7     Field: due
+   3.8     Field: until
+   3.9     Field: wait
+   3.10    Field: recur
+   3.11    Field: mask
+   3.12    Field: imask
+   3.13    Field: parent
+   3.14    Field: annotation_<time>
+   3.15    Field: project
+   3.16    Field: tags
+   3.17    Field: priority
+   3.18    Field: depends
+   3.19    User Defined Attributes
+
+   5      References
+   6      Acknowledgements
+   7      Authors' Addresses
+   8      Full Copyright Statement
+
+
+1  Introduction
+
+   Any client of the Task Server will need to communicate task information.
+   This document describes the format of a single task.  It does not describe
+   the protocol between client and server.
+
+   This document is subject to change.  The data attributes are also subject
+   to change.
+
+
+1.1  Requirements
+
+   In this document, we adopt the convention discussed in Section 1.3.2 of
+   [RFC1122] of using the capitalized words MUST, REQUIRED, SHOULD, RECOMMENDED,
+   MAY, and OPTIONAL to define the significance of each particular requirement
+   specified in this document.
+
+   In brief: "MUST" (or "REQUIRED") means that the item is an absolute
+   requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
+   exist valid reasons for ignoring this item, but the full implications should
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   is optional, and may be omitted without careful consideration.
+
+
+2  General Format
+
+   The format is similar to JSON, but is not JSON.  A task comprises a single
+   line of text, surrounded by [ (U+005B) and ] (U+005D), and terminated by a
+   newline (U+000D).
+
+   The line of text is a collection of name/value pairs like this:
+
+      [description:"One two three" entry:"1241916966" status:"pending" ... ]
+
+   While this is not a valid task (there are missing fields), the format is
+   illustrated.
+
+   The names are simply words followed by a : (U+003A), then a value that is
+   quoted using " (U+0022).  A name will always have a corresponding value, and
+   if a value is blank, then the name/value pair is omitted from the format.
+   Newline characters are not permitted within the value, meaning that a task
+   consists of a single line of text.
+
+
+2.1  Data Types
+
+   There are five data types used in the task format.
+
+
+2.1.1  Data Type: String
+
+   Strings may consist of any UTF-8 characters, except double quotes and newline
+   characters.
+
+
+2.1.2  Data Type: Literal String
+
+   A literal string is one value from a set of acceptable values, such as a
+   priority level.
+
+
+2.1.3  Data Type: UUID
+
+   A UUID is a 32-hex-character lower case string, formatted in this way:
+
+      xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+   An example:
+
+      296d835e-8f85-4224-8f36-c612cad1b9f8
+
+
+2.1.4  Data Type: Integer
+
+   Integers are rendered in a simple fashion:
+
+      123
+
+ 
+2.1.5  Data Type: Date
+
+   Dates are rendered in ISO 8601 combined date and time in UTC format using the
+   template:
+
+      YYYYMMDDTHHMMSSZ
+
+   An example:
+
+      20120110T231200Z
+
+   No other formats are supported.
+
+
+2.2  The Fields
+
+   Here are the standard fields that may comprise a task:
+
+      +-------------------+---------+
+      | Name              | Type    |
+      +-------------------+---------+
+      | status            | String  |
+      | uuid              | UUID    |
+      | entry             | Date    |
+      | description       | String  |
+      | start             | Date    |
+      | end               | Date    |
+      | due               | Date    |
+      | until             | Date    |
+      | wait              | Date    |
+      | recur             | String  |
+      | mask              | String  |
+      | imask             | Integer |
+      | parent            | UUID    |
+      | annotation_<time> | String  |
+      | project           | String  |
+      | tags              | String  |
+      | priority          | String  |
+      | depends           | String  |
+      +-------------------+---------+
+
+   There are other forms, which are conditional upon the state of a task:
+
+      +-------------------+-------+-------+-------+-------+-------+-------+
+      | Name              | Pendi | Delet | Compl | Waiti | Recur | Recur |
+      |                   | ng    | ed    | eted  | ng    | ring  | ring  |
+      |                   |       |       |       |       | parent| child |
+      +-------------------+-------+-------+-------+-------+-------+-------+
+      | status            | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  |
+      | uuid              | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  |
+      | entry             | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  |
+      | description       | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  | Reqd  |
+      | start             | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      | end               |       | Reqd  | Reqd  |       |       |       |
+      | due               | Opt   | Opt   | Opt   | Opt   | Reqd  | Opt   |
+      | until             |       |       |       |       | Opt   | Opt   |
+      | wait              |       |       |       | Reqd  |       |       |
+      | recur             |       |       |       |       | Reqd  | Reqd  |
+      | mask              |       |       |       |       | Intrn |       |
+      | imask             |       |       |       |       |       | Reqd  |
+      | parent            |       |       |       |       |       | Reqd  |
+      | annotation_<time> | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      | project           | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      | tags              | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      | priority          | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      | depends           | Opt   | Opt   | Opt   | Opt   | Opt   | Opt   |
+      +-------------------+-------+-------+-------+-------+-------+-------+
+
+      (Legend: Reqd = required, Opt = optional, Intrn = Internally generated)
+
+   All tasks have four required fields.  There are other states in which a task
+   may exist, and the requirements change.
+
+   Deleted
+      A deleted task MUST have "status":"deleted", and an "end" date.
+
+   Completed
+      A completed task MUST have "status":"completed", and an "end" date.
+
+   Waiting
+      A waiting task MUST have "status":"waiting" and a "wait" date.  The task
+      is hidden from the user, until that "wait" date has passed.
+
+   Recurring Parent
+      When a recurring task is entered, it MUST have "status":"recurring", a
+      "recur" period and a "due" date.  It MAY also have an "until" date.
+      Recurring parent tasks are hidden from the user.
+
+   Recurring Child
+      A recurring child task is not created by the user, but is cloned from the
+      recurring parent task by the task server.  It may be modified by the user.
+      On completion, there is special handling to be done.
+
+2.3  Additional Fields
+
+   There MAY be other fields than those listed above in a task definition.  Such
+   fields MUST be preserved intact by any client, which means that if a task is
+   downloaded that contains an unrecognized field, that field MUST not be
+   modified, and MUST be uploaded.
+
+   Once an additional field is part of a task, a client MUST NOT remove it.
+
+
+3  Field Details
+
+   The individual fields convey important information about a task, and in some
+   cases work only in collusion with other fields.
+
+
+3.1  Field: status
+
+   The status field describes the state of the task, which can be one of these
+   literal strings:
+
+      "status":"pending"
+      "status":"deleted"
+      "status":"completed"
+      "status":"waiting"
+      "status":"recurring"
+
+   A pending task is a task that has not yet been completed or deleted.  This is
+   the typical state for a task.
+
+   A deleted task is one that has been removed from the pending state, and MUST
+   have an "end" field specified.  Given the required "entry" and "end" field,
+   it can be determined how long the task was pending.
+
+   A completed task is one that has been removed from the pending state by
+   completion, and MUST have an "end" field specified.  Given the required
+   "entry" and "end" fields, it can be determine how long the task was pending.
+
+   A waiting task is ostensibly a pending task that has been hidden from typical
+   view, and MUST have a "wait" field containing the date when the task is
+   automatically returned to the pending state.  If a client sees a task that is
+   in the waiting state, and the "wait" field is earlier than the current date
+   and time, the client MUST remove the "wait" field and set the "status" field
+   to "pending".
+
+   A recurring task ...
+
+   [Missing section]
+
+
+3.2  Field: uuid
+
+   When a task is created, it MUST be assigned a new UUID by the client.  Once
+   assigned, a UUID field MUST NOT be modified.  UUID fields are permanent.
+
+
+3.3  Field: entry
+
+   When a task is created, it MUST be assigned an "entry" date by the client.
+   This is the creation date of the task.
+
+
+3.4  Field: description
+
+   When a task is created, it MUST have a "description" field value, which MAY
+   contain UTF8 characters.  A "description" field may not contain newline
+   characters, but may contain other characters, properly escaped.
+   See http://json.org for details.
+
+
+3.5  Field: start
+
+   To indicate that a task is being worked on, it MAY be assigned a "start"
+   field.  Such a task is then considered Active.
+
+
+3.6  Field: end
+
+   When a task is deleted or completed, is MUST be assigned an "end" field.
+   It is not valid for a task to have an "end" field unless the status is also
+   "completed" or "deleted".
+
+
+3.7  Field: due
+
+   A task MAY have a "due" field, which indicates when the task should be
+   completed.  If a task is due within the next 7 days, it is considered "due".
+   If a task is due some time today, is is considered "due today", and if it is
+   past due, it is considered "overdue".  The three phases MAY be highlighted
+   differently.
+
+
+3.8  Field: until
+
+   A recurring task MAY have an "until" field, which is the date after which no
+   more recurring tasks should be generated.
+
+
+3.9  Field: wait
+
+   A task MAY have a "wait" field date, in conjunction with a "status" of
+   "waiting".  An example of this is a birthday reminder.  A task may be entered
+   for a birthday reminder in 10 months time, but can have a "wait" date 9
+   months from now, which means the task remains hidden until 1 month before the
+   due date.  This prevents long-term tasks from cluttering the list until they
+   become important.
+
+
+3.10  Field: recur
+
+   [Missing section]
+
+
+3.11  Field: mask
+
+   [Missing section]
+
+
+3.12  Field: imask
+
+   [Missing section]
+
+
+3.13  Field: parent
+
+   A recurring task instance MUST have a "parent" field, which is the UUID of
+   the task that has "status" of "recurring".  This linkage between tasks is
+   used to track the need to generate more recurring tasks.
+
+
+3.14  Field: annotation
+
+   Annotations are strings with timestamps.  Each annotation itself has an
+   "entry" field and a "description" field.  Annotations form an array named
+   "annotations".  For example (lines broken for clarity):
+
+      "annotations":[
+        {"entry":"20120110T234212Z","description":"Remember to get the mail"},
+        {"entry":"20120110T234559Z","description":"Pay the bills"}]
+
+
+3.15  Field: project
+
+   A project is a single word string, with no spaces.  For example:
+
+      "project":"Taxes"
+
+
+3.16  Field: tags
+
+   The "tags" field is a string consisting of a comma-separated unique set of
+   single words, which are tags.  For example:
+
+      "tags":["home","garden"]
+
+
+3.17  Field: priority
+
+   The "priority" field, if present, MAY contain one of the following strings:
+
+      "priority":"H"
+      "priority":"M"
+      "priority":"L"
+
+   These represent High, Medium and Low priorities.
+
+
+3.18  Field: depends
+
+   The "depends" field is a string containing a comma-separated unique set of
+   UUIDs.  If task 2 depends on task 1, then it is task 1 that must be completed
+   first.  Task 1 is considered a "blocking" tasks, and task 2 is considered a
+   "blocked" task.  For example:
+
+     "depends":"<uuid>,<uuid>, ..."
+
+
+3.19  User Defined Attributes
+
+
+
+
+
+
+
+
+5  References
+ 
+
+
+6  Acknowledgements
+
+   Thanks to Dirk Deimeke for feedback.
+   Thanks to Wim Schuermann for feedback.
+
+
+7  Authors' Addresses
+
+   Federico Hernandez
+   Email: fredde@yootabory.org
+
+   Paul Beckingham
+   Email: paul@yootabory.org
+
+
+8  Full Copyright Statement
+
+   Copyright 2010 - 2012, Göteborg Bit Factory
+   All rights reserved.
+
+   This document and translations of it may be copied and furnished to others,
+   and derivative works that comment on or otherwise explain it or assist in its
+   implementation may be prepared, copied, published and distributed, in whole or
+   in part, without restriction of any kind, provided that the above copyright
+   notice and this paragraph are included on all such copies and derivative
+   works.  However, this document itself may not be modified in any way, such as
+   by removing the copyright notice or by omission of certain sections.
+
+   The limited permissions granted above are perpetual and will not be revoked
+   by the authors or their successors or assigns.
+
+   This document and the information contained herein is provided on an "AS IS"
+   basis and the authors disclaim all warranties, express or implied, including
+   but not limited to any warranty that the use of the information herein will
+   not infringe any rights or any implied warranties of merchantability or
+   fitness for a particular purpose.
+
+---
+

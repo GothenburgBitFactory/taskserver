@@ -1,6 +1,8 @@
 Göteborg Bit Factory                                               October 2012
 
                                      Title
+                                   Version 1
+                                    Draft 1
 
 Status of this Memo
 
@@ -8,31 +10,34 @@ Status of this Memo
    specify an Internet standard of any kind.  Distribution of this document is
    not restricted.
 
+
 Copyright Notice
 
    Copyright (C) 2010 - 2012, Göteborg Bit Factory.
+
 
 Abstract
 
    This document is ...
 
+
 Table of Contents
 
-   1.     Introduction
-   1.1.   Requirements
+   1      Introduction
+   1.1    Requirements
 
-   9.     References
-   10.    Acknowledgements
-   11.    Authors' Addresses
-   12.    Full Copyright Statement
+   9      References
+   10     Acknowledgements
+   11     Authors' Addresses
+   12     Full Copyright Statement
 
 
-1.  Introduction
+1  Introduction
 
    For many years ...
 
 
-1.1.  Requirements
+1.1  Requirements
 
    In this document, we adopt the convention discussed in Section 1.3.2 of
    [RFC1122] of using the capitalized words MUST, REQUIRED, SHOULD, RECOMMENDED,
@@ -46,20 +51,20 @@ Table of Contents
    is optional, and may be omitted without careful consideration.
 
 
-9.  References
+9  References
  
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
 
 
-10.  Acknowledgements
+10  Acknowledgements
 
    Thanks to ... for testing and feedback.
 
    Thanks to ... whose comments helped improve this document.
 
 
-11.  Authors' Addresses
+11  Authors' Addresses
 
    Federico Hernandez
    Email: fredde@yootabory.org
@@ -68,9 +73,8 @@ Table of Contents
    Email: paul@yootabory.org
 
 
-12.  Full Copyright Statement
+12  Full Copyright Statement
 
-   Copyright 2010 - 2012, Paul Beckingham, Federico Hernandez.
    Copyright 2010 - 2012, Göteborg Bit Factory.
    All rights reserved.
 

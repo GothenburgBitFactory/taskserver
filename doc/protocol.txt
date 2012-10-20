@@ -1,95 +1,453 @@
-Task Server Protocol
---------------------
+Göteborg Bit Factory                                               October 2012
 
-N. The Task Server
+                              Task Server Protocol
+                                   Version 1
+                                    Draft 1
 
-  The Task Server is a simple transaction-based server.
+Status of this Memo
 
+   This document provides information for the Internet community.  It does not
+   specify an Internet standard of any kind.  Distribution of this document is
+   not restricted.
 
-N. Transactions
+Copyright Notice
 
-  Each transaction is a single incoming message, with a response that is also a
-  single message.  All communication therefore consists of a single 'send',
-  followed by a single 'receive', then termination.
+   Copyright (C) 2010 - 2012, Göteborg Bit Factory
 
-  All messages are required to have a 'type' header that identifies the message
-  type.  Valid types include 'sync' and 'statistics'.
+Abstract
 
+   The Task Server Protocol is a TCP transaction based query/response protocol
+   that allows a client to access tasks on a distributed server as the basis for
+   a variety of front end task clients and data sharing.
 
-N. Message Format
+Table of Contents
 
-  This format is based on RFC2822, 'Internet Message Format'.  Here is an
-  example message:
-
-    <SIZE>
-    name: value\n
-    name2: value2\n
-    \n
-    payload
-
-  There are three sections.  The first is the size, which is a 4-byte, big-
-  endian, binary byte count of the length of the message, including the 4 bytes
-  for the size.
-
-  The header section is a set of name/value pairs separated by newline
-  characters (U+000D).  The name is separated from the value by ': ' (colon
-  U+003A, space U+0020)  The header section is terminated by two consecutive
-  newline (U+000D) characters.  All text is UTF8.
-
-  The payload section is arbitrary.
-
-
-N. Responsibilities of the Client
-
-  All modifications to tasks (add, modify, done, delete ...) are recorded in the
-  form of a fully-composed FF4-format task.  The formatted task is appended to
-  the backlog.data file.  If a task is modified a second time, it is appended
-  again to the backlog.data file - the lines are not combined.  Each task
-  may have a 'modified' date attribute that will help resolve conflicts.
-
-  When a client syncs, it must follow this procedure:
-
-  - send the entire contents of the backlog.data, unmodified
-  - receive one of the following response codes:
-    - 201: This means 'no change', and there is no further action to be taken.
-    - 200: This means 'success', and the message payload contains a set of tasks
-      and a sync key:
-      - the formatted tasks are to be stored as-is.  These tasks will either be
-        appended to the client data or will overwrite existing client data,
-        based on the UUID of the task.  No other logic is necessary.
-      - the sync key will be written to the backlog.data file, overwriting the
-        previous contents, such that it will contain only one line.
-    - 3xx, 4xx, 5xx: The 'status' field contains an error message.
-  - if the response contained any error or warning, the error is required to be
-    shown to the user.  This provides an opportunity for the server to announce
-    downtime, or relocation.
-
-  If no sync key is sent, the server cannot provide an incremental delta, and so
-  will send all task data, which should be stored as above.  This should be the
-  case for a client making its first sync call.
-
-  The Taskwarrior client maintains data in several files (pending.data,
-  completed.data, undo.data) which are not relevant to the server.  Only the
-  backlog.data file is important.
+   1      Introduction
+   1.1    Requirements
+   2      Protocol Overview
+   2.1    Link Level
+   2.2    Transactions
+   2.3    Message Format
+   2.4    Message Requirements
+   2.5    Auth Data
+   2.6    Status Data
+   2.7    Payload Data
+   2.8    Responsibilities of the Server
+   2.9    Responsibilities of the Client
+   3      Message Types
+   3.1    Message Type "stats"
+   3.2    Message Type "sync"
+   4      Extensions
+   5      Summary of Response Codes
+   6      Security Considerations
+   7      Limitations and Assumptions
+   8      References
+   9      Acknowledgements
+   10     Authors' Addresses
+   11     Full Copyright Statement
 
 
-N. Responsibilities of the Server
+1   Introduction
 
-  The server will maintain a set of transactions, in the original sequence,
-  punctuated by sync keys, which are simply UUIDs.  Each sync key represents a
-  non-trivial sync operation by a client.  Each transaction is an FF4-formatted
-  task, followed by a newline (\n) character.  The result is a single file that
-  contains interleaved lines of two types: tasks and sync keys.
+   Taskwarrior data has typically been shared in several ways.  Those include
+   SCM (source code management) systems, directory synchronizing software (such
+   as DropBox), and by use of the 'push', 'pull' and 'merge' commands introduced
+   in version 1.9.3.
+
+   While these methods work, they each have problems associated with the merging
+   of the data.  In the case of directoy synchronizing software, there is no
+   merging at all - just simple file overwrite, despite many people believing
+   that the data is somehow combined and preserved.
+
+   The task server is a solution.  It is an online/cloud storage and sync
+   service for taskwarrior data.  It performs conflict-free data merging, and
+   minimizes bandwidth use.
+
+   The task server also provides multi-client access, so that a task added using
+   a web client could be immediately viewed using a mobile client, or modified
+   using taskwarrior.  With both thin and rich client support, users can quickly
+   capture tasks on the go, and use the rich client for later review and
+   categorization.  Choice among clients is important - people have widely
+   varying behaviors and tastes.
+
+   The task server also provides multi-user access, which introduces a whole new
+   set of capabilities, such as list sharing and delegation.  These will require
+   later modification to this protocol.
+
+   The task server protocol will be implemented by the taskd project and first
+   used in taskwarrior 2.3.0.  Other clients will likely follow.
 
 
-N. Limitations and Assumptions
+1.1  Requirements
 
-  A client may only connect to a single server.  Synchronization among a set of
-  servers is not supported.
+   In this document, we adopt the convention discussed in Section 1.3.2 of
+   [RFC1122] of using the capitalized words MUST, REQUIRED, SHOULD, RECOMMENDED,
+   MAY, and OPTIONAL to define the significance of each particular requirement
+   specified in this document.
 
-  A client should minimize data transfers by maintaining a local store of data.
+   In brief: "MUST" (or "REQUIRED") means that the item is an absolute
+   requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
+   exist valid reasons for ignoring this item, but the full implications should
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   is optional, and may be omitted without careful consideration.
 
-  A client should minimize data transfers by limiting the frequency of sync
-  requests.
+
+2  Protocol Overview
+
+
+2.1  Link Level
+
+   The Task Server protocol assumes a reliable data stream such as provided by
+   TCP.  When TCP is used, a task server listens on a single predetermined port
+   _for the given client_ only.  This means the server may be using multiple
+   ports to serve multiple sets of clients.
+
+   This server is only an interface between programs and the task database.  It
+   does not perform any user interaction or presentation-level functions.
+
+
+2.2  Transactions
+
+   Each transaction is a single incoming message, with a response that is also a
+   single message.  All communication therefore consists of a single 'send',
+   followed by a single 'receive', then termination.  There are no sessions, and
+   no continuously open connections.
+
+
+2.3  Message Format
+
+   This format is based on [RFC2822], 'Internet Message Format'.  Here is an
+   example of the format:
+
+      <SIZE>
+      name: value\n
+      name2: value2\n
+      \n
+      payload
+
+   There are three sections.  The first is the size, which is a 4-byte, big-
+   endian, binary byte count of the length of the message, including the 4 bytes
+   for the size.
+
+   The header section is a set of name/value pairs separated by newline
+   characters (U+000D).  The name is separated from the value by ': ' (colon
+   U+003A, space U+0020)  The header section is terminated by two consecutive
+   newline (U+000D) characters.  All text is UTF8.
+
+   The payload section is arbitrary.
+
+   Here is a complete example of a 'sync' message:
+
+      <size>
+      type: sync
+      org: <organization>
+      user: <user>
+      key: <key>
+      version: 0.9.0
+      protocol: v1
+
+      2e4685f8-34bc-4f9b-b7ed-399388e182e1
+      [description:"Test data" entry:"1234567890" status:"pending"]
+
+   An example repsonse message might be:
+
+      <size>
+      type: response
+      version: 0.9.0
+      protocol: v1
+      code: 200
+      status: Ok
+
+      45da7110-1bcc-4318-d33e-12267a774e0f
+
+   In the event of a status response that is a redirect, the client MUST reissue
+   the ticket with modified details.  This is the only time that client/server
+   interaction is more than a simple exchange of information.
+
+
+2.4  Message Requirements
+
+   Messages SHALL contain particular headers.  Those are:
+
+      type
+      protocol
+      version
+
+
+2.5  Auth Data
+
+   Every request ticket from the client MUST contain an "auth" section, which
+   involves these headers:
+
+      org: <organization>
+      user: <user>
+      key: <key>
+
+   The user and org fields uniquely identify a user.
+
+   The key field is generated when a new account is set up.  It is a shared
+   secret, equivalent to a password, and should be protected.
+
+   Authentication failure can result in these errors:
+       430 Authentication failed
+       431 Account suspended
+
+
+2.6  Status Data
+
+   Every response ticket from taskd SHALL contain status data:
+
+      code: <code>
+      status: <status text>
+
+   The code is a numeric status indicator defined in section 5.
+
+   There is an optional error string if the server determines the need to go
+   beyond a simple code.  This string MUST be presented to the user, and will
+   contain essential feedback from the server.
+
+   There is an info string that MAY be presented to the user.  The info string
+   will contain non-essential feedback from the server.  An example of this
+   might be a message that the client version is no longer current.
+
+   The info string may contain the address of a redirected server, in the event
+   of a 301 status code.  Such a result will look like this:
+
+        +--------+------+------------------+
+        | status | code | 301              |
+        |        | info | <address>:<port> |
+        +--------+------+------------------+
+
+   Address may be a DNS name or an IP address.  Port is a positive integer.
+
+
+2.7  Payload Data
+
+   Payload data is optional, arbitrary and message type dependent.
+
+
+2.8  Responsibilities of the Server
+
+   The server will maintain a set of transactions, in the original sequence,
+   punctuated by sync keys, which are UUIDs.  Each sync key represents a non-
+   trivial sync operation by a client.  Each transaction is an FF4-formatted
+   task, followed by a newline (\n) character.  The result is a single file that
+   contains interleaved lines of two types: tasks and sync keys.
+
+   This design allows the server to maintain a set of deltas such that multiple
+   clients may request a minimal set of changes since their last sync.
+
+
+2.9  Responsibilities of the Client
+
+   All modifications to tasks (add, modify, done, delete ...) are recorded in
+   the form of a fully-composed FF4-format task.  The formatted task is appended
+   to the backlog.data file.  If a task is modified a second time, it is
+   appended again to the backlog.data file - the lines are not combined.  Each
+   task SHALL have a 'modified' date attribute that will help resolve conflicts.
+
+   When a client syncs, it must follow this procedure:
+
+   - Send a 'sync' type message with the entire contents of the backlog.data,
+     unmodified, as the message payload.
+   - Receive one of the following response codes:
+     - 201: This means 'no change', and there is no further action to be taken.
+     - 200: This means 'success', and the message payload contains a set of
+       tasks and a sync key:
+       - The formatted tasks are to be stored as-is.  These tasks will either be
+         appended to the client data or will overwrite existing client data,
+         based on the UUID of the task.  No other logic is necessary.
+       - The sync key will be written to the backlog.data file, overwriting the
+         previous contents, such that it will now contain only one line.
+     - 3xx, 4xx, 5xx: The 'status' field contains an error message.
+   - If the response contained any error or warning, the error is required to be
+     shown to the user.  This provides an opportunity for the server to announce
+     downtime, or relocation.
+
+   If no sync key is sent, the server cannot provide an incremental delta, and
+   so will send all task data, which should be stored as above.  This should be
+   the case for a client making its first sync call.
+
+   If an unrecognized attribute is present in the task data, the client SHALL
+   preserve the attribute unmodified.  This permits individual clients to
+   augment the task data without other clients stripping it out.  This is how
+   UDAs (user defined attributes) are handled.
+
+
+3  Message Types
+
+   The task server supports many ticket types, thus providing a rich set of
+   primitives for use by clients to access all the taskwarrior capabilities
+   remotely.
+
+   It is expected that the number of supported ticket types will increase over
+   time.
+
+
+3.1  Message Type "stats"
+
+   The "stats" message type ...
+
+   TODO
+
+   The data returned by the stats message is subject to change depending upon
+   monitoring needs.  Data items will be added, but not removed.
+
+
+3.2  Message Type "sync"
+
+   The "sync" ticket always originates from the client, but is a two-way
+   process.  It is used to communicate additions and changes on both the client
+   and server.
+
+   Note that the task server sometimes modifies tasks independently of user-
+   initiated modification.  This can result in unexpected synch transfers.
+   There are many reasons why a server may modify a task, including:
+
+        - Another client modified the task
+        - Spelling automatically corrected
+        - A waiting task expired
+        - A new recurring task was generated
+
+   The client processes the response by iterating over the modified/added tasks
+   and according to UUID, the task either exists locally and is therefore a
+   remote modification, or does not exist locally and is therefore a remote
+   addition.
+
+
+4  Extensions
+
+   This protocol was designed so that extensions to the protocol will take the
+   form of additional message types and status codes.  The task server protocol
+   specifically SHALL NOT modify message types after publication, and so there
+   is no need to version the message types.
+
+
+5  Summary of Response Codes
+
+   Status responses indicate the server's response to the last command received
+   from the client.  The codes consist of a 3 digit numeric code.
+
+   The first digit of the response broadly indicates the success, failure, or
+   progress of the previous command (based generally on [RFC640,RFC821]):
+
+       1yz - Positive Preliminary reply
+       2yz - Positive Completion reply
+       3yz - Positive Intermediate reply
+       4yz - Transient Negative Completion reply
+       5yz - Permanent Negative Completion reply
+
+   The next digit in the code indicates the response category:
+
+       x0z - Syntax
+       x1z - Information (e.g., help)
+       x2z - Connections
+       x3z - Authentication
+       x4z - Unspecified as yet
+       x5z - Taskd System (...)
+       x8z - Nonstandard (private implementation) extensions
+
+   A summary of all status response are:
+
+       200 Success
+       201 No change
+
+       300 Deprecated message type
+           This message will not be supported in future task server releases.
+       301 Redirect
+           Further requests should be made to the specified server/port.
+       302 Retry
+           The client is requested to wait and retry the same request.  The wait
+           time is not specified, and further retry responses are possible.
+
+       400 Malformed data
+       401 Unsupported encoding
+       420 Server temporarily unavailable
+|      421 Server shutting down at operator request
+       430 Access denied
+       431 Account suspended
+       432 Account terminated
+
+       500 Syntax error in request
+       501 Syntax error, illegal parameters
+       502 Not implemented
+|      503 Command parameter not implemented
+       504 Request too big
+       531 Account terminated
+
+
+6  Security Considerations
+
+   TODO
+
+   Note: encryption may be disabled to facilitate testing.
+
+
+7  Limitations and Assumptions
+
+   Some limitations exists to reduce bandwidth and load on the server.  They
+   are:
+
+      A client may only connect to a single server.  Synchronization among a set
+      of servers is not currently supported.
+
+      A client should minimize data transfers by maintaining a local store of
+      data.
+
+      A client should minimize data transfers by limiting the frequency of sync
+      requests.
+
+
+8  References
+ 
+   [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
+        1975.
+
+   [RFC821] Postel, J., "Simple Mail Transfer Protocol", STD 10,
+        RFC 821, August 1982.
+
+   [RFC1122] IETF, "Requirements for Internet Hosts - Communication
+        Layers", October 1989.
+
+   [RFC2822] Resnick, P., "Internet Message Format", April 2001.
+
+
+9  Acknowledgements
+
+   Thanks to Dirk Deimeke whose comments helped improve this document.
+   Thanks to Wim Schuermann whose comments helped improve this document.
+
+
+10  Authors' Addresses
+
+   Federico Hernandez
+   Email: fredde@yootabory.org
+
+   Paul Beckingham
+   Email: paul@yootabory.org
+
+
+11  Full Copyright Statement
+
+   Copyright 2010 - 2011, Göteborg Bit Factory.
+   All rights reserved.
+
+   This document and translations of it may be copied and furnished to others,
+   and derivative works that comment on or otherwise explain it or assist in its
+   implmentation may be prepared, copied, published and distributed, in whole or
+   in part, without restriction of any kind, provided that the above copyright
+   notice and this paragraph are included on all such copies and derivative
+   works.  However, this document itself may not be modified in any way, such as
+   by removing the copyright notice or by ommission of certain sections.
+
+   The limited permissions granted above are perpetual and will not be revoked
+   by the authors or their successors or assigns.
+
+   This document and the information contained herein is provided on an "AS IS"
+   basis and the authors disclaim all warranties, express or implied, including
+   but not limited to any warranty that the use of the information herein will
+   not infringe any rights or any implied warranties of merchantability or
+   fitness for a particular purpose.
 
 ---
+
