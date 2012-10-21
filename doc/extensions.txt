@@ -2,7 +2,7 @@ Göteborg Bit Factory                                               October 2012
 
                              Task Server Extensions
                                    Version 1
-                                    Draft 1
+
 
 Status of this Memo
 
@@ -61,11 +61,11 @@ Table of Contents
 
 2  Authors' Addresses
 
-   Federico Hernandez
-   Email: fredde@yootabory.org
-
    Paul Beckingham
    Email: paul@yootabory.org
+
+   Federico Hernandez
+   Email: fredde@yootabory.org
 
 
 3  Full Copyright Statement

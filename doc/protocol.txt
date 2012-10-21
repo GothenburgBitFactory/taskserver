@@ -2,7 +2,7 @@ Göteborg Bit Factory                                               October 2012
 
                               Task Server Protocol
                                    Version 1
-                                    Draft 1
+
 
 Status of this Memo
 
@@ -10,15 +10,18 @@ Status of this Memo
    specify an Internet standard of any kind.  Distribution of this document is
    not restricted.
 
+
 Copyright Notice
 
    Copyright (C) 2010 - 2012, Göteborg Bit Factory
+
 
 Abstract
 
    The Task Server Protocol is a TCP transaction based query/response protocol
    that allows a client to access tasks on a distributed server as the basis for
    a variety of front end task clients and data sharing.
+
 
 Table of Contents
 
@@ -40,7 +43,7 @@ Table of Contents
    4      Extensions
    5      Summary of Response Codes
    6      Security Considerations
-   7      Limitations and Assumptions
+   7      Limitations and Guidelines
    8      References
    9      Acknowledgements
    10     Authors' Addresses
@@ -231,8 +234,8 @@ Table of Contents
    The server will maintain a set of transactions, in the original sequence,
    punctuated by sync keys, which are UUIDs.  Each sync key represents a non-
    trivial sync operation by a client.  Each transaction is an FF4-formatted
-   task, followed by a newline (\n) character.  The result is a single file that
-   contains interleaved lines of two types: tasks and sync keys.
+   task [1], followed by a newline (\n) character.  The result is a single file
+   that contains interleaved lines of two types: tasks and sync keys.
 
    This design allows the server to maintain a set of deltas such that multiple
    clients may request a minimal set of changes since their last sync.
@@ -241,10 +244,11 @@ Table of Contents
 2.9  Responsibilities of the Client
 
    All modifications to tasks (add, modify, done, delete ...) are recorded in
-   the form of a fully-composed FF4-format task.  The formatted task is appended
-   to the backlog.data file.  If a task is modified a second time, it is
-   appended again to the backlog.data file - the lines are not combined.  Each
-   task SHALL have a 'modified' date attribute that will help resolve conflicts.
+   the form of a fully-composed FF4-format [1] task.  The formatted task is
+   appended to the backlog.data file.  If a task is modified a second time, it
+   is appended again to the backlog.data file - the lines are not combined.
+   Each task SHALL have a 'modified' date attribute that will help resolve
+   conflicts.
 
    When a client syncs, it must follow this procedure:
 
@@ -383,7 +387,7 @@ Table of Contents
    Note: encryption may be disabled to facilitate testing.
 
 
-7  Limitations and Assumptions
+7  Limitations and Guidelines
 
    Some limitations exists to reduce bandwidth and load on the server.  They
    are:
@@ -391,8 +395,8 @@ Table of Contents
       A client may only connect to a single server.  Synchronization among a set
       of servers is not currently supported.
 
-      A client should minimize data transfers by maintaining a local store of
-      data.
+      A client shold attempt to minimize data bandwidth usage by maintaining a
+      local data store, and using sync keys.
 
       A client should minimize data transfers by limiting the frequency of sync
       requests.
@@ -400,6 +404,9 @@ Table of Contents
 
 8  References
  
+   [1] Beckingham, P., Hernandez, F., "Taskwarrior Data Format (FF4)", October,
+        2012.
+
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
 
@@ -420,11 +427,11 @@ Table of Contents
 
 10  Authors' Addresses
 
-   Federico Hernandez
-   Email: fredde@yootabory.org
-
    Paul Beckingham
    Email: paul@yootabory.org
+
+   Federico Hernandez
+   Email: fredde@yootabory.org
 
 
 11  Full Copyright Statement
