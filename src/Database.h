@@ -36,16 +36,16 @@
 class Database
 {
 public:
-  Database (Config&);
+  Database (Config*);
   Database (const Database&);            // Copy constructor
   Database& operator= (const Database&); // Assignment operator
   ~Database ();                          // Destructor
 
   void setLog (Log*);
 
-#ifdef NONE_OF_THIS_WORKS
   // These throw on failure.
-  void authenticate (const std::string&, const std::string&, const std::string&);
+  bool authenticate (const Msg&, Msg&);
+#ifdef NONE_OF_THIS_WORKS
   void authorize (const std::string&, const std::string&, const std::string&);
   bool redirect (const std::string&, Msg&);
 
@@ -96,7 +96,7 @@ private:
 #endif
 
 private:
-  Config& _config;
+  Config* _config;
   Directory _root;
   Log* _log;
 };

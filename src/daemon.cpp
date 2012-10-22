@@ -87,7 +87,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 Daemon::Daemon (Config& settings)
-: _db (_config)
+: _db (&settings)
 , _config (settings)
 , _start (Date ())
 , _txn_count (0)
@@ -199,7 +199,7 @@ void Daemon::handler (const std::string& input, std::string& output)
 // Statistics request from dev.
 void Daemon::handle_statistics (const Msg& in, Msg& out)
 {
-  if (! taskd_authenticate (_config, *_log, in, out))
+  if (! _db.authenticate (in, out))
     return;
 
   // Support only task server protocol v1.
@@ -251,7 +251,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
 // Sync request.
 void Daemon::handle_sync (const Msg& in, Msg& out)
 {
-  if (! taskd_authenticate (_config, *_log, in, out))
+  if (! _db.authenticate (in, out))
     return;
 
   // Support only task server protocol v1.

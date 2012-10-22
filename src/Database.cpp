@@ -33,14 +33,17 @@
 #include <File.h>
 #include <text.h>
 #include <util.h>
+#include <taskd.h>
 #include <cmake.h>
 #include <Database.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-Database::Database (Config& c)
-: _config (c)
+Database::Database (Config* config)
+: _config (config)
+, _root ()
+, _log (NULL)
 {
-  std::string data_root = c.get ("root");
+  std::string data_root = _config->get ("root");
   if (data_root == "")
     throw std::string ("root is not set");
 
@@ -70,22 +73,31 @@ void Database::setLog (Log* l)
   _log = l;
 }
 
-#ifdef NONE_OF_THIS_WORKS
 ////////////////////////////////////////////////////////////////////////////////
 // Authentication is when the org/user/key data exists/matches that on the
-// server, in the absence of account suspension or termination.
-void Database::authenticate (
-  const std::string& org,
-  const std::string& user,
-  const std::string& key)
+// server, in the absence of org/user account suspension.
+//
+// If authentication fails, fills in response code and status.
+// Note: information regarding valid/invalid org/user is not revealed.
+bool Database::authenticate (
+  const Msg& request,
+  Msg& response)
 {
-  // Verify non-existence of <root>/orgs/<org>/terminated
-  File org_terminated (_root._data + "/orgs/" + org + "/terminated");
-  if (org_terminated.exists ())
+  std::string org  = request.get ("org");
+  std::string user = request.get ("user");
+  std::string key  = request.get ("key");
+
+  // Verify existence of <root>/orgs/<org>
+  Directory org_dir (_root._data + "/orgs/" + org);
+  if (! org_dir.exists ())
   {
     if (_log)
-      _log->write ("Database::authenticate found " + org_terminated._data);
-    throw 432;
+      _log->format ("INFO Auth failure: org '%s' unknown",
+                    org.c_str ());
+
+    response.set ("code", 430);
+    response.set ("status", taskd_error (430));
+    return false;
   }
 
   // Verify non-existence of <root>/orgs/<org>/suspended
@@ -93,51 +105,61 @@ void Database::authenticate (
   if (org_suspended.exists ())
   {
     if (_log)
-      _log->write ("Database::authenticate found " + org_suspended._data);
-    throw 431;
+      _log->format ("INFO Auth failure: org '%s' suspended",
+                    org.c_str ());
+
+    response.set ("code", 431);
+    response.set ("status", taskd_error (431));
+    return false;
   }
 
   // Verify existence of <root>/orgs/<org>/users/<user>
-  Path user_dir (_root._data + "/orgs/" + org + "/users/" + user);
-  if (!user_dir.exists ())
+  Directory user_dir (_root._data + "/orgs/" + org + "/users/" + user);
+  if (! user_dir.exists ())
   {
     if (_log)
-      _log->write ("Database::authenticate missing " + user_dir._data);
-    throw 430;
+      _log->format ("INFO Auth failure: org '%s' user '%s' unknown",
+                    org.c_str (),
+                    user.c_str ());
+
+    response.set ("code", 430);
+    response.set ("status", taskd_error (430));
+    return false;
   }
 
-  // Verify non-existence of <root>/orgs/<org>/users/<user>/terminated
-  File user_terminated (_root._data + "/orgs/" + org + "/users/" + user + "/terminated");
-  if (user_terminated.exists ())
-  {
-    if (_log)
-      _log->write ("Database::authenticate found " + user_terminated._data);
-    throw 432;
-  }
-
-  // Verify non-existence of <root>/orgs/<org>/users/<user>/suspended
-  File user_suspended (_root._data + "/orgs/" + org + "/users/" + user + "/suspended");
+  // Verify non-existence of <root>/orgs/<org>/user/<user>/suspended
+  File user_suspended (_root._data + "/orgs/" + org + "/user/" + user + "/suspended");
   if (user_suspended.exists ())
   {
     if (_log)
-      _log->write ("Database::authenticate found " + user_suspended._data);
-    throw 431;
+      _log->format ("INFO Auth failure: org '%s' user '%s' suspended",
+                    org.c_str (),
+                    user.c_str ());
+
+    response.set ("code", 431);
+    response.set ("status", taskd_error (431));
+    return false;
   }
 
   // Match <key> against <root>/orgs/<org>/users/<user>/rc:<key>
-  Config user_rc (_root._data + "/orgs/" + org + "/users/" + user + "/rc");
+  Config user_rc (_root._data + "/orgs/" + org + "/users/" + user + "/config");
   if (user_rc.get ("key") != key)
   {
     if (_log)
-      _log->write ("Database::authenticate key mismatch in " + _root._data + "/orgs/" + org + "/users/" + user + "/rc");
-    throw 430;
+      _log->format ("INFO Auth failure: org '%s' user '%s' bad key",
+                    org.c_str (),
+                    user.c_str ());
+
+    response.set ("code", 430);
+    response.set ("status", taskd_error (430));
+    return false;
   }
 
-  // No failures means successful authentication.
-  if (_log)
-    _log->write ("Authenticated '" + org + "/" + user + "'");
+  // All checks succeed, user is authenticated.
+  return true;
 }
 
+#ifdef NONE_OF_THIS_WORKS
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization is when the specified token is found at the org, user or group
 // level.
@@ -479,7 +501,7 @@ bool Database::has_admin (
 
   // Look for the token.
   std::vector <std::string> tokens;
-  split (tokens, _config.get ("permissions." + id), ',');
+  split (tokens, _config->get ("permissions." + id), ',');
 
   return std::find (tokens.begin (), tokens.end (), token) != tokens.end ()
     ? true : false;
