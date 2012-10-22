@@ -443,6 +443,20 @@ void Server::daemonize ()
 {
   if (_log) _log->write ("Daemonizing");
 
+/* TODO Load RUN_AS_USER from config.
+
+  // If run as root, switch to preferred user.
+  if (getuid () == 0 || geteuid () == 0 )
+  {
+    struct passwd *pw = getpwnam (RUN_AS_USER);
+    if (pw)
+    {
+      if (_log) _log->write ("setting user to " RUN_AS_USER);
+      setuid (pw->pw_uid);
+    }
+  }
+*/
+
   // Fork off the parent process
   pid_t pid = fork ();
   if (pid < 0)

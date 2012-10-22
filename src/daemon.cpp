@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <Server.h>
 #include <Timer.h>
+#include <Database.h>
 #include <Log.h>
 #include <Date.h>
 #include <Duration.h>
@@ -70,6 +71,9 @@ private:
   time_t last_modification (const Task&) const;
   void patch (Task&, const Task&, const Task&) const;
 
+public:
+  Database _db;
+
 private:
   Config& _config;
   Date _start;
@@ -83,7 +87,8 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 Daemon::Daemon (Config& settings)
-: _config (settings)
+: _db (_config)
+, _config (settings)
 , _start (Date ())
 , _txn_count (0)
 , _error_count (0)
@@ -807,6 +812,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
     // Create a taskd server object.
     Daemon server        (config);
     server.setLog        (&log);
+    server._db.setLog    (&log);
     server.setPort       (port);
     server.setQueueSize  (config.getInteger ("queue.size"));
     server.setLimit      (config.getInteger ("request.limit"));
