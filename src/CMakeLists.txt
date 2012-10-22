@@ -34,6 +34,7 @@ add_executable (taskd_executable taskd.cpp
                                  utf8.cpp       utf8.h
                                  util.cpp       util.h)
 
+target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
 
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})
