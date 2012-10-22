@@ -28,11 +28,6 @@
 #define INCLUDED_SERVER
 
 #include <cmake.h>
-
-#ifdef HAVE_OPENSSL
-#include <openssl/bio.h>
-#endif
-
 #include <sys/types.h>
 #include <string>
 #include <Log.h>
@@ -57,9 +52,7 @@ public:
   void start ();
 
   void beginServer ();
-#ifdef HAVE_OPENSSL
-  void beginSSLServer ();
-#endif
+  void beginSecureServer ();
 
   void stats (int&, time_t&, double&);
 

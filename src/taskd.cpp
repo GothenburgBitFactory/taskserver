@@ -206,19 +206,14 @@ int main (int argc, const char** argv)
 #else
                 << " -uuid"
 #endif
-
-#ifdef HAVE_OPENSSL
-                << " +ssl"
-#else
-                << " -ssl"
-#endif
                 << "\n\n";
-
+/*
       std::cout << "[1mExternal Libraries[0m\n"
-#ifdef HAVE_OPENSSL
-                << "   OpenSSL: " << OPENSSL_VERSION_TEXT << "\n"
+#ifdef HAVE_XXX
+                << "   XXX: " << XXX_VERSION_TEXT << "\n"
 #endif
                 << "\n";
+*/
     }
     else
     {
