@@ -65,12 +65,14 @@ int main (int argc, const char** argv)
     args.push_back (argv[i]);
 
   Config config;
-  // TODO Load config file.
 
   // Some options are hard-coded.
   if (args.size ())
   {
-    if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
+    if (args[0] == "-h" || closeEnough ("--help", args[0], 3))
+      status = command_help (config, args);
+
+    else if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
     {
       Color bold ("bold");
       std::cout << "\n"
