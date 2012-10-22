@@ -29,6 +29,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cmake.h>
 #ifdef CYGWIN
 #include <time.h>
 #else
@@ -38,7 +39,6 @@
 #include <Color.h>
 #include <text.h>
 #include <taskd.h>
-#include <cmake.h>
 #include <commit.h>
 
 #ifdef HAVE_SRANDOM

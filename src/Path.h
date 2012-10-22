@@ -31,6 +31,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cmake.h>
 
 class Path
 {

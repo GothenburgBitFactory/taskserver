@@ -28,6 +28,7 @@
 #ifndef INCLUDED_DATABASE
 #define INCLUDED_DATABASE
 
+#include <cmake.h>
 #include <ConfigFile.h>
 #include <Directory.h>
 #include <Msg.h>

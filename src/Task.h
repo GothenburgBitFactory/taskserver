@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <stdio.h>
+#include <cmake.h>
 
 class Task : public std::map <std::string, std::string>
 {

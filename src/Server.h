@@ -27,9 +27,9 @@
 #ifndef INCLUDED_SERVER
 #define INCLUDED_SERVER
 
-#include <cmake.h>
 #include <sys/types.h>
 #include <string>
+#include <cmake.h>
 #include <Log.h>
 
 class Server
@@ -66,12 +66,6 @@ protected:
   bool _log_clients;
   std::string _client_address;
   int _client_port;
-
-#ifdef HAVE_OPENSSL
-private:
-  std::string read (BIO*);
-  bool write (BIO*, const std::string&);
-#endif
 
 private:
   std::string _port;

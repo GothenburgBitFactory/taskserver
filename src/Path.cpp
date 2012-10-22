@@ -33,8 +33,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
-#include <Path.h>
 #include <cmake.h>
+#include <Path.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 std::ostream& operator<< (std::ostream& out, const Path& path)

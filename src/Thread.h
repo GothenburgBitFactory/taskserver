@@ -29,6 +29,7 @@
 #define INCLUDED_THREAD
 
 #include <pthread.h>
+#include <cmake.h>
 
 class Thread
 {
