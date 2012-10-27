@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskwarrior - a command line task list manager.
+// taskd - Task Server
 //
-// Copyright 2006-2012, Paul Beckingham, Federico Hernandez.
+// Copyright 2010 - 2012, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,49 +24,57 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef INCLUDED_SOCKET
-#define INCLUDED_SOCKET
 
-#include <string>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <cmake.h>
+#include <iostream>
+#include <Thread.h>
 
-class Socket
+////////////////////////////////////////////////////////////////////////////////
+Thread::Thread ()
 {
-public:
-  Socket ();
-  Socket (int);
-  ~Socket ();
+}
 
-  // Client
-  void connect (const std::string&, const std::string&);
+////////////////////////////////////////////////////////////////////////////////
+Thread::~Thread ()
+{
+}
 
-  // Server
-  void bind (const std::string&);
-  void listen (int queue = 5);
-  int accept ();
-  void read (std::string&);
-  void write (const std::string&);
+////////////////////////////////////////////////////////////////////////////////
+int Thread::start (void* inArg)
+{
+  _arg = inArg;
+  return pthread_create (&_tid, NULL, (void*(*)(void*)) Thread::entryPoint, (void*) this);
+}
 
-  void close ();
+////////////////////////////////////////////////////////////////////////////////
+void Thread::wait ()
+{
+  pthread_join (_tid, NULL);
+}
 
-  void limit (int);
-  void debug ();
+////////////////////////////////////////////////////////////////////////////////
+void Thread::cancel ()
+{
+  pthread_cancel (_tid);
+}
 
-private:
-  void* get_in_addr (struct sockaddr*);
+////////////////////////////////////////////////////////////////////////////////
+void Thread::detach ()
+{
+  pthread_detach (_tid);
+}
 
-private:
-  int  _socket;
-  int  _limit;
-  bool _debug;
-};
+////////////////////////////////////////////////////////////////////////////////
+void* Thread::entryPoint (void* inThis)
+{
+  Thread* p = (Thread*) inThis;
+  p->execute (p->arg ());
+  return NULL;
+}
 
-#endif
+////////////////////////////////////////////////////////////////////////////////
+void* Thread::arg ()
+{
+  return _arg;
+}
 
 ////////////////////////////////////////////////////////////////////////////////

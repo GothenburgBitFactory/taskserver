@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskwarrior - a command line task list manager.
+// taskd - Task Server
 //
-// Copyright 2006-2012, Paul Beckingham, Federico Hernandez.
+// Copyright 2010 - 2012, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,47 +24,31 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef INCLUDED_SOCKET
-#define INCLUDED_SOCKET
 
-#include <string>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#ifndef INCLUDED_THREAD
+#define INCLUDED_THREAD
+
+#include <pthread.h>
 #include <cmake.h>
 
-class Socket
+class Thread
 {
 public:
-  Socket ();
-  Socket (int);
-  ~Socket ();
+  Thread ();
+  virtual ~Thread ();
+  int start (void* arg);
+  void wait ();
+  void cancel ();
+  void detach ();
+  void* arg ();
 
-  // Client
-  void connect (const std::string&, const std::string&);
-
-  // Server
-  void bind (const std::string&);
-  void listen (int queue = 5);
-  int accept ();
-  void read (std::string&);
-  void write (const std::string&);
-
-  void close ();
-
-  void limit (int);
-  void debug ();
+protected:
+  static void* entryPoint (void*);
+  virtual void execute (void*) = 0;
 
 private:
-  void* get_in_addr (struct sockaddr*);
-
-private:
-  int  _socket;
-  int  _limit;
-  bool _debug;
+  pthread_t _tid;
+  void* _arg;
 };
 
 #endif

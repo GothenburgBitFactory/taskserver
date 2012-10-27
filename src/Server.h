@@ -27,14 +27,9 @@
 #ifndef INCLUDED_SERVER
 #define INCLUDED_SERVER
 
-#include <cmake.h>
-
-#ifdef HAVE_OPENSSL
-#include <openssl/bio.h>
-#endif
-
 #include <sys/types.h>
 #include <string>
+#include <cmake.h>
 #include <Log.h>
 
 class Server
@@ -42,7 +37,7 @@ class Server
 public:
   Server ();
   virtual ~Server ();
-  void setPort (int);
+  void setPort (const std::string&);
   void setPoolSize (int);
   void setQueueSize (int);
   void setDaemon ();
@@ -57,9 +52,7 @@ public:
   void start ();
 
   void beginServer ();
-#ifdef HAVE_OPENSSL
-  void beginSSLServer ();
-#endif
+  void beginSecureServer ();
 
   void stats (int&, time_t&, double&);
 
@@ -74,14 +67,8 @@ protected:
   std::string _client_address;
   int _client_port;
 
-#ifdef HAVE_OPENSSL
 private:
-  std::string read (BIO*);
-  bool write (BIO*, const std::string&);
-#endif
-
-private:
-  int _port;
+  std::string _port;
   int _pool_size;
   int _queue_size;
   bool _daemon;

@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <stdio.h>
+#include <cmake.h>
 
 class Task : public std::map <std::string, std::string>
 {
@@ -56,16 +57,20 @@ public:
   static status textToStatus (const std::string&);
   static std::string statusToText (status);
 
+  void setModified ();
+
   bool has (const std::string&) const;
   std::vector <std::string> all ();
   const std::string get (const std::string&) const;
+  time_t get_date (const std::string&) const;
   void set (const std::string&, const std::string&);
+  void set (const std::string&, int);                                           
   void remove (const std::string&);
 
   status getStatus () const;
   void setStatus (status);
 
-  void validate (bool applyDefault = true);
+  void validate ();
 };
 
 #endif

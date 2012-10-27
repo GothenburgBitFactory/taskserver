@@ -25,19 +25,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-//#include <sstream>
-//#include <stdlib.h>
-//#include <math.h>
-//#include <algorithm>
-//#include <Nibbler.h>
-//#include <Date.h>
+#include <stdlib.h>
 #include <Duration.h>
 #include <Task.h>
 #include <JSON.h>
-//#include <RX.h>
 #include <text.h>
 #include <util.h>
-//#include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 Task::Task ()
@@ -116,6 +109,14 @@ std::string Task::statusToText (Task::status s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Task::setModified ()                                                       
+{                                                                               
+  char now[16];                                                                 
+  sprintf (now, "%u", (unsigned int) time (NULL));                              
+  set ("modified", now);                                                        
+}                                                                               
+
+////////////////////////////////////////////////////////////////////////////////
 bool Task::has (const std::string& name) const
 {
   Task::const_iterator i = this->find (name);
@@ -147,10 +148,26 @@ const std::string Task::get (const std::string& name) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+time_t Task::get_date (const std::string& name) const
+{
+  Task::const_iterator i = this->find (name);
+  if (i != this->end ())
+    return (time_t) strtoul (i->second.c_str (), NULL, 10);
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Task::set (const std::string& name, const std::string& value)
 {
   (*this)[name] = value;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void Task::set (const std::string& name, int value)                             
+{                                                                               
+  (*this)[name] = format (value);                                               
+}                                                                               
 
 ////////////////////////////////////////////////////////////////////////////////
 void Task::remove (const std::string& name)
@@ -262,7 +279,7 @@ std::string Task::composeF4 () const
 //   2) To provide suitable warnings about odd states
 //   3) To generate errors when the inconsistencies are not fixable
 //
-void Task::validate (bool applyDefault /* = true */)
+void Task::validate ()
 {
   Task::status status = getStatus ();
 

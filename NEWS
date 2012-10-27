@@ -1,13 +1,13 @@
 
-New Features in taskd 0.8.0
+New Features in taskd 0.9.0
 
-  - Optional SSL support.  May be turned off for debugging or private use, but
-    is not a good idea.
+  - Functioning sync algorithm
+  - IPv4 and IPv6 support
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
-New configuration options in taskd 0.8.0
+New configuration options in taskd 0.9.0
 
   - They are all new
 
@@ -30,7 +30,7 @@ Or you can also report the issue in the forums at:
 
 Or just send a message to:
 
-  support@taskwarrio.org
+  support@taskwarrior.org
 
 Thank you.
 

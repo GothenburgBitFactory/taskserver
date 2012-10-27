@@ -1,0 +1,28 @@
+#!/bin/bash
+
+rm -r client1 client2
+mkdir client1 client2
+
+echo "data.location=$PWD/client1"      > client1/rc
+echo "taskd.server=localhost:6544"    >> client1/rc
+echo "taskd.credentials=ORG/USER/KEY" >> client1/rc
+echo "confirmation=off"               >> client1/rc
+
+echo "data.location=$PWD/client2"      > client2/rc
+echo "taskd.server=localhost:6544"    >> client2/rc
+echo "taskd.credentials=ORG/USER/KEY" >> client2/rc
+echo "confirmation=off"               >> client2/rc
+
+echo '--- use.case.1 ----------------------------------------------------------'
+./run.use.case.1
+echo '--- use.case.2 ----------------------------------------------------------'
+./run.use.case.2
+echo '--- use.case.3 ----------------------------------------------------------'
+./run.use.case.3
+echo '--- use.case.4 ----------------------------------------------------------'
+./run.use.case.4
+echo '--- use.case.5 ----------------------------------------------------------'
+./run.use.case.5
+echo '--- use.case.6 ----------------------------------------------------------'
+./run.use.case.6
+

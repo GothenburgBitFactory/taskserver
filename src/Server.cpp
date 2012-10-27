@@ -26,14 +26,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
-
-#ifdef HAVE_OPENSSL
-#include <openssl/err.h>
-#include <openssl/ssl.h>
-#include <openssl/rand.h>
-#include <openssl/x509v3.h>
-#endif
-
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -47,7 +39,6 @@
 #include <syslog.h>
 #include <string.h>
 #include <assert.h>
-
 #include <Server.h>
 #include <Socket.h>
 #include <Timer.h>
@@ -58,7 +49,7 @@ Server::Server ()
   , _log_clients (false)
   , _client_address ("")
   , _client_port (0)
-  , _port (12345)
+  , _port ("12345")
   , _pool_size (4)
   , _queue_size (10)
   , _daemon (false)
@@ -76,9 +67,9 @@ Server::~Server ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::setPort (int port)
+void Server::setPort (const std::string& port)
 {
-  if (_log) _log->format ("Using port %d", port);
+  if (_log) _log->format ("Using port %s", port.c_str ());
   _port = port;
 }
 
@@ -157,8 +148,8 @@ void Server::beginServer ()
     writePidFile ();
   }
 
-  Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  s.bind (AF_INET, _port);
+  Socket s;
+  s.bind (_port);
   s.listen (_queue_size);
 
   _request_count = 0;
@@ -228,10 +219,9 @@ void Server::beginServer ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef HAVE_OPENSSL
-void Server::beginSSLServer ()
+void Server::beginSecureServer ()
 {
-  if (_log) _log->write ("SSL Server Starting");
+  if (_log) _log->write ("Secure Server Starting");
 
   if (_daemon)
   {
@@ -242,193 +232,13 @@ void Server::beginSSLServer ()
   _request_count = 0;
   try
   {
-    BIO* bio_ssl;
-    BIO* bio_incoming;
-    BIO* bio_connection;
-
-    SSL_library_init ();
-    SSL_load_error_strings ();
-
-    // Select protocol version in the following order:
-    // - use pure TLSv1 if it is the only protocol version available
-    // - use SSLv3 support optionally in an SSLv2 handshake
-    //   (for maximum compatibility) (if possible)
-    // - use pure SSLv3
-    // - use pure SSLv2
-    SSL_METHOD* method = NULL;
-#if defined(NO_SSL2) && defined(NO_SSL3) && !defined(NO_TLS1)
-    method = TLSv1_server_method ();
-    if (_log) _log->write ("TLSv1 connection type");
-#elif (!defined(NO_SSL2) || defined(NO_SSL2IMPL)) && !defined(NO_SSL3)
-    method = SSLv23_server_method ();
-    if (_log) _log->write ("SSLv23 connection type");
-#elif !defined(NO_SSL3)
-    method = SSLv3_server_method ();
-    if (_log) _log->write ("SSLv3 connection type");
-#elif !defined(NO_SSL2)
-    method = SSLv2_server_method ();
-    if (_log) _log->write ("SSLv2 connection type");
-#else
-    throw std::string ("ERROR: No suitable SSL protocol type available");
-#endif
-
-    SSL_CTX* ctx = SSL_CTX_new (method);
-
-    // Enable all vendor bug compatibility options.
-    SSL_CTX_set_options (ctx, SSL_OP_ALL);
-
-    if (SSL_CTX_use_certificate_file (ctx, _cert_file.c_str (), SSL_FILETYPE_PEM) < 1)
-      throw std::string ("ERROR: While loading public cert '") + _cert_file + "'";
-
-    if (SSL_CTX_use_PrivateKey_file (ctx, _key_file.c_str (), SSL_FILETYPE_PEM) < 1)
-      throw std::string ("ERROR: While loading private key '") + _key_file + "'";
-
-    // Check that the certificate and private key match.
-    if (! SSL_CTX_check_private_key (ctx))
-      throw std::string ("ERROR: No matching cert '") + _cert_file + "' to private key '" + _key_file + "'";
-
-    bio_ssl = BIO_new_ssl (ctx, 0);
-    if (bio_ssl == NULL)
-      throw std::string ("ERROR: Cannot create server socket");
-
-    SSL* ssl;
-    BIO_get_ssl (bio_ssl, &ssl);
-    SSL_set_mode (ssl, SSL_MODE_AUTO_RETRY);
-
-    char port_string[12];
-    sprintf (port_string, "%d", _port);
-    bio_incoming = BIO_new_accept (port_string);
-    BIO_set_accept_bios (bio_incoming, bio_ssl);
-
-    // First call sets up socket.
-    if (BIO_do_accept (bio_incoming) <= 0)
-      throw std::string ("ERROR: Cannot bind server socket");
-
-    for (;;)
-    {
-      if (BIO_do_accept (bio_incoming) <= 0)
-        throw std::string ("ERROR: Cannot accept connection");
-
-      bio_connection = BIO_pop (bio_incoming);
-
-      // Switch on the non-blocking I/O flag for the connection BIO bio_connection
-      // TODO This call is misbehaving and not returning 1, as promised.
-      /*if (*/BIO_set_nbio (bio_connection, 1)/* != 1)
-        throw std::string ("ERROR: Unable to set non-blocking mode")*/;
-
-      // Preempt an in-session handshake request.
-      if (BIO_do_handshake (bio_connection) <= 0)
-        throw std::string ("ERROR: Problem during handshake");
-
-      // Get client address and port, for logging.
-      if (_log_clients)
-      {
-        struct sockaddr_storage addr;
-        socklen_t len = sizeof (addr);
-        char ipstr[INET6_ADDRSTRLEN];
-
-        int client_fd = BIO_get_fd (bio_connection, NULL);
-
-        _client_address = "";
-        if (!getpeername (client_fd, (struct sockaddr*) &addr, &len))
-        {
-          // deal with both IPv4 and IPv6:
-          if (addr.ss_family == AF_INET)
-          {
-            struct sockaddr_in *s = (struct sockaddr_in *) &addr;
-            _client_port = ntohs (s->sin_port);
-            inet_ntop (AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
-          }
-          // AF_INET6
-          else
-          {
-            struct sockaddr_in6 *s = (struct sockaddr_in6 *) &addr;
-            _client_port = ntohs (s->sin6_port);
-            inet_ntop (AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
-          }
-
-          _client_address = ipstr;
-        }
-      }
-
-      // Metrics.
-      HighResTimer timer;
-      timer.start ();
-
-      // Handle the request.
-      ++_request_count;
-
-      // Read, process request, write response.
-      std::string input = read (bio_connection);
-      std::string output;
-      handler (input, output);
-      write (bio_connection, output);
-
-      BIO_free_all (bio_connection);
-      ERR_remove_state (0);
-
-      if (_log)
-      {
-        timer.stop ();
-        _log->format ("[%d] Serviced in %.6fs", _request_count, timer.total ());
-      }
-    }
-
-    BIO_free_all (bio_incoming);
+    throw std::string ("ERROR: Secure Server not implemented.");
   }
 
   catch (std::string& e) { if (_log) _log->write (std::string ("Error: ") + e); }
   catch (char* e)        { if (_log) _log->write (std::string ("Error: ") + e); }
   catch (...)            { if (_log) _log->write ("Error: Unknown exception"); }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-std::string Server::read (BIO* bio)
-{
-  std::string input;
-  int error;
-  char buf[1024];
-
-  do
-  {
-    error = BIO_read (bio, buf, sizeof (buf) - 1);
-    if (error > 0)
-    {
-      buf[error] = 0;
-      input += buf;
-    }
-    else
-    {
-      if (! BIO_should_retry (bio))
-        return input;
-
-      error = 0;
-    }
-  }
-  while (error == 0 || error == sizeof (buf) - 1);
-
-  return input;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Server::write (BIO* bio, const std::string& output)
-{
-  int error = 0;
-  for (int bytes = 0; bytes < output.size (); bytes += error)
-  {
-    error = BIO_write (bio, output.c_str () + bytes, output.size () - bytes);
-    if (error <= 0)
-    {
-      if (! BIO_should_retry (bio))
-        return false;
-
-      error = 0;
-    }
-  }
-
-  return true;
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO To provide these data, a request count, a start time, and a cumulative
@@ -444,6 +254,20 @@ void Server::stats (int& requests, time_t& uptime, double& utilization)
 void Server::daemonize ()
 {
   if (_log) _log->write ("Daemonizing");
+
+/* TODO Load RUN_AS_USER from config.
+
+  // If run as root, switch to preferred user.
+  if (getuid () == 0 || geteuid () == 0 )
+  {
+    struct passwd *pw = getpwnam (RUN_AS_USER);
+    if (pw)
+    {
+      if (_log) _log->write ("setting user to " RUN_AS_USER);
+      setuid (pw->pw_uid);
+    }
+  }
+*/
 
   // Fork off the parent process
   pid_t pid = fork ();

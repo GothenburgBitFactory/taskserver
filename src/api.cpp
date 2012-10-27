@@ -269,6 +269,17 @@ void taskd_requireVersion (const Msg& message, const std::string& version)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Assert: message.protocol >= version
+void taskd_requireHeader (
+  const Msg& message,
+  const std::string& name,
+  const std::string& value)
+{
+  if (message.get (name) != value)
+    throw format ("ERROR: Message {1} should be '{2}'", name, value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Tests left >= right, where left and right are version number strings.
 // Assumes all versions are Major.Minor.Patch[other], such as '1.0.0' or
 // '1.0.0beta1'
@@ -296,49 +307,6 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// If authentication fails, fills in response code and status.
-// Note: information regarding valid/invalid org/user is not revealed.
-bool taskd_authenticate (
-  Config& config,
-  Log& log,
-  const Msg& request,
-  Msg& response)
-{
-  Directory root (config.get ("root"));
-  std::string org  = request.get ("org");
-  std::string user = request.get ("user");
-  std::string key  = request.get ("key");
-
-  if (! taskd_is_org (root, org))
-  {
-    log.format ("INFO Auth failure: org '%s'",
-                org.c_str ());
-
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
-    return false;
-  }
-
-  // TODO Assert org is not terminated or suspended.
-
-  if (! taskd_is_user (root, org, user))
-  {
-    log.format ("INFO Auth failure: org '%s' user '%s'",
-                org.c_str (),
-                user.c_str ());
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
-    return false;
-  }
-
-  // TODO Assert user is not terminated or suspended.
-  // TODO Assert key matches.
-
-  // All checks succeed, user is authenticated.
-  return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // TODO Tempporary key gen for development.
 std::string taskd_generate_key ()
 {
@@ -352,18 +320,18 @@ bool taskd_sendMessage (
   const Msg& out)
 {
   std::string destination = config.get (to);
-  std::string::size_type colon = destination.find (':');
+  std::string::size_type colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
   std::string server = destination.substr (0, colon);
-  int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
+  std::string port   = destination.substr (colon + 1);
 
   try
   {
-    Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    Socket s;
     s.connect (server, port);
-    s.write (out.serialize () + "\r\n");
+    s.write (out.serialize () + "\n");
 
     std::string response;
     s.read (response);
@@ -392,18 +360,18 @@ bool taskd_sendMessage (
   Msg& in)
 {
   std::string destination = config.get (to);
-  std::string::size_type colon = destination.find (':');
+  std::string::size_type colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
   std::string server = destination.substr (0, colon);
-  int port = strtoimax (destination.substr (colon + 1).c_str (), NULL, 10);
+  std::string port   = destination.substr (colon + 1);
 
   try
   {
-    Socket s (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    Socket s;
     s.connect (server, port);
-    s.write (out.serialize () + "\r\n");
+    s.write (out.serialize () + "\n");
 
     std::string response;
     s.read (response);

@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include <regex.h>
+#include <cmake.h>
 
 class RX
 {

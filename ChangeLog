@@ -2,24 +2,31 @@
 
 1.0.0beta ()
 
-1.0.0alpha ()
+0.11.0alpha ()
 
-0.9.0 ()
-
-0.8.0 ()
-- 
+0.10.0 ()
+- Full user authentication.
 
 ------ current release ---------------------------
 
-0.7.0 ()
+0.9.0 (2012-10-16)
+- IPv4 and IPv6 support.
+- Sync use cases and test.
+
+------ old releases ------------------------------
+
+0.8.0 (2012-10-11)
+- Functioning sync algorithm.
+- Initial documentation.
+- Demo scripts (early unit tests).
+
+0.7.0 (2012-09-30)
 - Added program shell.
 - Added SSL support.
 - Added server command, responding to 'statistics' and 'sync' requests.
 - Added debug 'client' command.
 - Added 'add' command.
 - Equalled functionality of original codebase.
-
------- old releases ------------------------------
 
 Project restarted 2012-09-26
 Project started 2010-09-22

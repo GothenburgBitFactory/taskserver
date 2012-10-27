@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <cmake.h>
 
 class Date;
 

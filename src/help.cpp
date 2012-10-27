@@ -82,8 +82,8 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "\n"
                 << "Options:\n"
                 << "  --daemon       Runs server as a daemon\n"
-                << "  --ssl          Uses SSL encryption (default)\n"
-                << "  --nossl        Plaintext, no encryption\n"
+                << "  --tls          Uses TLS encryption (default)\n"
+                << "  --notls        Plaintext, no encryption\n"
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
@@ -157,23 +157,33 @@ int command_help (Config& config, const std::vector <std::string>& args)
       std::cout << "No help for '" << args[1] << "'.\n";
   }
   else
-  {
     std::cout << "\n"
-              << "taskd - Task Server\n"
-              << VERSION << "\n"
+              << "Usage: taskd -v|--version\n"
+              << "       taskd -d|--diagnostics\n"
+              << "       taskd -h|--help\n"
+              << "       taskd add --data <root> [options] org <org>\n"
+              << "       taskd add --data <root> [options] group <org> <group>\n"
+              << "       taskd add --data <root> [options] user <org> <user>\n"
+              << "       taskd client --data <root> [options] <host:port> <file> [<file> ...]\n"
+              << "       taskd config --data <root> [<name> [<value>]]\n"
+              << "       taskd help [<command>]\n"
+              << "       taskd init --data <root> [--debug] [options]\n"
+              << "       taskd remove --data <root> [options] org <org>\n"
+              << "       taskd remove --data <root> [options] group <org> <group>\n"
+              << "       taskd remove --data <root> [options] user <org> <user>\n"
+              << "       taskd resume --data <root> [options] org <org>\n"
+              << "       taskd resume --data <root> [options] group <org> <group>\n"
+              << "       taskd resume --data <root> [options] user <org> <user>\n"
+              << "       taskd server --data <root> [--daemon] [--tls|--notls] [--debug] [options]\n"
+              << "       taskd status [options]\n"
+              << "       taskd suspend --data <root> [options] org <org>\n"
+              << "       taskd suspend --data <root> [options] group <org> <group>\n"
+              << "       taskd suspend --data <root> [options] user <org> <user>\n"
               << "\n"
-              << "add            Add org/group/user\n"
-              << "client         Debug client\n"
-              << "config         Modify and inspect configuration\n"
-              << "help           Show detailed help\n"
-              << "init           One-time project initialization\n"
-              << "remove         Remove org/group/user\n"
-              << "resume         Resume org/group/user\n"
-              << "server         Run the server\n"
-              << "status         Display taskd status\n"
-              << "suspend        Suspend org/group/user\n"
+              << "Common Options:\n"
+              << "  --quiet        Turns off verbose output\n"
+              << "  --NAME=VALUE   Temporary configuration override\n"
               << "\n";
-  }
 
   return 0;
 }

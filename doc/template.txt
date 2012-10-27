@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                               October 2012
 
-                             Task Server Extensions
+                                     Title
                                    Version 1
 
 
@@ -18,31 +18,23 @@ Copyright Notice
 
 Abstract
 
-   Task Server Extensions are not supported in release 1.x.  This document is a
-   placeholder.
+   This document is ...
 
 
 Table of Contents
 
    1      Introduction
    1.1    Requirements
-   2      Authors' Addresses
-   3      Full Copyright Statement
+
+   9      References
+   10     Acknowledgements
+   11     Authors' Addresses
+   12     Full Copyright Statement
 
 
 1  Introduction
 
-   The Task Server will support extensions in the form of executable scripts
-   that are run when certain events occur.  The server will define a set of
-   events (data modified, new user added ...) and extensions will be able to
-   hook into the events.
-
-   Server capabilities will be enhanced by these extensions, which will likely
-   provide:
-
-      Reminders for due tasks
-      Spelling correction for task descriptions
-      Functionality triggered by the presence of particular tags
+   For many years ...
 
 
 1.1  Requirements
@@ -59,16 +51,29 @@ Table of Contents
    is optional, and may be omitted without careful consideration.
 
 
-2  Authors' Addresses
+9  References
+ 
+   [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
+        1975.
 
-   Paul Beckingham
-   Email: paul@yootabory.org
+
+10  Acknowledgements
+
+   Thanks to ... for testing and feedback.
+
+   Thanks to ... whose comments helped improve this document.
+
+
+11  Authors' Addresses
 
    Federico Hernandez
    Email: fredde@yootabory.org
 
+   Paul Beckingham
+   Email: paul@yootabory.org
 
-3  Full Copyright Statement
+
+12  Full Copyright Statement
 
    Copyright 2010 - 2012, Göteborg Bit Factory.
    All rights reserved.

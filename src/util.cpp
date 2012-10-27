@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <text.h>
 #include <util.h>
+#include <cmake.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Uses std::getline, because std::cin eats leading whitespace, and that means

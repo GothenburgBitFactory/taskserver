@@ -11,6 +11,7 @@ add_executable (taskd_executable taskd.cpp
                                  ConfigFile.cpp ConfigFile.h
                                  config.cpp
                                  daemon.cpp
+                                 Database.cpp   Database.h
                                  Date.cpp       Date.h
                                  Directory.cpp  Directory.h
                                  Duration.cpp   Duration.h
@@ -28,10 +29,12 @@ add_executable (taskd_executable taskd.cpp
                                  status.cpp
                                  Task.cpp       Task.h
                                  text.cpp       text.h
+                                 Thread.cpp     Thread.h
                                  Timer.cpp      Timer.h
                                  utf8.cpp       utf8.h
                                  util.cpp       util.h)
 
+target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
 
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})

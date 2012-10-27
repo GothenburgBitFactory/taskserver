@@ -29,6 +29,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cmake.h>
 #ifdef CYGWIN
 #include <time.h>
 #else
@@ -38,7 +39,6 @@
 #include <Color.h>
 #include <text.h>
 #include <taskd.h>
-#include <cmake.h>
 #include <commit.h>
 
 #ifdef HAVE_SRANDOM
@@ -65,12 +65,14 @@ int main (int argc, const char** argv)
     args.push_back (argv[i]);
 
   Config config;
-  // TODO Load config file.
 
   // Some options are hard-coded.
   if (args.size ())
   {
-    if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
+    if (args[0] == "-h" || closeEnough ("--help", args[0], 3))
+      status = command_help (config, args);
+
+    else if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
     {
       Color bold ("bold");
       std::cout << "\n"
@@ -206,19 +208,14 @@ int main (int argc, const char** argv)
 #else
                 << " -uuid"
 #endif
-
-#ifdef HAVE_OPENSSL
-                << " +ssl"
-#else
-                << " -ssl"
-#endif
                 << "\n\n";
-
+/*
       std::cout << "[1mExternal Libraries[0m\n"
-#ifdef HAVE_OPENSSL
-                << "   OpenSSL: " << OPENSSL_VERSION_TEXT << "\n"
+#ifdef HAVE_XXX
+                << "   XXX: " << XXX_VERSION_TEXT << "\n"
 #endif
                 << "\n";
+*/
     }
     else
     {

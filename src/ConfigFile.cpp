@@ -39,7 +39,7 @@
 // This string is used in two ways:
 // 1) It is used to create a new .taskrc file, by copying it directly to disk.
 // 2) It is parsed and used as default values for all Config.get calls.
-std::string Config::_defaults = "extensions=" TASKD_EXTDIR "\n";
+std::string Config::_defaults = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 // DO NOT CALL Config::setDefaults.

@@ -28,14 +28,15 @@
 #ifndef INCLUDED_NIBBLER
 #define INCLUDED_NIBBLER
 
+#include <cmake.h>
+#include <string>
+#include <vector>
+
 #define NIBBLER_FEATURE_DATE
 //#undef  NIBBLER_FEATURE_DATE
 
 #define NIBBLER_FEATURE_REGEX
 //#undef  NIBBLER_FEATURE_REGEX
-
-#include <string>
-#include <vector>
 
 class Nibbler
 {
