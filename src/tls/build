@@ -1,4 +1,2 @@
-g++ -c c.cpp s.cpp
-g++ -o c c.o -lgnutls
-g++ -o s s.o -lgnutls
-
+g++ c.cpp -o c -lgnutls
+g++ s.cpp -o s -lgnutls

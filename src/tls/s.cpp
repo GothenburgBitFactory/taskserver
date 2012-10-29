@@ -9,10 +9,10 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-#define KEYFILE "key.pem"
-#define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
-#define CRLFILE "crl.pem"
+#define KEYFILE  "pki/server.key.pem"
+#define CERTFILE "pki/server.cert.pem"
+#define CAFILE   "pki/ca.cert.pem"
+#define CRLFILE  "pki/server.crl.pem"
 
 // This is a sample TLS 1.0 echo server, using X.509 authentication.
 
@@ -83,6 +83,7 @@ int main (void)
 
     // request client certificate if any.
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+    //gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
     // Set maximum compatibility mode. This is only suggested on public
     // webservers that need to trade security for compatibility
@@ -94,6 +95,8 @@ int main (void)
                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
     gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+
+    // Key exchange.
     ret = gnutls_handshake (session);
     if (ret < 0)
     {

@@ -11,7 +11,8 @@
 // A very basic TLS client, with X.509 authentication.
 
 #define MAX_BUF 1024
-#define CAFILE "ca.pem"
+#define CAFILE "pki/client.cert.pem"
+
 #define MSG "This is a test."
 
 const char *PORT = "5556";
