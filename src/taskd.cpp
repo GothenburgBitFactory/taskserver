@@ -45,6 +45,10 @@
 #define srand(x) srandom(x)
 #endif
 
+#ifdef HAVE_LIBGNUTLS
+#include <gnutls/gnutls.h>
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, const char** argv)
 {
@@ -191,6 +195,12 @@ int main (int argc, const char** argv)
                 << " -pthreads"
 #endif
 
+#ifdef HAVE_LIBGNUTLS
+                << " +tls"
+#else
+                << " -tls"
+#endif
+
 #ifdef HAVE_SRANDOM
                 << " +srandom"
 #else
@@ -209,13 +219,15 @@ int main (int argc, const char** argv)
                 << " -uuid"
 #endif
                 << "\n\n";
-/*
+
       std::cout << "[1mExternal Libraries[0m\n"
-#ifdef HAVE_XXX
-                << "   XXX: " << XXX_VERSION_TEXT << "\n"
+#ifdef HAVE_LIBGNUTLS
+                << "    GnuTLS: " << GNUTLS_VERSION << "\n"
+#else
+                << "    GnuTLS: n/a\n"
 #endif
                 << "\n";
-*/
+
     }
     else
     {

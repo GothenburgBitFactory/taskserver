@@ -2,3 +2,4 @@ c
 s
 *.o
 gnutls-*
+*.pem

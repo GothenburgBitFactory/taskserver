@@ -45,4 +45,5 @@
 /* Libraries */
 #cmakedefine HAVE_UUID
 #cmakedefine HAVE_LIBPTHREAD
+#cmakedefine HAVE_LIBGNUTLS
 
