@@ -6,6 +6,12 @@ release, and will be replaced asap.
 
 GnuTLS 2.12.20 or later is assumed.
 
+Build the keys, certs and crl:
+
+  cd pki
+  ./build
+  cd ..
+
 Build the source using:
 
   ./build

@@ -1,4 +1,9 @@
 #include <stdio.h>
+#include <Socket.h>
+
+
+
+
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -28,55 +33,41 @@ static gnutls_dh_params_t dh_params;
 
 int main (void)
 {
-  int err, listen_sd;
-  int sd, ret;
-  struct sockaddr_in sa_serv;
-  struct sockaddr_in sa_cli;
-  int client_len;
-  char topbuf[512];
-  gnutls_session_t session;
-  char buffer[MAX_BUF + 1];
-  int optval = 1;
-
-  // this must be called once in the program
   gnutls_global_init ();
-
   gnutls_certificate_allocate_credentials (&x509_cred);
   gnutls_certificate_set_x509_trust_file (x509_cred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_crl_file (x509_cred, CRLFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_key_file (x509_cred, CERTFILE, KEYFILE, GNUTLS_X509_FMT_PEM);
-
-  // Generate Diffie-Hellman parameters - for use with DHE kx algorithms. When
-  // short bit length is used, it might be wise to regenerate parameters.
-  // Check the ex-serv-export.c example for using static parameters.
   gnutls_dh_params_init (&dh_params);
   gnutls_dh_params_generate2 (dh_params, DH_BITS);
-
   gnutls_priority_init (&priority_cache, "NORMAL", NULL);
-
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
 
   // Socket operations
-  listen_sd = socket (AF_INET, SOCK_STREAM, 0);
+  int listen_sd = socket (AF_INET, SOCK_STREAM, 0);
   SOCKET_ERR (listen_sd, "socket");
 
+  struct sockaddr_in sa_serv;
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
   sa_serv.sin_port = htons (PORT);      // Server Port number
 
+  int optval = 1;
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval, sizeof (int));
 
-  err = bind (listen_sd, (struct sockaddr *) & sa_serv, sizeof (sa_serv));
+  int err = bind (listen_sd, (struct sockaddr *) & sa_serv, sizeof (sa_serv));
   SOCKET_ERR (err, "bind");
   err = listen (listen_sd, 1024);
   SOCKET_ERR (err, "listen");
 
   printf ("s: Server ready. Listening to port '%d'.\n\n", PORT);
 
-  client_len = sizeof (sa_cli);
+  struct sockaddr_in sa_cli;
+  int client_len = sizeof (sa_cli);
   for (;;)
   {
+    gnutls_session_t session;
     gnutls_init (&session, GNUTLS_SERVER);
     gnutls_priority_set (session, priority_cache);
     gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -89,7 +80,8 @@ int main (void)
     // webservers that need to trade security for compatibility
     gnutls_session_enable_compatibility_mode (session);
 
-    sd = accept (listen_sd, (struct sockaddr *) &sa_cli, (socklen_t*) &client_len);
+    int sd = accept (listen_sd, (struct sockaddr *) &sa_cli, (socklen_t*) &client_len);
+    char topbuf[512];
     printf ("s: - connection from %s, port %d\n",
             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
@@ -97,7 +89,7 @@ int main (void)
     gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
     // Key exchange.
-    ret = gnutls_handshake (session);
+    int ret = gnutls_handshake (session);
     if (ret < 0)
     {
       close (sd);
@@ -112,6 +104,7 @@ int main (void)
 
     for (;;)
     {
+      char buffer[MAX_BUF + 1];
       memset (buffer, 0, MAX_BUF + 1);
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
 

@@ -1,2 +1,3 @@
-g++ c.cpp -o c -lgnutls
-g++ s.cpp -o s -lgnutls
+g++ -D HAVE_LIBGNUTLS=1 -c -I. Socket.cpp
+g++ -D HAVE_LIBGNUTLS=1 -I. c.cpp Socket.o -o c -lgnutls
+g++ -D HAVE_LIBGNUTLS=1 -I. s.cpp Socket.o -o s -lgnutls

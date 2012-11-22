@@ -1,4 +1,9 @@
 #include <stdio.h>
+#include <Socket.h>
+
+
+
+
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -20,14 +25,13 @@ const char *SERVER = "127.0.0.1";
 
 int main (void)
 {
-  gnutls_global_init ();
+  Socket s;
+  s.client_cert (CAFILE);
 
-  // X509 stuff: set the trusted cas file
+  gnutls_global_init ();
   gnutls_certificate_credentials_t xcred;
   gnutls_certificate_allocate_credentials (&xcred);
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
-
-  // Initialize TLS session 
   gnutls_session_t session;
   gnutls_init (&session, GNUTLS_CLIENT);
 
