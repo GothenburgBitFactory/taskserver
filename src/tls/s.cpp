@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <Socket.h>
 
-
-
-
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -33,6 +30,11 @@ static gnutls_dh_params_t dh_params;
 
 int main (void)
 {
+  Socket s;
+  s.ca_cert (CAFILE);
+  s.crl (CRLFILE);
+  s.cert (CERTFILE);
+
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&x509_cred);
   gnutls_certificate_set_x509_trust_file (x509_cred, CAFILE, GNUTLS_X509_FMT_PEM);
@@ -72,7 +74,7 @@ int main (void)
     gnutls_priority_set (session, priority_cache);
     gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
-    // request client certificate if any.
+    // Request client certificate if any.
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
     //gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
@@ -100,7 +102,7 @@ int main (void)
     }
     printf ("s: - Handshake was completed\n");
 
-    // see the Getting peer's information example print_info(session);
+    // See the Getting peer's information example print_info(session);
 
     for (;;)
     {
@@ -121,13 +123,13 @@ int main (void)
       }
       else if (ret > 0)
       {
-        // echo data back to the client
+        // Echo data back to the client
         gnutls_record_send (session, buffer, strlen (buffer));
       }
     }
     printf ("\n");
 
-    // do not wait for the peer to close the connection.
+    // Do not wait for the peer to close the connection.
     gnutls_bye (session, GNUTLS_SHUT_WR);
 
     close (sd);

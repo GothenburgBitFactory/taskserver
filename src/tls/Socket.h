@@ -48,7 +48,9 @@ public:
   // Client
   void connect (const std::string&, const std::string&);
 #ifdef HAVE_LIBGNUTLS
-  void client_cert (const std::string&);
+  void ca_cert (const std::string&);
+  void crl (const std::string&);
+  void cert (const std::string&);
 #endif
 
   // Server
@@ -72,6 +74,8 @@ private:
   bool _debug;
 
 #ifdef HAVE_LIBGNUTLS
+  std::string _ca_cert;
+  std::string _crl;
   std::string _cert;
 #endif
 };

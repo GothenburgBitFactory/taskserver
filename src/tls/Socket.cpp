@@ -111,9 +111,21 @@ void Socket::connect (const std::string& host, const std::string& port)
 
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef HAVE_LIBGNUTLS
-void Socket::client_cert (const std::string& cert)
+void Socket::ca_cert (const std::string& file)
 {
-  _cert = cert;
+  _ca_cert = file;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Socket::crl (const std::string& file)
+{
+  _crl = file;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Socket::cert (const std::string& file)
+{
+  _cert = file;
 }
 #endif
 

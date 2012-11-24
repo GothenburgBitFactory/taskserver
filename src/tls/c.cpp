@@ -26,7 +26,7 @@ const char *SERVER = "127.0.0.1";
 int main (void)
 {
   Socket s;
-  s.client_cert (CAFILE);
+  s.ca_cert (CAFILE);
 
   gnutls_global_init ();
   gnutls_certificate_credentials_t xcred;
