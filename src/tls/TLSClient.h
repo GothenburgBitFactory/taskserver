@@ -27,23 +27,25 @@
 #ifndef INCLUDED_TLSCLIENT
 #define INCLUDED_TLSCLIENT
 
-/*
 #include <string>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <cmake.h>
-*/
+#include <gnutls/gnutls.h>
 
 class TLSClient
 {
 public:
   TLSClient ();
+  ~TLSClient ();
+  void init (const std::string&);
+  void connect (const std::string&, const std::string&);
+
+  void send (const std::string&);
+  void recv (std::string&);
 
 private:
+  std::string                      _ca;
+  gnutls_certificate_credentials_t _credentials;
+  gnutls_session_t                 _session;
+  int                              _socket;
 };
 
 #endif
