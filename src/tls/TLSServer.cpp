@@ -24,62 +24,12 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef INCLUDED_SOCKET
-#define INCLUDED_SOCKET
 
-#include <string>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include <TLSServer.h>
 
-// TODO Restore.
-//#include <cmake.h>
-
-class Socket
+////////////////////////////////////////////////////////////////////////////////
+TLSServer::TLSServer ()
 {
-public:
-  Socket ();
-  Socket (int);
-  ~Socket ();
-
-  // Client
-  void connect (const std::string&, const std::string&);
-#ifdef HAVE_LIBGNUTLS
-  void ca_cert (const std::string&);
-  void crl (const std::string&);
-  void cert (const std::string&);
-#endif
-
-  // Server
-  void bind (const std::string&);
-  void listen (int queue = 5);
-  int accept ();
-  void read (std::string&);
-  void write (const std::string&);
-
-  void close ();
-
-  void limit (int);
-  void debug ();
-
-private:
-  void* get_in_addr (struct sockaddr*);
-
-private:
-  int  _socket;
-  int  _limit;
-  bool _debug;
-
-#ifdef HAVE_LIBGNUTLS
-  std::string _ca_cert;
-  std::string _crl;
-  std::string _cert;
-#endif
-};
-
-#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////////

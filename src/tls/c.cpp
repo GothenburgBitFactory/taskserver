@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <Socket.h>
+#include <TLSClient.h>
 
 
 
@@ -25,8 +25,7 @@ const char *SERVER = "127.0.0.1";
 
 int main (void)
 {
-  Socket s;
-  s.ca_cert (CAFILE);
+  TLSClient client;
 
   gnutls_global_init ();
   gnutls_certificate_credentials_t xcred;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <Socket.h>
+#include <TLSServer.h>
 
 #include <stdlib.h>
 #include <errno.h>
@@ -30,10 +30,7 @@ static gnutls_dh_params_t dh_params;
 
 int main (void)
 {
-  Socket s;
-  s.ca_cert (CAFILE);
-  s.crl (CRLFILE);
-  s.cert (CERTFILE);
+  TLSServer server;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&x509_cred);
