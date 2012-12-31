@@ -25,9 +25,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include <TLSClient.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <sys/errno.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 #define MAX_BUF 1024
 
@@ -35,6 +39,7 @@
 TLSClient::TLSClient ()
 : _ca ("")
 , _socket (0)
+, _debug (false)
 {
 }
 
@@ -53,6 +58,20 @@ TLSClient::~TLSClient ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSClient::limit (int max)
+{
+  _limit = max;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Calling this method results in all subsequent socket traffic being sent to
+// std::cout, labelled with >>> for outgoing, <<< for incoming.
+void TLSClient::debug ()
+{
+  _debug = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSClient::init (const std::string& ca)
 {
   _ca = ca;
@@ -68,7 +87,7 @@ void TLSClient::init (const std::string& ca)
   if (ret < 0)
   {
     if (ret == GNUTLS_E_INVALID_REQUEST)
-      fprintf (stderr, "c: Syntax error at: %s\n", err);
+      std::cout << "c: ERROR Priority error at: " << err << "\n";
 
     exit (1);
   }
@@ -78,23 +97,47 @@ void TLSClient::init (const std::string& ca)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::connect (const std::string& server, const std::string& port)
+void TLSClient::connect (const std::string& host, const std::string& port)
 {
-  // connect to server
-  _socket = socket (AF_INET, SOCK_STREAM, 0);
+  // use IPv4 or IPv6, does not matter.
+  struct addrinfo hints;
+  memset (&hints, 0, sizeof hints);
+  hints.ai_family   = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags    = AI_PASSIVE; // use my IP
 
-  struct sockaddr_in sa;
-  memset (&sa, '\0', sizeof (sa));
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons (atoi (port.c_str ()));
-  inet_pton (AF_INET, server.c_str (), &sa.sin_addr);
+  struct addrinfo* res;
+  if (::getaddrinfo (host.c_str (), port.c_str (), &hints, &res) != 0)
+    throw "ERROR: " + std::string (::gai_strerror (errno));
 
-  int error = ::connect (_socket, (struct sockaddr *) &sa, sizeof (sa));
-  if (error < 0)
+  // Try them all, stop on success.
+  struct addrinfo* p;
+  for (p = res; p != NULL; p = p->ai_next)
   {
-    fprintf (stderr, "c: Connect error\n");
-    exit (1);
+    if ((_socket = ::socket (p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+      continue;
+
+    // When a socket is closed, it remains unavailable for a while (netstat -an).
+    // Setting SO_REUSEADDR allows this program to assume control of a closed,
+    // but unavailable socket.
+    int on = 1;
+    if (::setsockopt (_socket,
+                      SOL_SOCKET,
+                      SO_REUSEADDR,
+                      (const void*) &on,
+                      sizeof (on)) == -1)
+      throw "ERROR: " + std::string (::strerror (errno));
+
+    if (::connect (_socket, p->ai_addr, p->ai_addrlen) == -1)
+      continue;
+
+    break;
   }
+
+  free (res);
+
+  if (p == NULL)
+    throw "ERROR: Could not connect to " + host + " " + port;
 
   gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) _socket);
 
@@ -103,40 +146,129 @@ void TLSClient::connect (const std::string& server, const std::string& port)
 
   if (ret < 0)
   {
-    fprintf (stderr, "c: *** Handshake failed\n");
+    std::cout << "c: ERROR Handshake failed\n";
     gnutls_perror (ret);
   }
   else
   {
-    printf ("c: - Handshake was completed\n");
+    std::cout << "c: INFO Handshake was completed\n";
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::send (const std::string& text)
+void TLSClient::send (const std::string& data)
 {
-  gnutls_record_send (_session, text.c_str (), text.length ());
-}
+  std::string packet = data;
+/*
+  std::string packet = "XXXX" + data;
 
-////////////////////////////////////////////////////////////////////////////////
-void TLSClient::recv (std::string& text)
-{
-  char buffer[MAX_BUF + 1];
-  int ret = gnutls_record_recv (_session, buffer, MAX_BUF);
-  if (ret == 0)
-    printf ("c: - Peer has closed the TLS connection\n");
-  else if (ret < 0)
-    fprintf (stderr, "c: *** Error: %s\n", gnutls_strerror (ret));
-  else
+  // Encode the length.
+  unsigned long l = packet.length ();
+  packet[0] = l >>24;
+  packet[1] = l >>16;
+  packet[2] = l >>8;
+  packet[3] = l;
+*/
+
+  int total = 0;
+  int remaining = packet.length ();
+
+  while (total < remaining)
   {
-    printf ("c: - Received %d bytes: ", ret);
-    for (int ii = 0; ii < ret; ii++)
-      fputc (buffer[ii], stdout);
-    fputs ("\n", stdout);
-    text = buffer;
+    int status;
+    do
+    {
+      status = gnutls_record_send (_session, packet.c_str () + total, remaining);
+    }
+    while (errno == GNUTLS_E_INTERRUPTED ||
+           errno == GNUTLS_E_AGAIN);
 
-    gnutls_bye (_session, GNUTLS_SHUT_RDWR);
+    if (status == -1)
+      break;
+
+    total     += status;
+    remaining -= status;
   }
+
+  if (_debug)
+    std::cout << "c: INFO Sending '"
+              << data.c_str ()
+              << "' (" << total << " bytes)"
+              << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void TLSClient::recv (std::string& data)
+{
+  data = "";          // No appending of data.
+  int received = 0;
+
+  // Get the encoded length.
+  unsigned char header[4] = {0};
+/*
+  do
+  {
+    received = gnutls_record_recv (_session, header, 4);
+  }
+  while (received > 0 &&
+         (errno == GNUTLS_E_INTERRUPTED ||
+          errno == GNUTLS_E_AGAIN));
+*/
+
+  int total = received;
+
+  // Decode the length.
+  unsigned long expected = (header[0]<<24) |
+                           (header[1]<<16) |
+                           (header[2]<<8) |
+                            header[3];
+
+  // TODO This would be a good place to assert 'expected < _limit'.
+
+  // Arbitrary buffer size.
+  char buffer[MAX_BUF];
+
+  // Keep reading until no more data.  Concatenate chunks of data if a) the
+  // read was interrupted by a signal, and b) if there is more data than
+  // fits in the buffer.
+  do
+  {
+    do
+    {
+      received = gnutls_record_recv (_session, buffer, MAX_BUF - 1);
+    }
+    while (received > 0 &&
+           (errno == GNUTLS_E_INTERRUPTED ||
+            errno == GNUTLS_E_AGAIN));
+
+    // Other end closed the connection.
+    if (received == 0)
+    {
+      std::cout << "c: INFO Peer has closed the TLS connection\n";
+      break;
+    }
+
+    // Something happened.
+    if (received < 0)
+      throw "ERROR: " + std::string (gnutls_strerror (received));
+
+    buffer [received] = '\0';
+    data += buffer;
+    total += received;
+
+    // Stop at defined limit.
+    if (_limit && total > _limit)
+      break;
+  }
+  while (received > 0 && total < (int) expected);
+
+  gnutls_bye (_session, GNUTLS_SHUT_RDWR);
+
+  if (_debug)
+    std::cout << "c: INFO Receiving '"
+              << data.c_str ()
+              << "' (" << total << " bytes)"
+              << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

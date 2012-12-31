@@ -35,6 +35,8 @@ class TLSClient
 public:
   TLSClient ();
   ~TLSClient ();
+  void limit (int);
+  void debug ();
   void init (const std::string&);
   void connect (const std::string&, const std::string&);
 
@@ -46,6 +48,8 @@ private:
   gnutls_certificate_credentials_t _credentials;
   gnutls_session_t                 _session;
   int                              _socket;
+  int                              _limit;
+  bool                             _debug;
 };
 
 #endif

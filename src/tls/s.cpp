@@ -60,7 +60,7 @@ int main (void)
   err = listen (listen_sd, 1024);
   SOCKET_ERR (err, "listen");
 
-  printf ("s: Server ready. Listening to port '%d'.\n\n", PORT);
+  printf ("s: INFO Server ready. Listening to port '%d'.\n\n", PORT);
 
   struct sockaddr_in sa_cli;
   int client_len = sizeof (sa_cli);
@@ -81,7 +81,7 @@ int main (void)
 
     int sd = accept (listen_sd, (struct sockaddr *) &sa_cli, (socklen_t*) &client_len);
     char topbuf[512];
-    printf ("s: - connection from %s, port %d\n",
+    printf ("s: INFO connection from %s, port %d\n",
             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
@@ -93,11 +93,11 @@ int main (void)
     {
       close (sd);
       gnutls_deinit (session);
-      fprintf (stderr, "s: *** Handshake has failed (%s)\n\n",
+      fprintf (stderr, "s: ERROR Handshake has failed (%s)\n\n",
                gnutls_strerror (ret));
       continue;
     }
-    printf ("s: - Handshake was completed\n");
+    printf ("s: INFO Handshake was completed\n");
 
     // See the Getting peer's information example print_info(session);
 
@@ -109,12 +109,12 @@ int main (void)
 
       if (ret == 0)
       {
-        printf ("\ns: - Peer has closed the GnuTLS connection\n");
+        printf ("\ns: INFO Peer has closed the GnuTLS connection\n");
         break;
       }
       else if (ret < 0)
       {
-        fprintf (stderr, "\ns: *** Received corrupted "
+        fprintf (stderr, "\ns: ERROR Received corrupted "
                  "data(%d). Closing the connection.\n\n", ret);
         break;
       }
