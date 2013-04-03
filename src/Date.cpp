@@ -237,8 +237,8 @@ const std::string Date::toString (
     case 'A': sprintf (buffer, "%.10s", Date::dayName (dayOfWeek ()).c_str ()); break;
     case 'b': sprintf (buffer, "%.3s", Date::monthName (month ()).c_str ());   break;
     case 'B': sprintf (buffer, "%.10s", Date::monthName (month ()).c_str ());   break;
-    case 'v': sprintf (buffer, "%d",    Date::weekOfYear (Date::dayOfWeek (context.config.get ("weekstart")))); break;
-    case 'V': sprintf (buffer, "%02d",  Date::weekOfYear (Date::dayOfWeek (context.config.get ("weekstart")))); break;
+    case 'v': sprintf (buffer, "%d",    Date::weekOfYear (Date::dayOfWeek (weekStart))); break;
+    case 'V': sprintf (buffer, "%02d",  Date::weekOfYear (Date::dayOfWeek (weekStart))); break;
     case 'h': sprintf (buffer, "%d",   this->hour ());                         break;
     case 'H': sprintf (buffer, "%02d", this->hour ());                         break;
     case 'n': sprintf (buffer, "%d",   this->minute ());                       break;

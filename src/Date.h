@@ -32,6 +32,9 @@
 #include <string>
 #include <cmake.h>
 
+#include <vector>
+#include <string>
+
 class Date;
 
 class Date
