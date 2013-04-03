@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // taskd - Task Server
 //
-// Copyright 2010 - 2012, Göteborg Bit Factory.
+// Copyright 2010 - 2013, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <unistd.h>
-#include <limits.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
 #include <Directory.h>
 #include <cmake.h>
+
+#ifdef SOLARIS
+#include <limits.h>
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 Directory::Directory ()
@@ -106,13 +109,14 @@ bool Directory::remove_directory (const std::string& dir) const
 
 #if defined (SOLARIS) || defined (HAIKU)
       struct stat s;
-      stat ((dir + "/" + de->d_name).c_str (), &s);
+      lstat ((dir + "/" + de->d_name).c_str (), &s);
       if (s.st_mode & S_IFDIR)
         remove_directory (dir + "/" + de->d_name);
       else
         unlink ((dir + "/" + de->d_name).c_str ());
 #else
-      if (de->d_type == DT_DIR)
+      if (de->d_type == DT_DIR ||
+          de->d_type == DT_UNKNOWN)
         remove_directory (dir + "/" + de->d_name);
       else
         unlink ((dir + "/" + de->d_name).c_str ());
