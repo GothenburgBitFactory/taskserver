@@ -726,6 +726,20 @@ const std::string format (
 const std::string format (
   const std::string& fmt,
   int arg1,
+  int arg2,
+  int arg3)
+{
+  std::string output = fmt;
+  replace_positional (output, "{1}", format (arg1));
+  replace_positional (output, "{2}", format (arg2));
+  replace_positional (output, "{3}", format (arg3));
+  return output;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+const std::string format (
+  const std::string& fmt,
+  int arg1,
   double arg2)
 {
   std::string output = fmt;
@@ -760,7 +774,7 @@ std::string leftJustify (const int input, const int width)
 ////////////////////////////////////////////////////////////////////////////////
 std::string leftJustify (const std::string& input, const int width)
 {
-  return input + std::string (width - utf8_text_length (input), ' ');
+  return input + std::string (width - utf8_text_width (input), ' ');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -782,7 +796,7 @@ std::string rightJustify (const int input, const int width)
 ////////////////////////////////////////////////////////////////////////////////
 std::string rightJustify (const std::string& input, const int width)
 {
-  return std::string (width - utf8_text_length (input), ' ') + input;
+  return std::string (width - utf8_text_width (input), ' ') + input;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,7 @@ foreach (src_FILE ${test_SRCS})
                               ../src/text.cpp
                               ../src/utf8.cpp
                               ../src/util.cpp
+                              ../src/wcwidth6.cpp
                               test.cpp)
 endforeach (src_FILE)
 

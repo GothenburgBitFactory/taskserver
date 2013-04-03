@@ -32,7 +32,8 @@ add_executable (taskd_executable taskd.cpp
                                  Thread.cpp     Thread.h
                                  Timer.cpp      Timer.h
                                  utf8.cpp       utf8.h
-                                 util.cpp       util.h)
+                                 util.cpp       util.h
+                                 wcwidth6.cpp)
 
 target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
