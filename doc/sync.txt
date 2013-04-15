@@ -13,7 +13,7 @@ Status of this Memo
 
 Copyright Notice
 
-   Copyright (C) 2010 - 2012, Göteborg Bit Factory.
+   Copyright (C) 2010 - 2013, Göteborg Bit Factory.
 
 
 Abstract
@@ -293,7 +293,7 @@ Table of Contents
 
 5  References
 
-   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", October, 2012.
+   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", October, 2012 - 2013.
 
 
 6  Acknowledgements
@@ -312,7 +312,7 @@ Table of Contents
 
 8  Full Copyright Statement
 
-   Copyright 2010 - 2012, Göteborg Bit Factory.
+   Copyright 2010 - 2013, Göteborg Bit Factory.
    All rights reserved.
 
    This document and translations of it may be copied and furnished to others,

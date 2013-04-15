@@ -94,7 +94,7 @@ the 'init' command, which creates a config file, overrides are made permanent.
 .SH EXAMPLES
 
 .SH "CREDITS & COPYRIGHTS"
-Copyright (C) 2010 - 2012, Göteborg Bit Factory.
+Copyright (C) 2010 - 2013, Göteborg Bit Factory.
 
 Taskd is distributed under the MIT license. See
 http://www.opensource.org/licenses/mit-license.php for more information.
