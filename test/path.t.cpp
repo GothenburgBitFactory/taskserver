@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <Path.h>
+#include <Directory.h>
 #include <test.h>
 
 int main (int argc, char** argv)
@@ -34,11 +35,11 @@ int main (int argc, char** argv)
 
   // Path ();
   Path p0;
-  t.ok (p0._data == "", "Path::Path");
+  t.is (p0._data, "", "Path::Path");
 
   // Path (const Path&);
   Path p1 = Path ("foo");
-  t.ok (p1._data == "foo", "Path::operator=");
+  t.is (p1._data, Directory::cwd () + "/foo", "Path::operator=");
 
   // Path (const std::string&);
   Path p2 ("~");
@@ -103,7 +104,7 @@ int main (int argc, char** argv)
 
   // bool is_absolute () const;
   t.notok (p0.is_absolute (), "'' !is_absolute");
-  t.notok (p1.is_absolute (), "foo !is_absolute");
+  t.ok    (p1.is_absolute (), "foo is_absolute");
   t.ok    (p2.is_absolute (), "~ is_absolute (after expansion)");
   t.ok    (p3.is_absolute (), "/tmp is_absolute");
   t.ok    (p4.is_absolute (), "/a/b/c/file.ext is_absolute");
