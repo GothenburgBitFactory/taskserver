@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
+set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 
 include (CheckFunctionExists)
 include (CheckStructHasMember)
@@ -25,6 +26,10 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "NetBSD")
   set (NETBSD true)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   set (SOLARIS true)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "GNU/kFreeBSD")
+  set (KFREEBSD true)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "GNU/Hurd")
+  set (GNUHURD true)
 else (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set (UNKNOWN true)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")

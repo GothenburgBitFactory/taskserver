@@ -28,6 +28,8 @@
 #cmakedefine NETBSD
 #cmakedefine HAIKU
 #cmakedefine SOLARIS
+#cmakedefine KFREEBSD
+#cmakedefine GNUHURD
 #cmakedefine UNKNOWN
 
 /* Found tm.tm_gmtoff struct member */

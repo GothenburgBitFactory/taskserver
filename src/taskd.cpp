@@ -139,6 +139,10 @@ int main (int argc, const char** argv)
                    "FreeBSD"
 #elif defined (NETBSD)
                    "netbsd"
+#elif defined (KFREEBSD)
+                   "gnu-kfreebsd"
+#elif defined (GNUHURD)
+                   "gnu-hurd"
 #elif defined (LINUX)
                    "Linux"
 #else

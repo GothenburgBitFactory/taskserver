@@ -30,6 +30,8 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
+#include <errno.h>
+#include <stdlib.h>
 #include <Directory.h>
 #include <cmake.h>
 
@@ -115,8 +117,14 @@ bool Directory::remove_directory (const std::string& dir) const
       else
         unlink ((dir + "/" + de->d_name).c_str ());
 #else
-      if (de->d_type == DT_DIR ||
-          de->d_type == DT_UNKNOWN)
+      if (de->d_type == DT_UNKNOWN)
+      {
+        struct stat s;
+        lstat ((dir + "/" + de->d_name).c_str (), &s);
+        if (s.st_mode & S_IFDIR)
+          de->d_type = DT_DIR;
+      }
+      if (de->d_type == DT_DIR)
         remove_directory (dir + "/" + de->d_name);
       else
         unlink ((dir + "/" + de->d_name).c_str ());
@@ -148,9 +156,18 @@ std::vector <std::string> Directory::listRecursive ()
 ////////////////////////////////////////////////////////////////////////////////
 std::string Directory::cwd ()
 {
+#ifdef HAVE_GET_CURRENT_DIR_NAME
+  char *buf = get_current_dir_name ();
+  if (buf == NULL)
+    throw std::bad_alloc ();
+  std::string result (buf);
+  free (buf);
+  return result;
+#else
   char buf[PATH_MAX];
   getcwd (buf, PATH_MAX - 1);
   return std::string (buf);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +221,13 @@ void Directory::list (
       else
         results.push_back (base + "/" + de->d_name);
 #else
+      if (recursive && de->d_type == DT_UNKNOWN)
+      {
+        struct stat s;
+        lstat ((base + "/" + de->d_name).c_str (), &s);
+        if (s.st_mode & S_IFDIR)
+          de->d_type = DT_DIR;
+      }
       if (recursive && de->d_type == DT_DIR)
         list (base + "/" + de->d_name, results, recursive);
       else
