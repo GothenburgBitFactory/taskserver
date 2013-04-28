@@ -55,7 +55,7 @@ int status_statistics (Config& config)
     std::map <std::string, std::string> data;
     data["Uptime"]                = formatTime (strtol (response.get ("uptime").c_str (), NULL, 10));
     data["Transactions"]          = commify (response.get ("transactions"));
-    data["TPS"]                   = commify (response.get ("tps"));
+    data["TPS"]                   = format (strtod (response.get ("tps").c_str (), NULL), 4, 5);
     data["Errors"]                = commify (response.get ("errors"));
     data["Idle"]                  = format (100.0 * strtod (response.get ("idle").c_str (), NULL), 3, 5) + "%";
     data["Total In"]              = formatBytes (strtol (response.get ("total bytes in").c_str (), NULL, 10));

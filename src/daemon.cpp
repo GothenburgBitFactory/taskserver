@@ -219,7 +219,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   int average_req          = 0;
   int average_resp         = 0;
   double average_resp_time = 0.0;
-  int tps                  = 0;
+  double tps               = 0;
   if (_txn_count)
   {
     average_req       = _bytes_in  / _txn_count;
@@ -228,7 +228,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
 
     // Only calculate tps if average_resp_time is non-trivial.
     if (average_resp_time > 0.000001)
-      tps = (int) (1.0 / average_resp_time);
+      tps = 1.0 / average_resp_time;
   }
 
   out.set ("uptime",                 (int) uptime);
