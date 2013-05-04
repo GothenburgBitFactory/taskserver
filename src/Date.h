@@ -29,9 +29,6 @@
 #define INCLUDED_DATE
 
 #include <stdio.h>
-#include <string>
-#include <cmake.h>
-
 #include <vector>
 #include <string>
 

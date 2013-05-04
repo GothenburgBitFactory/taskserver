@@ -28,7 +28,6 @@
 #ifndef INCLUDED_COLOR
 #define INCLUDED_COLOR
 
-#include <cmake.h>
 #include <string>
 
 #define FEATURE_COLOR 1

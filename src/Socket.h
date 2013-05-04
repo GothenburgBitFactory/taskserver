@@ -24,6 +24,7 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
+
 #ifndef INCLUDED_SOCKET
 #define INCLUDED_SOCKET
 
@@ -34,7 +35,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <cmake.h>
 
 class Socket
 {

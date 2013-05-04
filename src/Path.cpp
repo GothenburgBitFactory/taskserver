@@ -219,7 +219,7 @@ std::string Path::expand (const std::string& in)
     const char *home = getenv("HOME");
     if (home == NULL)
     {
-    struct passwd* pw = getpwuid (getuid ());
+      struct passwd* pw = getpwuid (getuid ());
       home = pw->pw_dir;
     }
 

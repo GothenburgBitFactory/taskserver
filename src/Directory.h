@@ -28,7 +28,6 @@
 #ifndef INCLUDED_DIRECTORY
 #define INCLUDED_DIRECTORY
 
-#include <cmake.h>
 #include <File.h>
 
 class Directory : public File

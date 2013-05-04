@@ -29,14 +29,15 @@
 #define INCLUDED_NIBBLER
 
 #include <cmake.h>
-#include <string>
-#include <vector>
 
 #define NIBBLER_FEATURE_DATE
 //#undef  NIBBLER_FEATURE_DATE
 
 #define NIBBLER_FEATURE_REGEX
 //#undef  NIBBLER_FEATURE_REGEX
+
+#include <string>
+#include <vector>
 
 class Nibbler
 {
@@ -64,6 +65,9 @@ public:
   bool getN (const int, std::string&);
   bool getQuoted (char, std::string&, bool quote = false);
   bool getDigit (int&);
+  bool getDigit6 (int&);
+  bool getDigit4 (int&);
+  bool getDigit2 (int&);
   bool getInt (int&);
   bool getHex (int&);
   bool getUnsignedInt (int&);

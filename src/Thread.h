@@ -28,8 +28,10 @@
 #ifndef INCLUDED_THREAD
 #define INCLUDED_THREAD
 
-#include <pthread.h>
 #include <cmake.h>
+
+#ifdef HAVE_LIBPTHREAD
+#include <pthread.h>
 
 class Thread
 {
@@ -51,6 +53,7 @@ private:
   void* _arg;
 };
 
+#endif
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

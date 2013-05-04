@@ -30,7 +30,6 @@
 
 #include <string>
 #include <stdio.h>
-#include <cmake.h>
 
 class Log
 {

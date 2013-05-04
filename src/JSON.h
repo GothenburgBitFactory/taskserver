@@ -31,7 +31,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cmake.h>
 #include <Nibbler.h>
 
 namespace json

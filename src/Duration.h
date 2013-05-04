@@ -31,7 +31,6 @@
 #include <vector>
 #include <string>
 #include <time.h>
-#include <cmake.h>
 
 class Duration
 {

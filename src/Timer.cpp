@@ -31,6 +31,15 @@
 #include <Timer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+// Timer starts when the object is constructed.
+Timer::Timer ()
+: _description ("-")
+, _running (false)
+, _total (0)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Timer starts when the object is constructed with a description.
 Timer::Timer (const std::string& description)
 : _description (description)

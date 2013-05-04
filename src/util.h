@@ -33,8 +33,8 @@
 #include <cmake.h>
 
 #ifdef HAVE_UUID                                                                
-#include <uuid/uuid.h>                                                          
-#endif                                                                          
+#include <uuid/uuid.h>
+#endif
 
 bool confirm (const std::string&);
 std::string formatBytes (size_t);

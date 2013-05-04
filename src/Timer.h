@@ -30,12 +30,12 @@
 
 #include <string>
 #include <sys/time.h>
-#include <cmake.h>
 
 // Timer is a scope-activated timer that dumps to std::cout at end of scope.
 class Timer
 {
 public:
+  Timer ();
   Timer (const std::string&);
   ~Timer ();
   Timer (const Timer&);

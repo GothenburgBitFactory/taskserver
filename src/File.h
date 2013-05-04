@@ -32,7 +32,6 @@
 #include <string>
 #include <vector>
 #include <sys/stat.h>
-#include <cmake.h>
 #include <Path.h>
 
 class File : public Path
