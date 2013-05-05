@@ -2,10 +2,10 @@
 
 if [ x"$1" = x"--verbose" ];
 then
-  for i in *.t *.t.exe
+  for i in ./*.t
   do
     echo '#' $i
-    ./$i > test.log 2>&1
+    $i > test.log 2>&1
     while read LINE
     do
       echo $LINE
@@ -24,11 +24,11 @@ else
   if [ -x "$VRAMSTEG" ]; then
     BAR=1
     COUNT=0
-    TOTAL=`ls *.t | wc -l`
+    TOTAL=`ls ./*.t | wc -l`
     START=`$VRAMSTEG --now`
   fi
 
-  for i in *.t *.t.exe
+  for i in ./*.t
   do
     echo '#' $i >>all.log
 
@@ -37,7 +37,7 @@ else
       COUNT=`expr $COUNT + 1`
     fi
 
-    ./$i >> all.log 2>&1
+    $i >> all.log 2>&1
   done
 
   if [ $BAR -eq 1 ]; then

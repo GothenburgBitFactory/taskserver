@@ -5,12 +5,14 @@ date.t
 directory.t
 duration.t
 file.t
+json.t
+json_test
 msg.t
 nibbler.t
 path.t
 rx.t
 text.t
-util.t
 utf8.t
+util.t
 width.t
 obsolete

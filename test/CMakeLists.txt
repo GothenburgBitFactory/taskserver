@@ -5,7 +5,8 @@ include_directories (${CMAKE_SOURCE_DIR}
                      ${TASKD_INCLUDE_DIRS})
 
 set (test_SRCS color.t config.t date.t directory.t duration.t file.t msg.t
-               nibbler.t path.t rx.t text.t util.t utf8.t width.t)
+               nibbler.t path.t rx.t text.t util.t utf8.t width.t json.t
+               json_test)
 
 add_custom_target (test ./run_all --verbose
                         DEPENDS ${test_SRCS}
@@ -22,6 +23,7 @@ foreach (src_FILE ${test_SRCS})
                               ../src/Directory.cpp
                               ../src/Duration.cpp
                               ../src/File.cpp
+                              ../src/JSON.cpp
                               ../src/Msg.cpp
                               ../src/Nibbler.cpp
                               ../src/Path.cpp

@@ -779,7 +779,6 @@ bool Nibbler::getDateISO (time_t& t)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef NIBBLER_FEATURE_DATE
 // Parse the longest integer using the next 'limit' characters of 'result'
 // following position 'i' (when strict is true, the number of digits must be
 // equal to limit).
@@ -821,6 +820,7 @@ bool Nibbler::parseDigits(std::string::size_type& i,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef NIBBLER_FEATURE_DATE
 bool Nibbler::getDate (const std::string& format, time_t& t)
 {
   std::string::size_type i = _cursor;
