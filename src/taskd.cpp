@@ -103,6 +103,10 @@ int main (int argc, const char** argv)
                 << "netbsd"
 #elif defined (LINUX)
                 << "linux"
+#elif defined (KFREEBSD)
+                << "GNU/kFreeBSD"
+#elif defined (GNUHURD)
+                << "GNU/Hurd"
 #else
                 << "unknown"
 #endif
