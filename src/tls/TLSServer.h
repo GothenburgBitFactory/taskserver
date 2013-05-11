@@ -27,6 +27,8 @@
 #ifndef INCLUDED_TLSSERVER
 #define INCLUDED_TLSSERVER
 
+#ifdef HAVE_LIBGNUTLS
+
 #include <string>
 #include <gnutls/gnutls.h>
 
@@ -78,6 +80,7 @@ private:
   bool             _debug;
 };
 
+#endif
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

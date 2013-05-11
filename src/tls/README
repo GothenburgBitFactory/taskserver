@@ -9,7 +9,7 @@ GnuTLS 2.12.20 or later is assumed.
 Build the keys, certs and crl:
 
   cd pki
-  ./build
+  ./generate
   cd ..
 
 Build the source using:
