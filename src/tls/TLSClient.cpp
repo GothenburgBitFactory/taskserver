@@ -36,6 +36,13 @@
 #include <netdb.h>
 
 #define MAX_BUF 1024
+#define LOG_LEVEL 3
+
+////////////////////////////////////////////////////////////////////////////////
+static void gnutls_log_function (int level, const char* message)
+{
+  std::cout << "c: " << level << " " << message;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSClient::TLSClient ()
@@ -71,6 +78,8 @@ void TLSClient::limit (int max)
 void TLSClient::debug ()
 {
   _debug = true;
+  gnutls_global_set_log_function (gnutls_log_function);
+  gnutls_global_set_log_level (LOG_LEVEL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

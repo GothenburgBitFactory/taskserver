@@ -37,6 +37,13 @@
 
 #define DH_BITS 1024
 #define MAX_BUF 1024
+#define LOG_LEVEL 3
+
+////////////////////////////////////////////////////////////////////////////////
+static void gnutls_log_function (int level, const char* message)
+{
+  std::cout << "s: " << level << " " << message;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
@@ -76,6 +83,8 @@ void TLSServer::queue (int depth)
 void TLSServer::debug ()
 {
   _debug = true;
+  gnutls_global_set_log_function (gnutls_log_function);
+  gnutls_global_set_log_level (LOG_LEVEL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
