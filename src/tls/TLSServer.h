@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // taskwarrior - a command line task list manager.
 //
-// Copyright 2006-2012, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2013, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,23 +27,55 @@
 #ifndef INCLUDED_TLSSERVER
 #define INCLUDED_TLSSERVER
 
-/*
 #include <string>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <cmake.h>
-*/
+#include <gnutls/gnutls.h>
+
+class TLSTransaction;
 
 class TLSServer
 {
 public:
   TLSServer ();
+  ~TLSServer ();
+  void queue (int);
+  void debug ();
+  void init (const std::string&, const std::string&, const std::string&, const std::string&);
+  void bind (const std::string&);
+  void listen ();
+  void accept (TLSTransaction&);
+
+  friend class TLSTransaction;
 
 private:
+  std::string                      _ca;
+  std::string                      _crl;
+  std::string                      _cert;
+  std::string                      _key;
+  gnutls_certificate_credentials_t _credentials;
+  gnutls_dh_params_t               _params;
+  gnutls_priority_t                _priorities;
+  int                              _socket;
+  int                              _queue;
+  bool                             _debug;
+};
+
+class TLSTransaction
+{
+public:
+  TLSTransaction ();
+  ~TLSTransaction ();
+  void init (TLSServer&);
+  void bye ();
+  void debug ();
+  void limit (int);
+  void send (const std::string&);
+  void recv (std::string&);
+
+private:
+  int              _socket;
+  gnutls_session_t _session;
+  int              _limit;
+  bool             _debug;
 };
 
 #endif

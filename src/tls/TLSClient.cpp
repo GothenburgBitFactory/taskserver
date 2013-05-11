@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // taskwarrior - a command line task list manager.
 //
-// Copyright 2006-2012, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2013, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -156,10 +156,14 @@ void TLSClient::connect (const std::string& host, const std::string& port)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSClient::bye ()
+{
+  gnutls_bye (_session, GNUTLS_SHUT_RDWR);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSClient::send (const std::string& data)
 {
-  std::string packet = data;
-/*
   std::string packet = "XXXX" + data;
 
   // Encode the length.
@@ -168,7 +172,6 @@ void TLSClient::send (const std::string& data)
   packet[1] = l >>16;
   packet[2] = l >>8;
   packet[3] = l;
-*/
 
   int total = 0;
   int remaining = packet.length ();
@@ -191,7 +194,7 @@ void TLSClient::send (const std::string& data)
   }
 
   if (_debug)
-    std::cout << "c: INFO Sending '"
+    std::cout << "c: INFO Sending 'XXXX"
               << data.c_str ()
               << "' (" << total << " bytes)"
               << std::endl;
@@ -205,7 +208,6 @@ void TLSClient::recv (std::string& data)
 
   // Get the encoded length.
   unsigned char header[4] = {0};
-/*
   do
   {
     received = gnutls_record_recv (_session, header, 4);
@@ -213,7 +215,6 @@ void TLSClient::recv (std::string& data)
   while (received > 0 &&
          (errno == GNUTLS_E_INTERRUPTED ||
           errno == GNUTLS_E_AGAIN));
-*/
 
   int total = received;
 
@@ -222,6 +223,7 @@ void TLSClient::recv (std::string& data)
                            (header[1]<<16) |
                            (header[2]<<8) |
                             header[3];
+  std::cout << "c: INFO expecting " << expected << " bytes.\n";
 
   // TODO This would be a good place to assert 'expected < _limit'.
 
@@ -262,10 +264,8 @@ void TLSClient::recv (std::string& data)
   }
   while (received > 0 && total < (int) expected);
 
-  gnutls_bye (_session, GNUTLS_SHUT_RDWR);
-
   if (_debug)
-    std::cout << "c: INFO Receiving '"
+    std::cout << "c: INFO Receiving 'XXXX"
               << data.c_str ()
               << "' (" << total << " bytes)"
               << std::endl;

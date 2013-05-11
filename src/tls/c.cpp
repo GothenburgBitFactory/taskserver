@@ -15,6 +15,7 @@ int main (void)
   std::string response;
   client.recv (response);
   std::cout << response << "\n";
+  client.bye ();
 
   return 0;
 }
