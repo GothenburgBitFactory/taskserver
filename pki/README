@@ -1,0 +1,19 @@
+PKI
+---
+
+To generate all keys/certs, run:
+
+  ./generate
+
+Files generated are:
+
+  ca.cert.pem          - Needed by server
+  ca.key.pem
+
+  client.cert.pem      - Needed by client (taskwarrior)
+  client.key.pem
+
+  server.cert.pem      - Needed by server
+  server.crl.pem       - Needed by server
+  server.key.pem       - Needed by server
+
