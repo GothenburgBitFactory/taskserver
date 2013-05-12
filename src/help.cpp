@@ -180,7 +180,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd resume --data <root> [options] org <org>\n"
               << "       taskd resume --data <root> [options] group <org> <group>\n"
               << "       taskd resume --data <root> [options] user <org> <user>\n"
-              << "       taskd server --data <root> [--daemon] [--tls|--notls] [--debug] [options]\n"
+              << "       taskd server --data <root> [--daemon] [--debug] [options]\n"
               << "       taskd status [options]\n"
               << "       taskd suspend --data <root> [options] org <org>\n"
               << "       taskd suspend --data <root> [options] group <org> <group>\n"

@@ -2,26 +2,26 @@
 
 1.0.0beta ()
 
-0.12.0alpha ()
+0.14.0alpha ()
 
-0.12.0 ()
+0.13.0 ()
 - JSON support.
 
-0.11.0 ()
+0.12.0 ()
 - Full user authentication.
 
-0.10.0 ()
-- Full TLS support.
+------ current release ---------------------------
+
+0.10.0 (2013-05-12)
+- Full TLS support, for encrypted-only communication.
 - Added 'diagnostics' command.
 - Bug: Statistics 'tps' value now floating point.
 
------- current release ---------------------------
+------ old releases ------------------------------
 
 0.9.0 (2012-10-16)
 - IPv4 and IPv6 support.
 - Sync use cases and test.
-
------- old releases ------------------------------
 
 0.8.0 (2012-10-11)
 - Functioning sync algorithm.
