@@ -40,7 +40,7 @@
 #include <string.h>
 #include <assert.h>
 #include <Server.h>
-#include <Socket.h>
+#include <TLSServer.h>
 #include <Timer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,17 +148,24 @@ void Server::beginServer ()
     writePidFile ();
   }
 
-  Socket s;
-  s.bind (_port);
-  s.listen (_queue_size);
+  TLSServer server;
+  server.debug ();
+  server.init ("pki/ca.cert.pem",      // CA
+               "pki/server.crl.pem",   // CRL
+               "pki/server.cert.pem",  // Cert
+               "pki/server.key.pem");  // Key
+  server.bind (_port);
+  server.listen ();
 
   _request_count = 0;
   while (1)
   {
     try
     {
-      int client = s.accept ();
+      TLSTransaction tx;
+      server.accept (tx);
 
+/*
       // Get client address and port, for logging.
       if (_log_clients)
       {
@@ -187,14 +194,14 @@ void Server::beginServer ()
           _client_address = ipstr;
         }
       }
+*/
 
       // Metrics.
       HighResTimer timer;
       timer.start ();
 
       std::string input;
-      Socket in (client);
-      in.read (input);
+      tx.recv (input);
 
       // Handle the request.
       ++_request_count;
@@ -203,7 +210,10 @@ void Server::beginServer ()
       std::string output;
       handler (input, output);
       if (output.length ())
-        in.write (output);
+      {
+        tx.send (output);
+        tx.bye ();
+      }
 
       if (_log)
       {

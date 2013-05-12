@@ -26,17 +26,19 @@ add_executable (taskd_executable taskd.cpp
                                  Path.cpp       Path.h
                                  RX.cpp         RX.h
                                  Server.cpp     Server.h
-                                 Socket.cpp     Socket.h
                                  status.cpp
                                  Task.cpp       Task.h
                                  text.cpp       text.h
                                  Thread.cpp     Thread.h
                                  Timer.cpp      Timer.h
+                                 TLSClient.cpp  TLSClient.h
+                                 TLSServer.cpp  TLSServer.h
                                  utf8.cpp       utf8.h
                                  util.cpp       util.h
                                  wcwidth6.cpp)
 
-target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
+#target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (taskd_executable ${TASKD_LIBRARIES})
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
 
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})

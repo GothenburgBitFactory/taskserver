@@ -25,20 +25,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <iomanip>
 #include <cstring>
 #include <algorithm>
 #include <stdio.h>
 #include <inttypes.h>
-#include <Socket.h>
+#include <TLSClient.h>
 #include <Directory.h>
 #include <Date.h>
 #include <Color.h>
 #include <Log.h>
 #include <text.h>
 #include <taskd.h>
-#include <cmake.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 static struct
@@ -329,16 +329,17 @@ bool taskd_sendMessage (
 
   try
   {
-    Socket s;
-    s.connect (server, port);
-    s.write (out.serialize () + "\n");
+    TLSClient client;
+    client.debug ();
+    client.limit (1024 * 1024);
+    client.init ("pki/client.cert.pem");
+    client.connect (server, port);
+  
+    client.send (out.serialize () + "\n");
 
     std::string response;
-    s.read (response);
-    s.close ();
-
-    Msg in;
-    in.parse (response);
+    client.recv (response);  // Ignored.
+    client.bye ();
 
     // Indicate message sent.
     return true;
@@ -369,13 +370,17 @@ bool taskd_sendMessage (
 
   try
   {
-    Socket s;
-    s.connect (server, port);
-    s.write (out.serialize () + "\n");
+    TLSClient client;
+    client.debug ();
+    client.limit (1024 * 1024);
+    client.init ("pki/client.cert.pem");
+    client.connect (server, port);
+  
+    client.send (out.serialize () + "\n");
 
     std::string response;
-    s.read (response);
-    s.close ();
+    client.recv (response);
+    client.bye ();
 
     in.parse (response);
 
