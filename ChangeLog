@@ -8,17 +8,18 @@
 - JSON support.
 
 0.11.0 ()
-- Full TLS support.
+- Full user authentication.
 
 0.10.0 ()
-- Full user authentication.
+- Full TLS support.
+- Added 'diagnostics' command.
+- Bug: Statistics 'tps' value now floating point.
 
 ------ current release ---------------------------
 
 0.9.0 (2012-10-16)
 - IPv4 and IPv6 support.
 - Sync use cases and test.
-- Bug: Statistics 'tps' value now floating point.
 
 ------ old releases ------------------------------
 

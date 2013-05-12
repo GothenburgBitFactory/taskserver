@@ -153,6 +153,14 @@ int command_help (Config& config, const std::vector <std::string>& args)
                   << "  --NAME=VALUE   Temporary configuration override\n"
                   << "\n";
     }
+    else if (closeEnough ("diag", args[1], 3))
+    {
+      std::cout << "\n"
+                << "taskd diag\n"
+                << "\n"
+                << "Show installation details.\n"
+                << "\n";
+    }
     else
       std::cout << "No help for '" << args[1] << "'.\n";
   }
@@ -166,6 +174,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd add --data <root> [options] user <org> <user>\n"
               << "       taskd client --data <root> [options] <host:port> <file> [<file> ...]\n"
               << "       taskd config --data <root> [<name> [<value>]]\n"
+              << "       taskd diagnostics\n"
               << "       taskd help [<command>]\n"
               << "       taskd init --data <root> [--debug] [options]\n"
               << "       taskd remove --data <root> [options] org <org>\n"

@@ -242,16 +242,17 @@ int main (int argc, const char** argv)
       try
       {
         // The highest-level commands are hard-coded:
-             if (closeEnough ("init",      args[0], 3)) status = command_init      (config, args);
-        else if (closeEnough ("config",    args[0], 3)) status = command_config    (config, args);
-        else if (closeEnough ("status",    args[0], 3)) status = command_status    (config, args);
-        else if (closeEnough ("help",      args[0], 3)) status = command_help      (config, args);
-        else if (closeEnough ("server",    args[0], 3)) status = command_server    (config, args);
+             if (closeEnough ("init",        args[0], 3)) status = command_init      (config, args);
+        else if (closeEnough ("config",      args[0], 3)) status = command_config    (config, args);
+        else if (closeEnough ("status",      args[0], 3)) status = command_status    (config, args);
+        else if (closeEnough ("help",        args[0], 3)) status = command_help      (config, args);
+        else if (closeEnough ("diagnostics", args[0], 3)) status = command_diag      (config, args);
+        else if (closeEnough ("server",      args[0], 3)) status = command_server    (config, args);
 
-        else if (closeEnough ("add",       args[0], 3)) status = command_add       (config, args);
-        else if (closeEnough ("remove",    args[0], 3)) status = command_remove    (config, args);
-        else if (closeEnough ("suspend",   args[0], 3)) status = command_suspend   (config, args);
-        else if (closeEnough ("resume",    args[0], 3)) status = command_resume    (config, args);
+        else if (closeEnough ("add",         args[0], 3)) status = command_add       (config, args);
+        else if (closeEnough ("remove",      args[0], 3)) status = command_remove    (config, args);
+        else if (closeEnough ("suspend",     args[0], 3)) status = command_suspend   (config, args);
+        else if (closeEnough ("resume",      args[0], 3)) status = command_resume    (config, args);
 
         // For debugging purposes.  Will be removed later.
         else if (closeEnough ("client",    args[0], 3)) status = command_client    (config, args);

@@ -11,6 +11,7 @@ add_executable (taskd_executable taskd.cpp
                                  ConfigFile.cpp ConfigFile.h
                                  config.cpp
                                  daemon.cpp
+                                 diag.cpp
                                  Database.cpp   Database.h
                                  Date.cpp       Date.h
                                  Directory.cpp  Directory.h
