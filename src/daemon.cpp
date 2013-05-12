@@ -823,15 +823,12 @@ int command_server (Config& config, const std::vector <std::string>& args)
     }
 
     // It just runs until you kill it.
-/*
-    File cert (config.get ("certificate_file"));
+    File cert (config.get ("cert"));
     server.setCertFile (cert._data);
 
-    File key (config.get ("key_file"));
+    File key (config.get ("key"));
     server.setKeyFile (key._data);
 
-*/
-    throw std::string ("ERROR: TLS not implemented.");
     server.beginServer ();
   }
 

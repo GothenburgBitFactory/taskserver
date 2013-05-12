@@ -331,7 +331,9 @@ bool taskd_sendMessage (
   {
     TLSClient client;
     client.debug ();
+/*
     client.limit (1024 * 1024);
+*/
     client.init ("pki/client.cert.pem");
     client.connect (server, port);
   

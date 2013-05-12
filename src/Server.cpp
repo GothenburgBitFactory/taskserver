@@ -150,10 +150,10 @@ void Server::beginServer ()
 
   TLSServer server;
   server.debug ();
-  server.init ("pki/ca.cert.pem",      // CA
-               "pki/server.crl.pem",   // CRL
-               "pki/server.cert.pem",  // Cert
-               "pki/server.key.pem");  // Key
+  server.init (/*"pki/ca.cert.pem",      // CA
+               "pki/server.crl.pem",*/   // CRL
+               _cert_file,               // Cert
+               _key_file);               // Key
   server.bind (_port);
   server.listen ();
 

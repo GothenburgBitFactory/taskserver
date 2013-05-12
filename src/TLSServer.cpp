@@ -49,9 +49,9 @@ static void gnutls_log_function (int level, const char* message)
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
-: _ca ("")
+: /*_ca ("")
 , _crl ("")
-, _cert ("")
+,*/ _cert ("")
 , _key ("")
 , _socket (0)
 , _queue (5)
@@ -91,20 +91,26 @@ void TLSServer::debug ()
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
+/*
   const std::string& ca,
   const std::string& crl,
+*/
   const std::string& cert,
   const std::string& key)
 {
+/*
   _ca = ca;
   _crl = crl;
+*/
   _cert = cert;
   _key = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
+/*
   gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
+*/
   gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
 
   gnutls_dh_params_init (&_params);

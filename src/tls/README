@@ -1,16 +1,9 @@
 GnuTLS Demo Programs
 
 The 'c' (client) and 's' (server) programs are based on public domain examples
-from the GnuTLS release.  The cert.pem and key.pem files are from the GnuTLS
-release, and will be replaced asap.
+from the GnuTLS release.
 
 GnuTLS 2.12.20 or later is assumed.
-
-Build the keys, certs and crl:
-
-  cd pki
-  ./generate
-  cd ..
 
 Build the source using:
 
