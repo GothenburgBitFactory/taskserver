@@ -30,6 +30,8 @@
 #ifdef HAVE_LIBGNUTLS
 
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <TLSServer.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>

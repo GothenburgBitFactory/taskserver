@@ -30,6 +30,8 @@
 #ifdef HAVE_LIBGNUTLS
 
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <TLSClient.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -102,7 +104,7 @@ void TLSClient::init (const std::string& ca)
     if (ret == GNUTLS_E_INVALID_REQUEST)
       std::cout << "c: ERROR Priority error at: " << err << "\n";
 
-    exit (1);
+    throw std::string ("Error initializing TLS.");
   }
 
   // Apply the x509 credentials to the current session.
