@@ -84,7 +84,7 @@ else (DARWIN)
 endif (DARWIN)
 
 message ("-- Looking for GnuTLS")
-find_package (GnuTLS)
+find_package (GnuTLS REQUIRED)
 if (GNUTLS_FOUND)
   set (HAVE_LIBGNUTLS true)
   set (TASKD_INCLUDE_DIRS ${TASKD_INCLUDE_DIRS} ${GNUTLS_INCLUDE_DIR})
