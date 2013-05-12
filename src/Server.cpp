@@ -219,28 +219,6 @@ void Server::beginServer ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::beginSecureServer ()
-{
-  if (_log) _log->write ("Secure Server Starting");
-
-  if (_daemon)
-  {
-    daemonize ();  // Only the child returns.
-    writePidFile ();
-  }
-
-  _request_count = 0;
-  try
-  {
-    throw std::string ("ERROR: Secure Server not implemented.");
-  }
-
-  catch (std::string& e) { if (_log) _log->write (std::string ("Error: ") + e); }
-  catch (char* e)        { if (_log) _log->write (std::string ("Error: ") + e); }
-  catch (...)            { if (_log) _log->write ("Error: Unknown exception"); }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // TODO To provide these data, a request count, a start time, and a cumulative
 //      utilization time must be tracked.
 void Server::stats (int& requests, time_t& uptime, double& utilization)

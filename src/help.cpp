@@ -82,8 +82,6 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "\n"
                 << "Options:\n"
                 << "  --daemon       Runs server as a daemon\n"
-                << "  --tls          Uses TLS encryption (default)\n"
-                << "  --notls        Plaintext, no encryption\n"
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"

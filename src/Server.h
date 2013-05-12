@@ -52,7 +52,6 @@ public:
   void start ();
 
   void beginServer ();
-  void beginSecureServer ();
 
   void stats (int&, time_t&, double&);
 

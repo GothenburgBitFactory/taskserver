@@ -749,7 +749,6 @@ int command_server (Config& config, const std::vector <std::string>& args)
   bool verbose     = true;
   bool debug       = false;
   bool daemon      = false;
-  bool use_tls     = false;
   std::string root = "";
 
   std::vector <std::string>::const_iterator i;
@@ -759,8 +758,6 @@ int command_server (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("--debug",  *i, 3)) debug   = true;
     else if (closeEnough ("--daemon", *i, 3)) daemon  = true;
     else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (closeEnough ("--tls",    *i, 3)) use_tls = true;
-    else if (closeEnough ("--notls",  *i, 3)) use_tls = false;
     else if (taskd_applyOverride (config, *i))   ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
@@ -826,24 +823,16 @@ int command_server (Config& config, const std::vector <std::string>& args)
     }
 
     // It just runs until you kill it.
-    if (use_tls)
-    {
 /*
-      // Resolve paths that may include ~.
-      File cert (config.get ("certificate_file"));
-      server.setCertFile (cert._data);
+    File cert (config.get ("certificate_file"));
+    server.setCertFile (cert._data);
 
-      File key (config.get ("key_file"));
-      server.setKeyFile (key._data);
+    File key (config.get ("key_file"));
+    server.setKeyFile (key._data);
 
-      server.beginSecureServer ();
 */
-      throw std::string ("ERROR: TLS not implemented.");
-    }
-    else
-    {
-      server.beginServer ();
-    }
+    throw std::string ("ERROR: TLS not implemented.");
+    server.beginServer ();
   }
 
   catch (std::string& error)
