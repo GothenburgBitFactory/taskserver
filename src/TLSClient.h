@@ -38,7 +38,7 @@ public:
   TLSClient ();
   ~TLSClient ();
   void limit (int);
-  void debug ();
+  void debug (int);
   void init (const std::string&);
   void connect (const std::string&, const std::string&);
   void bye ();

@@ -138,6 +138,12 @@ void Server::setLog (Log* l)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Server::setConfig (Config* c)
+{
+  _config = c;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Server::beginServer ()
 {
   if (_log) _log->write ("Server starting");
@@ -149,7 +155,9 @@ void Server::beginServer ()
   }
 
   TLSServer server;
-  server.debug ();
+  if (_config)
+    server.debug (_config->getInteger ("debug.tls"));
+
   server.init (/*"pki/ca.cert.pem",      // CA
                "pki/server.crl.pem",*/   // CRL
                _cert_file,               // Cert

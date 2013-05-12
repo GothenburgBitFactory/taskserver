@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <string>
 #include <cmake.h>
+#include <ConfigFile.h>
 #include <Log.h>
 
 class Server
@@ -45,6 +46,7 @@ public:
   void setNonBlocking ();
   void setPidFile (const std::string&);
   void setLog (Log*);
+  void setConfig (Config*);
   void setLimit (int);
   void setCertFile (const std::string&);
   void setKeyFile (const std::string&);
@@ -62,6 +64,7 @@ protected:
   void writePidFile ();
   void removePidFile ();
   Log* _log;
+  Config* _config;
   bool _log_clients;
   std::string _client_address;
   int _client_port;

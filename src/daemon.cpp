@@ -810,6 +810,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
     Daemon server        (config);
     server.setLog        (&log);
     server._db.setLog    (&log);
+    server.setConfig     (&config);
     server.setPort       (port);
     server.setQueueSize  (config.getInteger ("queue.size"));
     server.setLimit      (config.getInteger ("request.limit"));
