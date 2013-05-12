@@ -824,10 +824,10 @@ int command_server (Config& config, const std::vector <std::string>& args)
     }
 
     // It just runs until you kill it.
-    File cert (config.get ("cert"));
+    File cert (config.get ("server.cert"));
     server.setCertFile (cert._data);
 
-    File key (config.get ("key"));
+    File key (config.get ("server.key"));
     server.setKeyFile (key._data);
 
     server.beginServer ();

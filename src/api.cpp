@@ -334,7 +334,7 @@ bool taskd_sendMessage (
 /*
     client.limit (1024 * 1024);
 */
-    client.init ("pki/client.cert.pem");
+    client.init (config.get ("client.cert"));
     client.connect (server, port);
   
     client.send (out.serialize () + "\n");
@@ -377,7 +377,7 @@ bool taskd_sendMessage (
 /*
     client.limit (1024 * 1024);
 */
-    client.init ("pki/client.cert.pem");
+    client.init (config.get ("client.cert"));
     client.connect (server, port);
   
     client.send (out.serialize () + "\n");

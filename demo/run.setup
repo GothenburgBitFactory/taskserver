@@ -68,8 +68,10 @@ find $DATA
 # Install the cert and key.
 echo
 echo '# Cert and key installation'
-echo "cert=$DATA/server.cert.pem" >> $DATA/config
-echo "key=$DATA/server.key.pem"   >> $DATA/config
+echo "client.cert=$DATA/client.cert.pem" >> $DATA/config
+echo "server.cert=$DATA/server.cert.pem" >> $DATA/config
+echo "server.key=$DATA/server.key.pem"   >> $DATA/config
+cp ../pki/client.cert.pem  $DATA
 cp ../pki/server.cert.pem $DATA
 cp ../pki/server.key.pem  $DATA
 find $DATA
