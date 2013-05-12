@@ -117,8 +117,7 @@ void TLSClient::init (const std::string& ca)
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
   // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints;
-  memset (&hints, 0, sizeof hints);
+  struct addrinfo hints = {0};
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_PASSIVE; // use my IP
