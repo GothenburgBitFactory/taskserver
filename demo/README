@@ -10,7 +10,7 @@ This is used for development, testing and debugging.  There are scripts:
   run.server
     Clears the log file, and launches the server.
 
-There are also data files, which are used as requests and send as-is to a
+There are also data files, which are used as requests and sent as-is to a
 running server instance.  The files are:
 
   stats.0
@@ -31,7 +31,7 @@ command:
 Build / Install
 ---------------
 
-Follow these command to build and install taskd.  Note that the tests are all
+Follow these commands to build and install taskd.  Note that the tests are all
 expected to pass.  If they do not all pass, do not install taskd.
 
   $ git clone git://tasktools.org/taskd.git taskd.git
@@ -53,7 +53,7 @@ Run these commands to verify your installation:
 
   $ taskd --version
   ...
-  $ taskd --diagnostics
+  $ taskd diagnostics
   ...
   $ taskd
   ...
@@ -73,6 +73,8 @@ Follow these commands for a sample session:
   $ taskd client localhost:6544 stats.0
   ...
   $ taskd client localhost:6544 sync.1
+  ...
+  $ ./run.client
   ...
   $ fg
   ^C

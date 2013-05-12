@@ -167,7 +167,6 @@ int command_help (Config& config, const std::vector <std::string>& args)
   else
     std::cout << "\n"
               << "Usage: taskd -v|--version\n"
-              << "       taskd -d|--diagnostics\n"
               << "       taskd -h|--help\n"
               << "       taskd add --data <root> [options] org <org>\n"
               << "       taskd add --data <root> [options] group <org> <group>\n"
