@@ -10,6 +10,7 @@ project (taskd)
 set (PROJECT_VERSION "0.9.0")
 
 SET (TASKD_MAN1DIR share/man/man1  CACHE STRING "Installation directory for man pages, section 1")
+SET (TASKD_MAN5DIR share/man/man5  CACHE STRING "Installation directory for man pages, section 5")
 SET (TASKD_DOCDIR  share/doc/taskd CACHE STRING "Installation directory for doc files")
 SET (TASKD_EXTDIR  libexec/taskd   CACHE STRING "Installation directory for the extensions")
 SET (TASKD_BINDIR  bin             CACHE STRING "Installation directory for the program")

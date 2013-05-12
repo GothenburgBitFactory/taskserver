@@ -1,0 +1,44 @@
+.TH taskd 5 2013-05-12 "${PACKAGE_STRING}" "User Manuals"
+
+.SH NAME
+taskdrc \- Configuration file for the taskd(1) server
+
+.SH CONFIGURATION VARIABLES
+
+Valid variable names and their default values are:
+
+.TP
+.B debug.tls=0
+.RS
+GnuTLS log level, an integer from 0 to 9, where 0 means no logging, and 9
+means sensitive data leaks.  Caution!
+.RE
+
+.SH "CREDITS & COPYRIGHTS"
+Copyright (C) 2012 \- 2013, Göteborg Bit Factory.
+
+Taskd is distributed under the MIT license. See
+http://www.opensource.org/licenses/mit-license.php for more information.
+
+.SH SEE ALSO
+.BR taskd(1)
+
+For more information regarding taskd, see the following:
+
+.TP
+The official site at
+<http://taskwarrior.org>
+
+.TP
+The official code repository at
+<git://tasktools.org/taskd.git/>
+
+.TP
+You can contact the project by emailing
+<support@taskwarrior.org>
+
+.SH REPORTING BUGS
+.TP
+Bugs in taskd may be reported to the issue-tracker at
+<http://taskwarrior.org
+
