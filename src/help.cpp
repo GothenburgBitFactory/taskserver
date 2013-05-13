@@ -54,7 +54,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("config", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd config [<name> [<value>]]\n"
+                << "taskd config --data <root> [<name> [<value>]]\n"
                 << "\n"
                 << "Displays or modifies a configuration variable value.\n"
                 << "\n"
@@ -89,72 +89,85 @@ int command_help (Config& config, const std::vector <std::string>& args)
     }
     else if (closeEnough ("status", args[1], 3))
     {
-        std::cout << "\n"
-                  << "taskd status [options]\n"
-                  << "\n"
-                  << "Shows server status.\n"
-                  << "\n"
-                  << "Options:\n"
-                  << "  --quiet        Turns off verbose output\n"
-                  << "  --NAME=VALUE   Temporary configuration override\n"
-                  << "\n";
+      std::cout << "\n"
+                << "taskd status --data <root> [options]\n"
+                << "\n"
+                << "Shows server status.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("client", args[1], 3))
     {
-        std::cout << "\n"
-                  << "taskd client [options] <host:port> <file> [<file> ...]\n"
-                  << "\n"
-                  << "Sends <file> to task server on <host:port> and displays "
-                  << "the response.\n"
-                  << "\n"
-                  << "Options:\n"
-                  << "  --quiet        Turns off verbose output\n"
-                  << "  --NAME=VALUE   Temporary configuration override\n"
-                  << "\n";
+      std::cout << "\n"
+                << "taskd client [options] <host:port> <file> [<file> ...]\n"
+                << "\n"
+                << "Sends <file> to task server on <host:port> and displays "
+                << "the response.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("add", args[1], 3))
     {
-        std::cout << "\n"
-                  << "taskd add [options] org <org>\n"
-                  << "taskd add [options] group <org> <group>\n"
-                  << "taskd add [options] user <org> <user>\n"
-                  << "\n"
-                  << "Creates a new organization, group or user.\n"
-                  << "\n"
-                  << "Options:\n"
-                  << "  --NAME=VALUE   Temporary configuration override\n"
-                  << "\n";
+      std::cout << "\n"
+                << "taskd add --data <root> [options] org <org>\n"
+                << "taskd add --data <root> [options] group <org> <group>\n"
+                << "taskd add --data <root> [options] user <org> <user>\n"
+                << "\n"
+                << "Creates a new organization, group or user.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
+    }
+    else if (closeEnough ("remove", args[1], 3))
+    {
+      std::cout << "\n"
+                << "taskd remove --data <root> [options] org <org>\n"
+                << "taskd remove --data <root> [options] group <org> <group>\n"
+                << "taskd remove --data <root> [options] user <org> <user>\n"
+                << "\n"
+                << "Deletes an organization, group or user.  Permanently.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("suspend", args[1], 3))
     {
-        std::cout << "\n"
-                  << "taskd suspend [options] org <org>\n"
-                  << "taskd suspend [options] group <org> <group>\n"
-                  << "taskd suspend [options] user <org> <user>\n"
-                  << "\n"
-                  << "Suspends an organization, group or user.\n"
-                  << "\n"
-                  << "Options:\n"
-                  << "  --NAME=VALUE   Temporary configuration override\n"
-                  << "\n";
+      std::cout << "\n"
+                << "taskd suspend --data <root> [options] org <org>\n"
+                << "taskd suspend --data <root> [options] group <org> <group>\n"
+                << "taskd suspend --data <root> [options] user <org> <user>\n"
+                << "\n"
+                << "Suspends an organization, group or user.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("resume", args[1], 3))
     {
-        std::cout << "\n"
-                  << "taskd resume [options] org <org>\n"
-                  << "taskd resume [options] group <org> <group>\n"
-                  << "taskd resume [options] user <org> <user>\n"
-                  << "\n"
-                  << "Resumes, or un-suspends an organization, group or user.\n"
-                  << "\n"
-                  << "Options:\n"
-                  << "  --NAME=VALUE   Temporary configuration override\n"
-                  << "\n";
+      std::cout << "\n"
+                << "taskd resume --data <root> [options] org <org>\n"
+                << "taskd resume --data <root> [options] group <org> <group>\n"
+                << "taskd resume --data <root> [options] user <org> <user>\n"
+                << "\n"
+                << "Resumes, or un-suspends an organization, group or user.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n";
     }
     else if (closeEnough ("diag", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd diag\n"
+                << "taskd diagnostics\n"
                 << "\n"
                 << "Show installation details.\n"
                 << "\n";
@@ -166,13 +179,14 @@ int command_help (Config& config, const std::vector <std::string>& args)
     std::cout << "\n"
               << "Usage: taskd -v|--version\n"
               << "       taskd -h|--help\n"
+              << "       taskd diagnostics\n"
+              << "       taskd help [<command>]\n"
+              << "\n"
+              << "Commands run only on server:\n"
               << "       taskd add --data <root> [options] org <org>\n"
               << "       taskd add --data <root> [options] group <org> <group>\n"
               << "       taskd add --data <root> [options] user <org> <user>\n"
-              << "       taskd client --data <root> [options] <host:port> <file> [<file> ...]\n"
               << "       taskd config --data <root> [<name> [<value>]]\n"
-              << "       taskd diagnostics\n"
-              << "       taskd help [<command>]\n"
               << "       taskd init --data <root> [--debug] [options]\n"
               << "       taskd remove --data <root> [options] org <org>\n"
               << "       taskd remove --data <root> [options] group <org> <group>\n"
@@ -181,10 +195,13 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd resume --data <root> [options] group <org> <group>\n"
               << "       taskd resume --data <root> [options] user <org> <user>\n"
               << "       taskd server --data <root> [--daemon] [--debug] [options]\n"
-              << "       taskd status [options]\n"
+              << "       taskd status --data <root> [options]\n"
               << "       taskd suspend --data <root> [options] org <org>\n"
               << "       taskd suspend --data <root> [options] group <org> <group>\n"
               << "       taskd suspend --data <root> [options] user <org> <user>\n"
+              << "\n"
+              << "Commands run remotely:\n"
+              << "       taskd client [options] <host:port> <file> [<file> ...]\n"
               << "\n"
               << "Common Options:\n"
               << "  --quiet        Turns off verbose output\n"
