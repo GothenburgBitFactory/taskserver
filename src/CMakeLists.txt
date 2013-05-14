@@ -38,7 +38,8 @@ add_executable (taskd_executable taskd.cpp
                                  wcwidth6.cpp)
 
 #target_link_libraries (taskd_executable ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries (taskd_executable ${TASKD_LIBRARIES})
+target_link_libraries (taskd_executable ${TASKD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
 
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})

@@ -54,15 +54,12 @@ set (PACKAGE_TARNAME "${PACKAGE}")
 set (PACKAGE_VERSION "${VERSION}")
 set (PACKAGE_STRING "${PACKAGE} ${VERSION}")
 
-message ("-- Looking for pthread")
 find_package (Threads)
-
-check_function_exists (random          HAVE_RANDOM)
-check_function_exists (srandom         HAVE_SRANDOM)
-check_function_exists (timegm          HAVE_TIMEGM)
-
-check_struct_has_member ("struct tm"   tm_gmtoff    time.h                   HAVE_TM_GMTOFF)
-check_struct_has_member ("struct stat" st_birthtime "sys/types.h;sys/stat.h" HAVE_ST_BIRTHTIME)
+if (THREADS_FOUND)
+  set (HAVE_LIBPTHREAD true)
+  set (TASKD_INCLUDE_DIRS ${TASKD_INCLUDE_DIRS} ${THREADS_INCLUDE_DIR})
+  set (TASKD_LIBRARIES    ${TASKD_LIBRARIES}    ${THREADS_LIBRARIES})
+endif (THREADS_FOUND)
 
 message ("-- Looking for libuuid")
 if (DARWIN)
@@ -98,6 +95,14 @@ elseif (HAVE_UUID AND NOT HAVE_UUID_UNPARSE_LOWER)
 else (HAVE_UUID AND HAVE_UUID_UNPARSE_LOWER)
   message ("-- libuuid not found, using internal uuid")
 endif (HAVE_UUID AND HAVE_UUID_UNPARSE_LOWER)
+
+check_function_exists (random          HAVE_RANDOM)
+check_function_exists (srandom         HAVE_SRANDOM)
+check_function_exists (timegm          HAVE_TIMEGM)
+check_function_exists (get_current_dir_name HAVE_GET_CURRENT_DIR_NAME)
+
+check_struct_has_member ("struct tm"   tm_gmtoff    time.h                   HAVE_TM_GMTOFF)
+check_struct_has_member ("struct stat" st_birthtime "sys/types.h;sys/stat.h" HAVE_ST_BIRTHTIME)
 
 message ("-- Configuring cmake.h")
 configure_file (
