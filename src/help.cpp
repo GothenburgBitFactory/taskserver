@@ -54,7 +54,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("config", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd config --data <root> [<name> [<value>]]\n"
+                << "taskd config [<name> [<value>]]\n"
                 << "\n"
                 << "Displays or modifies a configuration variable value.\n"
                 << "\n"
@@ -62,13 +62,19 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "      Shows all configuration settings.\n"
                 << "\n"
                 << "  taskd config <name>\n"
-                << "      Displays the value for <name>.\n"
+                << "      Deletes the value for <name>.\n"
                 << "\n"
                 << "  taskd config <name> ''\n"
                 << "      Sets <name> to blank.\n"
                 << "\n"
                 << "  taskd config <name> <value>\n"
                 << "      Sets <name> to <value>.\n"
+                << "\n"
+                << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Debug mode generates lots of diagnostics\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "\n";
     }
     else if (closeEnough ("server", args[1], 3))
@@ -186,7 +192,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd add --data <root> [options] org <org>\n"
               << "       taskd add --data <root> [options] group <org> <group>\n"
               << "       taskd add --data <root> [options] user <org> <user>\n"
-              << "       taskd config --data <root> [<name> [<value>]]\n"
+              << "       taskd config [<name> [<value>]]\n"
               << "       taskd init --data <root> [--debug] [options]\n"
               << "       taskd remove --data <root> [options] org <org>\n"
               << "       taskd remove --data <root> [options] group <org> <group>\n"
@@ -206,6 +212,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "Common Options:\n"
               << "  --quiet        Turns off verbose output\n"
               << "  --NAME=VALUE   Temporary configuration override\n"
+              << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
               << "\n";
 
   return 0;

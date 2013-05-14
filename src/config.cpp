@@ -25,56 +25,58 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-#include <iostream>
-#include <cstring>
-*/
-#include <ConfigFile.h>
-/*
-#include <File.h>
 #include <cmake.h>
-*/
+#include <iostream>
+#include <stdlib.h>
+#include <ConfigFile.h>
+#include <Directory.h>
 #include <taskd.h>
-/*
 #include <text.h>
 #include <util.h>
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
+// taskd config --data <root> [<name> [<value>]]
 int command_config (Config& config, const std::vector <std::string>& args)
 {
   int status = 0;
-/*
-  // Check prerequisites.
-  taskd_requireConfiguration (config);
 
-  // Support:
-  //   taskd config name value    # set name to value
-  //   taskd config name ""       # set name to blank
-  //   taskd config name          # remove name
-  std::string name  = "";
-  std::string value = "";
+  std::string root;
+  std::string name;
+  std::string value;
   bool nonNull = false;
-  if (args.size () > 1)
-  {
-    name = args[1];
-
-    if (args.size () > 2)
+  std::vector <std::string>::const_iterator i;                                                                                      
+  for (i = ++(args.begin ()); i != args.end (); ++i)                                                                                
+  {                                                                                                                                 
+         if (closeEnough ("--data", *i, 3))    root  = *(++i);
+    else if (taskd_applyOverride (config, *i)) ;                                                                               
+    else if (name == "")                       name = *i;
+    else if (value == "")
     {
       nonNull = true;
-      for (unsigned int i = 2; i < args.size (); ++i)
-      {
-        if (i > 2)
-          value += " ";
+      if (value != "")
+        value += ' ';
 
-        value += args[i];
-      }
+      value += *i;
     }
+  }                                                                                                                                 
+
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
   }
+
+  Directory root_dir (root);
+  if (!root_dir.exists ())
+    throw std::string ("ERROR: The '--data' path does not exist.");
+
+  // Load the config file.
+  config.load (root_dir._data + "/config");
+  config.set ("root", root_dir._data);
 
   if (name != "" && nonNull)
   {
-    std::cout << "# config <name> <value> - overwrite.\n";
     bool change = false;
 
     // Read .taskd/config
@@ -128,8 +130,6 @@ int command_config (Config& config, const std::vector <std::string>& args)
   }
   else if (name != "")
   {
-    std::cout << "# config <name> - remove name/value.\n";
-
     // Read .taskd/config
     std::vector <std::string> contents;
     File::read (config._original_file, contents);
@@ -187,7 +187,6 @@ int command_config (Config& config, const std::vector <std::string>& args)
 
     taskd_renderMap (data, "Variable", "Value");
   }
-*/
 
   return status;
 }
