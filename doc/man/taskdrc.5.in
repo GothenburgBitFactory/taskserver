@@ -9,10 +9,18 @@ Valid variable names and their default values are:
 
 .TP
 .B debug.tls=0
-.RS
 GnuTLS log level, an integer from 0 to 9, where 0 means no logging, and 9
 means sensitive data leaks.  Caution!
-.RE
+
+.SH ENVIRONMENT VARIABLES
+
+Environment variables provide values that would otherwise be required at the
+command line.
+
+.TP
+.B TASKDDATA=<root>
+Most command require either '--data <root>' or this environment variable.  If
+both are provided, the command line overrides the environment.
 
 .SH "CREDITS & COPYRIGHTS"
 Copyright (C) 2012 \- 2013, Göteborg Bit Factory.

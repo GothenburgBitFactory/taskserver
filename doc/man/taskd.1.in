@@ -91,6 +91,16 @@ this syntax:
 In all commands but one, this will _temporarily_ override the value, but with
 the 'init' command, which creates a config file, overrides are made permanent.
 
+.SH ENVIRONMENT VARIABLES
+
+Environment variables provide values that would otherwise be required at the
+command line.
+
+.TP
+.B TASKDDATA=<root>
+Most command require either '--data <root>' or this environment variable.  If
+both are provided, the command line overrides the environment.
+
 .SH EXAMPLES
 
 .SH "CREDITS & COPYRIGHTS"
