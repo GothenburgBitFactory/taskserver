@@ -36,6 +36,7 @@
 #include <string.h>
 #include <TLSServer.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/errno.h>
 #include <sys/types.h>
@@ -52,8 +53,7 @@ static void gnutls_log_function (int level, const char* message)
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
-: /*_ca ("")
-, _crl ("")
+: /* _crl ("")
 ,*/ _cert ("")
 , _key ("")
 , _socket (0)
@@ -96,7 +96,6 @@ void TLSServer::debug (int level)
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
 /*
-  const std::string& ca,
   const std::string& crl,
 */
   const std::string& cert,

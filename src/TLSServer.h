@@ -50,7 +50,6 @@ public:
 
 private:
 /*
-  std::string                      _ca;
   std::string                      _crl;
 */
   std::string                      _cert;
