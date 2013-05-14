@@ -120,6 +120,8 @@ foreach (doc_FILE ${doc_FILES})
   install (FILES ${doc_FILE}  DESTINATION ${TASKD_DOCDIR})
 endforeach (doc_FILE)
 
+install (PROGRAMS src/taskdctl DESTINATION ${TASKD_BINDIR})
+
 # ---
 
 set (CPACK_SOURCE_GENERATOR "TGZ")
