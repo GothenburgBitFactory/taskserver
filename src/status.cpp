@@ -40,7 +40,7 @@
 int status_statistics (Config& config)
 {
   int status = 0;
-/*
+
   // Request statistics, but do not spool request, in the event of failure.
   Msg request;
   request.set ("type", "statistics");
@@ -72,30 +72,31 @@ int status_statistics (Config& config)
     std::cout << Color ("red").colorize ("ERROR: Task server not responding.") << "\n";
     status = 1;
   }
-*/
+
   return status;
 }
  
 ////////////////////////////////////////////////////////////////////////////////
 int command_status (Config& config, const std::vector <std::string>& args)
 {
-/*
-  taskd_requireConfiguration (config);
-  taskd_resume (config);
+//  taskd_requireConfiguration (config);
+//  taskd_resume (config);
 
   bool verbose = true;
+  std::string root;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--quiet",    *i, 3)) verbose  = false;
-    else if (taskd_applyOverride (config, *i))   ;
+         if (closeEnough ("--data",  *i, 3))   root     = *(++i);
+    else if (closeEnough ("--quiet", *i, 3))   verbose  = false;
+    else if (taskd_applyOverride (config, *i)) ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
   }
 
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);
-*/
+
   return status_statistics (config);
 }
 

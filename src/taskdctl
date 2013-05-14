@@ -1,0 +1,150 @@
+#! /bin/sh
+################################################################################
+## taskd - Task Server
+##
+## Copyright 2012 - 2013, Göteborg Bit Factory.
+##
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included
+## in all copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+## OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+## THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+## SOFTWARE.
+##
+## http://www.opensource.org/licenses/mit-license.php
+##
+################################################################################
+
+PIDFILE=$(taskd config | grep pid.file | awk '{print $2}')
+DAEMON="taskd server --data $TASKDDATA --daemon"
+
+ERROR=0
+ARGV="$@"
+if [ "x$ARGV" = "x" ] ; then 
+  ARGS="help"
+fi
+
+for ARG in $@ $ARGS
+do
+  # check for pidfile
+  if [ -f $PIDFILE ] ; then
+    PID=`cat $PIDFILE`
+    if [ "x$PID" != "x" ] && kill -0 $PID 2>/dev/null ; then
+      STATUS="daemon (pid $PID) running"
+      RUNNING=1
+    else
+      STATUS="daemon (pid $PID?) not running"
+      RUNNING=0
+    fi
+  else
+    STATUS="daemon (no pid file) not running"
+    RUNNING=0
+  fi
+
+  case $ARG in
+    start)
+      if [ $RUNNING -eq 1 ]; then
+        echo "$0 $ARG: daemon (pid $PID) already running"
+        continue
+      fi
+      if $DAEMON ; then
+        echo "$0 $ARG: daemon started"
+      else
+        echo "$0 $ARG: daemon could not be started"
+        ERROR=3
+      fi
+      ;;
+
+    stop)
+      if [ $RUNNING -eq 0 ]; then
+        echo "$0 $ARG: $STATUS"
+        continue
+      fi
+      if kill $PID ; then
+        rm $PIDFILE
+        echo "$0 $ARG: daemon stopped"
+      else
+        echo "$0 $ARG: daemon could not be stopped"
+        ERROR=4
+      fi
+      ;;
+
+    restart)
+      if [ $RUNNING -eq 0 ]; then
+        echo "$0 $ARG: daemon not running, trying to start"
+        if $DAEMON ; then
+          echo "$0 $ARG: daemon started"
+        else
+          echo "$0 $ARG: daemon could not be started"
+          ERROR=5
+        fi
+      else
+        if $DAEMON ; then
+          if kill -HUP $PID ; then
+            rm $PIDFILE
+            echo "$0 $ARG: daemon restarted"
+          else
+            echo "$0 $ARG: daemon could not be restarted"
+            ERROR=6
+          fi
+        else
+          echo "$0 $ARG: configuration broken, ignoring restart"
+          ERROR=6
+        fi
+      fi
+      ;;
+
+    graceful)
+      if [ $RUNNING -eq 0 ]; then
+        echo "$0 $ARG: daemon not running, trying to start"
+        if $DAEMON ; then
+          echo "$0 $ARG: daemon started"
+        else
+          echo "$0 $ARG: daemon could not be started"
+          ERROR=5
+        fi
+      else
+        if $DAEMON ; then
+          if kill -USR1 $PID ; then
+            echo "$0 $ARG: daemon gracefully restarted"
+          else
+            echo "$0 $ARG: daemon could not be restarted"
+            ERROR=7
+          fi
+        else
+          echo "$0 $ARG: configuration broken, ignoring restart"
+          ERROR=7
+        fi
+      fi
+      ;;
+
+    *)
+      echo "usage: $0 (start|stop|restart|graceful|help)"
+      cat <<EOF
+
+start         - start daemon
+stop          - stop daemon
+restart       - restart daemon if running by sending a SIGHUP or start if not running
+graceful      - do a graceful restart by sending a SIGUSR1 or start if not running
+help          - this screen
+
+EOF
+      ERROR=2
+      ;;
+
+  esac
+done
+
+exit $ERROR
+
