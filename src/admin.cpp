@@ -129,6 +129,13 @@ int command_add (Config& config, const std::vector <std::string>& args)
       positional.push_back (*i);
   }
 
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
+  }
+
   // Verify that root exists.
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");

@@ -121,14 +121,15 @@ int command_help (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("add", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd add --data <root> [options] org <org>\n"
-                << "taskd add --data <root> [options] group <org> <group>\n"
-                << "taskd add --data <root> [options] user <org> <user>\n"
+                << "taskd add [options] org <org>\n"
+                << "taskd add [options] group <org> <group>\n"
+                << "taskd add [options] user <org> <user>\n"
                 << "\n"
                 << "Creates a new organization, group or user.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "\n";
     }
     else if (closeEnough ("remove", args[1], 3))
@@ -189,9 +190,9 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd help [<command>]\n"
               << "\n"
               << "Commands run only on server:\n"
-              << "       taskd add --data <root> [options] org <org>\n"
-              << "       taskd add --data <root> [options] group <org> <group>\n"
-              << "       taskd add --data <root> [options] user <org> <user>\n"
+              << "       taskd add [options] org <org>\n"
+              << "       taskd add [options] group <org> <group>\n"
+              << "       taskd add [options] user <org> <user>\n"
               << "       taskd config [<name> [<value>]]\n"
               << "       taskd init --data <root> [--debug] [options]\n"
               << "       taskd remove --data <root> [options] org <org>\n"
