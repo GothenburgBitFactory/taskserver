@@ -25,6 +25,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
+#include <stdlib.h>
 #include <ConfigFile.h>
 #include <taskd.h>
 #include <text.h>
