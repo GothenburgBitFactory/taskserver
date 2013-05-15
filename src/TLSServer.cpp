@@ -221,7 +221,7 @@ void TLSTransaction::init (TLSServer& server)
             << "\n";
 
 
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
 
   // Key exchange.
   int ret = gnutls_handshake (_session);
