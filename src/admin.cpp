@@ -98,6 +98,56 @@ static bool add_user (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+static bool remove_org (
+  const Directory& root,
+  const std::string& org)
+{
+  Directory org_dir (root);
+  org_dir += "orgs";
+  org_dir += org;
+
+  // TODO Remove users?
+  // TODO Remove groups?
+  // TODO Revoke user group membership.
+
+  return org_dir.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static bool remove_group (
+  const Directory& root,
+  const std::string& org,
+  const std::string& group)
+{
+  Directory group_dir (root);
+  group_dir += "orgs";
+  group_dir += org;
+  group_dir += "groups";
+  group_dir += group;
+
+  // TODO Revoke user group membership.
+
+  return group_dir.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static bool remove_user (
+  const Directory& root,
+  const std::string& org,
+  const std::string& user)
+{
+  Directory user_dir (root);
+  user_dir += "orgs";
+  user_dir += org;
+  user_dir += "users";
+  user_dir += user;
+
+  // TODO Revoke group memberships.
+
+  return user_dir.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 static bool suspend_node (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
@@ -242,7 +292,6 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       positional.push_back (*i);
   }
 
-/*
   if (root == "")
   {
     char* root_env = getenv ("TASKDDATA");
@@ -273,7 +322,7 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
-      if (! remove_node (root_dir._data + "/orgs/" + positional[i]))
+      if (! remove_org (root_dir, positional[i]))
         throw std::string ("ERROR: Failed to remove organization '") + positional[i] + "'.";
     }
   }
@@ -293,7 +342,7 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
-      if (! remove_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+      if (! remove_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Failed to remove group '") + positional[i] + "'.";
     }
   }
@@ -313,14 +362,14 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
-      if (! remove_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+      if (! remove_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Failed to remove user '") + positional[i] + "'.";
     }
   }
 
   else
     throw std::string ("ERROR: Unrecognized argument '") + positional[0] + "'";
-*/
+
   return status;
 }
 
