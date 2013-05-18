@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Use Case 2: Continuing, nothing changes, and another sync is performed.
+# Nothing is expected to happen.
+
+echo '--- list 1 --------------------------------------------------------------'
+task rc:tw1/rc list
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+

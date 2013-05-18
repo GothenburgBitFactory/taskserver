@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Use Case 3: Client adds two tasks, then syncs.
+
+echo '--- add 1 ---------------------------------------------------------------'
+task rc:tw1/rc add One pri:L due:tomorrow +tag1
+echo '--- add 1 ---------------------------------------------------------------'
+task rc:tw1/rc add Two pri:L +tag2
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+

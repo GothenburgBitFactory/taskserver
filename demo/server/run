@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+ROOT=$PWD/root
+
+rm -f $PWD/taskd.log
+
+echo "# taskd server --data $ROOT"
+echo "# (Ctrl-C to exit)"
+../../src/taskd server --data $ROOT
+

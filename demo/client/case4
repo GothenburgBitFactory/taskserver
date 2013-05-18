@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Use Case 4: Client modifies a task, syncs, and receives a new task from the
+# server, placed there by a different client.
+
+echo '--- add 2 ---------------------------------------------------------------'
+task rc:tw2/rc add Three pri:L pro:P +tag1 +tag2
+echo '--- sync 2 --------------------------------------------------------------'
+task rc:tw2/rc sync
+
+echo '--- modify 1 ------------------------------------------------------------'
+task rc:tw1/rc /One/ modify pri:H
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+
+echo '--- sync 2 --------------------------------------------------------------'
+task rc:tw2/rc sync

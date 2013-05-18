@@ -1,5 +1,0 @@
-#!/bin/bash
-
-rm /tmp/taskd.log
-../src/taskd server --data /tmp/taskd.data
-

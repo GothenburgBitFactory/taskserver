@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Use Case 5: Client modifies a task, syncs and finds that another client has
+# modified the same task twice.
+
+echo '--- modify 2 ------------------------------------------------------------'
+task rc:tw2/rc 3 modify Two mod1
+
+echo '--- modify 1 ------------------------------------------------------------'
+echo sleep 2
+sleep 2
+task rc:tw1/rc 2 modify Two mod2 +tag1
+
+echo '--- modify 2 ------------------------------------------------------------'
+echo sleep 2
+sleep 2
+task rc:tw2/rc 3 modify Two mod3 pro:PRO
+
+echo '--- modify 1 ------------------------------------------------------------'
+echo sleep 2
+sleep 2
+task rc:tw1/rc 2 modify Two mod4 +tag2
+
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+
+echo '--- sync 2 --------------------------------------------------------------'
+task rc:tw2/rc sync
+
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+

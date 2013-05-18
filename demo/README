@@ -1,51 +1,28 @@
 Demonstration
 -------------
 
-This is used for development, testing and debugging.  There are scripts:
+The demonstration requires taskd and an installed copy of Taskwarrior 2.3.0 or
+later.
 
-  run.setup
-    Sets up a task server instance using /tmp/taskd.data as the data root, and
-    /tmp/taskd.log as the log file.  Listens on post 6544, in plaintext mode.
-
-  run.server
-    Clears the log file, and launches the server.
-
-There are also data files, which are used as requests and sent as-is to a
-running server instance.  The files are:
-
-  stats.0
-    Requests server statistics.
-
-  sync.1
-    Requests a sync, but provides no synch key, and no transactions, therefore
-    simulating an existing client user that is syncing for the first time.
-
-The data files are numbered (*.0, *.1 ...) which indicates the sequence in which
-they are expected to be sent as requests.  They are sent using the 'client'
-command:
-
-  taskd client localhost:6544 stats.0
-  taskd client localhost:6544 sync.1
+Follow these steps:
 
 
 Build / Install
 ---------------
 
-Follow these commands to build and install taskd.  Note that the tests are all
-expected to pass.  If they do not all pass, do not install taskd.
+Follow these commands to build and install taskd.
 
   $ git clone git://tasktools.org/taskd.git taskd.git
-  ...
   $ cd task.git
   $ cmake .
-  ...
   $ make
-  ...
   $ cd test
   $ make
-  ...
   $ ./run_all
-  ...
+
+Note that the tests are all expected to pass.  If they do not all pass, do not
+install taskd.  Please report the failures.
+
   $ cd ..
   $ sudo make install
 
@@ -63,20 +40,59 @@ option provides details about the build environment.  The last command should
 present a list of commands that can be run.
 
 
-Example Session
----------------
+Create Keys and Certs
+---------------------
 
-Follow these commands for a sample session:
+The server and client communicate using Transport Layer Security (TLS), which
+requires certificates and keys.  Generate these using:
 
-  $ ./run.setup
-  $ ./run.server &
-  $ taskd client localhost:6544 stats.0
-  ...
-  $ taskd client localhost:6544 sync.1
-  ...
-  $ ./run.client
-  ...
-  $ fg
-  ^C
+  $ cd pki
+  $ ./generate
+  $ cd ..
+
+
+Setup and Run the Server
+------------------------
+
+It is recommended that you run the server and the client in separate windows.
+In the server window, the setup script creates a server instance, with an
+organization ("ORG") that has a group ("Group Name"), and two users ("USER",
+"User Name").  There is also a suspended organization ("ABC Corp").
+
+  $ cd demo/server
+  $ ./setup
+
+Run the server:
+
+  $ ./run
+
+Note that the server is not run as a daemon, so use Ctrl-C to kill the server,
+when the client tests are complete.
+
+
+Setup and Run the Client
+------------------------
+
+In the client window, the client tests are a set of simulated transactions.
+First setup the client:
+
+  $ cd ../client
+  $ ./setup
+
+Run the tests:
+
+  $ ./run
+
+
+Test interface
+--------------
+
+There is currently a test client interface, used for further testing.  This may
+be removed before release.  In the meantime it serves as a means to send
+requests to the server.  The requests are fully-formed API messages, in files,
+sent using the 'client' command.
+
+  taskd client localhost:6544 stats.0
+  taskd client localhost:6544 sync.1
 
 ---

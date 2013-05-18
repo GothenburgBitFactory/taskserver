@@ -10,6 +10,7 @@
 0.11.0 ()
 - Implemented 'config' command.
 - Supports $TASKDDATA in config command.
+- Improved demo scripts and documentation.
 
 ------ current release ---------------------------
 

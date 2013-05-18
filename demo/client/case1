@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Use Case 1: New user, no tasks, with an unused server account.
+
+echo '--- list 1 --------------------------------------------------------------'
+task rc:tw1/rc list
+echo '--- sync 1 --------------------------------------------------------------'
+task rc:tw1/rc sync
+
