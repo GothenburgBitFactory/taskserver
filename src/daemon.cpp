@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cstring>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <unistd.h>
 #include <Server.h>

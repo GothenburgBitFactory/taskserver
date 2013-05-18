@@ -11,6 +11,7 @@
 - Implemented 'config' command.
 - Supports $TASKDDATA in config command.
 - Improved demo scripts and documentation.
+- Consistent use of command line options for all commands.
 
 ------ current release ---------------------------
 

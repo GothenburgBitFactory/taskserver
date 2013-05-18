@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <stdlib.h>
 #include <taskd.h>
 #include <text.h>
 #include <cmake.h>
