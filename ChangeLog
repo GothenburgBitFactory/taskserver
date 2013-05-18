@@ -7,20 +7,24 @@
 ? Full user authentication.
 ? JSON support.
 
-0.11.0 ()
+0.12.0 ()
+ -
+
+------ current release ---------------------------
+
+0.11.0 (2013-05-18)
 - Implemented 'config' command.
+- Implemented 'remove' command.
 - Supports $TASKDDATA in config command.
 - Improved demo scripts and documentation.
 - Consistent use of command line options for all commands.
 
------- current release ---------------------------
+------ old releases ------------------------------
 
 0.10.0 (2013-05-12)
 - Full TLS support, for encrypted-only communication.
 - Added 'diagnostics' command.
 - Bug: Statistics 'tps' value now floating point.
-
------- old releases ------------------------------
 
 0.9.0 (2012-10-16)
 - IPv4 and IPv6 support.
