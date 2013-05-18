@@ -35,7 +35,7 @@ my $output = qx{../src/taskd init 2>&1};
 like ($output, qr/^ERROR: The '--data' option is required\./, "'taskd init' - missing --data option");
 
 # Check that --data exists.
-my $data = '/tmp/init.data';
+my $data = 'init.data';
 $output = qx{../src/taskd init --data $data 2>&1};
 like ($output, qr/^ERROR: The '--data' path does not exist\./, "'taskd init --data $data' - missing data dir");
 
