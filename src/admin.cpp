@@ -81,6 +81,8 @@ static bool add_user (
   if (new_user.create ())
   {
     // Generate new KEY
+    // TODO This may not be necessary.
+    // TODO This may be a proper key generation step.
     std::string key = taskd_generate_key ();
 
     // Store KEY in <new_user>/config
@@ -121,11 +123,14 @@ int command_add (Config& config, const std::vector <std::string>& args)
   std::string root = "";
 
   std::vector <std::string> positional;
-
+  bool verbose = true;
+  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--data",   *i, 3))  root = *(++i);
+    else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
+    else if (closeEnough ("--debug",  *i, 3))  debug = true;
     else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
@@ -171,7 +176,7 @@ int command_add (Config& config, const std::vector <std::string>& args)
   else if (closeEnough ("group", positional[0], 3))
   {
     if (positional.size () < 3)
-      throw std::string ("Usage: taskd add [options] group <org> <user>");
+      throw std::string ("Usage: taskd add [options] group <org> <group>");
 
     if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
@@ -218,8 +223,105 @@ int command_add (Config& config, const std::vector <std::string>& args)
 // taskd remove user  <org> <user>
 int command_remove (Config& config, const std::vector <std::string>& args)
 {
+  int status = 0;
 
-  return 0;
+  // Standard argument processing.
+  std::string root = "";
+
+  std::vector <std::string> positional;
+  bool verbose = true;
+  bool debug = false;
+  std::vector <std::string>::const_iterator i;
+  for (i = ++(args.begin ()); i != args.end (); ++i)
+  {
+         if (closeEnough ("--data",   *i, 3))  root = *(++i);
+    else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
+    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (taskd_applyOverride (config, *i)) ;
+    else
+      positional.push_back (*i);
+  }
+
+/*
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
+  }
+
+  // Verify that root exists.
+  if (root == "")
+    throw std::string ("ERROR: The '--data' option is required.");
+
+  Directory root_dir (root);
+  if (!root_dir.exists ())
+    throw std::string ("ERROR: The '--data' path does not exist.");
+
+  if (positional.size () < 1)
+    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+
+  // Remove an organization.
+  //   org <org>
+  if (closeEnough ("org", positional[0], 3))
+  {
+    if (positional.size () < 2)
+      throw std::string ("Usage: taskd remove [options] org <org>");
+
+    for (unsigned int i = 1; i < positional.size (); ++i)
+    {
+      if (! taskd_is_org (root_dir, positional[i]))
+        throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
+
+      if (! remove_node (root_dir._data + "/orgs/" + positional[i]))
+        throw std::string ("ERROR: Failed to remove organization '") + positional[i] + "'.";
+    }
+  }
+
+  // Remove a group.
+  //   group <org> <group>
+  else if (closeEnough ("group", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd remove [options] group <org> <group>");
+
+    if (! taskd_is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (unsigned int i = 2; i < positional.size (); ++i)
+    {
+      if (! taskd_is_group (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
+
+      if (! remove_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+        throw std::string ("ERROR: Failed to remove group '") + positional[i] + "'.";
+    }
+  }
+
+  // Remove a user.
+  //   user <org> <user>
+  else if (closeEnough ("user", positional[0], 3))
+  {
+    if (positional.size () < 3)
+      throw std::string ("Usage: taskd remove [options] user <org> <user>");
+
+    if (! taskd_is_org (root_dir, positional[1]))
+      throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
+
+    for (unsigned int i = 2; i < positional.size (); ++i)
+    {
+      if (! taskd_is_user (root_dir, positional[1], positional[i]))
+        throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
+
+      if (! remove_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+        throw std::string ("ERROR: Failed to remove user '") + positional[i] + "'.";
+    }
+  }
+
+  else
+    throw std::string ("ERROR: Unrecognized argument '") + positional[0] + "'";
+*/
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,14 +336,24 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
   std::string root = "";
 
   std::vector <std::string> positional;
-
+  bool verbose = true;
+  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i))   ;
+         if (closeEnough ("--data",   *i, 3))  root = *(++i);
+    else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
+    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
+  }
+
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
   }
 
   // Verify that root exists.
@@ -277,7 +389,7 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
   else if (closeEnough ("group", positional[0], 3))
   {
     if (positional.size () < 3)
-      throw std::string ("Usage: taskd suspend [options] group <org> <user>");
+      throw std::string ("Usage: taskd suspend [options] group <org> <group>");
 
     if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";
@@ -330,14 +442,24 @@ int command_resume (Config& config, const std::vector <std::string>& args)
   std::string root = "";
 
   std::vector <std::string> positional;
-
+  bool verbose = true;
+  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i))   ;
+         if (closeEnough ("--data",   *i, 3))  root = *(++i);
+    else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
+    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
+  }
+
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
   }
 
   // Verify that root exists.
@@ -373,7 +495,7 @@ int command_resume (Config& config, const std::vector <std::string>& args)
   else if (closeEnough ("group", positional[0], 3))
   {
     if (positional.size () < 3)
-      throw std::string ("Usage: taskd resume [options] group <org> <user>");
+      throw std::string ("Usage: taskd resume [options] group <org> <group>");
 
     if (! taskd_is_org (root_dir, positional[1]))
       throw std::string ("ERROR: Organization '") + positional[1] + "' does not exist.";

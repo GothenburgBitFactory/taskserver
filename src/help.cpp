@@ -39,15 +39,14 @@ int command_help (Config& config, const std::vector <std::string>& args)
     if (closeEnough ("init", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd init --data <root> [options]\n"
+                << "taskd init [options]\n"
                 << "\n"
-                << "Initializes a server instance at <root>.  Runs the server. "
-                << "Requires that the location of the data is specified:\n"
-                << "  --data         Specifies data location\n"
+                << "Initializes a server instance at <root>.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
@@ -74,14 +73,14 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
                 << "  --force        Do not ask for confirmation of changes\n"
-                << "  --NAME=VALUE   Temporary configuration override\n"
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
     else if (closeEnough ("server", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd server --data <root> [options]\n"
+                << "taskd server [options]\n"
                 << "\n"
                 << "Runs the server.  Requires that the location of the data "
                 << "is specified:\n"
@@ -91,18 +90,21 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --daemon       Runs server as a daemon\n"
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
     else if (closeEnough ("status", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd status --data <root> [options]\n"
+                << "taskd status [options]\n"
                 << "\n"
                 << "Shows server status.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
@@ -116,6 +118,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
@@ -129,46 +132,57 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "Creates a new organization, group or user.\n"
                 << "\n"
                 << "Options:\n"
-                << "  --NAME=VALUE   Temporary configuration override\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
+                << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
     else if (closeEnough ("remove", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd remove --data <root> [options] org <org>\n"
-                << "taskd remove --data <root> [options] group <org> <group>\n"
-                << "taskd remove --data <root> [options] user <org> <user>\n"
+                << "taskd remove [options] org <org>\n"
+                << "taskd remove [options] group <org> <group>\n"
+                << "taskd remove [options] user <org> <user>\n"
                 << "\n"
                 << "Deletes an organization, group or user.  Permanently.\n"
                 << "\n"
                 << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
     else if (closeEnough ("suspend", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd suspend --data <root> [options] org <org>\n"
-                << "taskd suspend --data <root> [options] group <org> <group>\n"
-                << "taskd suspend --data <root> [options] user <org> <user>\n"
+                << "taskd suspend [options] org <org>\n"
+                << "taskd suspend [options] group <org> <group>\n"
+                << "taskd suspend [options] user <org> <user>\n"
                 << "\n"
                 << "Suspends an organization, group or user.\n"
                 << "\n"
                 << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
     else if (closeEnough ("resume", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd resume --data <root> [options] org <org>\n"
-                << "taskd resume --data <root> [options] group <org> <group>\n"
-                << "taskd resume --data <root> [options] user <org> <user>\n"
+                << "taskd resume [options] org <org>\n"
+                << "taskd resume [options] group <org> <group>\n"
+                << "taskd resume [options] user <org> <user>\n"
                 << "\n"
                 << "Resumes, or un-suspends an organization, group or user.\n"
                 << "\n"
                 << "Options:\n"
+                << "  --quiet        Turns off verbose output\n"
+                << "  --debug        Generates debugging diagnostics\n"
+                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
@@ -191,31 +205,31 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd help [<command>]\n"
               << "\n"
               << "Commands run only on server:\n"
-              << "       taskd add                   [options] org   <org>\n"
-              << "       taskd add                   [options] group <org> <group>\n"
-              << "       taskd add                   [options] user  <org> <user>\n"
-              << "       taskd config                [options] [--force] [<name> [<value>]]\n"
-              << "       taskd init    --data <root> [options]\n"
-              << "       taskd remove  --data <root> [options] org   <org>\n"
-              << "       taskd remove  --data <root> [options] group <org> <group>\n"
-              << "       taskd remove  --data <root> [options] user  <org> <user>\n"
-              << "       taskd resume  --data <root> [options] org   <org>\n"
-              << "       taskd resume  --data <root> [options] group <org> <group>\n"
-              << "       taskd resume  --data <root> [options] user  <org> <user>\n"
-              << "       taskd server  --data <root> [options] [--daemon]\n"
-              << "       taskd status  --data <root> [options]\n"
-              << "       taskd suspend --data <root> [options] org   <org>\n"
-              << "       taskd suspend --data <root> [options] group <org> <group>\n"
-              << "       taskd suspend --data <root> [options] user  <org> <user>\n"
+              << "       taskd add     [options] org   <org>\n"
+              << "       taskd add     [options] group <org> <group>\n"
+              << "       taskd add     [options] user  <org> <user>\n"
+              << "       taskd config  [options] [--force] [<name> [<value>]]\n"
+              << "       taskd init    [options]\n"
+              << "       taskd remove  [options] org   <org>\n"
+              << "       taskd remove  [options] group <org> <group>\n"
+              << "       taskd remove  [options] user  <org> <user>\n"
+              << "       taskd resume  [options] org   <org>\n"
+              << "       taskd resume  [options] group <org> <group>\n"
+              << "       taskd resume  [options] user  <org> <user>\n"
+              << "       taskd server  [options] [--daemon]\n"
+              << "       taskd status  [options]\n"
+              << "       taskd suspend [options] org   <org>\n"
+              << "       taskd suspend [options] group <org> <group>\n"
+              << "       taskd suspend [options] user  <org> <user>\n"
               << "\n"
               << "Commands run remotely:\n"
-              << "       taskd client                [options] <host:port> <file> [<file> ...]\n"
+              << "       taskd client  [options] <host:port> <file> [<file> ...]\n"
               << "\n"
               << "Common Options:\n"
               << "  --quiet        Turns off verbose output\n"
               << "  --debug        Generates debugging diagnostics\n"
-              << "  --NAME=VALUE   Temporary configuration override\n"
               << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
+              << "  --NAME=VALUE   Temporary configuration override\n"
               << "\n";
 
   return 0;

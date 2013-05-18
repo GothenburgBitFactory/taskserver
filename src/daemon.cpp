@@ -763,6 +763,13 @@ int command_server (Config& config, const std::vector <std::string>& args)
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
   }
 
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
+  }
+
   // Verify that root exists.
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");

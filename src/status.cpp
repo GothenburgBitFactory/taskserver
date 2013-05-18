@@ -83,15 +83,24 @@ int command_status (Config& config, const std::vector <std::string>& args)
 //  taskd_resume (config);
 
   bool verbose = true;
+  bool debug = false;
   std::string root;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--data",  *i, 3))   root     = *(++i);
+         if (closeEnough ("--debug",  *i, 3))  debug    = true;
+    else if (closeEnough ("--data",  *i, 3))   root     = *(++i);
     else if (closeEnough ("--quiet", *i, 3))   verbose  = false;
     else if (taskd_applyOverride (config, *i)) ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
+  }
+
+  if (root == "")
+  {
+    char* root_env = getenv ("TASKDDATA");
+    if (root_env)
+      root = root_env;
   }
 
   // Preserve the verbose setting for this run.

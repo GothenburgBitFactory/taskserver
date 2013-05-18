@@ -44,7 +44,7 @@ int command_client (Config& config, const std::vector <std::string>& args)
 {
   // Parse arguments.
   if (args.size () < 3)
-    throw std::string ("ERROR: Usage:  taskd client <host:post> <file>");
+    throw std::string ("ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]");
 
   config.set ("server", args[1]);
 
