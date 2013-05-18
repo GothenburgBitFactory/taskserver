@@ -54,7 +54,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("config", args[1], 3))
     {
       std::cout << "\n"
-                << "taskd config [<name> [<value>]]\n"
+                << "taskd config [options] [<name> [<value>]]\n"
                 << "\n"
                 << "Displays or modifies a configuration variable value.\n"
                 << "\n"
@@ -73,6 +73,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
                 << "  --debug        Debug mode generates lots of diagnostics\n"
+                << "  --force        Do not ask for confirmation of changes\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "\n";
@@ -193,7 +194,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "       taskd add [options] org <org>\n"
               << "       taskd add [options] group <org> <group>\n"
               << "       taskd add [options] user <org> <user>\n"
-              << "       taskd config [<name> [<value>]]\n"
+              << "       taskd config [options] [<name> [<value>]]\n"
               << "       taskd init --data <root> [--debug] [options]\n"
               << "       taskd remove --data <root> [options] org <org>\n"
               << "       taskd remove --data <root> [options] group <org> <group>\n"
@@ -214,6 +215,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "  --quiet        Turns off verbose output\n"
               << "  --NAME=VALUE   Temporary configuration override\n"
               << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
+              << "  --force        Do not ask for confirmation of changes\n"
               << "\n";
 
   return 0;

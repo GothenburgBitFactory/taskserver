@@ -44,11 +44,13 @@ int command_config (Config& config, const std::vector <std::string>& args)
   std::string name;
   std::string value;
   bool nonNull = false;
-  std::vector <std::string>::const_iterator i;                                                                                      
-  for (i = ++(args.begin ()); i != args.end (); ++i)                                                                                
-  {                                                                                                                                 
-         if (closeEnough ("--data", *i, 3))    root  = *(++i);
-    else if (taskd_applyOverride (config, *i)) ;                                                                               
+  bool confirmation = true;
+  std::vector <std::string>::const_iterator i;
+  for (i = ++(args.begin ()); i != args.end (); ++i)
+  {
+         if (closeEnough ("--data",  *i, 3))   root  = *(++i);
+    else if (closeEnough ("--force", *i, 3))   confirmation = false;
+    else if (taskd_applyOverride (config, *i)) ;
     else if (name == "")                       name = *i;
     else if (value == "")
     {
@@ -58,7 +60,7 @@ int command_config (Config& config, const std::vector <std::string>& args)
 
       value += *i;
     }
-  }                                                                                                                                 
+  }
 
   if (root == "")
   {
@@ -96,7 +98,8 @@ int command_config (Config& config, const std::vector <std::string>& args)
            comment > pos))
       {
         found = true;
-        if (confirm (format ("Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?",
+        if (!confirmation ||
+            confirm (format ("Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?",
                              name, config.get (name), value)))
         {
           if (comment != std::string::npos)
@@ -111,7 +114,8 @@ int command_config (Config& config, const std::vector <std::string>& args)
 
     // Not found, so append instead.
     if (!found &&
-        confirm (format ("Are you sure you want to add '{1}' with a value of '{2}'?", name, value)))
+        (!confirmation ||
+         confirm (format ("Are you sure you want to add '{1}' with a value of '{2}'?", name, value))))
     {
       contents.push_back (name + "=" + value);
       change = true;
@@ -150,7 +154,8 @@ int command_config (Config& config, const std::vector <std::string>& args)
         found = true;
 
         // Remove name
-        if (confirm (format ("Are you sure you want to remove '{1}'?", name)))
+        if (!confirmation ||
+            confirm (format ("Are you sure you want to remove '{1}'?", name)))
         {
           *line = "";
           change = true;

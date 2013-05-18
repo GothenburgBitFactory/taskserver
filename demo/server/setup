@@ -45,17 +45,17 @@ cp ../../pki/server.cert.pem $ROOT
 echo "# cp ../../pki/server.key.pem $ROOT"
 cp ../../pki/server.key.pem $ROOT
 
-echo "# taskd config --data $ROOT client.cert $ROOT/client.cert.pem"
-../../src/taskd config --data $ROOT client.cert $ROOT/client.cert.pem
-echo "# taskd config --data $ROOT server.cert $ROOT/server.cert.pem"
-../../src/taskd config --data $ROOT server.cert $ROOT/server.cert.pem
-echo "# taskd config --data $ROOT server.key $ROOT/server.key.pem"
-../../src/taskd config --data $ROOT server.key $ROOT/server.key.pem
+echo "# taskd config --force --data $ROOT client.cert $ROOT/client.cert.pem"
+../../src/taskd config --force --data $ROOT client.cert $ROOT/client.cert.pem
+echo "# taskd config --force --data $ROOT server.cert $ROOT/server.cert.pem"
+../../src/taskd config --force --data $ROOT server.cert $ROOT/server.cert.pem
+echo "# taskd config --force --data $ROOT server.key $ROOT/server.key.pem"
+../../src/taskd config --force --data $ROOT server.key $ROOT/server.key.pem
 
-echo "# taskd config --data $ROOT log $PWD/taskd.log"
-../../src/taskd config --data $ROOT log $PWD/taskd.log
-echo "# taskd config --data $ROOT pid.file $PWD/taskd.pid"
-../../src/taskd config --data $ROOT pid.file $PWD/taskd.pid
+echo "# taskd config --force --data $ROOT log $PWD/taskd.log"
+../../src/taskd config --force --data $ROOT log $PWD/taskd.log
+echo "# taskd config --force --data $ROOT pid.file $PWD/taskd.pid"
+../../src/taskd config --force --data $ROOT pid.file $PWD/taskd.pid
 
 echo
 tree $ROOT

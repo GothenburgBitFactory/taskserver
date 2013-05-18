@@ -20,21 +20,21 @@ which can be extended via plugins to add functionality.
 The commands are:
 
 .TP
-.B taskd init --data <root> [OPTIONS]
+.B taskd init --data <root> [options]
 Performs a one-time initialization of the task server instance.  Creates the
 bare data structure.
 
 .TP
-.B taskd help <command> [OPTIONS]
+.B taskd help <command> [options]
 
 .TP
-.B taskd config [<name> [<value>]]
+.B taskd config [options] [<name> [<value>]]
 
 .TP
-.B taskd status [OPTIONS]
+.B taskd status [options]
 
 .TP
-.B taskd server [OPTIONS]
+.B taskd server [options]
 Starts the daemon.
 
 .TP
@@ -77,8 +77,16 @@ Most commands support the following options:
 Temporary configuration override.
 
 .TP
+.B --force
+Does not ask for confirmation of changes.
+
+.TP
 .B --quiet
 Suppresses verbose output.
+
+.TP
+.B --debug
+Shows debugging information.
 
 .SH CONFIGURATION
 Configuration files can be found ...
