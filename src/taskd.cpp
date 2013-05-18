@@ -163,7 +163,13 @@ int main (int argc, const char** argv)
 
       catch (std::string& error)
       {
-        std::cout << error << "\n";
+        if (error == "usage")
+        {
+          std::vector <std::string> no_args;
+          command_help (config, no_args);
+        }
+        else
+          std::cout << error << "\n";
         status = -1;
       }
 
