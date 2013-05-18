@@ -28,10 +28,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 15;
 
 # Create the data dir.
-my $data = 'add_user.data';
+my $data = 'resume_user.data';
 qx{mkdir $data};
 ok (-d $data, "Created $data");
 
@@ -52,7 +52,17 @@ $output = qx{../src/taskd add --data $data user ORG USER 2>&1};
 unlike ($output, qr/^ERROR/,         "'taskd add --data $data user ORG USER' - no errors");
 ok (-d $data.'/orgs/ORG/users/USER', "'$data/orgs/ORG/users/USER' dir exists");
 
-# TODO Test that user key is generated.
+# Suspend user.
+$output = qx{../src/taskd suspend --data $data user ORG USER 2>&1};
+unlike ($output, qr/^ERROR/,         "'taskd suspend --data $data user ORG USER' - no errors");
+ok (-f $data.'/orgs/ORG/users/USER/suspended',
+                                     "'$data/orgs/ORG/users/USER/suspended' file exists");
+
+# Resume user.
+$output = qx{../src/taskd resume --data $data user ORG USER 2>&1};
+unlike ($output, qr/^ERROR/,         "'taskd resume --data $data user ORG USER' - no errors");
+ok (! -f $data.'/orgs/ORG/users/USER/suspended',
+                                     "'$data/orgs/ORG/users/USER/suspended' file gone");
 
 # Cleanup.
 qx{rm -rf $data};

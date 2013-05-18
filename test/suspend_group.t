@@ -28,10 +28,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 13;
 
 # Create the data dir.
-my $data = '/tmp/suspend_org.data';
+my $data = 'suspend_group.data';
 qx{mkdir $data};
 ok (-d $data, "Created $data");
 
@@ -42,27 +42,21 @@ ok (-d $data.'/orgs',                  "'$data/orgs' dir exists");
 
 # Simple organization.
 $output = qx{../src/taskd add --data $data org ORG 2>&1};
-unlike ($output, qr/^ERROR/,           "'taskd add --data $data org ...' - no errors");
+unlike ($output, qr/^ERROR/,           "'taskd add --data $data org ORG' - no errors");
 ok (-d $data.'/orgs/ORG',              "'$data/orgs/ORG' dir exists");
 ok (-d $data.'/orgs/ORG/groups',       "'$data/orgs/ORG/groups' dir exists");
 ok (-d $data.'/orgs/ORG/users',        "'$data/orgs/ORG/users' dir exists");
 
 # Simple group.
 $output = qx{../src/taskd add --data $data group ORG GROUP 2>&1};
-unlike ($output, qr/^ERROR/,           "'taskd add --data $data group ...' - no errors");
+unlike ($output, qr/^ERROR/,           "'taskd add --data $data group ORG GROUP' - no errors");
 ok (-d $data.'/orgs/ORG/groups/GROUP', "'$data/orgs/ORG/groups/GROUP' dir exists");
 
 # Suspend group.
 $output = qx{../src/taskd suspend --data $data group ORG GROUP 2>&1};
-unlike ($output, qr/^ERROR/,           "'taskd suspend --data $data group ...' - no errors");
+unlike ($output, qr/^ERROR/,           "'taskd suspend --data $data group ORG GROUP' - no errors");
 ok (-f $data.'/orgs/ORG/groups/GROUP/suspended',
                                        "'$data/orgs/ORG/groups/GROUP/suspended' file exists");
-
-# Resume group.
-$output = qx{../src/taskd resume --data $data group ORG GROUP 2>&1};
-unlike ($output, qr/^ERROR/,           "'taskd resume --data $data group ...' - no errors");
-ok (! -f $data.'/orgs/ORG/groups/GROUP/suspended',
-                                       "'$data/orgs/ORG/groups/GROUP/suspended' file gone");
 
 # Cleanup.
 qx{rm -rf $data};

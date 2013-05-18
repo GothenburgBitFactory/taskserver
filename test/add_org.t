@@ -31,7 +31,7 @@ use warnings;
 use Test::More tests => 13;
 
 # Create the data dir.
-my $data = '/tmp/add_org.data';
+my $data = 'add_org.data';
 qx{mkdir $data};
 ok (-d $data, "Created $data");
 
@@ -42,14 +42,14 @@ ok (-d $data.'/orgs',                "'$data/orgs' dir exists");
 
 # Simple organization.
 $output = qx{../src/taskd add --data $data org ORG 2>&1};
-unlike ($output, qr/^ERROR/,         "'taskd add --data $data' - no errors");
+unlike ($output, qr/^ERROR/,         "'taskd add --data $data org ORG' - no errors");
 ok (-d $data.'/orgs/ORG',            "'$data/orgs/ORG' dir exists");
 ok (-d $data.'/orgs/ORG/groups',     "'$data/orgs/ORG/groups' dir exists");
 ok (-d $data.'/orgs/ORG/users',      "'$data/orgs/ORG/users' dir exists");
 
 # Organization with a space in the name.
 $output = qx{../src/taskd add --data $data org 'one two' 2>&1};
-unlike ($output, qr/^ERROR/,         "'taskd add --data $data' - no errors");
+unlike ($output, qr/^ERROR/,         "'taskd add --data $data org \'one two\'' - no errors");
 ok (-d $data.'/orgs/one two',        "'$data/orgs/one two' dir exists");
 ok (-d $data.'/orgs/one two/groups', "'$data/orgs/one two/groups' dir exists");
 ok (-d $data.'/orgs/one two/users',  "'$data/orgs/one two/users' dir exists");

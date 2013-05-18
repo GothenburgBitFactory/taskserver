@@ -31,7 +31,7 @@ use warnings;
 use Test::More tests => 11;
 
 # Create the data dir.
-my $data = '/tmp/add_group.data';
+my $data = 'add_group.data';
 qx{mkdir $data};
 ok (-d $data, "Created $data");
 
