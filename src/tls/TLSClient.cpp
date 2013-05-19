@@ -75,11 +75,12 @@ void TLSClient::limit (int max)
 ////////////////////////////////////////////////////////////////////////////////
 // Calling this method results in all subsequent socket traffic being sent to
 // std::cout, labelled with >>> for outgoing, <<< for incoming.
-void TLSClient::debug ()
+void TLSClient::debug (int level)
 {
   _debug = true;
+
   gnutls_global_set_log_function (gnutls_log_function);
-  gnutls_global_set_log_level (LOG_LEVEL);
+  gnutls_global_set_log_level (level);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +101,7 @@ void TLSClient::init (const std::string& ca)
     if (ret == GNUTLS_E_INVALID_REQUEST)
       std::cout << "c: ERROR Priority error at: " << err << "\n";
 
-    exit (1);
+    throw std::string ("Error initializing TLS.");
   }
 
   // Apply the x509 credentials to the current session.
@@ -111,8 +112,7 @@ void TLSClient::init (const std::string& ca)
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
   // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints;
-  memset (&hints, 0, sizeof hints);
+  struct addrinfo hints = {0};
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_PASSIVE; // use my IP
@@ -150,7 +150,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   if (p == NULL)
     throw "ERROR: Could not connect to " + host + " " + port;
 
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) _socket);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) _socket);
 
   // Perform the TLS handshake
   int ret = gnutls_handshake (_session);

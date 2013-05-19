@@ -30,6 +30,7 @@
 #include <iostream>
 #include <TLSServer.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/errno.h>
 #include <sys/types.h>
@@ -80,11 +81,12 @@ void TLSServer::queue (int depth)
 ////////////////////////////////////////////////////////////////////////////////
 // Calling this method results in all subsequent socket traffic being sent to
 // std::cout, labelled with >>> for outgoing, <<< for incoming.
-void TLSServer::debug ()
+void TLSServer::debug (int level)
 {
   _debug = true;
+
   gnutls_global_set_log_function (gnutls_log_function);
-  gnutls_global_set_log_level (LOG_LEVEL);
+  gnutls_global_set_log_level (level);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +218,7 @@ void TLSTransaction::init (TLSServer& server)
             << "\n";
 
 
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
 
   // Key exchange.
   int ret = gnutls_handshake (_session);

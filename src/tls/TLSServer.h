@@ -40,7 +40,7 @@ public:
   TLSServer ();
   ~TLSServer ();
   void queue (int);
-  void debug ();
+  void debug (int);
   void init (/*const std::string&, const std::string&,*/ const std::string&, const std::string&);
   void bind (const std::string&);
   void listen ();
