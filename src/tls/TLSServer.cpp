@@ -218,13 +218,15 @@ void TLSTransaction::init (TLSServer& server)
   if (sd < 0)
     throw "ERROR: " + std::string (::strerror (errno));
 
+  // Obtain client info.
   char topbuf[512];
+  _address = inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf, sizeof (topbuf));
+  _port    = ntohs (sa_cli.sin_port);
   std::cout << "s: INFO connection from "
-            << inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf, sizeof (topbuf))
+            << _address
             << " port "
-            << ntohs (sa_cli.sin_port)
+            << _port
             << "\n";
-
 
   gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
 
@@ -371,6 +373,13 @@ void TLSTransaction::recv (std::string& data)
               << data.c_str ()
               << "' (" << total << " bytes)"
               << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void TLSTransaction::getClient (std::string& address, int& port)
+{
+  address = _address;
+  port = _port;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

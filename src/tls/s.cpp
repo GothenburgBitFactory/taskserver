@@ -5,7 +5,7 @@ int main (void)
 {
   // This is a sample TLS 1.0 echo server, using X.509 authentication.
   TLSServer server;
-  server.debug (3);
+  server.debug (0);
   server.init (/*"../../pki/ca.cert.pem",      // CA
                "../../pki/server.crl.pem",*/   // CRL
                "../../pki/server.cert.pem",  // Cert
@@ -20,7 +20,7 @@ int main (void)
 
     std::string request;
     tx.recv (request);
-    std::cout << request << "\n";
+    std::cout << "s: '" << request << "'\n";
     tx.send (request);  // Echo back.
     tx.bye ();
   }
