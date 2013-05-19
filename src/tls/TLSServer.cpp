@@ -80,10 +80,11 @@ void TLSServer::queue (int depth)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Calling this method results in all subsequent socket traffic being sent to
-// std::cout, labelled with >>> for outgoing, <<< for incoming.
+// std::cout, labelled with 's: ...'.
 void TLSServer::debug (int level)
 {
-  _debug = true;
+  if (level)
+    _debug = true;
 
   gnutls_global_set_log_function (gnutls_log_function);
   gnutls_global_set_log_level (level);
@@ -158,7 +159,8 @@ void TLSServer::listen ()
   if (::listen (_socket, _queue) < 0)
     throw "ERROR: " + std::string (::strerror (errno));
 
-  std::cout << "s: INFO Server listening.\n";
+  if (_debug)
+    std::cout << "s: INFO Server listening.\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,11 +224,12 @@ void TLSTransaction::init (TLSServer& server)
   char topbuf[512];
   _address = inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf, sizeof (topbuf));
   _port    = ntohs (sa_cli.sin_port);
-  std::cout << "s: INFO connection from "
-            << _address
-            << " port "
-            << _port
-            << "\n";
+  if (_debug)
+    std::cout << "s: INFO connection from "
+              << _address
+              << " port "
+              << _port
+              << "\n";
 
   gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
 
@@ -236,13 +239,15 @@ void TLSTransaction::init (TLSServer& server)
   {
     close (sd);
     gnutls_deinit (_session);
-    std::cout << "s: ERROR Handshake has failed ("
-              << gnutls_strerror (ret)
-              << ")\n\n";
+    if (_debug)
+      std::cout << "s: ERROR Handshake has failed ("
+                << gnutls_strerror (ret)
+                << ")\n\n";
     return;
   }
 
-  std::cout << "s: INFO Handshake was completed\n";
+  if (_debug)
+    std::cout << "s: INFO Handshake was completed\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +258,7 @@ void TLSTransaction::bye ()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Calling this method results in all subsequent socket traffic being sent to
-// std::cout, labelled with >>> for outgoing, <<< for incoming.
+// std::cout, labelled with 's: ...'.
 void TLSTransaction::debug ()
 {
   _debug = true;
@@ -327,7 +332,8 @@ void TLSTransaction::recv (std::string& data)
                            (header[1]<<16) |
                            (header[2]<<8) |
                             header[3];
-  std::cout << "s: INFO expecting " << expected << " bytes.\n";
+  if (_debug)
+    std::cout << "s: INFO expecting " << expected << " bytes.\n";
 
   // TODO This would be a good place to assert 'expected < _limit'.
 
@@ -350,7 +356,8 @@ void TLSTransaction::recv (std::string& data)
     // Other end closed the connection.
     if (received == 0)
     {
-      std::cout << "s: INFO Peer has closed the TLS connection\n";
+      if (_debug)
+        std::cout << "s: INFO Peer has closed the TLS connection\n";
       break;
     }
 
