@@ -126,8 +126,7 @@ void TLSServer::init (
 void TLSServer::bind (const std::string& port)
 {
   // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints;
-  memset (&hints, 0, sizeof hints);
+  struct addrinfo hints = {0};
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_PASSIVE; // use my IP
@@ -210,9 +209,18 @@ void TLSTransaction::init (TLSServer& server)
   // webservers that need to trade security for compatibility
   gnutls_session_enable_compatibility_mode (_session);
 
-  struct sockaddr_in sa_cli;
-  int client_len = sizeof (sa_cli);
-  int sd = accept (server._socket, (struct sockaddr *) &sa_cli, (socklen_t*) &client_len);
+  struct sockaddr_in sa_cli = {0};
+  socklen_t client_len = sizeof sa_cli;
+  int sd;
+  do
+  {
+    sd = accept (server._socket, (struct sockaddr *) &sa_cli, &client_len);
+  }
+  while (errno == EINTR);
+
+  if (sd < 0)
+    throw "ERROR: " + std::string (::strerror (errno));
+
   char topbuf[512];
   std::cout << "s: INFO connection from "
             << inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf, sizeof (topbuf))

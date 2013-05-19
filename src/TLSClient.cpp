@@ -159,7 +159,6 @@ void TLSClient::connect (const std::string& host, const std::string& port)
 
   // Perform the TLS handshake
   int ret = gnutls_handshake (_session);
-
   if (ret < 0)
   {
     std::cout << "c: ERROR Handshake failed\n";
