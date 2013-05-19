@@ -173,36 +173,9 @@ void Server::beginServer ()
       TLSTransaction tx;
       server.accept (tx);
 
-/*
       // Get client address and port, for logging.
       if (_log_clients)
-      {
-        struct sockaddr_storage addr;
-        socklen_t len = sizeof (addr);
-        char ipstr[INET6_ADDRSTRLEN];
-
-        _client_address = "-";
-        if (!getpeername (client, (struct sockaddr*) &addr, &len))
-        {
-          // deal with both IPv4 and IPv6:
-          if (addr.ss_family == AF_INET)
-          {
-            struct sockaddr_in *s = (struct sockaddr_in *) &addr;
-            _client_port = ntohs (s->sin_port);
-            inet_ntop (AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
-          }
-          // AF_INET6
-          else
-          {
-            struct sockaddr_in6 *s = (struct sockaddr_in6 *) &addr;
-            _client_port = ntohs (s->sin6_port);
-            inet_ntop (AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
-          }
-
-          _client_address = ipstr;
-        }
-      }
-*/
+        tx.getClient (_client_address, _client_port);
 
       // Metrics.
       HighResTimer timer;

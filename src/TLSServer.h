@@ -73,12 +73,15 @@ public:
   void limit (int);
   void send (const std::string&);
   void recv (std::string&);
+  void getClient (std::string&, int&);
 
 private:
   int              _socket;
   gnutls_session_t _session;
   int              _limit;
   bool             _debug;
+  std::string      _address;
+  int              _port;
 };
 
 #endif

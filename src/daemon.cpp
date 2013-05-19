@@ -659,7 +659,7 @@ void Daemon::zipper_walk (
       prev_r = iter_r;
       ++iter_r;
     }
-  } 
+  }
 
   while (iter_l != left.end ())
   {
