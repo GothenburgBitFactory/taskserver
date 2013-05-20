@@ -456,7 +456,7 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Read server data: %u line(s)", _txn_count, data.size ());
+  _log->format ("[%d] Read server data: %uln", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -474,7 +474,7 @@ void Daemon::append_server_data (
 
   user_data.append (data);
 
-  _log->format ("[%d] Appended %u line(s) to server data", _txn_count, data.size ());
+  _log->format ("[%d] Appended %uln to server data", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -521,7 +521,7 @@ void Daemon::extract_subset (
       if (data[i][0] == '[')
         subset.push_back (Task (data[i]));
 
-  _log->format ("[%d] Subset: %u line(s) after branch point", _txn_count, subset.size ());
+  _log->format ("[%d] Subset: %uln after branch point", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
