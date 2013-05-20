@@ -53,6 +53,7 @@ static void gnutls_log_function (int level, const char* message)
 TLSClient::TLSClient ()
 : _ca ("")
 , _socket (0)
+, _limit (0)
 , _debug (false)
 {
 }

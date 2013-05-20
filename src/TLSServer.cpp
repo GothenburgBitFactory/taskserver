@@ -180,6 +180,8 @@ TLSTransaction::TLSTransaction ()
 : _socket (0)
 , _limit (0)
 , _debug (false)
+, _address ("")
+, _port (0)
 {
 }
 
