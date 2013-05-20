@@ -1,5 +1,8 @@
 /* cmake.h.in. Creates cmake.h during a cmake run */
 
+/* Product identification */
+#define PRODUCT_TASKSERVER 1
+
 /* Package information */
 #define PACKAGE           "${PACKAGE}"
 #define VERSION           "${VERSION}"
@@ -11,6 +14,10 @@
 
 /* Installation details */
 #define TASKD_EXTDIR "${CMAKE_INSTALL_PREFIX}/${TASKD_EXTDIR}"
+
+/* Localization */
+#define PACKAGE_LANGUAGE  ${PACKAGE_LANGUAGE}
+#define LANGUAGE_EN_US ${LANGUAGE_EN_US}
 
 /* git information */
 #cmakedefine HAVE_COMMIT

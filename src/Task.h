@@ -28,11 +28,15 @@
 #ifndef INCLUDED_TASK
 #define INCLUDED_TASK
 
+#include <cmake.h>
 #include <vector>
 #include <map>
 #include <string>
 #include <stdio.h>
-#include <cmake.h>
+
+#ifdef PRODUCT_TASKWARRIOR
+void initializeUrgencyCoefficients ();
+#endif
 
 class Task : public std::map <std::string, std::string>
 {
@@ -46,31 +50,106 @@ public:
 
   void parse (const std::string&);
   std::string composeF4 () const;
+#ifdef PRODUCT_TASKWARRIOR
+  std::string composeJSON (bool decorate = false) const;
+#endif
 
   // Status values.
   enum status {pending, completed, deleted, recurring, waiting};
 
   // Public data.
   int id;
+  float urgency_value;
+  bool recalc_urgency;
+
+  bool is_blocked;
+  bool is_blocking;
+
+  int annotation_count;
 
   // Series of helper functions.
   static status textToStatus (const std::string&);
   static std::string statusToText (status);
 
+  void setEntry ();
+  void setEnd ();
+  void setStart ();
   void setModified ();
 
   bool has (const std::string&) const;
   std::vector <std::string> all ();
   const std::string get (const std::string&) const;
+  const std::string& get_ref (const std::string&) const;
+  int get_int (const std::string&) const;
+  unsigned long get_ulong (const std::string&) const;
   time_t get_date (const std::string&) const;
   void set (const std::string&, const std::string&);
   void set (const std::string&, int);                                           
   void remove (const std::string&);
 
+#ifdef PRODUCT_TASKWARRIOR
+  bool is_due () const;
+  bool is_duetoday () const;
+  bool is_overdue () const;
+#endif
+
   status getStatus () const;
   void setStatus (status);
 
-  void validate ();
+  int getTagCount () const;
+  bool hasTag (const std::string&) const;
+  void addTag (const std::string&);
+  void addTags (const std::vector <std::string>&);
+  void getTags (std::vector<std::string>&) const;
+  void removeTag (const std::string&);
+
+  bool hasAnnotations () const;
+  void getAnnotations (std::map <std::string, std::string>&) const;
+  void setAnnotations (const std::map <std::string, std::string>&);
+  void addAnnotation (const std::string&);
+  void removeAnnotations ();
+
+#ifdef PRODUCT_TASKWARRIOR
+  void addDependency (int);
+  void addDependency (const std::string&);
+  void removeDependency (int);
+  void removeDependency (const std::string&);
+  void getDependencies (std::vector <int>&) const;
+  void getDependencies (std::vector <std::string>&) const;
+
+  void getUDAs (std::vector <std::string>&) const;
+  void getUDAOrphans (std::vector <std::string>&) const;
+
+  void substitute (const std::string&, const std::string&, bool);
+#endif
+
+  void validate (bool applyDefault = true);
+
+#ifdef PRODUCT_TASKWARRIOR
+  float urgency_c () const;
+  float urgency ();
+#endif
+
+private:
+  int determineVersion (const std::string&);
+  void parseJSON (const std::string&);
+  void parseLegacy (const std::string&);
+  void validate_before (const std::string&, const std::string&);
+
+#ifdef PRODUCT_TASKWARRIOR
+  inline float urgency_priority () const;
+  inline float urgency_project () const;
+  inline float urgency_active () const;
+  inline float urgency_scheduled () const;
+  inline float urgency_waiting () const;
+  inline float urgency_blocked () const;
+  inline float urgency_annotations () const;
+  inline float urgency_tags () const;
+  inline float urgency_next () const;
+  inline float urgency_due () const;
+  inline float urgency_blocking () const;
+  inline float urgency_age () const;
+#endif
 };
 
 #endif
