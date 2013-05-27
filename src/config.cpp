@@ -81,6 +81,8 @@ int command_config (Config& config, const std::vector <std::string>& args)
   config.load (root_dir._data + "/config");
   config.set ("root", root_dir._data);
 
+  // taskd config <name> <value>
+  // - set <name> to <value>
   if (name != "" && nonNull)
   {
     bool change = false;
@@ -136,6 +138,9 @@ int command_config (Config& config, const std::vector <std::string>& args)
     else
       std::cout << "No changes made.\n";
   }
+
+  // taskd config <name>
+  // - remove <name>
   else if (name != "")
   {
     // Read .taskd/config
@@ -182,19 +187,12 @@ int command_config (Config& config, const std::vector <std::string>& args)
       std::cout << "No changes made.\n";
   }
 
+  // taskd config
+  // - list all settings.
   else
   {
     std::cout << "\nConfiguration read from " << config._original_file._data << "\n\n";
-
-    std::vector <std::string> names;
-    config.all (names);
-    std::map <std::string, std::string> data;
-
-    std::vector <std::string>::iterator i;
-    for (i = names.begin (); i != names.end (); ++i)
-      data[*i] = config.get (*i);
-
-    taskd_renderMap (data, "Variable", "Value");
+    taskd_renderMap (config, "Variable", "Value");
   }
 
   return status;
