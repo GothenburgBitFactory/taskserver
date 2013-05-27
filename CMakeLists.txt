@@ -104,6 +104,15 @@ check_function_exists (get_current_dir_name HAVE_GET_CURRENT_DIR_NAME)
 check_struct_has_member ("struct tm"   tm_gmtoff    time.h                   HAVE_TM_GMTOFF)
 check_struct_has_member ("struct stat" st_birthtime "sys/types.h;sys/stat.h" HAVE_ST_BIRTHTIME)
 
+# Set the package language.
+if (LANGUAGE)
+  set (PACKAGE_LANGUAGE ${LANGUAGE})
+else (LANGUAGE)
+  set (PACKAGE_LANGUAGE 1)
+endif (LANGUAGE)
+
+set (LANGUAGE_EN_US 1)
+
 message ("-- Configuring cmake.h")
 configure_file (
   ${CMAKE_SOURCE_DIR}/cmake.h.in
