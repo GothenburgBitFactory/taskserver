@@ -37,6 +37,7 @@
 #include <Date.h>
 #include <Color.h>
 #include <Log.h>
+#include <Task.h>
 #include <text.h>
 #include <taskd.h>
 
@@ -336,7 +337,7 @@ bool taskd_sendMessage (
 */
     client.init (config.get ("client.cert"));
     client.connect (server, port);
-  
+
     client.send (out.serialize () + "\n");
 
     std::string response;
@@ -379,7 +380,7 @@ bool taskd_sendMessage (
 */
     client.init (config.get ("client.cert"));
     client.connect (server, port);
-  
+
     client.send (out.serialize () + "\n");
 
     std::string response;
@@ -489,6 +490,34 @@ std::string taskd_error (const int code)
       return errors[i].error;
 
   return "[Missing error code]";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void taskd_staticInitialize ()
+{
+  // List is corrected as of 2.3.0.
+  // Note: annotation_* fields are missing, and are assumed to be 'string'
+  // Note: UDA fields are missing, and are assumed to be 'string'
+
+  Task::attributes["depends"]     = "string";
+  Task::attributes["description"] = "string";
+  Task::attributes["due"]         = "date";
+  Task::attributes["end"]         = "date";
+  Task::attributes["entry"]       = "date";
+  Task::attributes["imask"]       = "numeric";
+  Task::attributes["mask"]        = "string";
+  Task::attributes["modified"]    = "date";
+  Task::attributes["parent"]      = "string";
+  Task::attributes["priority"]    = "string";
+  Task::attributes["project"]     = "string";
+  Task::attributes["recur"]       = "duration";
+  Task::attributes["scheduled"]   = "date";
+  Task::attributes["start"]       = "date";
+  Task::attributes["status"]      = "string";
+  Task::attributes["tags"]        = "string";
+  Task::attributes["until"]       = "date";
+  Task::attributes["uuid"]        = "string";
+  Task::attributes["wait"]        = "date";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
