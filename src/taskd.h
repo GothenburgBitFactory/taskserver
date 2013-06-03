@@ -73,6 +73,8 @@ bool taskd_is_user  (const Directory&root, const std::string&, const std::string
 
 std::string taskd_error (const int);
 
+void taskd_staticInitialize ();
+
 // list template
 ///////////////////////////////////////////////////////////////////////////////
 template <class T> bool listDiff (const T& left, const T& right)

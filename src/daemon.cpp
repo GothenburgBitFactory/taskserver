@@ -68,7 +68,7 @@ private:
   unsigned int find_common_ancestor (const std::vector <std::string>&, unsigned int, const std::string&) const;
   void get_client_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&) const;
   void get_server_mods (std::vector <Task>&, const std::vector <std::string>&, const std::string&, unsigned int) const;
-  void zipper_walk (const std::vector <Task>&, const std::vector <Task>&, Task&) const;
+  void merge_sort (const std::vector <Task>&, const std::vector <Task>&, Task&) const;
   time_t last_modification (const Task&) const;
   void patch (Task&, const Task&, const Task&) const;
 
@@ -334,12 +334,12 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
       // Merge sort between client_mods and server_mods, patching ancestor.
       Task combined (server_data[common_ancestor]);
-      zipper_walk (client_mods, server_mods, combined);
-      std::string combined_F4 = trimRight (combined.composeF4 (), "\n");
+      merge_sort (client_mods, server_mods, combined);
+      std::string combined_JSON = combined.composeJSON ();
 
       // Append combined task to client and server data, if not already there.
-      new_server_data.push_back (combined_F4);
-      new_client_data.push_back (combined_F4);
+      new_server_data.push_back (combined_JSON);
+      new_client_data.push_back (combined_JSON);
     }
     else
     {
@@ -367,7 +367,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     std::vector <std::string>::reverse_iterator i;
     for (i = server_data.rbegin (); i != server_data.rend (); ++i)
-      if ((*i)[0] != '[')
+      if ((*i)[0] != '{')
       {
         new_client_key = *i;
         break;
@@ -427,7 +427,7 @@ void Daemon::parse_payload (
   {
     if (*i != "")
     {
-      if ((*i)[0] == '[')
+      if ((*i)[0] == '{')
         data.push_back (*i);
       else
         key = *i;
@@ -518,7 +518,7 @@ void Daemon::extract_subset (
 {
   if (branch_point < data.size ())
     for (unsigned int i = branch_point; i < data.size (); ++i)
-      if (data[i][0] == '[')
+      if (data[i][0] == '{')
         subset.push_back (Task (data[i]));
 
   _log->format ("[%d] Subset: %uln after branch point", _txn_count, subset.size ());
@@ -547,7 +547,7 @@ std::string Daemon::generate_payload (
 
   std::vector <Task>::const_iterator t;
   for (t = subset.begin (); t != subset.end (); ++t)
-    payload += t->composeF4 ();
+    payload += t->composeJSON () + "\n";
 
   std::vector <std::string>::const_iterator s;
   for (s = additions.begin (); s != additions.end (); ++s)
@@ -568,7 +568,7 @@ unsigned int Daemon::find_common_ancestor (
 {
   for (int i = (int) branch_point; i >= 0; --i)
   {
-    if (data[i][0] == '[')
+    if (data[i][0] == '{')
     {
       Task t (data[i]);
       if (t.get ("uuid") == uuid)
@@ -590,7 +590,7 @@ void Daemon::get_client_mods (
   std::vector <std::string>::const_iterator line;
   for (line = data.begin (); line != data.end (); ++line)
   {
-    if ((*line)[0] == '[')
+    if ((*line)[0] == '{')
     {
       Task t (*line);
       if (t.get ("uuid") == uuid)
@@ -610,7 +610,7 @@ void Daemon::get_server_mods (
 {
   for (unsigned int i = ancestor + 1; i < data.size (); ++i)
   {
-    if (data[i][0] == '[')
+    if (data[i][0] == '{')
     {
       Task t (data[i]);
       if (t.get ("uuid") == uuid)
@@ -622,9 +622,7 @@ void Daemon::get_server_mods (
 ////////////////////////////////////////////////////////////////////////////////
 // Simultaneously walks two lists, select either the left or the right depending
 // on last modification time.
-//
-// What a horrible name.
-void Daemon::zipper_walk (
+void Daemon::merge_sort (
   const std::vector <Task>& left,
   const std::vector <Task>& right,
   Task& combined) const
@@ -677,7 +675,7 @@ void Daemon::zipper_walk (
     ++iter_r;
   }
 
-  _log->format ("[%d] Zipper result %s", _txn_count, combined.composeF4 ().c_str ());
+  _log->format ("[%d] Zipper result %s", _txn_count, combined.composeJSON ().c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -786,6 +784,9 @@ int command_server (Config& config, const std::vector <std::string>& args)
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);
   config.set ("debug", debug);
+
+  // Provide a set of attribute types.
+  taskd_staticInitialize ();
 
   Log log;
 
