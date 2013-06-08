@@ -188,8 +188,8 @@ scheduled
       | tags              | String  |
       | priority          | String  |
       | depends           | String  |
-modified
-scheduled
+      | modified          | Date    |
+      | scheduled         | Date    |
       +-------------------+---------+
 
    There are other forms, which are conditional upon the state of a task:
