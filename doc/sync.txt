@@ -25,19 +25,19 @@ Abstract
 Table of Contents
 
    1      Introduction
-   1.1    Requirements
+   1.1      Requirements
    2      Problem Definition
-   2.1    Change Sequence
-   2.2    Deltas
+   2.1      Change Sequence
+   2.2      Deltas
    3      Use Case Classification
-   3.1    Two Branch Case
-   3.2    Two Branch, Multiple Changes Case
-   3.3    Two Branch Case Example
+   3.1      Two Branch Case
+   3.2      Two Branch, Multiple Changes Case
+   3.3      Two Branch Case Example
    4      Use Cases
-   4.1    Use Case 1: New Local Task
-   4.2    Use Case 2: Local Modification
-   4.3    Use Case 3: Local and Remote Modification
-   4.4    Use Case 4: Multiple Local and Remote Modifications
+   4.1      Use Case 1: New Local Task
+   4.2      Use Case 2: Local Modification
+   4.3      Use Case 3: Local and Remote Modification
+   4.4      Use Case 4: Multiple Local and Remote Modifications
    5      References
    6      Acknowledgements
    7      Authors' Addresses

@@ -29,7 +29,7 @@ Abstract
 Table of Contents
 
    1      Introduction
-   1.1    Requirements
+   1.1      Requirements
    2      Configuration
    3      Local Changes
    4      Sync Message

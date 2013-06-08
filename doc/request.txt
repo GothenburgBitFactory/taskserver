@@ -25,16 +25,16 @@ Abstract
 Table of Contents
 
    1      Introduction
-   1.1    Requirements
+   1.1      Requirements
    2      Messages
-   2.1    Message Format
-   2.2    Message Requirements
-   2.3    Authentication Data
-   2.4    Status Data
-   2.5    Payload
+   2.1      Message Format
+   2.2      Message Requirements
+   2.3      Authentication Data
+   2.4      Status Data
+   2.5      Payload
    3      Message Types
-   3.1    Message Type "sync"
-   3.2    Message Type "statistics"
+   3.1      Message Type "sync"
+   3.2      Message Type "statistics"
    4      References
    5      Acknowledgements
    6      Authors' Addresses

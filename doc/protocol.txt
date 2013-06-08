@@ -26,28 +26,20 @@ Abstract
 Table of Contents
 
    1      Introduction
-   1.1    Requirements
+   1.1      Requirements
    2      Protocol Overview
-   2.1    Link Level
-   2.2    Transactions
-   2.3    Message Format
-   2.4    Message Requirements
-   2.5    Auth Data
-   2.6    Status Data
-   2.7    Payload Data
-   2.8    Responsibilities of the Server
-   2.9    Responsibilities of the Client
-   3      Message Types
-   3.1    Message Type "stats"
-   3.2    Message Type "sync"
-   4      Extensions
-   5      Summary of Response Codes
-   6      Security Considerations
-   7      Limitations and Guidelines
-   8      References
-   9      Acknowledgements
-   10     Authors' Addresses
-   11     Full Copyright Statement
+   2.1      Link Level
+   2.2      Transactions
+   2.3      Responsibilities of the Server
+   2.4      Responsibilities of the Client
+   3      Extensions
+   4      Summary of Response Codes
+   5      Security Considerations
+   6      Limitations and Guidelines
+   7      References
+   8      Acknowledgements
+   9      Authors' Addresses
+   10     Full Copyright Statement
 
 
 1   Introduction
@@ -112,140 +104,11 @@ Table of Contents
    Each transaction is a single incoming message, with a single response
    message.  All communication therefore consists of a single 'send', followed
    by a single 'receive', then termination.  There are no sessions, and
-   no continuously open connections.
+   no continuously open connections.  The message format is described in the
+   "Task Server Message Format" [2] document.
 
 
-2.3  Message Format
-
-   This format is based on [RFC2822], 'Internet Message Format'.  Here is an
-   example of the format:
-
-      <SIZE>
-      name: value\n
-      name2: value2\n
-      \n
-      payload
-
-   There are three sections.  The first is the size, which is a 4-byte, big-
-   Endian, binary byte count of the length of the message, including the 4 bytes
-   for the size.
-
-   The header section is a set of name/value pairs separated by newline
-   characters (U+000D).  The name is separated from the value by ': ' (colon
-   U+003A, space U+0020)  The header section is terminated by two consecutive
-   newline (U+000D) characters.  All text is UTF8.
-
-   The payload section is arbitrary, and message type-speciific.
-
-   Here is a complete example of a 'sync' message:
-
-      <size>
-      type: sync
-      org: <organization>
-      user: <user>
-      key: <key>
-      version: task 2.3.0
-      protocol: v1
-
-      2e4685f8-34bc-4f9b-b7ed-399388e182e1
-      {"description":"Test data","entry":"20130602T002341Z","status":"pending"}
-
-   An example repsonse message might be:
-
-      <size>
-      type: response
-      version: taskd 0.9.0
-      protocol: v1
-      code: 200
-      status: Ok
-
-      45da7110-1bcc-4318-d33e-12267a774e0f
-
-   In the event of a status response that is a redirect, the client MUST reissue
-   the request with modified details.  Here is an example of a redirect
-   response:
-
-     <size>
-     type: response
-     version: taskd 0.9.0
-     protocol: v1
-     code: 301
-     status: Redirect
-     info: <server>:<port>
-
-
-2.4  Message Requirements
-
-   Messages SHALL contain particular headers.  Those are:
-
-      type
-      protocol
-      version
-
-   The 'type' value is message-specific.  The 'protocol' value should be 'v1'
-   (described in this document), or any subsequent published protocol.  The
-   'version' represent the sender's identifier, so that any special cases can be
-   handled.  The form of the 'version' value is:
-
-      <product identifier> <version number>
-
-   As an example:
-
-      taskwarrior 2.3.0
-
-
-2.5  Auth Data
-
-   Every request ticket from the client MUST contain "auth" information, which
-   involves these header lines:
-
-      org: <organization>
-      user: <user>
-      key: <key>
-
-   The user and org fields uniquely identify a user.
-
-   The key field is generated when a new account is set up.  It is a shared
-   secret, equivalent to a password, and should be protected.
-
-   Authentication failure can result in these errors:
-       430 Authentication failed
-       431 Account suspended
-
-
-2.6  Status Data
-
-   Every response ticket from taskd SHALL contain status data:
-
-      code: <code>
-      status: <status text>
-
-   The code is a numeric status indicator defined in section 5.
-
-   There is an optional error string if the server determines the need to go
-   beyond a simple code.  This string MUST be presented to the user, and will
-   contain essential feedback from the server.
-
-   There is an info string that MAY be presented to the user.  The info string
-   will contain non-essential feedback from the server.  An example of this
-   might be a message that the client version is no longer current.
-
-   The info string may contain the address of a redirected server, in the event
-   of a 301 status code.  Such a result will look like this:
-
-      code: 301
-      status: Redirect
-      info: <server>:<port>
-
-   Address may be a DNS name or an IP address.  Port is a positive integer.
-
-
-2.7  Payload Data
-
-   Payload data is optional, arbitrary and message type dependent.
-
-
-2.8  Responsibilities of the Server
+2.3  Responsibilities of the Server
 
    The server will maintain a set of transactions, in the original sequence,
    punctuated by sync keys which are UUIDs.  Each sync key represents a non-
@@ -257,7 +120,7 @@ Table of Contents
    clients may request a minimal set of changes since their last sync.
 
 
-2.9  Responsibilities of the Client
+2.4  Responsibilities of the Client
 
    All modifications to tasks (add, modify, done, delete ...) are recorded in
    the form of a fully-composed JSON-format [1] task.  The formatted task is
@@ -297,55 +160,13 @@ Table of Contents
    handled.
 
 
-3  Message Types
-
-   The task server supports several message types, thus providing a set of
-   primitives for use by clients.
-
-   It is expected that the number of supported ticket types will increase over
-   time.
-
-
-3.1  Message Type "stats"
-
-   The "stats" message type ...
-
-   TODO
-
-   The data returned by the stats message is subject to change depending upon
-   monitoring needs.  Data items will be added, but not removed.
-
-
-3.2  Message Type "sync"
-
-   The "sync" message always originates from the client, but is a two-way
-   process.  It is used to communicate additions and changes on both the client
-   and server.
-
-   Note that the task server sometimes modifies tasks independently of user-
-   initiated modification.  This can result in unexpected sync transfers.
-   There are many reasons why a server may modify a task, including:
-
-        - Another client modified the task
-        - Spelling automatically corrected
-        - A waiting task expired
-        - A new recurring task was generated
-
-   The client processes the response by iterating over the modified/added tasks
-   and according to UUID, the task either exists locally and is therefore a
-   remote modification, or does not exist locally and is therefore a remote
-   addition.
-
-
-4  Extensions
+3  Extensions
 
    This protocol was designed so that extensions to the protocol will take the
-   form of additional message types and status codes.  The task server protocol
-   specifically SHALL NOT modify message types after publication, and so there
-   is no need to version the message types.
+   form of additional message types and status codes.
 
 
-5  Summary of Response Codes
+4  Summary of Response Codes
 
    Status responses indicate the server's response to the last command received
    from the client.  The codes consist of a 3 digit numeric code.
@@ -385,7 +206,7 @@ Table of Contents
        400 Malformed data
        401 Unsupported encoding
        420 Server temporarily unavailable
-|      421 Server shutting down at operator request
+       421 Server shutting down at operator request
        430 Access denied
        431 Account suspended
        432 Account terminated
@@ -393,24 +214,24 @@ Table of Contents
        500 Syntax error in request
        501 Syntax error, illegal parameters
        502 Not implemented
-|      503 Command parameter not implemented
+       503 Command parameter not implemented
        504 Request too big
        531 Account terminated
 
 
-6  Security Considerations
+5  Security Considerations
 
    All communication with the task server uses SSL 3.0 or TLS 1.0, 1.1 or 1.2.
    Encryption is mandatory.  Data is never transmitted in plain text.
 
 
-7  Limitations and Guidelines
+6  Limitations and Guidelines
 
    Some limitations exists to reduce bandwidth and load on the server.  They
    are:
 
       A client may only connect to a single server.  Synchronization among a set
-      of servers is not currently supported.
+      of servers is not supported.
 
       A client should attempt to minimize data bandwidth usage by maintaining a
       local data store, and properly using sync keys.
@@ -419,10 +240,13 @@ Table of Contents
       requests.
 
 
-8  References
+7  References
  
    [1] Beckingham, P., Hernandez, F., "Taskwarrior Data Interchange Format
-        (JSON)", June 2013.
+        (JSON)", Version 1, June 2013.
+
+   [2] Beckingham, P., Hernandez, F., "Task Server Message Format", Version 1,
+        June 2013.
 
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
@@ -436,13 +260,13 @@ Table of Contents
    [RFC2822] Resnick, P., "Internet Message Format", April 2001.
 
 
-9  Acknowledgements
+8  Acknowledgements
 
    Thanks to Dirk Deimeke whose comments helped improve this document.
    Thanks to Wim Schuermann whose comments helped improve this document.
 
 
-10  Authors' Addresses
+9  Authors' Addresses
 
    Paul Beckingham
    Email: paul@yootabory.org
@@ -451,7 +275,7 @@ Table of Contents
    Email: fredde@yootabory.org
 
 
-11  Full Copyright Statement
+10  Full Copyright Statement
 
    Copyright 2010 - 2013, Göteborg Bit Factory.
    All rights reserved.

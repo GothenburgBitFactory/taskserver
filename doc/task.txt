@@ -26,37 +26,37 @@ Abstract
 Table of Contents
 
    1       Introduction
-   1.1     Requirements
+   1.1       Requirements
    2       General Format
-   2.1     Data Types
-   2.1.1   Data Type: String
-   2.1.2   Data Type: Literal String
-   2.1.3   Data Type: UUID
-   2.1.4   Data Type: Integer
-   2.1.5   Data Type: Date
-   2.1.6   Data Type: Duration
-   2.2     The Fields
-   2.3     Additional Fields
+   2.1       Data Types
+   2.1.1       Data Type: String
+   2.1.2       Data Type: Literal String
+   2.1.3       Data Type: UUID
+   2.1.4       Data Type: Integer
+   2.1.5       Data Type: Date
+   2.1.6       Data Type: Duration
+   2.2       The Fields
+   2.3       Additional Fields
    3       Field Details
-   3.1     Field: status
-   3.2     Field: uuid
-   3.3     Field: entry
-   3.4     Field: description
-   3.5     Field: start
-   3.6     Field: end
-   3.7     Field: due
-   3.8     Field: until
-   3.9     Field: wait
-   3.10    Field: recur
-   3.11    Field: mask
-   3.12    Field: imask
-   3.13    Field: parent
-   3.14    Field: annotation_<time>
-   3.15    Field: project
-   3.16    Field: tags
-   3.17    Field: priority
-   3.18    Field: depends
-   3.19    User Defined Attributes
+   3.1       Field: status
+   3.2       Field: uuid
+   3.3       Field: entry
+   3.4       Field: description
+   3.5       Field: start
+   3.6       Field: end
+   3.7       Field: due
+   3.8       Field: until
+   3.9       Field: wait
+   3.10      Field: recur
+   3.11      Field: mask
+   3.12      Field: imask
+   3.13      Field: parent
+   3.14      Field: annotation_<time>
+   3.15      Field: project
+   3.16      Field: tags
+   3.17      Field: priority
+   3.18      Field: depends
+   3.19      User Defined Attributes
 
 modification
 scheduled
