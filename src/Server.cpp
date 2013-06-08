@@ -58,6 +58,7 @@ Server::Server ()
   , _limit (0)        // Unlimited
   , _cert_file ()
   , _key_file ()
+  , _crl_file ()
 {
 }
 
@@ -125,6 +126,13 @@ void Server::setKeyFile (const std::string& file)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Server::setCRLFile (const std::string& file)
+{
+  if (_log) _log->format ("CRL %s", file.c_str ());
+  _crl_file = file;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Server::setLogClients (bool value)
 {
   if (_log) _log->format ("IP logging %s", (value ? "on" : "off"));
@@ -158,8 +166,8 @@ void Server::beginServer ()
   if (_config)
     server.debug (_config->getInteger ("debug.tls"));
 
-  server.init (/*"pki/ca.cert.pem",      // CA
-               "pki/server.crl.pem",*/   // CRL
+  server.init (/*"pki/ca.cert.pem",*/    // CA
+               _crl_file,                // CRL
                _cert_file,               // Cert
                _key_file);               // Key
   server.bind (_port);

@@ -839,6 +839,9 @@ int command_server (Config& config, const std::vector <std::string>& args)
     File key (config.get ("server.key"));
     server.setKeyFile (key._data);
 
+    File crl (config.get ("server.crl"));
+    server.setCRLFile (crl._data);
+
     server.beginServer ();
   }
 

@@ -50,6 +50,7 @@ public:
   void setLimit (int);
   void setCertFile (const std::string&);
   void setKeyFile (const std::string&);
+  void setCRLFile (const std::string&);
   void setLogClients (bool);
   void start ();
 
@@ -79,6 +80,7 @@ private:
   int _limit;
   std::string _cert_file;
   std::string _key_file;
+  std::string _crl_file;
 };
 
 #endif
