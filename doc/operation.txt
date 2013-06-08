@@ -1,0 +1,385 @@
+Göteborg Bit Factory                                               October 2012
+
+                          Task Server Operation Guide
+                                   Version 1
+
+
+Status of this Memo
+
+   This document provides information for the Internet community.  It does not
+   specify an Internet standard of any kind.  Distribution of this document is
+   not restricted.
+
+
+Copyright Notice
+
+   Copyright (C) 2010 - 2013, Göteborg Bit Factory.
+
+
+Abstract
+
+   This document describes the care and feeding of Task Server.  If you wish to
+   run your own Task Server, this document provides all the information you
+   need, provided you have sufficient working knowledge regarding the upkeep of
+   servers.  Operating a Task Server is not for casual users.
+
+
+Table of Contents
+
+   1      Introduction
+   2      Installation & Setup
+   3      Updates
+   4      PKI
+   5      Server Start/Stop
+   6      User Configuration
+   6.1      General
+   6.2      Organizations
+   6.3      Groups
+   6.4      Users
+   7      Backups
+   8      Monitoring
+   9      References
+   10     Acknowledgements
+   11     Authors' Addresses
+   12     Full Copyright Statement
+
+
+1  Introduction
+
+   Operating your own Task Server is straightforward.  You will need the
+   following:
+
+   - A machine capable of running the Task Server.  See the NEWS file for a list
+     of plaforms and operating systems on which Task Server has been tested.
+     There are likely other combinations that support Task Server that have not
+     been tested.
+
+   - Connectivity from your client to your server.  This may involve firewall or
+     VPN, but access is needed.
+
+   - An open port.  The default is 6544.
+
+   - Tools:  C++ compiler, CMake, make, Perl and Python
+
+   - Libraries:  GnuTLS, libuuid
+
+   - Storage: enough storage for task list history per user.  A guideline for
+     usage is 1MiB per user, per year.
+
+
+2  Installation & Setup
+
+   Clone the git source repository using:
+
+      $ git clone git://tasktools.org/taskd.git taskd.git
+
+   Use the 'master' branch, which always represents the current stable release,
+   build and install.
+
+      $ cd taskd.git
+      $ cmake .
+      $ make
+      $ cd test
+      $ make
+      $ ./run_all
+
+   Only proceed if there are no test failures.
+
+      $ cd ..
+      $ sudo make install
+
+   Verify your build and installation with the diagnostics command:
+
+      $ taskd diagnostics
+
+   A data 'root' is needed.  This will be the root of the directory structure
+   that will store all the data.  Choose a root location, create the directory
+   and initialize the server:
+
+      $ export TASKDDATA=/path/to/task/server/data
+      $ mkdir -p $TASKDDATA
+      $ taskd init --data $TASKDDATA
+
+   Basic configuration is needed before the server can be started.  The config
+   command makes use of the TASKDDATA variable, otherwise you need to specify
+   '--data /path/to/task/server/data' with each command.
+
+      $ taskd config log      /path/to/taskd.log
+      $ taskd config pid.file /path/to/taskd.pid
+      $ taskd config ip.log   1
+
+   To override the confirmation question for each of the above, you can specify
+   the '--force' option:
+
+      $ taskd config --force ip.log 1
+
+   View the current configuration with:
+
+      $ taskd config
+
+
+3  Updates
+
+   Updating Task Server involves a clone of the repository, build, test and
+   install, then a server bounce.
+
+      $ git clone git://tasktools.org/taskd.git taskd.git
+      $ cd taskd.git
+      $ cmake .
+      $ make
+      $ cd test
+      $ make
+      $ ./run_all
+
+   Only proceed if there are no test failures.
+
+   Check the ChangeLog and NEWS files in the distribution for any new or
+   obsolete configuration settings that may need to be changed.
+
+      $ cd ..
+      $ sudo make install
+      $ taskdctl restart
+
+
+4  PKI
+
+   *****************************************************************************
+   Warning
+
+   These instructions are for alpha testing only, and refer to self-signed certs
+   which are not suitable for production use.  This section will be replaced for
+   beta testing.
+   *****************************************************************************
+
+   The server needs a cert, key and crl.  For testing purposes, there is a
+   script that will do all of this:
+
+      $ cd taskd.git/pki
+      $ ./generate
+
+   Once the various files are created, install them in $TASKDDATA:
+
+      $ cp client.cert.pem $TASKDDATA
+      $ cp server.cert.pem $TASKDDATA
+      $ cp server.key.pem $TASKDDATA
+      $ cp server.crl.pem $TASKDDATA
+
+   Configure the server to use them:
+
+      $ taskd config client.cert $TASKDDATA/client.cert.pem
+      $ taskd config server.cert $TASKDDATA/server.cert.pem
+      $ taskd config server.key $TASKDDATA/server.key.pem
+      $ taskd config server.crl $TASKDDATA/server.crl.pem
+
+   Note that the 'client.cert.pem' is not intended for use by Task Server
+   clients like Taskwarrior, but is used for the 'taskd client ...' interface.
+
+
+5  Server Start/Stop
+
+   There is a 'taskdctl' script to perform start/stop/restart.  Use it like
+   this:
+
+      $ taskdctl start
+      $ taskdctl restart
+      $ taskdctl stop
+
+   This script is just a convenience, and you can directly run the commands.  To
+   start the server:
+
+      $ taskd server --data /path/to/task/server/data
+
+   Or if þhe TASKDDATA variable is defined:
+
+      $ taskd server
+
+   This can be terminated with Ctrl-C.  To start a daemon server:
+
+      $ taskd server --daemon
+
+   The daemon server needs to be terminated with a kill.  See the pid.file
+   config setting for the PID.
+
+
+6  User Configuration
+
+   The 'config' command is used here to illustrate how to manage users of a task
+   server.  The structure of the user accounts is such that future expansion to
+   include organizations and groups will not require changes to the data root.
+
+
+6.1  General
+
+   Note that all taskd commands shown support the TASKDDATA environment variable
+   but also support '--date /path/to/task/server/data' as well.  In these
+   examples, the former is assumed to be set:
+
+      $ export TASKDDATA=/path/to/task/server/data
+
+
+6.2  Organizations
+
+   An Organization is the top-level structure on the server.  A user MUST belong
+   to one Organization.
+
+   In this example, one organization named 'Public' is created.  An organization
+   may contain multiple words, but may not contain a slash (U+002F).
+
+      $ taskd add org Public
+
+   An organization can be removed permanently with:
+
+      $ taskd remove org Public
+
+   This is a destructive command, and not recommended.  It will remove an entire
+   set of related groups and users.
+
+   You may suspend an organization:
+
+      $ taskd suspend org Public
+
+   This will prevent any users in that organization from using the server.  This
+   is one way to take the server offline, while keeping it running.  A suspended
+   organiztion can be restore with:
+
+      $ taskd resume org Public
+
+   The server supports an unlimited number of organizations.
+
+
+6.3  Groups
+
+   Groups are equivalent to shared task lists within an organization.  Groups
+   are not yet supported.
+
+   The data structures for groups is managed in a similar way to organizations,
+   using these commands:
+
+      $ taskd add     group <org> <group>
+      $ taskd remove  group <org> <group>
+      $ taskd suspend group <org> <group>
+      $ taskd resume  group <org> <group>
+
+
+6.4  Users
+
+   A user must be added to an organization.  When adding a user, a key is
+   generated and shown.  This is a user-specific secret key that is needed by
+   the client.  For example:
+
+      $ taskd add user Public John_D
+      New user key: 1b89dd01-7a33-4890-815f-1f87f090cbe8
+
+   Note that a PKI key is also needed, see the PKI section.
+
+   The data structures for users is managed in a similar way to organizations,
+   using these commands:
+
+      $ taskd add     user <org> <user>
+      $ taskd remove  user <org> <user>
+      $ taskd suspend user <org> <user>
+      $ taskd resume  user <org> <user>
+
+
+7  Backups
+
+   The data needing backup consists of only one directory, which is the data
+   root.  It is recommended that the server be taken offline for this:
+
+   $ taskdctl stop
+   $ <your backup program here>
+   $ taskdctl start
+
+   Rotating the task server log file requires the same care.
+
+
+8  Monitoring
+
+   The task server has a client interface, where arbitrary requests can be sent.
+   This can include the 'statistics' request.  Here is an example:
+
+      $ cat stats.request
+      type: statistics
+      org: <Organization>
+      user: <User>
+      key: <Key>
+      version: 0.12.0
+      protocol: v1
+      
+      
+      $
+
+   Note that the request file has two blank lines at the end.  You will need to
+   provide a valid organization, user and key.  Once you have a valid request
+   file, use the 'client' command to send the request to the server.  The
+   response is shown in raw form:
+
+      $ taskd client localhost:6544 stats.request
+      >>> stats.request
+      <<<
+      average request bytes: 0
+      average response bytes: 0
+      average response time: 0.000000
+      code: 200
+      errors: 0
+      idle: 1.000000
+      maximum response time: 0.000000
+      status: Ok
+      total bytes in: 0
+      total bytes out: 0
+      tps: 0.000000
+      transactions: 1
+      uptime: 28
+      version: taskd 0.12.0
+
+   This response shows a task server that has been running for only 28 seconds,
+   and has processed one transaction.  This response can be easily parsed and
+   stored for monitoring purposes.
+
+
+9  References
+ 
+   [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
+        1975.
+
+
+10  Acknowledgements
+
+   Thanks to ... for testing and feedback.
+
+   Thanks to ... whose comments helped improve this document.
+
+
+11  Authors' Addresses
+
+   Federico Hernandez
+   Email: fredde@yootabory.org
+
+   Paul Beckingham
+   Email: paul@yootabory.org
+
+
+12  Full Copyright Statement
+
+   Copyright 2010 - 2013, Göteborg Bit Factory.
+   All rights reserved.
+
+   This document and translations of it may be copied and furnished to others,
+   and derivative works that comment on or otherwise explain it or assist in its
+   implmentation may be prepared, copied, published and distributed, in whole or
+   in part, without restriction of any kind, provided that the above copyright
+   notice and this paragraph are included on all such copies and derivative
+   works.  However, this document itself may not be modified in any way, such as
+   by removing the copyright notice or by ommission of certain sections.
+
+   The limited permissions granted above are perpetual and will not be revoked
+   by the authors or their successors or assigns.
+
+   This document and the information contained herein is provided on an "AS IS"
+   basis and the authors disclaim all warranties, express or implied, including
+   but not limited to any warranty that the use of the information herein will
+   not infringe any rights or any implied warranties of merchantability or
+   fitness for a particular purpose.
+
+---
+
