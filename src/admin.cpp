@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <iostream>
 #include <stdlib.h>
 #include <ConfigFile.h>
 #include <taskd.h>
@@ -81,8 +82,6 @@ static bool add_user (
   if (new_user.create ())
   {
     // Generate new KEY
-    // TODO This may not be necessary.
-    // TODO This may be a proper key generation step.
     std::string key = taskd_generate_key ();
 
     // Store KEY in <new_user>/config
@@ -91,6 +90,8 @@ static bool add_user (
     conf.set ("key", key);
     conf.save ();
 
+    // User will need this key.
+    std::cout << "New user key: " << key << "\n";
     return true;
   }
 

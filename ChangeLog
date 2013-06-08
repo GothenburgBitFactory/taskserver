@@ -3,8 +3,14 @@
 1.0.0beta ()
 
 1.0.0alpha ()
-
-? Full user authentication.
+- Supports CRL (Certificate Revocation List)
+- Supports new user key generation
+- Documentation for:
+    - operations
+    - writing a client 
+    - task data interchange format
+    - task server protocol
+    - sync algorithm
 
 ------ current release ---------------------------
 

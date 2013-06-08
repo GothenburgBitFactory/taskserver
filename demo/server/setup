@@ -17,20 +17,20 @@ echo
 echo "# taskd init --data $ROOT"
 ../../src/taskd init --data $ROOT
 
-echo "# taskd add --data $ROOT org ORG"
-../../src/taskd add --data $ROOT org ORG
+echo "# taskd add --data $ROOT org Public"
+../../src/taskd add --data $ROOT org Public
 
 echo "# taskd add --data $ROOT org 'ABC Corp'"
 ../../src/taskd add --data $ROOT org 'ABC Corp'
 
-echo "# taskd add --data $ROOT group 'ORG' 'Group Name'"
-../../src/taskd add --data $ROOT group 'ORG' 'Group Name'
+echo "# taskd add --data $ROOT group 'Public' 'Group Name'"
+../../src/taskd add --data $ROOT group 'Public' 'Group Name'
 
-echo "# taskd add --data $ROOT user 'ORG' 'User Name'"
-../../src/taskd add --data $ROOT user 'ORG' 'User Name'
+echo "# taskd add --data $ROOT user 'Public' 'User Name'"
+../../src/taskd add --data $ROOT user 'Public' 'User Name'
 
-echo "# taskd add --data $ROOT user 'ORG' 'USER'"
-../../src/taskd add --data $ROOT user 'ORG' 'USER'
+echo "# taskd add --data $ROOT user 'Public' 'USER'"
+../../src/taskd add --data $ROOT user 'Public' 'USER' > ../client/user.key
 
 echo "# taskd suspend --data $ROOT org 'ABC Corp'"
 ../../src/taskd suspend --data $ROOT org "ABC Corp"
