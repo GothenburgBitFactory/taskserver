@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                               October 2012
 
-                          Taskwarrior Data Format (FF4)
+                   Taskwarrior Data Interchange Format (JSON)
                                    Version 1
 
 
@@ -18,12 +18,9 @@ Copyright Notice
 
 Abstract
 
-   The Taskwarrior Data Format describes the structure and semantics for tasks
-   stored by Taskwarrior, transmitted to/from the Task Server, and stored by the
-   Task Server.
-
-   This format is known as FF4 - File Format 4.  Previous formats were less
-   elegant and more rigid, relying on the position of data within the line.
+   When Taskwarrior exchanges data, it uses JSON.  This document describes the
+   structure and semantics for tasks exported from Taskwarrior, imported to
+   Taskwarrior, or synced with the Task Server.
 
 
 Table of Contents
@@ -37,6 +34,7 @@ Table of Contents
    2.1.3   Data Type: UUID
    2.1.4   Data Type: Integer
    2.1.5   Data Type: Date
+   2.1.6   Data Type: Duration
    2.2     The Fields
    2.3     Additional Fields
    3       Field Details
@@ -60,11 +58,14 @@ Table of Contents
    3.18    Field: depends
    3.19    User Defined Attributes
 
-   4      Future Format FF5
-   5      References
-   6      Acknowledgements
-   7      Authors' Addresses
-   8      Full Copyright Statement
+modification
+scheduled
+
+
+   4      References
+   5      Acknowledgements
+   6      Authors' Addresses
+   7      Full Copyright Statement
 
 
 1  Introduction
@@ -87,7 +88,7 @@ Table of Contents
    In brief: "MUST" (or "REQUIRED") means that the item is an absolute
    requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
    exist valid reasons for ignoring this item, but the full implications should
-   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that this item
    is optional, and may be omitted without careful consideration.
 
 
@@ -187,6 +188,8 @@ Table of Contents
       | tags              | String  |
       | priority          | String  |
       | depends           | String  |
+modified
+scheduled
       +-------------------+---------+
 
    There are other forms, which are conditional upon the state of a task:
@@ -430,24 +433,20 @@ Table of Contents
 
 
 
-4  Future Format FF5
-
-   There are no plans to introduce FF5, but this is likely to occur at some
-   point.  FF5 will most likely be a strict JSON format, similar to the current
-   import/export format.
-
-
-5  References
+4  References
  
+   [RFC1122] IETF, "Requirements for Internet Hosts - Communication
+        Layers", October 1989.
 
 
-6  Acknowledgements
+
+5  Acknowledgements
 
    Thanks to Dirk Deimeke for feedback.
    Thanks to Wim Schuermann for feedback.
 
 
-7  Authors' Addresses
+6  Authors' Addresses
 
    Paul Beckingham
    Email: paul@yootabory.org
@@ -456,7 +455,7 @@ Table of Contents
    Email: fredde@yootabory.org
 
 
-8  Full Copyright Statement
+7  Full Copyright Statement
 
    Copyright 2010 - 2013, Göteborg Bit Factory
    All rights reserved.

@@ -26,6 +26,11 @@ Table of Contents
 
    1      Introduction
    1.1    Requirements
+
+   X      Events
+   X      Hooks
+
+   X      References
    2      Authors' Addresses
    3      Full Copyright Statement
 
@@ -55,8 +60,20 @@ Table of Contents
    In brief: "MUST" (or "REQUIRED") means that the item is an absolute
    requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
    exist valid reasons for ignoring this item, but the full implications should
-   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that this item
    is optional, and may be omitted without careful consideration.
+
+
+X  Events
+
+
+X  Hooks
+
+
+X  References
+
+   [RFC1122] IETF, "Requirements for Internet Hosts - Communication
+        Layers", October 1989.
 
 
 2  Authors' Addresses

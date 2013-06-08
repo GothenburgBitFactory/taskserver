@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                               October 2012
 
-                              Task Server Protocol
+                             Task Server Protocol
                                    Version 1
 
 
@@ -58,7 +58,7 @@ Table of Contents
    in version 1.9.3.
 
    While these methods work, they each have problems associated with the merging
-   of the data.  In the case of directoy synchronizing software, there is no
+   of the data.  In the case of directory synchronizing software, there is no
    merging at all - just simple file overwrite, despite many people believing
    that the data is somehow combined and preserved.
 
@@ -68,14 +68,12 @@ Table of Contents
 
    The task server also provides multi-client access, so that a task added using
    a web client could be immediately viewed using a mobile client, or modified
-   using taskwarrior.  With both thin and rich client support, users can quickly
-   capture tasks on the go, and use the rich client for later review and
-   categorization.  Choice among clients is important - people have widely
+   using taskwarrior.  Choice of clients is important - people have widely
    varying behaviors and tastes.
 
-   The task server also provides multi-user access, which introduces a whole new
-   set of capabilities, such as list sharing and delegation.  These will require
-   later modification to this protocol.
+   The task server also provides multi-user access, which introduces new
+   capabilities, such as list sharing and delegation.  These will require later
+   modification to this protocol.
 
    The task server protocol will be implemented by the taskd project and first
    used in taskwarrior 2.3.0.  Other clients will likely follow.
@@ -91,7 +89,7 @@ Table of Contents
    In brief: "MUST" (or "REQUIRED") means that the item is an absolute
    requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
    exist valid reasons for ignoring this item, but the full implications should
-   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that this item
    is optional, and may be omitted without careful consideration.
 
 
@@ -105,15 +103,15 @@ Table of Contents
    _for the given client_ only.  This means the server may be using multiple
    ports to serve multiple sets of clients.
 
-   This server is only an interface between programs and the task database.  It
-   does not perform any user interaction or presentation-level functions.
+   This server is only an interface between programs and the task data.  It does
+   not perform any user interaction or presentation-level functions.
 
 
 2.2  Transactions
 
-   Each transaction is a single incoming message, with a response that is also a
-   single message.  All communication therefore consists of a single 'send',
-   followed by a single 'receive', then termination.  There are no sessions, and
+   Each transaction is a single incoming message, with a single response
+   message.  All communication therefore consists of a single 'send', followed
+   by a single 'receive', then termination.  There are no sessions, and
    no continuously open connections.
 
 
@@ -129,7 +127,7 @@ Table of Contents
       payload
 
    There are three sections.  The first is the size, which is a 4-byte, big-
-   endian, binary byte count of the length of the message, including the 4 bytes
+   Endian, binary byte count of the length of the message, including the 4 bytes
    for the size.
 
    The header section is a set of name/value pairs separated by newline
@@ -137,7 +135,7 @@ Table of Contents
    U+003A, space U+0020)  The header section is terminated by two consecutive
    newline (U+000D) characters.  All text is UTF8.
 
-   The payload section is arbitrary.
+   The payload section is arbitrary, and message type-speciific.
 
    Here is a complete example of a 'sync' message:
 
@@ -146,17 +144,17 @@ Table of Contents
       org: <organization>
       user: <user>
       key: <key>
-      version: 0.9.0
+      version: task 2.3.0
       protocol: v1
 
       2e4685f8-34bc-4f9b-b7ed-399388e182e1
-      [description:"Test data" entry:"1234567890" status:"pending"]
+      {"description":"Test data","entry":"20130602T002341Z","status":"pending"}
 
    An example repsonse message might be:
 
       <size>
       type: response
-      version: 0.9.0
+      version: taskd 0.9.0
       protocol: v1
       code: 200
       status: Ok
@@ -164,8 +162,16 @@ Table of Contents
       45da7110-1bcc-4318-d33e-12267a774e0f
 
    In the event of a status response that is a redirect, the client MUST reissue
-   the ticket with modified details.  This is the only time that client/server
-   interaction is more than a simple exchange of information.
+   the request with modified details.  Here is an example of a redirect
+   response:
+
+     <size>
+     type: response
+     version: taskd 0.9.0
+     protocol: v1
+     code: 301
+     status: Redirect
+     info: <server>:<port>
 
 
 2.4  Message Requirements
@@ -176,11 +182,22 @@ Table of Contents
       protocol
       version
 
+   The 'type' value is message-specific.  The 'protocol' value should be 'v1'
+   (described in this document), or any subsequent published protocol.  The
+   'version' represent the sender's identifier, so that any special cases can be
+   handled.  The form of the 'version' value is:
+
+      <product identifier> <version number>
+
+   As an example:
+
+      taskwarrior 2.3.0
+
 
 2.5  Auth Data
 
-   Every request ticket from the client MUST contain an "auth" section, which
-   involves these headers:
+   Every request ticket from the client MUST contain "auth" information, which
+   involves these header lines:
 
       org: <organization>
       user: <user>
@@ -216,10 +233,9 @@ Table of Contents
    The info string may contain the address of a redirected server, in the event
    of a 301 status code.  Such a result will look like this:
 
-        +--------+------+------------------+
-        | status | code | 301              |
-        |        | info | <address>:<port> |
-        +--------+------+------------------+
+      code: 301
+      status: Redirect
+      info: <server>:<port>
 
    Address may be a DNS name or an IP address.  Port is a positive integer.
 
@@ -232,8 +248,8 @@ Table of Contents
 2.8  Responsibilities of the Server
 
    The server will maintain a set of transactions, in the original sequence,
-   punctuated by sync keys, which are UUIDs.  Each sync key represents a non-
-   trivial sync operation by a client.  Each transaction is an FF4-formatted
+   punctuated by sync keys which are UUIDs.  Each sync key represents a non-
+   trivial sync operation by a client.  Each transaction is a JSON-formatted
    task [1], followed by a newline (\n) character.  The result is a single file
    that contains interleaved lines of two types: tasks and sync keys.
 
@@ -244,9 +260,9 @@ Table of Contents
 2.9  Responsibilities of the Client
 
    All modifications to tasks (add, modify, done, delete ...) are recorded in
-   the form of a fully-composed FF4-format [1] task.  The formatted task is
-   appended to the backlog.data file.  If a task is modified a second time, it
-   is appended again to the backlog.data file - the lines are not combined.
+   the form of a fully-composed JSON-format [1] task.  The formatted task is
+   added to a local backlog.data file.  If a task is modified a second time, it
+   is added again to the backlog.data file - the lines are not combined.
    Each task SHALL have a 'modified' date attribute that will help resolve
    conflicts.
 
@@ -260,9 +276,11 @@ Table of Contents
        tasks and a sync key:
        - The formatted tasks are to be stored as-is.  These tasks will either be
          appended to the client data or will overwrite existing client data,
-         based on the UUID of the task.  No other logic is necessary.
+         based on the UUID of the task.  No merge logic is necessary.
        - The sync key will be written to the backlog.data file, overwriting the
          previous contents, such that it will now contain only one line.
+     - 301: Redirect to <server>:<port> found in the 'info' response header,
+       will force the client to resubmit the request to the new server.
      - 3xx, 4xx, 5xx: The 'status' field contains an error message.
    - If the response contained any error or warning, the error is required to be
      shown to the user.  This provides an opportunity for the server to announce
@@ -273,16 +291,16 @@ Table of Contents
    the case for a client making its first sync call.
 
    If an unrecognized attribute is present in the task data, the client SHALL
-   preserve the attribute unmodified.  This permits individual clients to
-   augment the task data without other clients stripping it out.  This is how
-   UDAs (user defined attributes) are handled.
+   preserve the attribute unmodified, and assume it is of type 'string'.  This
+   permits individual clients to augment the task data without other clients
+   stripping it meaningful data.  This is how UDAs (user defined attributes) are
+   handled.
 
 
 3  Message Types
 
-   The task server supports many ticket types, thus providing a rich set of
-   primitives for use by clients to access all the taskwarrior capabilities
-   remotely.
+   The task server supports several message types, thus providing a set of
+   primitives for use by clients.
 
    It is expected that the number of supported ticket types will increase over
    time.
@@ -300,12 +318,12 @@ Table of Contents
 
 3.2  Message Type "sync"
 
-   The "sync" ticket always originates from the client, but is a two-way
+   The "sync" message always originates from the client, but is a two-way
    process.  It is used to communicate additions and changes on both the client
    and server.
 
    Note that the task server sometimes modifies tasks independently of user-
-   initiated modification.  This can result in unexpected synch transfers.
+   initiated modification.  This can result in unexpected sync transfers.
    There are many reasons why a server may modify a task, including:
 
         - Another client modified the task
@@ -382,9 +400,8 @@ Table of Contents
 
 6  Security Considerations
 
-   TODO
-
-   Note: encryption may be disabled to facilitate testing.
+   All communication with the task server uses SSL 3.0 or TLS 1.0, 1.1 or 1.2.
+   Encryption is mandatory.  Data is never transmitted in plain text.
 
 
 7  Limitations and Guidelines
@@ -395,8 +412,8 @@ Table of Contents
       A client may only connect to a single server.  Synchronization among a set
       of servers is not currently supported.
 
-      A client shold attempt to minimize data bandwidth usage by maintaining a
-      local data store, and using sync keys.
+      A client should attempt to minimize data bandwidth usage by maintaining a
+      local data store, and properly using sync keys.
 
       A client should minimize data transfers by limiting the frequency of sync
       requests.
@@ -404,8 +421,8 @@ Table of Contents
 
 8  References
  
-   [1] Beckingham, P., Hernandez, F., "Taskwarrior Data Format (FF4)", October,
-        2012.
+   [1] Beckingham, P., Hernandez, F., "Taskwarrior Data Interchange Format
+        (JSON)", June 2013.
 
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.

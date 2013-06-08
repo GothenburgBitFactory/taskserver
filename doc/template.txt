@@ -47,7 +47,7 @@ Table of Contents
    In brief: "MUST" (or "REQUIRED") means that the item is an absolute
    requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
    exist valid reasons for ignoring this item, but the full implications should
-   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that this item
    is optional, and may be omitted without careful consideration.
 
 
@@ -55,6 +55,9 @@ Table of Contents
  
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
+
+   [RFC1122] IETF, "Requirements for Internet Hosts - Communication
+        Layers", October 1989.
 
 
 10  Acknowledgements

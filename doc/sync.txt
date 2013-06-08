@@ -61,7 +61,7 @@ Table of Contents
    In brief: "MUST" (or "REQUIRED") means that the item is an absolute
    requirement of the specification; "SHOULD" (or "RECOMMENDED") means there may
    exist valid reasons for ignoring this item, but the full implications should
-   be understood before doing so; and "MAY" (or "OPTIONAL") means that his item
+   be understood before doing so; and "MAY" (or "OPTIONAL") means that this item
    is optional, and may be omitted without careful consideration.
 
 
@@ -294,7 +294,11 @@ Table of Contents
 
 5  References
 
-   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", October, 2012.
+   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", Version 1O, June
+        2013.
+
+   [RFC1122] IETF, "Requirements for Internet Hosts - Communication
+        Layers", October 1989.
 
 
 6  Acknowledgements
