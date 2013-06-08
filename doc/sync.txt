@@ -48,7 +48,7 @@ Table of Contents
 
    The Task Server merges tasks from multiple sources, resulting in conflict-
    free syncing of data.  The algorithm used to achieve this is simple and
-   effective, paralleling what SCM systems must do to perform a rebase.
+   effective, paralleling what SCM systems do to perform a rebase.
 
 
 1.1  Requirements
@@ -132,10 +132,11 @@ Table of Contents
       T0 + d1 + d2 =/= T0 + d2 + d1
 
    The application of deltas is not commutative, except in the trivial case
-   where the two deltas are identical.  The deltas therefore need to be applied
-   in the correct sequence.  Tasks have metadata that indicates the last
-   modification time, which dictates the sequence.  Assuming d1 occurred before
-   d2, this neatly collapses down to a single branch sequence:
+   where the two deltas are identical, or the deltas do not overlap.  The deltas
+   therefore need to be applied in the correct sequence.  Tasks have metadata
+   that indicates the last modification time, which dictates the sequence.
+   Assuming d1 occurred before d2, this neatly collapses down to a single branch
+   sequence:
 
       T0 + d1 + d2 = T3
 
@@ -293,7 +294,7 @@ Table of Contents
 
 5  References
 
-   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", October, 2012 - 2013.
+   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", October, 2012.
 
 
 6  Acknowledgements
