@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -40,7 +41,6 @@
 #include <Duration.h>
 #include <Color.h>
 #include <Task.h>
-#include <cmake.h>
 #include <commit.h>
 #include <text.h>
 #include <util.h>

@@ -25,8 +25,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <RX.h>
 #include <cmake.h>
+#include <RX.h>
 #include <test.h>
 
 int main (int argc, char** argv)

@@ -31,7 +31,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cmake.h>
 
 class Msg
 {

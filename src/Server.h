@@ -29,7 +29,6 @@
 
 #include <sys/types.h>
 #include <string>
-#include <cmake.h>
 #include <ConfigFile.h>
 #include <Log.h>
 

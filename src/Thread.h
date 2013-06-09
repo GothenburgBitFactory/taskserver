@@ -28,8 +28,6 @@
 #ifndef INCLUDED_THREAD
 #define INCLUDED_THREAD
 
-#include <cmake.h>
-
 #ifdef HAVE_LIBPTHREAD
 #include <pthread.h>
 

@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
@@ -32,7 +33,6 @@
 #include <Color.h>
 #include <Timer.h>
 #include <File.h>
-#include <cmake.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>

@@ -30,7 +30,6 @@
 
 #include <string>
 #include <vector>
-#include <cmake.h>
 
 #ifdef HAVE_UUID                                                                
 #include <uuid/uuid.h>

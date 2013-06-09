@@ -25,11 +25,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cmake.h>
 #ifdef CYGWIN
 #include <time.h>
 #else

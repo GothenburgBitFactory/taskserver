@@ -30,7 +30,6 @@
 
 #include <vector>
 #include <string>
-#include <cmake.h>
 #include <ConfigFile.h>
 #include <Msg.h>
 #include <Log.h>

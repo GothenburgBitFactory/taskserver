@@ -25,9 +25,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <cstring>
-#include <cmake.h>
 #include <text.h>
 #include <taskd.h>
 

@@ -25,13 +25,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmake.h>
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
 #include <Date.h>
 #include <Color.h>
 #include <Timer.h>
-#include <cmake.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>

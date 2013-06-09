@@ -31,7 +31,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cmake.h>
 #include <File.h>
 
 class Config : public std::map <std::string, std::string>
