@@ -677,7 +677,7 @@ void Daemon::merge_sort (
     ++iter_r;
   }
 
-  _log->format ("[%d] Zipper result %s", _txn_count, combined.composeJSON ().c_str ());
+  _log->format ("[%d] Merge result %s", _txn_count, combined.composeJSON ().c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

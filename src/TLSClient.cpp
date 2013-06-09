@@ -192,8 +192,8 @@ void TLSClient::send (const std::string& data)
   packet[2] = l >>8;
   packet[3] = l;
 
-  int total = 0;
-  int remaining = packet.length ();
+  unsigned int total = 0;
+  unsigned int remaining = packet.length ();
 
   while (total < packet.length ())
   {
@@ -208,8 +208,8 @@ void TLSClient::send (const std::string& data)
     if (status == -1)
       break;
 
-    total     += status;
-    remaining -= status;
+    total     += (unsigned int) status;
+    remaining -= (unsigned int) status;
   }
 
   if (_debug)
