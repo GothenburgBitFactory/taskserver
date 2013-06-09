@@ -43,7 +43,7 @@
 #include <netdb.h>
 
 #define DH_BITS 1024
-#define MAX_BUF 1024
+#define MAX_BUF 16384
 
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
