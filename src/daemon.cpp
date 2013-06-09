@@ -289,6 +289,8 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
   // Maintain a list of already-merged task UUIDs.
   std::vector <std::string> already_seen;
+  int store_count = 0;
+  int merge_count = 0;
 
   // For each incoming task...
   std::vector <std::string>::iterator client_task;
@@ -301,11 +303,6 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     std::string uuid = task.get ("uuid");
     task.validate ();
 
-    _log->format ("[%d] Validated: %s '%s'",
-                  _txn_count,
-                  uuid.c_str (),
-                  task.get ("description").c_str ());
-
     // If task is in subset
     if (contains (server_subset, uuid))
     {
@@ -316,13 +313,13 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
       already_seen.push_back (uuid);
 
-      _log->format ("[%d] Merge needed", _txn_count);
-
       // Find common ancestor, prior to branch point
       unsigned int common_ancestor = find_common_ancestor (server_data,
                                                            branch_point,
                                                            uuid);
+/*
       _log->format ("[%d] Ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
+*/
 
       // List the client-side modifications.
       std::vector <Task> client_mods;
@@ -340,16 +337,21 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       // Append combined task to client and server data, if not already there.
       new_server_data.push_back (combined_JSON);
       new_client_data.push_back (combined_JSON);
+      ++merge_count;
     }
     else
     {
-      _log->format ("[%d] Store", _txn_count);
-
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
       new_server_data.push_back (*client_task);
+      ++store_count;
     }
   }
+
+  _log->format ("[%d] Stored %d, merged %d",
+                _txn_count,
+                store_count,
+                merge_count);
 
   // New server data means a new sync key must be generated.  No new server data
   // means the most recent sync key is reused.
@@ -358,7 +360,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     new_client_key = uuid ();
     new_server_data.push_back (new_client_key);
-    _log->format ("[%d] New sync key: %s", _txn_count, new_client_key.c_str ());
+    _log->format ("[%d] New sync key '%s'", _txn_count, new_client_key.c_str ());
 
     // Append new_server_data to file.
     append_server_data (org, user, new_server_data);
@@ -373,7 +375,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
         break;
       }
 
-    _log->format ("[%d] Using latest sync key: %s", _txn_count, new_client_key.c_str ());
+    _log->format ("[%d] Sync key '%s' still valid", _txn_count, new_client_key.c_str ());
   }
 
   // If there is outgoing data, generate payload + key.
@@ -434,10 +436,10 @@ void Daemon::parse_payload (
     }
   }
 
-  _log->format ("[%d] Client key: %s", _txn_count, key.c_str ());
-
-  for (i = data.begin (); i != data.end (); ++i)
-    _log->format ("[%d] Client data: %s", _txn_count, i->c_str ());
+  _log->format ("[%d] Client key '%s' %u",
+                _txn_count,
+                key.c_str (),
+                data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +458,7 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Read server data: %uln", _txn_count, data.size ());
+  _log->format ("[%d] Loaded %u", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -474,7 +476,7 @@ void Daemon::append_server_data (
 
   user_data.append (data);
 
-  _log->format ("[%d] Appended %uln to server data", _txn_count, data.size ());
+  _log->format ("[%d] Wrote %u", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -521,7 +523,7 @@ void Daemon::extract_subset (
       if (data[i][0] == '{')
         subset.push_back (Task (data[i]));
 
-  _log->format ("[%d] Subset: %uln after branch point", _txn_count, subset.size ());
+  _log->format ("[%d] Subset %u", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
