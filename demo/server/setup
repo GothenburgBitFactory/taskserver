@@ -63,6 +63,8 @@ echo "# taskd config --force --data $ROOT pid.file $PWD/taskd.pid"
 
 echo "# taskd config --force --data $ROOT ip.log 1"
 ../../src/taskd config --force --data $ROOT ip.log 1
+echo "# taskd config --force --data $ROOT client.allow '^task [2-9]+'"
+../../src/taskd config --force --data $ROOT client.allow '^task [2-9]+'
 
 echo
 tree $ROOT

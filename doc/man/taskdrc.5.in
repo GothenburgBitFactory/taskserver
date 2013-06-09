@@ -8,6 +8,18 @@ taskdrc \- Configuration file for the taskd(1) server
 Valid variable names and their default values are:
 
 .TP
+.B client.deny=[Tt]ask [2-9]+
+A comma-separated list of regular expressions that are matched against the
+reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
+special meaning.  Any 'client.deny' entry overrides any 'client.allow' entry.
+
+.TP
+.B client.allow=[Tt]ask [2-9]+
+A comma-separated list of regular expressions that are matched against the
+reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
+special meaning.  Overidden by and 'client.deny' entry.
+
+.TP
 .B debug.tls=0
 GnuTLS log level, an integer from 0 to 9, where 0 means no logging, and 9
 means sensitive data leaks.  Caution!

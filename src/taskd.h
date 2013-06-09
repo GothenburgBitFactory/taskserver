@@ -72,6 +72,7 @@ bool taskd_is_group (const Directory&, const std::string&, const std::string&);
 bool taskd_is_user  (const Directory&root, const std::string&, const std::string&);
 
 std::string taskd_error (const int);
+bool taskd_allow (const std::string&, const std::vector <std::string>&, const std::vector <std::string>&, Log&, bool debug /*= false*/);
 
 void taskd_staticInitialize ();
 

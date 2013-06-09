@@ -74,6 +74,8 @@ private:
 
 public:
   Database _db;
+  std::vector <std::string> _allow_list;
+  std::vector <std::string> _deny_list;
 
 private:
   Config& _config;
@@ -98,6 +100,8 @@ Daemon::Daemon (Config& settings)
 , _bytes_in (0)
 , _bytes_out (0)
 {
+  split (_allow_list, _config.get ("client.allow"), ",");
+  split (_deny_list,  _config.get ("client.deny"),  ",");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,10 +146,13 @@ void Daemon::handler (const std::string& input, std::string& output)
     in.parse (input);
     Msg out;
 
-    if (_config.getBoolean ("debug"))
-    {
-      // TODO dump incoming msg
-    }
+    // Determine whether the client allow/deny list will permit continuation.
+    if (!taskd_allow (in.get ("client"),
+                      _allow_list,
+                      _deny_list,
+                      *_log,
+                      _config.getBoolean ("debug")))
+      throw 430;
 
     // Handle or reject all message types.
     std::string type = in.get ("type");
@@ -826,6 +833,14 @@ int command_server (Config& config, const std::vector <std::string>& args)
     server.setQueueSize  (config.getInteger ("queue.size"));
     server.setLimit      (config.getInteger ("request.limit"));
     server.setLogClients (config.getBoolean ("ip.log"));
+
+    // Client allow/deny lists are important - make them visible.
+    std::vector <std::string>::iterator i;
+    for (i = server._allow_list.begin (); i != server._allow_list.end (); ++i)
+      log.format ("client.allow /%s/", i->c_str ());
+
+    for (i = server._deny_list.begin (); i != server._deny_list.end (); ++i)
+      log.format ("client.deny /%s/", i->c_str ());
 
     // Optional daemonization.
     if (daemon)

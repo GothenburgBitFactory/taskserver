@@ -114,7 +114,7 @@ void Config::save ()
   std::map <std::string, std::string>::iterator i;
   for (i = this->begin (); i != this->end (); ++i)
     contents += i->first + "=" + i->second + "\n";
-  
+
   File::write (_original_file, contents);
   _dirty = false;
 }

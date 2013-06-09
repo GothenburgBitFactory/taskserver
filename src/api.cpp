@@ -38,6 +38,7 @@
 #include <Color.h>
 #include <Log.h>
 #include <Task.h>
+#include <RX.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
@@ -490,6 +491,67 @@ std::string taskd_error (const int code)
       return errors[i].error;
 
   return "[Missing error code]";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_allow (
+  const std::string& client,
+  const std::vector <std::string>& allow,
+  const std::vector <std::string>& deny,
+  Log& log,
+  bool debug /*= false*/)
+{
+  std::vector <std::string>::const_iterator i;
+  for (i = deny.begin (); i != deny.end (); ++i)
+  {
+    // If deny contains 'none', pass.
+    if (compare (*i, "none", false))
+      break;
+
+    // If deny contains 'all', fail and return.
+    if (compare (*i, "all", false))
+    {
+      log.format ("INFO client '%s' denied by 'all'", client.c_str ());
+      return false;
+    }
+
+    // If client is specifically denied.
+    RX r (*i);
+    if (r.match (client))
+    {
+      log.format ("INFO client '%s' denied", client.c_str ());
+      return false;
+    }
+  }
+
+  for (i = allow.begin (); i != allow.end (); ++i)
+  {
+    // If allow contains 'none', stop.
+    if (compare (*i, "none", false))
+    {
+      log.format ("INFO client '%s' not allowed by 'none'", client.c_str ());
+      return false;
+    }
+
+    // If allow contains 'all', or matches the client, pass.
+    if (compare (*i, "all", false))
+    {
+      if (debug)
+        log.format ("DEBUG client '%s' allowed by 'all'", client.c_str ());
+      return true;
+    }
+
+    RX r (*i);
+    if (r.match (client))
+    {
+      if (debug)
+        log.format ("DEBUG client '%s' allowed", client.c_str ());
+      return true;
+    }
+  }
+
+  log.format ("WARNING client '%s' neither denied nor allowed.", client.c_str ());
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
