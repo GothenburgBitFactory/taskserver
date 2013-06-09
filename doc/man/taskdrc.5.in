@@ -8,21 +8,71 @@ taskdrc \- Configuration file for the taskd(1) server
 Valid variable names and their default values are:
 
 .TP
-.B client.deny=[Tt]ask [2-9]+
-A comma-separated list of regular expressions that are matched against the
-reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
-special meaning.  Any 'client.deny' entry overrides any 'client.allow' entry.
-
-.TP
 .B client.allow=[Tt]ask [2-9]+
 A comma-separated list of regular expressions that are matched against the
 reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
 special meaning.  Overidden by and 'client.deny' entry.
 
 .TP
+.B client.cert
+Fully qualified path of the client cert.  This is used by the 'client' command.
+
+.TP
+.B client.deny=[Tt]ask [2-9]+
+A comma-separated list of regular expressions that are matched against the
+reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
+special meaning.  Any 'client.deny' entry overrides any 'client.allow' entry.
+
+.TP
+.B debug=off
+Logs debugging information.
+
+.TP
 .B debug.tls=0
 GnuTLS log level, an integer from 0 to 9, where 0 means no logging, and 9
 means sensitive data leaks.  Caution!
+
+.TP
+.B extensions=<path>
+Fully qualified path of the taskd extension scripts.  Currently there are none.
+
+.TP
+.B ip.log=on
+Logs the IP addresses of incoming requests.
+
+.TP
+.B log=/tmp/taskd.log
+Fully-qualified path name to the taskd log file.
+
+.TP
+.B pid.file=/tmp/taskd.pid
+Fully-qualified path name to the taskd PID file.  This is used by the 'taskdctl'
+script to start/stop the daemon.
+
+.TP
+.B queue.size=10
+Size of the connection backlog.  See 'man listen'.
+
+.TP
+.B request.limit=1048576
+Size limit of incoming requests, in bytes.
+
+.TP
+.B server=localhost:6544
+The address (IPv4, IPv6 or DNS) of the taskd server, followed by a colon and the
+port number.
+
+.TP
+.B server.cert
+Fully qualified path to the server certificate.
+
+.TP
+.B server.crl
+Fully qualified path to the server certificate revocation list.
+
+.TP
+.B server.key
+Fully qualified path to the server key.
 
 .SH ENVIRONMENT VARIABLES
 

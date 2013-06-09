@@ -1,4 +1,4 @@
-Göteborg Bit Factory                                               October 2012
+Göteborg Bit Factory                                                  June 2013
 
                              Task Server Extensions
                                    Version 1

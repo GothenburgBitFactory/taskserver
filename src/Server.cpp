@@ -170,6 +170,7 @@ void Server::beginServer ()
                _crl_file,                // CRL
                _cert_file,               // Cert
                _key_file);               // Key
+  server.queue (_queue_size);
   server.bind (_port);
   server.listen ();
 

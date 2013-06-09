@@ -7,13 +7,15 @@ Please follow the instructions below to build taskd with cmake.
 Pre-requisites
 --------------
 
-You will need the CMake build system installed in order to build taskd
-from source.
+You will need the following tools:
+   cmake
+   make
+
+You will need the following libraries:
+   libuuid
+   gnutls
 
 More information on cmake can be obtained at http://cmake.org
-
-Optionally, you might want to have Lua installed, if you wish to write plugins
-and modify taskd.
 
 
 Basic Installation

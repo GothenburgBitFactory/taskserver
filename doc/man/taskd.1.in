@@ -6,18 +6,16 @@ taskd \- Task Server
 .SH SYNOPSIS
 .B taskd <command> [options] [<args>]
 .br
-.B taskd --version
+.B taskd -v|--version
 .br
-.B taskd --diagnostics
+.B taskd -d|--diagnostics
 
 .SH DESCRIPTION
-Taskd is ...
+Taskd is a sync server for Taskwarrior and related products.
 
 .SH COMMANDS
-Taskd supports several fixed commands, which perform high level functionality,
-which can be extended via plugins to add functionality.
-
-The commands are:
+Taskd supports several commands, which provide adminstrative capabilities.  The
+commands are:
 
 .TP
 .B taskd init --data <root> [options]
@@ -26,19 +24,24 @@ bare data structure.
 
 .TP
 .B taskd help <command> [options]
+Provides option and syntax help for each command.
 
 .TP
-.B taskd config [options] [<name> [<value>]]
+.B taskd config [options] [--force] [<name> [<value>]]
+Allows modification of the taskd configuration.  Can add, remove, modify or list
+all configuration settings.
 
 .TP
 .B taskd status [options]
+Shows the server status, and statistics.
 
 .TP
-.B taskd server [options]
-Starts the daemon.
+.B taskd server [--daemon] [options]
+Starts the server in daemon or TTY mode.  While there is no interactivity, the
+difference is whether taskd is attached to a TTY or not.
 
 .TP
-.B taskd add --data <root> org <org> 
+.B taskd add --data <root> org <org>
 .TP
 .B taskd add --data <root> group <org> <group>
 .TP
@@ -46,7 +49,7 @@ Starts the daemon.
 Adds organizations, groups and users.
 
 .TP
-.B taskd remove --data <root> org <org> 
+.B taskd remove --data <root> org <org>
 .TP
 .B taskd remove --data <root> group <org> <group>
 .TP
@@ -54,7 +57,7 @@ Adds organizations, groups and users.
 Removes organizations, groups and users.
 
 .TP
-.B taskd suspend --data <root> org <org> 
+.B taskd suspend --data <root> org <org>
 .TP
 .B taskd suspend --data <root> group <org> <group>
 .TP
@@ -62,7 +65,7 @@ Removes organizations, groups and users.
 Suspends organizations, groups and users.
 
 .TP
-.B taskd resume --data <root> org <org> 
+.B taskd resume --data <root> org <org>
 .TP
 .B taskd resume --data <root> group <org> <group>
 .TP
@@ -89,12 +92,13 @@ Suppresses verbose output.
 Shows debugging information.
 
 .SH CONFIGURATION
-Configuration files can be found ...
+The taskd configuration file can be found in the top level of the data root.  It
+is recommended that the 'taskd config' command is used to manipulate this file.
 
 Note that any configuration variable may be overridden on the command line using
 this syntax:
 
-  $ taskd build --NAME=VALUE
+  $ taskd server --NAME=VALUE
 
 In all commands but one, this will _temporarily_ override the value, but with
 the 'init' command, which creates a config file, overrides are made permanent.
@@ -108,8 +112,6 @@ command line.
 .B TASKDDATA=<root>
 Most command require either '--data <root>' or this environment variable.  If
 both are provided, the command line overrides the environment.
-
-.SH EXAMPLES
 
 .SH "CREDITS & COPYRIGHTS"
 Copyright (C) 2010 \- 2013, Göteborg Bit Factory.

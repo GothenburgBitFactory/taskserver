@@ -11,6 +11,8 @@
     - task data interchange format
     - task server protocol
     - sync algorithm
+    - taskd.1 man page
+    - taskdrc.5 man page
 - Supports 'client.allow' and 'client.deny' lists
 
 ------ current release ---------------------------

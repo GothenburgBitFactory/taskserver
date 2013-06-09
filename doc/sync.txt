@@ -294,7 +294,7 @@ Table of Contents
 
 5  References
 
-   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", Version 1O, June
+   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", Version 1, June
         2013.
 
    [RFC1122] IETF, "Requirements for Internet Hosts - Communication

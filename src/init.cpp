@@ -69,16 +69,16 @@ int command_init (Config& config, const std::vector <std::string>& args)
 
   if (!root_dir.is_directory ())
      throw std::string ("ERROR: The '--data' path is not a directory.");
- 
+
   if (!root_dir.readable ())
     throw std::string ("ERROR: The '--data' directory is not readable.");
- 
+
   if (!root_dir.writable ())
     throw std::string ("ERROR: The '--data' directory is not writable.");
- 
+
   if (!root_dir.executable ())
     throw std::string ("ERROR: The '--data' directory is not executable.");
- 
+
   // Provide some defaults and overrides.
   config.set ("extensions", TASKD_EXTDIR);
 

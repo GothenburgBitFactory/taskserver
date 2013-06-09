@@ -1,4 +1,4 @@
-Göteborg Bit Factory                                               October 2012
+Göteborg Bit Factory                                                  June 2013
 
                    Taskwarrior Data Interchange Format (JSON)
                                    Version 1
