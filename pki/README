@@ -1,19 +1,29 @@
-PKI
----
 
-To generate all keys/certs, run:
+PKI is a complex subject.  These scripts, and this description are not intended
+to be a complete and accurate example of PKI.
 
-  ./generate
+Ideally you would purchase a server cert signed by a known CA, such as the
+following:
 
-Files generated are:
+  Symantec
+  Comodo
+  GoDaddy
+  GlobalSign
 
-  ca.cert.pem          - Needed by server
-  ca.key.pem
+Using that server cert, you would then issue a server CRL and client keys.
 
-  client.cert.pem      - Needed by client (taskwarrior)
-  client.key.pem
+If you are developing, testing, or running your own private server, you may
+choose instead to generate the above yourself.  In this case you would generate
+a CA key and cert, then use that to generate a server key, cert and CRL.  Then
+you would use the server key and cert to create a client key and cert.  But as
+there is no trusted CA in this example, just yourself, the resultant client key
+and cert will not be trusted by anyone, for good reasons.
 
-  server.cert.pem      - Needed by server
-  server.crl.pem       - Needed by server
-  server.key.pem       - Needed by server
+Note, you can inspect any cert with the command:
+
+  $ gnutls-certtool -i --infile $CERT
+
+There is a 'generate' script here that will perform the above steps.  Take a
+look at it to see the individual steps it takes to generate the proper set of
+keys and certs.
 

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Create a CA key.
+gnutls-certtool \
+  --generate-privkey \
+  --outfile ca.key.pem
+
+chmod 600 ca.key.pem
+
+# Sign a CA cert.
+cat <<EOF >ca.info
+cn = Göteborg Bit Factory
+ca
+cert_signing_key
+EOF
+
+gnutls-certtool \
+  --generate-self-signed \
+  --load-privkey ca.key.pem \
+  --template ca.info \
+  --outfile ca.cert.pem
+
+chmod 600 ca.cert.pem
+rm ca.info
+exit 0

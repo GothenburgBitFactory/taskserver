@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Create a server key.
+gnutls-certtool \
+  --generate-privkey \
+  --outfile server.key.pem
+
+chmod 600 server.key.pem
+
+# Sign a server cert using the key.
+cat <<EOF >server.info
+organization = Göteborg Bit Factory
+cn = tasktools.org
+tls_www_server
+encryption_key
+signing_key
+EOF
+
+gnutls-certtool \
+  --generate-certificate \
+  --load-privkey server.key.pem \
+  --load-ca-certificate ca.cert.pem \
+  --load-ca-privkey ca.key.pem \
+  --template server.info \
+  --outfile server.cert.pem
+
+chmod 600 server.cert.pem
+rm server.info
+exit 0
+
