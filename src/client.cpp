@@ -30,8 +30,6 @@
 #include <cstring>
 #include <stdlib.h>
 #include <Date.h>
-#include <Color.h>
-#include <Timer.h>
 #include <File.h>
 #include <text.h>
 #include <util.h>
@@ -42,6 +40,7 @@
 // displays the result.
 int command_client (Config& config, const std::vector <std::string>& args)
 {
+#ifdef FEATURE_CLIENT_INTERFACE
   // Parse arguments.
   if (args.size () < 3)
     throw std::string ("ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]");
@@ -67,6 +66,9 @@ int command_client (Config& config, const std::vector <std::string>& args)
     std::cout << "<<<\n"
               << response.serialize ();
   }
+#else
+  throw std::string ("ERROR: Client interface feature not enabled.");
+#endif
 
   return 0;
 }

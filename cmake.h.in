@@ -3,6 +3,9 @@
 /* Product identification */
 #define PRODUCT_TASKSERVER 1
 
+/* Feature enable/disabled */
+#define FEATURE_CLIENT_INTERFACE
+
 /* Package information */
 #define PACKAGE           "${PACKAGE}"
 #define VERSION           "${VERSION}"

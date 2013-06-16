@@ -3,8 +3,8 @@
 1.0.0beta ()
 
 1.0.0alpha ()
-- Supports CRL (Certificate Revocation List)
-- Supports new user key generation
+- Supports CRL (Certificate Revocation List).
+- Supports new user key generation.
 - Documentation for:
     - operations
     - writing a client 
@@ -14,7 +14,8 @@
     - taskd.1 man page
     - taskdrc.5 man page
     - PKI
-- Supports 'client.allow' and 'client.deny' lists
+- Supports 'client.allow' and 'client.deny' lists.
+- Client interface now an optional feature.
 
 ------ current release ---------------------------
 

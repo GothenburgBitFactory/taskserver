@@ -108,6 +108,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
+#ifdef FEATURE_CLIENT_INTERFACE
     else if (closeEnough ("client", args[1], 3))
     {
       std::cout << "\n"
@@ -122,6 +123,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
     }
+#endif
     else if (closeEnough ("add", args[1], 3))
     {
       std::cout << "\n"
