@@ -79,9 +79,16 @@ First setup the client:
   $ cd ../client
   $ ./setup
 
-Run the tests:
+You can run all the tests at once:
 
   $ ./run
+
+Or you can run them individually, and see what's happening:
+
+  $ ./case1
+  $ ./case2
+  $ ./case3
+  etc
 
 
 Test interface

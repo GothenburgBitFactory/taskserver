@@ -13,6 +13,7 @@
     - sync algorithm
     - taskd.1 man page
     - taskdrc.5 man page
+    - PKI
 - Supports 'client.allow' and 'client.deny' lists
 
 ------ current release ---------------------------

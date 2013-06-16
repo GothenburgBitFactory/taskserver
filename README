@@ -1,0 +1,33 @@
+Welcome To Task Server Alpha
+----------------------------
+
+The alpha release of the task server is intended to test the functionality and
+documentation.  It is not for casual users.  It is not for anyone who wishes to
+use the server in a production environment.  It is not for anyone who is
+unfamiliar with the operation of daemons.  It is not for anyone who does not
+make proper precautions with data.
+
+
+Demonstration
+-------------
+
+There is a demonstration, which illustrates many aspects of the task server:
+
+  demo/README
+
+
+Documentation
+-------------
+
+You will find documents in the doc directory, but specifically you will find the
+operation guide:
+
+  doc/operation.txt
+
+This document guides you through installation and setup.
+
+In addition there are two man pages installed:
+
+  taskd(1)
+  taskdrc(5)
+

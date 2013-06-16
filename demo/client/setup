@@ -15,7 +15,7 @@ echo "# Create first taskwarrior client"
 mkdir $TW1
 echo "data.location=$TW1"                      > $TW1/rc
 echo "taskd.server=localhost:6544"            >> $TW1/rc
-echo "taskd.credentials=Public/USER/$KEY"      >> $TW1/rc
+echo "taskd.credentials=Public/USER/$KEY"     >> $TW1/rc
 echo "taskd.certificate=$TW1/client.cert.pem" >> $TW1/rc
 echo "confirmation=off"                       >> $TW1/rc
 cp ../../pki/client.cert.pem $TW1
@@ -27,7 +27,7 @@ echo "# Create second taskwarrior client"
 mkdir $TW2
 echo "data.location=$TW2"                      > $TW2/rc
 echo "taskd.server=localhost:6544"            >> $TW2/rc
-echo "taskd.credentials=Public/USER/$KEY"      >> $TW2/rc
+echo "taskd.credentials=Public/USER/$KEY"     >> $TW2/rc
 echo "taskd.certificate=$TW2/client.cert.pem" >> $TW2/rc
 echo "confirmation=off"                       >> $TW2/rc
 cp ../../pki/client.cert.pem $TW2

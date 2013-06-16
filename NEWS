@@ -1,5 +1,5 @@
 
-New Features in taskd 0.12.0
+New Features in taskd 1.0.0alpha
 
   - Functioning sync algorithm
   - IPv4 and IPv6 support
@@ -12,7 +12,7 @@ New Features in taskd 0.12.0
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
-New configuration options in taskd 0.12.0
+New configuration options in taskd 1.0.0alpha
 
   - $TASKDDATA specifies the data root directory, otherwise '--data <root>' is
     needed for most commands.
