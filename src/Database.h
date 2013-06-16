@@ -46,54 +46,10 @@ public:
   // These throw on failure.
   bool authenticate (const Msg&, Msg&);
 #ifdef NONE_OF_THIS_WORKS
-  void authorize (const std::string&, const std::string&, const std::string&);
   bool redirect (const std::string&, Msg&);
-
-  void organizations (std::vector <std::string>&);
-  void groups (const std::string&, std::vector <std::string>&);
-  void users (const std::string&, std::vector <std::string>&);
-
-  void create_organization (const std::string&);
-  void suspend_organization (const std::string&);
-  void unsuspend_organization (const std::string&);
-  void terminate_organization (const std::string&);
-  void unterminate_organization (const std::string&);
-  void delete_organization (const std::string&);
-
-  void create_group (const std::string&, const std::string&);
-  void delete_group (const std::string&, const std::string&);
-
-  void create_user (const std::string&, const std::string&, std::string&);
-  void suspend_user (const std::string&, const std::string&);
-  void unsuspend_user (const std::string&, const std::string&);
-  void terminate_user (const std::string&, const std::string&);
-  void delete_user (const std::string&, const std::string&);
-/*
-  void add_user_to_group (const std::string&, const std::string&);
-  void remove_user_from_group (const std::string&, const std::string&);
-*/
-  void grant (const std::string&, const std::string&, const std::string&, const std::string&);
-  void revoke (const std::string&, const std::string&, const std::string&, const std::string&);
 #endif
 
   std::string key_generate ();
-
-#ifdef NONE_OF_THIS_WORKS
-/*
-  grant ();
-  revoke ();
-*/
-
-  void read_rc (const std::string&, const std::string&, Config&);
-  void read_data (const std::string&, const std::string&, std::vector <std::string>&);
-  std::string add_data (const std::string&, const std::string&, const std::vector <std::string>&);
-
-private:
-  bool has_admin (const std::string&, const std::string&, const std::string&);
-  bool has_org   (const std::string&, const std::string&, const std::string&);
-  bool has_group (const std::string&, const std::string&, const std::string&, const std::string&);
-  bool has_user  (const std::string&, const std::string&, const std::string&);
-#endif
 
 private:
   Config* _config;

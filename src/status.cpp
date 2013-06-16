@@ -75,7 +75,7 @@ int status_statistics (Config& config)
 
   return status;
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 int command_status (Config& config, const std::vector <std::string>& args)
 {
