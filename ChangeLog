@@ -2,7 +2,9 @@
 
 1.0.0beta ()
 
-1.0.0alpha ()
+------ current release ---------------------------
+
+1.0.0alpha (2013-06-23)
 - Supports CRL (Certificate Revocation List).
 - Supports new user key generation.
 - Documentation for:
@@ -17,13 +19,11 @@
 - Supports 'client.allow' and 'client.deny' lists.
 - Client interface now an optional feature.
 
------- current release ---------------------------
+------ old releases ------------------------------
 
-0.12.0 ()
+0.12.0 (2013-06-03
 - Added IP logging option.
 - JSON support.
-
------- old releases ------------------------------
 
 0.11.0 (2013-05-18)
 - Implemented 'config' command.
