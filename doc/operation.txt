@@ -213,7 +213,7 @@ Table of Contents
 
       $ taskd server --data /path/to/task/server/data
 
-   Or if þhe TASKDDATA variable is defined:
+   Or if the TASKDDATA variable is defined:
 
       $ taskd server
 
@@ -264,7 +264,7 @@ Table of Contents
 
    This will prevent any users in that organization from using the server.  This
    is one way to take the server offline, while keeping it running.  A suspended
-   organiztion can be restore with:
+   organization can be restore with:
 
       $ taskd resume org Public
 
@@ -310,9 +310,9 @@ Table of Contents
    The data needing backup consists of only one directory, which is the data
    root.  It is recommended that the server be taken offline for this:
 
-   $ taskdctl stop
-   $ <your backup program here>
-   $ taskdctl start
+      $ taskdctl stop
+      $ <your backup program here>
+      $ taskdctl start
 
    Rotating the task server log file requires the same care.
 
