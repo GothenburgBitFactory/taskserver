@@ -368,7 +368,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
   }
 
-  _log->format ("[%d] Stored %d, merged %d",
+  _log->format ("[%d] Stored %d tasks, merged %d tasks",
                 _txn_count,
                 store_count,
                 merge_count);
@@ -478,7 +478,7 @@ void Daemon::load_server_data (
   if (user_data.exists ())
     user_data.read (data);
 
-  _log->format ("[%d] Loaded %u", _txn_count, data.size ());
+  _log->format ("[%d] Loaded %u records", _txn_count, data.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -543,7 +543,7 @@ void Daemon::extract_subset (
       if (data[i][0] == '{')
         subset.push_back (Task (data[i]));
 
-  _log->format ("[%d] Subset %u", _txn_count, subset.size ());
+  _log->format ("[%d] Subset %u tasks", _txn_count, subset.size ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
