@@ -2,6 +2,7 @@
 
 1.0.0beta ()
 - Improved error handling for unrecognized requests.
+- Improved test suite for Cygwin.
 
 ------ current release ---------------------------
 

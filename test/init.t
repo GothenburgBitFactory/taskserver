@@ -30,8 +30,13 @@ use strict;
 use warnings;
 use Test::More tests => 11;
 
+# Check for Cygwin, which does not support the 'chmod 000 $data' command.
+my $output = qx{../src/taskd --version 2>&1};
+my ($platform) = $output =~ /built for (\S+)/;
+diag ("Platform: $platform");
+
 # Check for required --data option.
-my $output = qx{../src/taskd init 2>&1};
+$output = qx{../src/taskd init 2>&1};
 like ($output, qr/^ERROR: The '--data' option is required\./, "'taskd init' - missing --data option");
 
 # Check that --data exists.
@@ -43,13 +48,23 @@ qx{touch $data};
 $output = qx{../src/taskd init --data $data 2>&1};
 like ($output, qr/^ERROR: The '--data' path is not a directory\./, "'taskd init --data $data' - data not a directory");
 
-qx{rm $data; mkdir $data; chmod 000 $data};
-$output = qx{../src/taskd init --data $data 2>&1};
-like ($output, qr/^ERROR: The '--data' directory is not readable\./, "'taskd init --data $data' - data not readable");
+qx{rm $data; mkdir $data};
 
-qx{chmod +r $data};
-$output = qx{../src/taskd init --data $data 2>&1};
-like ($output, qr/^ERROR: The '--data' directory is not writable\./, "'taskd init --data $data' - data not writable");
+if ($platform eq 'cygwin')
+{
+  pass ("'taskd init --data $data' - data not readable (skipped for $platform)");
+  pass ("'taskd init --data $data' - data not writable (skipped for $platform)");
+}
+else
+{
+  qx{chmod 000 $data};
+  $output = qx{../src/taskd init --data $data 2>&1};
+  like ($output, qr/^ERROR: The '--data' directory is not readable\./, "'taskd init --data $data' - data not readable");
+
+  qx{chmod +r $data};
+  $output = qx{../src/taskd init --data $data 2>&1};
+  like ($output, qr/^ERROR: The '--data' directory is not writable\./, "'taskd init --data $data' - data not writable");
+}
 
 qx{chmod +w $data};
 $output = qx{../src/taskd init --data $data 2>&1};
