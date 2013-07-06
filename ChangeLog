@@ -1,6 +1,7 @@
 1.0.0 ()
 
 1.0.0beta ()
+- Improved error handling for unrecognized requests.
 
 ------ current release ---------------------------
 

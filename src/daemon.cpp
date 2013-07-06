@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <errno.h>
 #include <Server.h>
 #include <Timer.h>
 #include <Database.h>
@@ -159,7 +160,12 @@ void Daemon::handler (const std::string& input, std::string& output)
          if (type == "statistics") handle_statistics (in, out);
     else if (type == "sync")       handle_sync       (in, out);
     else
+    {
+      if (_log)
+        _log->format ("[%d] INFO Unrecognized message type '%s'", _txn_count, type.c_str ());
+
       throw 500;
+    }
 
     output = out.serialize ();
 
@@ -199,6 +205,13 @@ void Daemon::handler (const std::string& input, std::string& output)
       _log->format ("[%d] %s", _txn_count, e.c_str ());
   }
 
+  // Mystery errors.
+  catch (...)
+  {
+    if (_log)
+      _log->format ("[%d] Unknown error", _txn_count);
+  }
+
   _bytes_in  += input.length ();
   _bytes_out += output.length ();
 }
@@ -227,7 +240,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   int average_req          = 0;
   int average_resp         = 0;
   double average_resp_time = 0.0;
-  double tps               = 0;
+  double tps               = 0.0;
   if (_txn_count)
   {
     average_req       = _bytes_in  / _txn_count;
@@ -870,6 +883,9 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
   catch (...)
   {
+    if (errno)
+      log.format ("errno=%d %s", errno, strerror (errno));
+    else
     log.write ("Unknown error");
     return -2;
   }

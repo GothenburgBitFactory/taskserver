@@ -66,7 +66,7 @@ int main (int argc, const char** argv)
   // Create a vector of args.
   std::vector <std::string> args;
   for (int i = 1; i < argc; ++i)
-    args.push_back (std::string (argv[i]));
+    args.push_back (argv[i]);
 
   Config config;
 
