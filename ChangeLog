@@ -1,13 +1,18 @@
 1.0.0 ()
 
-1.0.0beta ()
+1.0.0.beta ()
+
+Features
 - Improved error handling for unrecognized requests.
 - Improved test suite for Cygwin.
 - Improved log entries, for brevity and clarity.
 
+Bugs
+- #1299 Now properly counts bytes sent back to client.
+
 ------ current release ---------------------------
 
-1.0.0alpha (2013-06-23)
+1.0.0.alpha (2013-06-23)
 - Supports CRL (Certificate Revocation List).
 - Supports new user key generation.
 - Documentation for:
