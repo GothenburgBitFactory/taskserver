@@ -23,6 +23,9 @@ New configuration options in taskd 1.0.0alpha
 Taskd has been built and tested on the following configurations:
 
   * OS X 10.8 Mountain Lion
+  * Debian 6.0 Squeeze (stable)
+  * Ubuntu 10.04 Lucid Lynx and 13.04 Raring Ringtail
+  * Cygwin 1.7
 
 ---
 
