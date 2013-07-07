@@ -9,6 +9,7 @@ Features
 
 Bugs
 - #1293 The operation.txt document details client.allow, client.deny.
+- #1295 Relaxed message parsing slightly.
 - #1296 Now uses permiѕsions 0600 and 0700 when creating files and directories.
 - #1299 Now properly counts bytes sent back to client.
 - #1300 Encode/decode pairing is now properly balanced.
