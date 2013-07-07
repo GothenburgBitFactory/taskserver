@@ -363,10 +363,12 @@ time_t File::btime () const
 ////////////////////////////////////////////////////////////////////////////////
 bool File::create (const std::string& name, int mode /* = 0640 */)
 {
-  std::ofstream out (expand (name).c_str ());
+  std::string full_name = expand (name);
+  std::ofstream out (full_name.c_str ());
   if (out.good ())
   {
     out.close ();
+    chmod (full_name.c_str (), mode);
     return true;
   }
 
