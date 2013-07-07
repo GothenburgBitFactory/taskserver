@@ -28,6 +28,7 @@
 #include <cmake.h>
 #include <fstream>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/file.h>
 #include <pwd.h>
 #include <unistd.h>
@@ -88,10 +89,11 @@ File& File::operator= (const File& other)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool File::create ()
+bool File::create (int mode /* = 0640 */)
 {
   if (open ())
   {
+    fchmod (_h, mode);
     close ();
     return true;
   }
@@ -359,7 +361,7 @@ time_t File::btime () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool File::create (const std::string& name)
+bool File::create (const std::string& name, int mode /* = 0640 */)
 {
   std::ofstream out (expand (name).c_str ());
   if (out.good ())
