@@ -21,8 +21,8 @@
 
 # The above is sufficient to operate a server.  What follows is a per-client
 # process.  Creates:
-#   client.key.pem
-#   client.cert.pem
+#   ${1}.key.pem
+#   ${1}.cert.pem
 
-./generate.client
+./generate.client client
 

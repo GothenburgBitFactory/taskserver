@@ -1,12 +1,17 @@
 #!/bin/bash
 
+NAME=client
+if [ $# -gt 0 ] ; then
+  NAME=$1
+fi
+
 # Create a client key.
 gnutls-certtool \
   --generate-privkey \
-  --outfile client.key.pem
+  --outfile ${NAME}.key.pem
 
 # Sign a client cert with the key.
-chmod 600 client.key.pem
+chmod 600 ${NAME}.key.pem
 cat <<EOF >client.info
 country = SE
 state = Västra Götaland
@@ -20,13 +25,13 @@ EOF
 
 gnutls-certtool \
   --generate-certificate \
-  --load-privkey client.key.pem \
+  --load-privkey ${NAME}.key.pem \
   --load-ca-certificate ca.cert.pem \
   --load-ca-privkey ca.key.pem \
   --template client.info \
-  --outfile client.cert.pem
+  --outfile ${NAME}.cert.pem
 
-chmod 600 client.cert.pem
+chmod 600 ${NAME}.cert.pem
 rm client.info
 exit 0
 
