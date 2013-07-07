@@ -217,6 +217,7 @@ Table of Contents
    There is a 'taskdctl' script to perform start/stop/restart.  Use it like
    this:
 
+      $ export TASKDDATA=/path/to/task/server/data
       $ taskdctl start
       $ taskdctl restart
       $ taskdctl stop
@@ -252,6 +253,8 @@ Table of Contents
    examples, the former is assumed to be set:
 
       $ export TASKDDATA=/path/to/task/server/data
+
+   Note that the 'taskdctl' script requires TASKDDATA.
 
 
 6.2  Organizations

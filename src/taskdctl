@@ -26,7 +26,12 @@
 ##
 ################################################################################
 
-PIDFILE=$(taskd config | grep pid.file | awk '{print $2}')
+if [ -z $TASKDDATA ] ; then
+  echo 'The TASKDDATA variable must be set.'
+  exit
+fi
+
+PIDFILE=$(taskd config --data $TASKDDATA | grep pid.file | awk '{print $2}')
 DAEMON="taskd server --data $TASKDDATA --daemon"
 
 ERROR=0
@@ -38,7 +43,7 @@ fi
 for ARG in $@ $ARGS
 do
   # check for pidfile
-  if [ -f $PIDFILE ] ; then
+  if [ -f "$PIDFILE" ] ; then
     PID=`cat $PIDFILE`
     if [ "x$PID" != "x" ] && kill -0 $PID 2>/dev/null ; then
       STATUS="daemon (pid $PID) running"
