@@ -296,7 +296,7 @@ bool taskd_at_least (const std::string& left, const std::string& right)
 ////////////////////////////////////////////////////////////////////////////////
 bool taskd_createDirectory (Directory& d, bool verbose)
 {
-  if (d.create ())
+  if (d.create (0700))
   {
     if (verbose)
       std::cout << Color ("green").colorize (

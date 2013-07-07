@@ -181,6 +181,9 @@ int command_config (Config& config, const std::vector <std::string>& args)
     // Write .taskd (or equivalent)
     if (change)
     {
+      if (! config._original_file.exists ())
+        config._original_file.create (0600);
+
       File::write (config._original_file, contents);
       if (verbose)
         std::cout << format ("Config file {1} modified.",

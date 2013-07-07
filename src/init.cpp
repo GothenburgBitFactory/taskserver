@@ -92,11 +92,15 @@ int command_init (Config& config, const std::vector <std::string>& args)
   Directory sub (root_dir);
   sub.cd ();
   sub += "orgs";
-  if (!sub.create ())
+  if (!sub.create (0700))
     throw std::string ("ERROR: Could not create '") + sub._data + "'.";
 
   // Dump the config file?
   config._original_file = root_dir._data + "/config";
+
+  if (! config._original_file.exists ())
+    config._original_file.create (0600);
+
   if (config.dirty ())
   {
     config.save ();

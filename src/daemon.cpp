@@ -477,6 +477,8 @@ void Daemon::load_server_data (
 
   if (user_data.exists ())
     user_data.read (data);
+  else
+    user_data.create (0600);
 
   _log->format ("[%d] Loaded %u records", _txn_count, data.size ());
 }
@@ -493,6 +495,9 @@ void Daemon::append_server_data (
   user_dir += "users";
   user_dir += user;
   File user_data (user_dir._data + "/tx.data");
+
+  if (!user_data.exists ())
+    user_data.create (0600);
 
   user_data.append (data);
 

@@ -47,9 +47,9 @@ static bool add_org (
   Directory users (new_org);
   users += "users";
 
-  return new_org.create () &&
-         groups.create () &&
-         users.create ();
+  return new_org.create (0700) &&
+         groups.create (0700) &&
+         users.create (0700);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ static bool add_group (
   new_group += "groups";
   new_group += group;
 
-  return new_group.create ();
+  return new_group.create (0700);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,13 +79,15 @@ static bool add_user (
   new_user += "users";
   new_user += user;
 
-  if (new_user.create ())
+  if (new_user.create (0700))
   {
     // Generate new KEY
     std::string key = taskd_generate_key ();
 
     // Store KEY in <new_user>/config
     File conf_file (new_user._data + "/config");
+    conf_file.create (0600);
+
     Config conf (conf_file._data);
     conf.set ("key", key);
     conf.save ();
@@ -152,7 +154,7 @@ static bool remove_user (
 static bool suspend_node (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
-  return semaphore.create ();
+  return semaphore.create (0600);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
