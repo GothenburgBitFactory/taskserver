@@ -44,14 +44,13 @@ int command_config (Config& config, const std::vector <std::string>& args)
   std::string name;
   std::string value;
   bool verbose = true;
-  bool debug = false;
   bool nonNull = false;
   bool confirmation = true;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--quiet",  *i, 3)) verbose = false;
-    else if (closeEnough ("--debug",  *i, 3)) debug   = true;
+    else if (closeEnough ("--debug",  *i, 3)) ; // TODO Is this necessary?
     else if (closeEnough ("--data",  *i, 3))   root  = *(++i);
     else if (closeEnough ("--force", *i, 3))   confirmation = false;
     else if (taskd_applyOverride (config, *i)) ;
@@ -131,12 +130,16 @@ int command_config (Config& config, const std::vector <std::string>& args)
     if (change)
     {
       File::write (config._original_file, contents);
-      std::cout << format ("Config file {1} modified.",
-                           config._original_file._data)
-                << "\n";
+      if (verbose)
+        std::cout << format ("Config file {1} modified.",
+                             config._original_file._data)
+                  << "\n";
     }
     else
-      std::cout << "No changes made.\n";
+    {
+      if (verbose)
+        std::cout << "No changes made.\n";
+    }
   }
 
   // taskd config <name>
@@ -179,19 +182,24 @@ int command_config (Config& config, const std::vector <std::string>& args)
     if (change)
     {
       File::write (config._original_file, contents);
-      std::cout << format ("Config file {1} modified.",
-                           config._original_file._data)
-                << "\n";
+      if (verbose)
+        std::cout << format ("Config file {1} modified.",
+                             config._original_file._data)
+                  << "\n";
     }
     else
-      std::cout << "No changes made.\n";
+    {
+      if (verbose)
+        std::cout << "No changes made.\n";
+    }
   }
 
   // taskd config
   // - list all settings.
   else
   {
-    std::cout << "\nConfiguration read from " << config._original_file._data << "\n\n";
+    if (verbose)
+      std::cout << "\nConfiguration read from " << config._original_file._data << "\n\n";
     taskd_renderMap (config, "Variable", "Value");
   }
 
