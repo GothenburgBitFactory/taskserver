@@ -82,11 +82,16 @@ int command_init (Config& config, const std::vector <std::string>& args)
   config.set ("extensions", TASKD_EXTDIR);
 
   if (config.get ("log")            == "") config.set ("log",            "/tmp/taskd.log");
-  if (config.get ("server")         == "") config.set ("server",         "localhost:6544");
   if (config.get ("queue.size")     == "") config.set ("queue.size",     "10");
   if (config.get ("pid.file")       == "") config.set ("pid.file",       "/tmp/taskd.pid");
   if (config.get ("ip.log")         == "") config.set ("ip.log",         "on");
   if (config.get ("request.limit")  == "") config.set ("request.limit",  "1048576");
+
+  // Suggestions for missing items.
+  if (config.get ("server") == "")
+    std::cout << "You must specify the 'server' variable, for example:\n"
+              << "  taskd config server localhost:6544\n"
+              << "\n";
 
   // Create the data structure.
   Directory sub (root_dir);

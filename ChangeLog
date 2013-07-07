@@ -9,6 +9,8 @@ Features
 - Improved log entries, for brevity and clarity.
 
 Bugs
+- #1289 The 'init' command no longer defaults the 'server' variable, and
+        provides feedback when it is not specified.
 - #1291 The 'taskdctl' script needs to use TASKDDATA for config command.
 - #1293 The operation.txt document details client.allow, client.deny.
 - #1295 Relaxed message parsing slightly.
