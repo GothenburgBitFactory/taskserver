@@ -38,14 +38,13 @@ int command_init (Config& config, const std::vector <std::string>& args)
 
   // Standard argument processing.
   bool verbose     = true;
-  bool debug       = false;
   std::string root = "";
 
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--quiet",  *i, 3)) verbose = false;
-    else if (closeEnough ("--debug",  *i, 3)) debug   = true;
+    else if (closeEnough ("--debug",  *i, 3)) ; // TODO Is this necessary?
     else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
     else if (taskd_applyOverride (config, *i))   ;
     else
