@@ -123,6 +123,19 @@ Table of Contents
       $ taskd config pid.file /path/to/taskd.pid
       $ taskd config ip.log   1
 
+   The next step is to allow/deny specific clients.  Taskwarrior has a client
+   defined as 'task 2.3.0', so to allow that:
+
+      $ taskd config client.allow 'task [2-9]'
+      $ taskd config client.deny none
+
+   Note that the values are regular expressions, and it is necessary to allow
+   for some flexibility in the version number.  The above is a very general
+   pattern, but it could be more specific.  To allow any client, do this:
+
+      $ taskd config client.allow all
+      $ taskd config client.deny none
+
    To override the confirmation question for each of the above, you can specify
    the '--force' option:
 

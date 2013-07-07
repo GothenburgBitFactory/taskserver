@@ -8,6 +8,7 @@ Features
 - Improved log entries, for brevity and clarity.
 
 Bugs
+- #1293 The operation.txt document details client.allow, client.deny.
 - #1299 Now properly counts bytes sent back to client.
 - #1300 Encode/decode pairing is now properly balanced.
 
