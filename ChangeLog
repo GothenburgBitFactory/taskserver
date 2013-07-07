@@ -9,6 +9,7 @@ Features
 
 Bugs
 - #1299 Now properly counts bytes sent back to client.
+- #1300 Encode/decode pairing is now properly balanced.
 
 ------ current release ---------------------------
 
