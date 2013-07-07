@@ -40,6 +40,9 @@ Please see this page for a list of issues, and their status:
   Taskwarrior 2.3.0   http://taskwarrior.org/versions/show/46
   Task Server 1.0.0   http://taskwarrior.org/versions/show/53
 
+It is generally recommended that you pull latest changes for both projects as
+often as possible, to benefit from bug fixes.
+
 
 Feedback
 --------
