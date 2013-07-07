@@ -217,7 +217,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
       if (taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' already exists.";
 
-      if (!add_org (root_dir, positional[i]))
+      if (add_org (root_dir, positional[i]))
+      {
+        if (verbose)
+          std::cout << "Created organization '" << positional[i] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to create organization '") + positional[i] + "'.";
     }
   }
@@ -237,7 +242,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
       if (taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' already exists.";
 
-      if (!add_group (root_dir, positional[1], positional[i]))
+      if (add_group (root_dir, positional[1], positional[i]))
+      {
+        if (verbose)
+          std::cout << "Created group '" << positional[i] << "' for organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to create group '") + positional[i] + "'.";
     }
   }
@@ -257,7 +267,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
       if (taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' already exists.";
 
-      if (!add_user (root_dir, positional[1], positional[i]))
+      if (add_user (root_dir, positional[1], positional[i]))
+      {
+        if (verbose)
+          std::cout << "Created user '" << positional[i] << "' for organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to create user '") + positional[i] + "'.";
     }
   }
@@ -323,7 +338,12 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
-      if (! remove_org (root_dir, positional[i]))
+      if (remove_org (root_dir, positional[i]))
+      {
+        if (verbose)
+          std::cout << "Removed organization '" << positional[i] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to remove organization '") + positional[i] + "'.";
     }
   }
@@ -343,7 +363,12 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
-      if (! remove_group (root_dir, positional[1], positional[i]))
+      if (remove_group (root_dir, positional[1], positional[i]))
+      {
+        if (verbose)
+          std::cout << "Removed group '" << positional[i] << "' from organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to remove group '") + positional[i] + "'.";
     }
   }
@@ -363,7 +388,12 @@ int command_remove (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
-      if (! remove_user (root_dir, positional[1], positional[i]))
+      if (remove_user (root_dir, positional[1], positional[i]))
+      {
+        if (verbose)
+          std::cout << "Removed user '" << positional[i] << "' from organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to remove user '") + positional[i] + "'.";
     }
   }
@@ -429,7 +459,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
-      if (! suspend_node (root_dir._data + "/orgs/" + positional[i]))
+      if (suspend_node (root_dir._data + "/orgs/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Suspended organization '" << positional[i] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to suspend organization '") + positional[i] + "'.";
     }
   }
@@ -449,7 +484,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
-      if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+      if (suspend_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Suspended group '" << positional[i] << "' in organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to suspend group '") + positional[i] + "'.";
     }
   }
@@ -469,7 +509,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
-      if (! suspend_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+      if (suspend_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Suspended user '" << positional[i] << "' in organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to suspend user '") + positional[i] + "'.";
     }
   }
@@ -535,7 +580,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, positional[i]))
         throw std::string ("ERROR: Organization '") + positional[i] + "' does not exist.";
 
-      if (! resume_node (root_dir._data + "/orgs/" + positional[i]))
+      if (resume_node (root_dir._data + "/orgs/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Resumed organization '" << positional[i] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to resume organization '") + positional[i] + "'.";
     }
   }
@@ -555,7 +605,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: Group '") + positional[i] + "' does not exist.";
 
-      if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+      if (resume_node (root_dir._data + "/orgs/" + positional[1] + "/groups/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Resumed group '" << positional[i] << "' in organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to resume group '") + positional[i] + "'.";
     }
   }
@@ -575,7 +630,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, positional[1], positional[i]))
         throw std::string ("ERROR: User '") + positional[i] + "' does not  exists.";
 
-      if (! resume_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+      if (resume_node (root_dir._data + "/orgs/" + positional[1] + "/users/" + positional[i]))
+      {
+        if (verbose)
+          std::cout << "Resumed user '" << positional[i] << "' in organization '" << positional[1] << "'\n";
+      }
+      else
         throw std::string ("ERROR: Failed to resume user '") + positional[i] + "'.";
     }
   }
