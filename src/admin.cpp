@@ -175,13 +175,12 @@ int command_add (Config& config, const std::vector <std::string>& args)
 
   std::vector <std::string> positional;
   bool verbose = true;
-  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--data",   *i, 3))  root = *(++i);
     else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
-    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (closeEnough ("--debug",  *i, 3))  ; // TODO Is this necessary?
     else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
@@ -296,13 +295,12 @@ int command_remove (Config& config, const std::vector <std::string>& args)
 
   std::vector <std::string> positional;
   bool verbose = true;
-  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--data",   *i, 3))  root = *(++i);
     else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
-    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (closeEnough ("--debug",  *i, 3))  ; // TODO Is this necessary?
     else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
@@ -417,13 +415,12 @@ int command_suspend (Config& config, const std::vector <std::string>& args)
 
   std::vector <std::string> positional;
   bool verbose = true;
-  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--data",   *i, 3))  root = *(++i);
     else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
-    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (closeEnough ("--debug",  *i, 3))  ; // TODO Is this necessary?
     else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
@@ -538,13 +535,12 @@ int command_resume (Config& config, const std::vector <std::string>& args)
 
   std::vector <std::string> positional;
   bool verbose = true;
-  bool debug = false;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
          if (closeEnough ("--data",   *i, 3))  root = *(++i);
     else if (closeEnough ("--quiet",  *i, 3))  verbose = false;
-    else if (closeEnough ("--debug",  *i, 3))  debug = true;
+    else if (closeEnough ("--debug",  *i, 3))  ; // TODO Is this necessary?
     else if (taskd_applyOverride (config, *i)) ;
     else
       positional.push_back (*i);
