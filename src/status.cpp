@@ -83,12 +83,11 @@ int command_status (Config& config, const std::vector <std::string>& args)
 //  taskd_resume (config);
 
   bool verbose = true;
-  bool debug = false;
   std::string root;
   std::vector <std::string>::const_iterator i;
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
-         if (closeEnough ("--debug",  *i, 3))  debug    = true;
+         if (closeEnough ("--debug",  *i, 3))  ; // TODO Is this necessary?
     else if (closeEnough ("--data",  *i, 3))   root     = *(++i);
     else if (closeEnough ("--quiet", *i, 3))   verbose  = false;
     else if (taskd_applyOverride (config, *i)) ;
