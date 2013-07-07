@@ -93,7 +93,7 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n"
-                << "Note that sending the USR1 signal to the taskd server causes a configuration\n"
+                << "Note that sending the HUP signal to the taskd server causes a configuration\n"
                 << "file reload before the next request is handled.\n"
                 << "\n";
     }

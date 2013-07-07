@@ -44,7 +44,8 @@
 #include <TLSServer.h>
 #include <Timer.h>
 
-// Indicates that SIGUSR1, SIGUSR2 were caught.
+// Indicates that certain signals were caught.
+bool _sighup  = false;
 bool _sigusr1 = false;
 bool _sigusr2 = false;
 
@@ -53,6 +54,7 @@ static void signal_handler (int s)
 {
   switch (s)
   {
+  case SIGHUP:  _sighup  = true; break;
   case SIGUSR1: _sigusr1 = true; break;
   case SIGUSR2: _sigusr2 = true; break;
   }
@@ -177,6 +179,7 @@ void Server::beginServer ()
     writePidFile ();
   }
 
+  signal (SIGHUP,  signal_handler);
   signal (SIGUSR1, signal_handler);
   signal (SIGUSR2, signal_handler);
 

@@ -47,7 +47,8 @@
 #include <util.h>
 #include <taskd.h>
 
-// Indicates that SIGUSR1, SIGUSR2 were caught.
+// Indicates that signals were caught.
+extern bool _sighup;
 extern bool _sigusr1;
 extern bool _sigusr2;
 static Config _overrides;
@@ -139,19 +140,19 @@ void Daemon::handler (const std::string& input, std::string& output)
          !input[3]))
       throw 401;
 
-    // A trapped SIGUSR1 results in a config reload.  Original command line
+    // A trapped SIGHUP results in a config reload.  Original command line
     // overrides are preserved.
-    if (_sigusr1)
+    if (_sighup)
     {
       if (_log)
-        _log->format ("[%d] SIGUSR1 triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
+        _log->format ("[%d] SIGHUP triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
 
       _config.load (_config._original_file._data);
       Config::iterator i;
       for (i = _overrides.begin (); i != _overrides.end (); ++i)
         _config[i->first] = i->second;
 
-      _sigusr1 = false;
+      _sighup = false;
     }
 
     unsigned int request_limit = (unsigned) _config.getInteger ("request.limit");
@@ -833,7 +834,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
   config.set ("verbose", verbose);
   config.set ("debug", debug);
 
-  // Preserve all overrides, to reapply on config reload via SIGUSR1.
+  // Preserve all overrides, to reapply on config reload via SIGHUP.
   _overrides.set ("root", root_dir._data);
   _overrides.set ("verbose", verbose);
   _overrides.set ("debug", debug);
