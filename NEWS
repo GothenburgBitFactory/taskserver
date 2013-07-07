@@ -17,6 +17,7 @@ New configuration options in taskd 1.0.0alpha
   - $TASKDDATA specifies the data root directory, otherwise '--data <root>' is
     needed for most commands.
   - Supports 'ip.log' to turn on/off logging of client IP address and port.
+  - Sending a USR1 signal to the task server forces a configuration file reload.
 
 ---
 

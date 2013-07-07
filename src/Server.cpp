@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <errno.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -42,6 +43,20 @@
 #include <Server.h>
 #include <TLSServer.h>
 #include <Timer.h>
+
+// Indicates that SIGUSR1, SIGUSR2 were caught.
+bool _sigusr1 = false;
+bool _sigusr2 = false;
+
+////////////////////////////////////////////////////////////////////////////////
+static void signal_handler (int s)
+{
+  switch (s)
+  {
+  case SIGUSR1: _sigusr1 = true; break;
+  case SIGUSR2: _sigusr2 = true; break;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 Server::Server ()
@@ -161,6 +176,9 @@ void Server::beginServer ()
     daemonize ();  // Only the child returns.
     writePidFile ();
   }
+
+  signal (SIGUSR1, signal_handler);
+  signal (SIGUSR2, signal_handler);
 
   TLSServer server;
   if (_config)

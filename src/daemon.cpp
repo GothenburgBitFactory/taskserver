@@ -47,6 +47,11 @@
 #include <util.h>
 #include <taskd.h>
 
+// Indicates that SIGUSR1, SIGUSR2 were caught.
+extern bool _sigusr1;
+extern bool _sigusr2;
+static Config _overrides;
+
 ////////////////////////////////////////////////////////////////////////////////
 class Daemon : public Server
 {
@@ -134,6 +139,21 @@ void Daemon::handler (const std::string& input, std::string& output)
          !input[3]))
       throw 401;
 
+    // A trapped SIGUSR1 results in a config reload.  Original command line
+    // overrides are preserved.
+    if (_sigusr1)
+    {
+      if (_log)
+        _log->format ("[%d] SIGUSR1 triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
+
+      _config.load (_config._original_file._data);
+      Config::iterator i;
+      for (i = _overrides.begin (); i != _overrides.end (); ++i)
+        _config[i->first] = i->second;
+
+      _sigusr1 = false;
+    }
+
     unsigned int request_limit = (unsigned) _config.getInteger ("request.limit");
     if (request_limit > 0 &&
         input.length () >= request_limit)
@@ -162,7 +182,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     else
     {
       if (_log)
-        _log->format ("[%d] INFO Unrecognized message type '%s'", _txn_count, type.c_str ());
+        _log->format ("[%d] ERROR Unrecognized message type '%s'", _txn_count, type.c_str ());
 
       throw 500;
     }
@@ -784,7 +804,8 @@ int command_server (Config& config, const std::vector <std::string>& args)
     else if (closeEnough ("--debug",  *i, 3)) debug   = true;
     else if (closeEnough ("--daemon", *i, 3)) daemon  = true;
     else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i))   ;
+    else if (taskd_applyOverride (config, *i) &&
+             taskd_applyOverride (_overrides, *i)) ;
     else
       throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
   }
@@ -811,6 +832,11 @@ int command_server (Config& config, const std::vector <std::string>& args)
   // Preserve the verbose setting for this run.
   config.set ("verbose", verbose);
   config.set ("debug", debug);
+
+  // Preserve all overrides, to reapply on config reload via SIGUSR1.
+  _overrides.set ("root", root_dir._data);
+  _overrides.set ("verbose", verbose);
+  _overrides.set ("debug", debug);
 
   // Provide a set of attribute types.
   taskd_staticInitialize ();

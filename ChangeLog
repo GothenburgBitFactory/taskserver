@@ -3,6 +3,7 @@
 1.0.0.beta ()
 
 Features
+- #1294 SIGUSR1 now forces a server config file reload.
 - Improved error handling for unrecognized requests.
 - Improved test suite for Cygwin.
 - Improved log entries, for brevity and clarity.

@@ -92,6 +92,9 @@ int command_help (Config& config, const std::vector <std::string>& args)
                 << "  --debug        Debug mode generates lots of diagnostics\n"
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
+                << "\n"
+                << "Note that sending the USR1 signal to the taskd server causes a configuration\n"
+                << "file reload before the next request is handled.\n"
                 << "\n";
     }
     else if (closeEnough ("status", args[1], 3))

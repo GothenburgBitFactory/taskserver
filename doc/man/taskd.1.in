@@ -40,6 +40,9 @@ Shows the server status, and statistics.
 Starts the server in daemon or TTY mode.  While there is no interactivity, the
 difference is whether taskd is attached to a TTY or not.
 
+Note that sending the USR1 signal to the taskd server causes a configuration
+file reload before the next request is handled.
+
 .TP
 .B taskd add --data <root> org <org>
 .TP

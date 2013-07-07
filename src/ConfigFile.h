@@ -47,7 +47,6 @@ public:
   void parse (const std::string&, int nest = 1);
 
   void setDefaults ();
-  void clear ();
 
   const std::string get        (const std::string&);
   const int         getInteger (const std::string&);

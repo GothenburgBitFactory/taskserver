@@ -74,6 +74,9 @@ Fully qualified path to the server certificate revocation list.
 .B server.key
 Fully qualified path to the server key.
 
+Note that sending the USR1 signal to the taskd server causes a configuration
+file reload before the next request is handled.
+
 .SH ENVIRONMENT VARIABLES
 
 Environment variables provide values that would otherwise be required at the
