@@ -36,26 +36,16 @@
 #include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-// This string is used in two ways:
-// 1) It is used to create a new .taskrc file, by copying it directly to disk.
-// 2) It is parsed and used as default values for all Config.get calls.
-std::string Config::_defaults = "";
-
-////////////////////////////////////////////////////////////////////////////////
-// DO NOT CALL Config::setDefaults.
-//
 // In all real use cases, Config::load is called.
 Config::Config ()
 : _original_file ()
 , _dirty (false)
 {
-  setDefaults ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 Config::Config (const std::string& file)
 {
-  setDefaults ();
   load (file);
 }
 
@@ -73,7 +63,6 @@ Config& Config::operator= (const Config& other)
     std::map<std::string, std::string>::operator= (other);
 
     _original_file = other._original_file;
-    _defaults      = other._defaults;
     _dirty         = other._dirty;
   }
 
@@ -95,10 +84,7 @@ void Config::load (const std::string& file, int nest /* = 1 */)
 
   // First time in, load the default values.
   if (nest == 1)
-  {
-    setDefaults ();
     _original_file = File (file);
-  }
 
   // Read the file, then parse the contents.
   std::string contents;
@@ -176,13 +162,6 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
     }
   }
 
-  _dirty = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Config::setDefaults ()
-{
-  parse (_defaults);
   _dirty = true;
 }
 

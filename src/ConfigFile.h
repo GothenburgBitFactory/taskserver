@@ -46,8 +46,6 @@ public:
   void save ();
   void parse (const std::string&, int nest = 1);
 
-  void setDefaults ();
-
   const std::string get        (const std::string&);
   const int         getInteger (const std::string&);
   const double      getReal    (const std::string&);
@@ -64,7 +62,6 @@ public:
   File _original_file;
 
 private:
-  static std::string _defaults;
   bool _dirty;
 };
 
