@@ -47,13 +47,13 @@ like ($output, qr/^ERROR: The '--data' path does not exist\./, "'taskd init --da
 qx{touch $data};
 $output = qx{../src/taskd init --data $data 2>&1};
 like ($output, qr/^ERROR: The '--data' path is not a directory\./, "'taskd init --data $data' - data not a directory");
-
 qx{rm $data; mkdir $data};
 
 if ($platform eq 'cygwin')
 {
   pass ("'taskd init --data $data' - data not readable (skipped for $platform)");
   pass ("'taskd init --data $data' - data not writable (skipped for $platform)");
+  pass ("'taskd init --data $data' - data not executable (skipped for $platform)");
 }
 else
 {
@@ -64,11 +64,11 @@ else
   qx{chmod +r $data};
   $output = qx{../src/taskd init --data $data 2>&1};
   like ($output, qr/^ERROR: The '--data' directory is not writable\./, "'taskd init --data $data' - data not writable");
-}
 
-qx{chmod +w $data};
-$output = qx{../src/taskd init --data $data 2>&1};
-like ($output, qr/^ERROR: The '--data' directory is not executable\./, "'taskd init --data $data' - data not executable");
+  qx{chmod +w $data};
+  $output = qx{../src/taskd init --data $data 2>&1};
+  like ($output, qr/^ERROR: The '--data' directory is not executable\./, "'taskd init --data $data' - data not executable");
+}
 
 qx{chmod +x $data};
 $output = qx{../src/taskd init --data $data 2>&1};
