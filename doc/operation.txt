@@ -396,10 +396,10 @@ Table of Contents
 11  Authors' Addresses
 
    Federico Hernandez
-   Email: fredde@yootabory.org
+   Email: fredde@taskwarrior.org
 
    Paul Beckingham
-   Email: paul@yootabory.org
+   Email: paul@taskwarrior.org
 
 
 12  Full Copyright Statement

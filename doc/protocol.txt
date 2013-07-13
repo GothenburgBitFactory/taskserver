@@ -93,7 +93,7 @@ Table of Contents
    The Task Server protocol assumes a reliable data stream such as provided by
    TCP.  When TCP is used, a task server listens on a single predetermined port
    _for the given client_ only.  This means the server may be using multiple
-   ports to serve multiple sets of clients.
+   ports to serve distinct sets of clients.
 
    This server is only an interface between programs and the task data.  It does
    not perform any user interaction or presentation-level functions.
@@ -269,10 +269,10 @@ Table of Contents
 9  Authors' Addresses
 
    Paul Beckingham
-   Email: paul@yootabory.org
+   Email: paul@taskwarrior.org
 
    Federico Hernandez
-   Email: fredde@yootabory.org
+   Email: fredde@taskwarrior.org
 
 
 10  Full Copyright Statement

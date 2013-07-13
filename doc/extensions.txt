@@ -79,10 +79,10 @@ X  References
 2  Authors' Addresses
 
    Paul Beckingham
-   Email: paul@yootabory.org
+   Email: paul@taskwarrior.org
 
    Federico Hernandez
-   Email: fredde@yootabory.org
+   Email: fredde@taskwarrior.org
 
 
 3  Full Copyright Statement

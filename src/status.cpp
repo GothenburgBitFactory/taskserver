@@ -80,7 +80,6 @@ int status_statistics (Config& config)
 int command_status (Config& config, const std::vector <std::string>& args)
 {
 //  taskd_requireConfiguration (config);
-//  taskd_resume (config);
 
   bool verbose = true;
   std::string root;
