@@ -35,7 +35,9 @@
 #include <Color.h>
 #include <Msg.h>
 #include <taskd.h>
+#ifdef HAVE_COMMIT
 #include <commit.h>
+#endif
 
 #ifdef HAVE_LIBGNUTLS                                                                                                               
 #include <gnutls/gnutls.h>                                                                                                          
@@ -125,7 +127,9 @@ int command_diag (Config& config, const std::vector <std::string>& args)
 
   // Build date.
             << "       Built: " << __DATE__ << " " << __TIME__ << "\n"
+#ifdef HAVE_COMMIT
             << "      Commit: " << COMMIT << "\n"
+#endif
             << "       CMake: " << CMAKE_VERSION << "\n"
             << "        Caps:"
 #ifdef HAVE_LIBPTHREAD

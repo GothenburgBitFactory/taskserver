@@ -39,7 +39,9 @@
 #include <Color.h>
 #include <text.h>
 #include <taskd.h>
+#ifdef HAVE_COMMIT
 #include <commit.h>
+#endif
 
 #ifdef HAVE_SRANDOM
 #define srand(x) srandom(x)

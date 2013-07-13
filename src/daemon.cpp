@@ -42,7 +42,9 @@
 #include <Duration.h>
 #include <Color.h>
 #include <Task.h>
+#ifdef HAVE_COMMIT
 #include <commit.h>
+#endif
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
