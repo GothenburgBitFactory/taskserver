@@ -28,6 +28,10 @@
 #ifdef HAVE_LIBGNUTLS
 
 #include <iostream>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <TLSServer.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -37,7 +41,7 @@
 #include <netdb.h>
 
 #define DH_BITS 1024
-#define MAX_BUF 1024
+#define MAX_BUF 16384
 #define LOG_LEVEL 3
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +52,8 @@ static void gnutls_log_function (int level, const char* message)
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
-: /*_ca ("")
-, _crl ("")
-,*/ _cert ("")
+: _crl ("")
+, _cert ("")
 , _key ("")
 , _socket (0)
 , _queue (5)
@@ -92,17 +95,11 @@ void TLSServer::debug (int level)
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
-/*
-  const std::string& ca,
   const std::string& crl,
-*/
   const std::string& cert,
   const std::string& key)
 {
-/*
-  _ca = ca;
   _crl = crl;
-*/
   _cert = cert;
   _key = key;
 
@@ -110,8 +107,8 @@ void TLSServer::init (
   gnutls_certificate_allocate_credentials (&_credentials);
 /*
   gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM);
-  gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
 */
+  gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
 
   gnutls_dh_params_init (&_params);
@@ -177,6 +174,8 @@ TLSTransaction::TLSTransaction ()
 : _socket (0)
 , _limit (0)
 , _debug (false)
+, _address ("")
+, _port (0)
 {
 }
 
@@ -282,10 +281,10 @@ void TLSTransaction::send (const std::string& data)
   packet[2] = l >>8;
   packet[3] = l;
 
-  int total = 0;
-  int remaining = packet.length ();
+  unsigned int total = 0;
+  unsigned int remaining = packet.length ();
 
-  while (total < remaining)
+  while (total < packet.length ())
   {
     int status;
     do
@@ -298,8 +297,8 @@ void TLSTransaction::send (const std::string& data)
     if (status == -1)
       break;
 
-    total     += status;
-    remaining -= status;
+    total     += (unsigned int) status;
+    remaining -= (unsigned int) status;
   }
 
   if (_debug)

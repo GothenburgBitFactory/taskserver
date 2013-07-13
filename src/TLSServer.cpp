@@ -100,9 +100,6 @@ void TLSServer::init (
   const std::string& cert,
   const std::string& key)
 {
-/*
-  _ca = ca;
-*/
   _crl = crl;
   _cert = cert;
   _key = key;

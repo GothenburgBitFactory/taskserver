@@ -28,6 +28,10 @@
 #ifdef HAVE_LIBGNUTLS
 
 #include <iostream>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <TLSClient.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -35,7 +39,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 
-#define MAX_BUF 1024
+#define MAX_BUF 16384
 #define LOG_LEVEL 3
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +52,7 @@ static void gnutls_log_function (int level, const char* message)
 TLSClient::TLSClient ()
 : _ca ("")
 , _socket (0)
+, _limit (0)
 , _debug (false)
 {
 }
@@ -186,10 +191,10 @@ void TLSClient::send (const std::string& data)
   packet[2] = l >>8;
   packet[3] = l;
 
-  int total = 0;
-  int remaining = packet.length ();
+  unsigned int total = 0;
+  unsigned int remaining = packet.length ();
 
-  while (total < remaining)
+  while (total < packet.length ())
   {
     int status;
     do
@@ -202,8 +207,8 @@ void TLSClient::send (const std::string& data)
     if (status == -1)
       break;
 
-    total     += status;
-    remaining -= status;
+    total     += (unsigned int) status;
+    remaining -= (unsigned int) status;
   }
 
   if (_debug)
