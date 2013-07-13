@@ -78,6 +78,7 @@ private:
   void merge_sort (const std::vector <Task>&, const std::vector <Task>&, Task&) const;
   time_t last_modification (const Task&) const;
   void patch (Task&, const Task&, const Task&) const;
+  void get_totals (long&, long&, long&);
 
 public:
   Database _db;
@@ -253,6 +254,13 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
                   _client_address.c_str (),
                   _client_port);
 
+  // Stats about the data.
+  long total_orgs = 0;
+  long total_users = 0;
+  long total_bytes = 0;
+  get_totals (total_orgs, total_users, total_bytes);
+
+  // Stats about the server.
   time_t uptime = Date () - _start;
   double idle = 0.0;
   if (uptime != 0)
@@ -284,6 +292,9 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   out.set ("average response time",        average_resp_time);
   out.set ("maximum response time",        _max_time);
   out.set ("tps",                          tps);
+  out.set ("organizations",          (int) total_orgs);
+  out.set ("users",                  (int) total_users);
+  out.set ("user data",              (int) total_bytes);
 
   out.set ("code",                         200);
   out.set ("status",                       taskd_error (200));
@@ -785,6 +796,38 @@ void Daemon::patch (
       _log->format ("[%d] patch modify %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
       base.set (*i, to.get (*i));
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Scans root, counts entities and sums data size.
+void Daemon::get_totals (
+  long& total_orgs,
+  long& total_users,
+  long& total_bytes)
+{
+  total_orgs = total_users = total_bytes = 0;
+
+  Directory orgs_dir (_config.get ("root"));
+  orgs_dir += "orgs";
+  std::vector <std::string> orgs = orgs_dir.list ();
+  std::vector <std::string>::iterator org;
+  for (org = orgs.begin (); org != orgs.end (); ++org)
+  {
+    ++total_orgs;
+
+    Directory users_dir (*org);
+    users_dir += "users";
+    std::vector <std::string> users = users_dir.list ();
+    std::vector <std::string>::iterator user;
+    for (user = users.begin (); user != users.end (); ++user)
+    {
+      ++total_users;
+
+      File data (*user);
+      data += "tx.data";
+      total_bytes += (long) data.size ();
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
