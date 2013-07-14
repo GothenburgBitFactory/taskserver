@@ -20,6 +20,8 @@ Bugs
 - #1296 Now uses permiѕsions 0600 and 0700 when creating files and directories.
 - #1299 Now properly counts bytes sent back to client.
 - #1300 Encode/decode pairing is now properly balanced.
+- #1305 Commit should be available from 'git archive' tarballs (thanks to Ben
+        Boeckel).
 
 ------ current release ---------------------------
 
