@@ -245,6 +245,10 @@ Table of Contents
 
    There is no payload, and the results are in the header variables.
 
+   Note that the statistics gathered by the server are growing, which means new
+   values are occasionally added to the response message.  Existing values will
+   not be removed.
+
 
 4  References
  
