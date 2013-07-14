@@ -145,8 +145,8 @@ Table of Contents
      - 301: Redirect to <server>:<port> found in the 'info' response header,
        will force the client to resubmit the request to the new server.
      - 3xx, 4xx, 5xx: The 'status' field contains an error message.
-   - If the response contained any error or warning, the error is required to be
-     shown to the user.  This provides an opportunity for the server to announce
+   - If the response contained any error or warning, the error should be shown
+     to the user.  This provides an opportunity for the server to announce
      downtime, or relocation.
 
    If no sync key is sent, the server cannot provide an incremental delta, and
