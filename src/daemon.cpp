@@ -371,9 +371,6 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       unsigned int common_ancestor = find_common_ancestor (server_data,
                                                            branch_point,
                                                            uuid);
-/*
-      _log->format ("[%d] Ancestor: %d %s", _txn_count, common_ancestor, server_data[common_ancestor].c_str ());
-*/
 
       // List the client-side modifications.
       std::vector <Task> client_mods;
