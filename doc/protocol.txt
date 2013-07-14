@@ -68,7 +68,7 @@ Table of Contents
    modification to this protocol.
 
    The task server protocol will be implemented by the taskd project and first
-   used in taskwarrior 2.3.0.  Other clients will likely follow.
+   used in taskwarrior 2.3.0.  Other clients will follow.
 
 
 1.1  Requirements
@@ -122,6 +122,8 @@ Table of Contents
 
 2.4  Responsibilities of the Client
 
+   This describes how Taskwarrior implements sync.
+
    All modifications to tasks (add, modify, done, delete ...) are recorded in
    the form of a fully-composed JSON-format [1] task.  The formatted task is
    added to a local backlog.data file.  If a task is modified a second time, it
@@ -129,7 +131,7 @@ Table of Contents
    Each task SHALL have a 'modified' date attribute that will help resolve
    conflicts.
 
-   When a client syncs, it must follow this procedure:
+   On sync:
 
    - Send a 'sync' type message with the entire contents of the backlog.data,
      unmodified, as the message payload.
@@ -282,11 +284,12 @@ Table of Contents
 
    This document and translations of it may be copied and furnished to others,
    and derivative works that comment on or otherwise explain it or assist in its
-   implmentation may be prepared, copied, published and distributed, in whole or
-   in part, without restriction of any kind, provided that the above copyright
-   notice and this paragraph are included on all such copies and derivative
-   works.  However, this document itself may not be modified in any way, such as
-   by removing the copyright notice or by ommission of certain sections.
+   implementation may be prepared, copied, published and distributed, in whole
+   or in part, without restriction of any kind, provided that the above
+   copyright notice and this paragraph are included on all such copies and
+   derivative works.  However, this document itself may not be modified in any
+   way, such as by removing the copyright notice or by omission of certain
+   sections.
 
    The limited permissions granted above are perpetual and will not be revoked
    by the authors or their successors or assigns.

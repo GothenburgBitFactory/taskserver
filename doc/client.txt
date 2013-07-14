@@ -205,6 +205,10 @@ Table of Contents
    Effectively, the client should maintain a separate list of tasks changed
    since the last successful sync operation.
 
+   Note that tasks have a "modification" attribute, which should be updated
+   whenever a change is made.  This attribute contributes to conflict
+   resolution on the server.
+
 
 3.5  Remote Changes
 
@@ -407,7 +411,7 @@ Table of Contents
 
 6.4  Response: No Data
 
-   If a sync results in no dowloads to the client, the response will look like
+   If a sync results in no downloads to the client, the response will look like
    this.
 
       ----8<----
@@ -567,11 +571,12 @@ Table of Contents
 
    This document and translations of it may be copied and furnished to others,
    and derivative works that comment on or otherwise explain it or assist in its
-   implmentation may be prepared, copied, published and distributed, in whole or
-   in part, without restriction of any kind, provided that the above copyright
-   notice and this paragraph are included on all such copies and derivative
-   works.  However, this document itself may not be modified in any way, such as
-   by removing the copyright notice or by ommission of certain sections.
+   implementation may be prepared, copied, published and distributed, in whole
+   or in part, without restriction of any kind, provided that the above
+   copyright notice and this paragraph are included on all such copies and
+   derivative works.  However, this document itself may not be modified in any
+   way, such as by removing the copyright notice or by omission of certain
+   sections.
 
    The limited permissions granted above are perpetual and will not be revoked
    by the authors or their successors or assigns.

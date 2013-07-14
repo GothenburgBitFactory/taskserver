@@ -67,7 +67,7 @@ Table of Contents
 
 2  Problem Definition
 
-   The sync algorithm considers a single task, with multiple changes occuring in
+   The sync algorithm considers a single task, with multiple changes occurring in
    two separate locations that must be resolved.  The two locations are the
    local machine and the server.  This results in two parallel change sequences.
 
@@ -322,11 +322,12 @@ Table of Contents
 
    This document and translations of it may be copied and furnished to others,
    and derivative works that comment on or otherwise explain it or assist in its
-   implmentation may be prepared, copied, published and distributed, in whole or
-   in part, without restriction of any kind, provided that the above copyright
-   notice and this paragraph are included on all such copies and derivative
-   works.  However, this document itself may not be modified in any way, such as
-   by removing the copyright notice or by ommission of certain sections.
+   implementation may be prepared, copied, published and distributed, in whole
+   or in part, without restriction of any kind, provided that the above
+   copyright notice and this paragraph are included on all such copies and
+   derivative works.  However, this document itself may not be modified in any
+   way, such as by removing the copyright notice or by omission of certain
+   sections.
 
    The limited permissions granted above are perpetual and will not be revoked
    by the authors or their successors or assigns.

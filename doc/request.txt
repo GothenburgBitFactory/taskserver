@@ -44,7 +44,7 @@ Table of Contents
 1   Introduction
 
    The message format allows for data, metadata, and extensibility.  This
-   combination allows the Task Server to accomodate current and future needs.
+   combination allows the Task Server to accommodate current and future needs.
    This document describes the message format, and the supported message types.
 
 
@@ -87,7 +87,7 @@ Table of Contents
    U+003A, space U+0020)  The header section is terminated by two consecutive
    newline (U+000D) characters.  All text is UTF8-encoded.
 
-   The payload section is arbitrary, and message type-speciific.  However, it is
+   The payload section is arbitrary, and message type-specific.  However, it is
    still UTF8-encoded text.
 
 
@@ -291,11 +291,12 @@ Table of Contents
 
    This document and translations of it may be copied and furnished to others,
    and derivative works that comment on or otherwise explain it or assist in its
-   implmentation may be prepared, copied, published and distributed, in whole or
-   in part, without restriction of any kind, provided that the above copyright
-   notice and this paragraph are included on all such copies and derivative
-   works.  However, this document itself may not be modified in any way, such as
-   by removing the copyright notice or by ommission of certain sections.
+   implementation may be prepared, copied, published and distributed, in whole
+   or in part, without restriction of any kind, provided that the above
+   copyright notice and this paragraph are included on all such copies and
+   derivative works.  However, this document itself may not be modified in any
+   way, such as by removing the copyright notice or by omission of certain
+   sections.
 
    The limited permissions granted above are perpetual and will not be revoked
    by the authors or their successors or assigns.
