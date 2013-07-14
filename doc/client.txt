@@ -38,19 +38,29 @@ Table of Contents
    3.2      Configuration
    3.3      Local Storage
    3.4      Local Changes
--  3.5      Remote Changes
-   3.6      Data Integrity
--  4      Synchronizing
--  4.1      Establish Encrypted Connection
--  4.2      Sync Request
--  4.3      Sync Response
--  4.4      Server Messages
--  5      Server Errors
-   6      Reference Implementation
-   7      References
--  8      Acknowledgements
--  9      Authors' Addresses
-   10     Full Copyright Statement
+   3.5      Remote Changes
+   3.6      Sync Key
+   3.7      Data Integrity
+   6      Synchronizing
+   4.1      Establish Encrypted Connection
+   4.2      Sync Request
+   4.3      Sync Response
+   4.4      Server Messages
+   5      Server Errors
+   6      Example Requests
+   6.1      Request: First Sync
+   6.2      Request: Sync No Data
+   6.3      Request: Sync Data
+   6.4      Response: No Data
+   6.5      Response: Remote Data
+   6.6      Response: Error
+   6.7      Response: Relocate
+   6.8      Response: Message
+   7      Reference Implementation
+   8      References
+   9      Acknowledgements
+   10     Authors' Addresses
+   11     Full Copyright Statement
 
 
 1  Introduction
@@ -180,8 +190,8 @@ Table of Contents
 3.4  Local Changes
 
    Whenever local data is modified, that change MUST be synced with the server.
-   This does not have to occur immediately, in fact the client SHOULD NOT assume
-   connectivity at any time.
+   But this does not have to occur immediately, in fact the client SHOULD NOT
+   assume connectivity at any time.
 
    A client SHOULD NOT also assume that the server is available.  If the server
    is not available, the local changes should be retained, and the sync
@@ -196,12 +206,31 @@ Table of Contents
    since the last successful sync operation.
 
 
-================================================================================
-
 3.5  Remote Changes
 
+   When a server sends remote changes to a client, in the response to a sync
+   request, the changes have already been merged by the server, and therefore
+   the client should simply store them intact.
 
-3.6  Data Integrity
+   Based on the UUID in the task, the client can determine whether a task is
+   new (and should be added to the local list of tasks), or whether it
+   represents a modification (and should overwrite it's existing entry).
+
+   The client MUST NOT perform any merges.
+
+
+3.6  Sync Key
+
+   Whenever a sync is performed, the server responds by sending a sync key and
+   any remote changes.  The sync key is important, and should be included in the
+   next sync request.  The client is REQUIRED to store the sync key in every
+   server response message.
+
+   If a client omits the sync key in a sync message, the response will be a
+   complete set of all tasks and modifications.
+
+
+3.7  Data Integrity
 
    Although a task is guaranteed to contain at least 'entry', 'description' and
    'uuid' attributes, it may also contain other known fields, and unknown
@@ -224,28 +253,259 @@ Table of Contents
 
 4  Synchronizing
 
+   Synchronizing with the Task Server consists of a single transaction.  Once an
+   encrypted connection is made with the server, the client MUST compose a
+   sync request message (See [Message]).  This message includes credentials and
+   local changes.  The response message contains status and remote changes,
+   which MUST be stored locally.
+
 
 4.1  Establish Encrypted Connection
 
+   All communication with the Task Server is encrypted using the certificate
+   provided to each user.  Using the 'server' configuration setting, establish
+   a connection.
 
 4.2  Sync Request
 
+   For message format details, see [Message].  A sync request MUST contain a
+   sync key if one was provided by a previous sync.  A sync request MUST contain
+   a list of modified tasks, in JSON format (see [Task JSON]), if local
+   modifications have been made.
+
 
 4.3  Sync Response
+
+   A sync response WILL contain a 'code' and 'status' header variable, WILL
+   contain a sync key in the payload, and MAY contain a list of tasks from the
+   server in JSON format (see [Task JSON]).
 
 
 4.4  Server Messages
 
    There are cases when the server needs to inform the user of some condition.
-   This may be anticipated server downtime, for example.  If such a message is
-   returned by the server, it SHOULD be made available to the user.  This is a
-   recommendation, not a requirement.
+   This may be anticipated server downtime, for example.  The response message
+   is typically not present, but may be present in the header, containing a
+   string:
+
+      ...
+      message: Scheduled maintenance 2013-07-14 08:00UTC for 10 minutes.
+      ...
+
+   If such a message is returned by the server, it SHOULD be made available to
+   the user.  This is a recommendation, not a requirement.
 
 
 5  Server Errors
 
+   The server may generate many errors (See [Protocol]), but the following is a
+   list of the ones most in need of special handling:
 
-6  Reference Implementation
+      200 Success
+      201 No change
+      301 Redirect
+      430 Access denied
+      431 Account suspended
+      432 Account terminated
+      5xx Error
+
+   The 200 indicates success, and that a change was recorded.  The 201 indicates
+   success but no changes were necessary.  The 301 is a redirect message
+   indicating that the client MUST re-request from a new server.  The 43x series
+   messages are account-related.  Any 5xx series code is a server error of some
+   kind.  All errors consist of a code and a status message:
+
+      code: 200
+      status: Success
+
+
+6  Examples
+
+   Here are examples of properly formatted request and response messages.  Note
+   that the messages are indented for clarity in this document, but is not the
+   case in a properly formatted message.  Also note that newline characters
+   U+000D are not shown, but are implied by the separate lines.  Because some
+   messages have trailing newline characters, the text is delimited by the 'cut'
+   markers:
+
+      ----8<----
+      foo
+
+      ----8<----
+
+   The example above illustrates text consisting of:
+
+      U+0066   f
+      U+006F   o
+      U+006F   o
+      U+000D   newline
+      U+000D   newline
+
+   Note that these values are left unspecified, but should be clear from the
+   context, and the [Message] format spec:
+
+      <size>
+      <organization>
+      <user>
+      <password>
+
+
+6.1  Request: First Sync
+
+   The first time a client syncs, there is (perhaps) no data to upload, and no
+   sync key from a previous sync.
+
+      ----8<----
+      <size>type: sync
+      org: <organization>
+      user: <user>
+      key: <password>
+      client: task 2.3.0
+      protocol: v1
+
+      ----8<----
+
+   Note the double newline character separating header from payload, with an
+   empty payload.
+
+
+6.2  Request: Sync No Data
+
+   Ordinarily when a client syncs, there is a sync key from the previous sync
+   response to send.  This example shows a sync with no local changes, but a
+   sync key from a previous sync.
+
+      ----8<----
+      <size>type: sync
+      org: <organization>
+      user: <user>
+      key: <password>
+      client: task 2.3.0
+      protocol: v1
+
+      2e4685f8-34bc-4f9b-b7ed-399388e182e1
+      ----8<----
+
+
+6.3  Request: Sync Data
+
+   This sync request shows a sync key from the previous sync, and a locally
+   modified task.
+
+      ----8<----
+      <size>type: sync
+      org: <organization>
+      user: <user>
+      key: <password>
+      client: task 2.3.0
+      protocol: v1
+
+      2e4685f8-34bc-4f9b-b7ed-399388e182e1
+      {"description":"An example","uuid":"8ad2e3db-914d-4832-b0e6-72fa04f6e331",...}
+      ----8<----
+
+
+6.4  Response: No Data
+
+   If a sync results in no dowloads to the client, the response will look like
+   this.
+
+      ----8<----
+      <size>type: response
+      client: taskd 1.0.0
+      protocol: v1
+      code: 200
+      status: Ok
+
+      45da7110-1bcc-4318-d33e-12267a774e0f
+      ----8<----
+
+   Note that there is a sync key which must be stored and used in the next sync
+   request, but there are no remote changes to store.
+
+
+6.5  Response: Remote Data
+
+  This shows a sync response providing a new sync key, and a remote change to
+  two tasks.
+
+      ----8<----
+      <size>type: response
+      client: taskd 1.0.0
+      protocol: v1
+      code: 200
+      status: Ok
+
+      45da7110-1bcc-4318-d33e-12267a774e0f
+      {"description":"Test data","uuid":"8ad2e3db-914d-4832-b0e6-72fa04f6e331",...}
+      {"description":"Test data2","uuid":"3b6218f9-726a-44fc-aa63-889ff52be442",...}
+      ----8<----
+
+   Note that the sync key must be stored for the next sync request.
+
+   Note that the two changed tasks must be stored locally, and if the UUID in
+   the tasks matches local tasks, then the local tasks must be overwritten.
+
+
+6.6  Response: Error
+
+      ----8<----
+      <size>type: response
+      client: taskd 1.0.0
+      protocol: v1
+      code: 431
+      status: Account suspended
+
+      ----8<----
+
+   Note the double newline character separating header from payload, with an
+   empty payload.
+
+
+6.7  Response: Relocate
+
+      ----8<----
+      <size>type: response
+      client: taskd 1.0.0
+      protocol: v1
+      code: 301
+      status: Redirect
+      info: <new-server>
+
+      ----8<----
+
+   Note the 'info' field will contain a '<server>:<port>' string that should be
+   used for all future sync requests.  This indicates that a user account was
+   moved to another server.
+
+   Note the double newline character separating header from payload, with an
+   empty payload.
+
+
+6.8  Response: Message
+
+   Occasionally the server will need to convey a message, and will include an
+   additional header variable containing that message.
+
+   The server [Protocol] states that the message SHOULD be shown to the user.
+   This message will be used for system event messages, used rarely, and never
+   used for advertising or promotion.
+
+      ----8<----
+      <size>type: response
+      client: taskd 1.0.0
+      protocol: v1
+      code: 200
+      status: Ok
+      message: Scheduled maintenance 2013-07-14 08:00UTC for 10 minutes.
+
+      45da7110-1bcc-4318-d33e-12267a774e0f
+      ----8<----
+
+   Note that the same message will likely be included in consecutive responses.
+
+
+7  Reference Implementation
 
    The Task Server codebase contains a reference implementation of an SSL/TLS
    client and server program, which communicate text strings.
@@ -267,7 +527,7 @@ Table of Contents
       task.git/src/commands/CmdSync.h
 
 
-7  References
+8  References
 
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
@@ -277,17 +537,21 @@ Table of Contents
 
    [GnuTLS] http://www.gnutls.org/manual/gnutls.html
 
-   [Task JSON] "Taskwarrior Data Interchange Format"
+   [Task JSON] "Taskwarrior Data Interchange Format", taskd.git/doc/task.txt
+
+   [Message] "Taskwarrior Server Message Format", taskd.git/doc/request.txt
+
+   [Protocol] "Task Server Protocol", taskd.git/doc/protocol.txt
 
 
-8  Acknowledgements
+9  Acknowledgements
 
    Thanks to ... for testing and feedback.
 
    Thanks to ... whose comments helped improve this document.
 
 
-9  Authors' Addresses
+10  Authors' Addresses
 
    Federico Hernandez
    Email: fredde@taskwarrior.org
@@ -296,7 +560,7 @@ Table of Contents
    Email: paul@taskwarrior.org
 
 
-10  Full Copyright Statement
+11  Full Copyright Statement
 
    Copyright 2010 - 2013, Göteborg Bit Factory.
    All rights reserved.
