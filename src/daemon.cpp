@@ -445,16 +445,16 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     payload = new_client_key + "\n";
   }
 
-  // Have payload and key, therefore success.
-  if (payload        != "" &&
-      new_client_key != "")
+  out.setPayload (payload);
+
+  // If there are changes, respond with 200, otherwise 201.
+  if (server_subset.size ()   ||
+      new_client_data.size () ||
+      new_server_data.size ())
   {
-    out.setPayload (payload);
     out.set ("code",   200);
     out.set ("status", taskd_error (200));
   }
-
-  // Nothing changed --> 201 is a success code.
   else
   {
     _log->format ("[%d] No change", _txn_count);
