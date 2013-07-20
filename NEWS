@@ -8,6 +8,7 @@ New Features in taskd 1.0.0.alpha
   - CRL Support
   - Client allow/deny lists
   - Documentation
+  - Requires libuuid
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.

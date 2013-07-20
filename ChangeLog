@@ -10,6 +10,7 @@ Features
 - Improved log entries for performance characterization.
 - Added statistics for orgs, users and data size.
 - Added data profiling script.
+- Now requires libuuid.
 
 Bugs
 - #1289 The 'init' command no longer defaults the 'server' variable, and

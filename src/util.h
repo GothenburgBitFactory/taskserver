@@ -40,7 +40,7 @@ std::string formatBytes (size_t);
 std::string formatTime (time_t);
 int autoComplete (const std::string&, const std::vector<std::string>&, std::vector<std::string>&, int minimum = 1);
 
-#if defined(HAVE_UUID) && !defined(HAVE_UUID_UNPARSE_LOWER)
+#ifndef HAVE_UUID_UNPARSE_LOWER
 void uuid_unparse_lower (uuid_t uu, char *out);
 #endif
 const std::string uuid ();

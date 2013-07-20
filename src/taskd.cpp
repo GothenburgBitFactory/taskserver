@@ -43,10 +43,6 @@
 #include <commit.h>
 #endif
 
-#ifdef HAVE_SRANDOM
-#define srand(x) srandom(x)
-#endif
-
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
 #endif
@@ -54,15 +50,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, const char** argv)
 {
-  // Set up randomness.
-#ifdef CYGWIN
-  srand (time (NULL));
-#else
-  struct timeval tv;
-  gettimeofday (&tv, NULL);
-  srand (tv.tv_usec);
-#endif
-
   int status = 0;
 
   // Create a vector of args.

@@ -138,18 +138,6 @@ int command_diag (Config& config, const std::vector <std::string>& args)
             << " -pthreads"
 #endif
 
-#ifdef HAVE_SRANDOM
-            << " +srandom"
-#else
-            << " -srandom"
-#endif
-
-#ifdef HAVE_RANDOM
-            << " +random"
-#else
-            << " -random"
-#endif
-
 #ifdef HAVE_UUID
             << " +uuid"
 #else
