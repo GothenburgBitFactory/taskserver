@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $datafile = './taskd.rrd';
+$datafile = shift if @ARGV;;
+die "Could not find data file: $datafile\n"
+  unless -f $datafile;
+
+my $server = 'localhost:6544';
+
+# $ taskd client <server>:<port> stats.request 
+# >>> stats.request
+# <<<
+# average request bytes: 0
+# average response bytes: 0
+# average response time: 0.000000
+# client: taskd 1.0.0.alpha1
+# code: 200
+# errors: 0
+# idle: 1.000000
+# maximum response time: 0.000000
+# organizations: 2
+# status: Ok
+# total bytes in: 0
+# total bytes out: 0
+# tps: 0.000000
+# transactions: 1
+# uptime: 22
+# user data: 59045
+# users: 3
+
+my $statistics = qx{/usr/local/bin/taskd client $server stats.request};
+
+my ($avgReq)   = $statistics =~ /average request bytes: (\d+)/;
+my ($avgResp)  = $statistics =~ /average response bytes: (\d+)/;
+my ($avgTime)  = $statistics =~ /average response time: ([0-9.]+)/;
+my ($errors)   = $statistics =~ /errors: (\d+)/;
+my ($idle)     = $statistics =~ /idle: ([0-9.]+)/;
+my ($maxResp)  = $statistics =~ /maximum response time: ([0-9.]+)/;
+my ($tps)      = $statistics =~ /tps: ([0-9.]+)/;
+my ($totalIn)  = $statistics =~ /total bytes in: (\d+)/;
+my ($totalOut) = $statistics =~ /total bytes out: (\d+)/;
+my ($tx)       = $statistics =~ /transactions: (\d+)/;
+my ($uptime)   = $statistics =~ /uptime: (\d+)/;
+my ($orgs)     = $statistics =~ /organizations: (\d+)/;
+my ($users)    = $statistics =~ /users: (\d+)/;
+my ($data)     = $statistics =~ /user data: (\d+)/;
+
+# Remove commas in transaction count.
+$tx =~ s/,//g;
+
+qx{rrdtool update $datafile N:$avgReq:$avgResp:$maxResp:$avgTime:$errors:$idle:$tps:$totalIn:$totalOut:$tx:$uptime:$orgs:$users:$data};
+
+exit 0;

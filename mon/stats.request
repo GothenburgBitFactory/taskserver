@@ -1,0 +1,8 @@
+type: statistics
+org: <organization>
+user: <user>
+key: <insert key here>
+client: <client>
+protocol: v1
+
+

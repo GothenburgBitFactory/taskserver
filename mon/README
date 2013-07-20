@@ -1,0 +1,19 @@
+Monitoring Scripts
+------------------
+
+These monitoring scripts create and update an rrdtool data file, then generate
+several graphs from it.  There are three scripts, named:
+
+  create
+  update
+  graph
+
+The create script is run once to create the taskd.rrd file.
+
+The update script and graph script are run hourly, at staggered times, and
+update the taskd.rrd file.  They are run from cron like this:
+
+  0   * * * * cd /home/taskd/mon && ./update ./taskd.rrd
+  30 23 * * * cd /home/taskd/mon && ./graph  ./taskd.rrd
+
+---

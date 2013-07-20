@@ -1,0 +1,26 @@
+#! /bin/sh
+
+DATA=./taskd.rrd
+rm -f $DATA
+
+# At hourly intervals, 1 year = 365 * 24 = 8760
+rrdtool \
+   create $DATA \
+   --step=300 \
+   DS:avgreq:GAUGE:8760:0:U \
+   DS:avgres:GAUGE:8760:0:U \
+   DS:maxres:GAUGE:8760:0:U \
+   DS:avgtime:GAUGE:8760:0:U \
+   DS:errors:GAUGE:8760:0:U \
+   DS:idle:GAUGE:8760:0:100 \
+   DS:tps:GAUGE:8760:0:U \
+   DS:in:GAUGE:8760:0:U \
+   DS:out:GAUGE:8760:0:U \
+   DS:tx:GAUGE:8760:0:U \
+   DS:uptime:GAUGE:8760:0:U \
+   DS:orgs:GAUGE:8760:0:U \
+   DS:users:GAUGE:8760:0:U \
+   DS:data:GAUGE:8760:0:U \
+   RRA:AVERAGE:0.5:1:8760 \
+   RRA:AVERAGE:0.5:30:292
+

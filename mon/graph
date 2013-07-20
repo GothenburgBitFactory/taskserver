@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $data = './taskd.rrd';
+$data = shift if @ARGV;
+die "Could not find data file: $data\n"
+  unless -f $data;
+
+my $docs = '.';
+$docs = shift if @ARGV;
+die "Could not find output directory: $docs\n"
+  unless -d $docs;
+
+# Show one month of data.
+my $start = time () - 30*86_400;
+
+my @graphs;
+push @graphs, "rrdtool "
+              . "graph $docs/bytes.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Request/Response Bytes\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Bytes\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:avgreq=$data:avgreq:AVERAGE "
+              . "DEF:avgres=$data:avgres:AVERAGE "
+              . "LINE2:avgreq#8dbecb:\"Avg Request Bytes\\l\" "
+              . "LINE2:avgres#43617f:\"Avg Response Bytes\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/service.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Service Time\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Time (s)\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:avgtime=$data:avgtime:AVERAGE "
+              . "DEF:maxres=$data:maxres:AVERAGE "
+              . "LINE2:avgtime#43617f:\"Avg Response Time\\l\" "
+              . "LINE2:maxres#8dbecb:\"Max Response Time\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/txns.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Transactions\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Transactions\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:tx=$data:tx:AVERAGE "
+              . "DEF:errors=$data:errors:AVERAGE "
+              . "LINE2:tx#43617f:\"Transactions\\l\" "
+              . "LINE2:errors#8dbecb:\"Errors\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/idle.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Idle\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"%\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:idle=$data:idle:AVERAGE "
+              . "LINE2:idle#8dbecb:\"Idle %\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/tps.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: TPS\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Transactions\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:tps=$data:tps:AVERAGE "
+              . "LINE2:tps#8dbecb:\"Transactions Per Second\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/orgs.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Organizations\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Organizations\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:orgs=$data:orgs:AVERAGE "
+              . "LINE2:orgs#8dbecb:\"Organizations\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/users.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Users\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Users\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:users=$data:users:AVERAGE "
+              . "LINE2:users#8dbecb:\"Users\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/data.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: User Data\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"User Data\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:data=$data:data:AVERAGE "
+              . "LINE2:data#8dbecb:\"User Data\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/total_bytes.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Bytes In/Out\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Bytes\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:in=$data:in:AVERAGE "
+              . "DEF:out=$data:out:AVERAGE "
+              . "LINE2:in#8dbecb:\"Total Bytes In\\l\" "
+              . "LINE2:out#43617f:\"Total Bytes Out\"";
+
+push @graphs, "rrdtool "
+              . "graph $docs/uptime.png "
+              . "--start $start "
+              . "--end now "
+              . "--title \"Task Server :: Uptime\" "
+              . "--watermark=\"`date`\" "
+              . "--vertical=\"Time\" "
+              . "--lower-limit=0 "
+              . "--width=600 "
+              . "--height=300 "
+              . "--slope-mode "
+              . "DEF:uptime=$data:uptime:AVERAGE "
+              . "LINE2:uptime#8dbecb:\"Uptime\"";
+
+print qx{$_ >/dev/null}for @graphs;
+exit 0;
+
