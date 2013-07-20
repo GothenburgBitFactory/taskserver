@@ -317,10 +317,11 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::string user = in.get ("user");
 
   if (_log)
-    _log->format ("[%d] 'sync' from %s/%s at %s:%d",
+    _log->format ("[%d] 'sync' from '%s/%s' using '%s' at %s:%d",
                   _txn_count,
                   org.c_str (),
                   user.c_str (),
+                  in.get ("client").c_str (),
                   _client_address.c_str (),
                   _client_port);
 

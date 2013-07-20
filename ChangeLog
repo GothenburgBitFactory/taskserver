@@ -7,6 +7,7 @@ Features
 - Improved error handling for unrecognized requests.
 - Improved test suite for Cygwin.
 - Improved log entries, for brevity and clarity.
+- Improved log entries for performance characterization.
 - Added statistics for orgs, users and data size.
 
 Bugs
