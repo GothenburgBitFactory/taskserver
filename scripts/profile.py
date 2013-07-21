@@ -181,7 +181,7 @@ def show_profile(root, data):
 
   if data['total_orgs']:
     print "[1mOrgs[0m"
-    for org in data['total_orgs']:
+    for org in sorted(data['total_orgs']):
       if org in data['active_orgs']:
         print ' ', org
       else:
@@ -189,13 +189,13 @@ def show_profile(root, data):
     print
   else:
     print "[1mOrgs[0m"
-    for org in data['active_orgs']:
+    for org in sorted(data['active_orgs']):
       print ' ', org
     print
 
   if data['total_users']:
     print "[1mUsers[0m"
-    for user in data['total_users']:
+    for user in sorted(data['total_users']):
       if user in data['active_users']:
         print ' ', user
       else:
@@ -203,13 +203,13 @@ def show_profile(root, data):
     print
   else:
     print "[1mUsers[0m"
-    for user in data['active_users']:
+    for user in sorted(data['active_users']):
       print ' ', user
     print
 
   if data['clients']:
     print "[1mClients[0m"
-    for client in data['clients']:
+    for client in sorted(data['clients']):
       print ' ', client
     print
 
