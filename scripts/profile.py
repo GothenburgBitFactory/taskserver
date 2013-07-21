@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2.7
 # coding=UTF-8
 ################################################################################
 ## taskd = Task Server
@@ -141,12 +141,10 @@ def scan_root(root, data):
 
 ################################################################################
 def show_profile(root, data):
-  print data
-  print "\n---------\n"
-
   days = (data['newest'] - data['oldest']).total_seconds() / 86400.0
   total_users = len(data['total_users'])
 
+  print
   print "[1mServer[0m"
   print "  Time range:             ", (data['newest'] - data['oldest'])
   print "  Bounces:                ", data['bounce']
