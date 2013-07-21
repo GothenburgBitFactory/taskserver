@@ -138,12 +138,6 @@ int command_diag (Config& config, const std::vector <std::string>& args)
             << " -pthreads"
 #endif
 
-#ifdef HAVE_UUID
-            << " +uuid"
-#else
-            << " -uuid"
-#endif
-
 #ifdef HAVE_LIBGNUTLS
             << " +tls"
 #else
@@ -152,12 +146,10 @@ int command_diag (Config& config, const std::vector <std::string>& args)
             << "\n";
 
   std::cout << "     libuuid: "
-#if defined (HAVE_UUID) and defined (HAVE_UUID_UNPARSE_LOWER)
+#ifdef HAVE_UUID_UNPARSE_LOWER
             << "libuuid + uuid_unparse_lower"
-#elif defined (HAVE_UUID) and !defined (HAVE_UUID_UNPARSE_LOWER)
-            << "libuuid, no uuid_unparse_lower"
 #else
-            << "n/a"
+            << "libuuid, no uuid_unparse_lower"
 #endif
             << "\n";
 
