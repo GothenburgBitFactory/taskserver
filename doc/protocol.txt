@@ -218,7 +218,6 @@ Table of Contents
        502 Not implemented
        503 Command parameter not implemented
        504 Request too big
-       531 Account terminated
 
 
 5  Security Considerations
