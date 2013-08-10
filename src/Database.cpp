@@ -40,28 +40,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 Database::Database (Config* config)
 : _config (config)
-, _root ()
 , _log (NULL)
 {
-/*
-  std::string data_root = _config->get ("root");
-  if (data_root == "")
-    throw std::string ("root is not set");
-
-  // Set up and validate root.
-  _root = Directory (data_root);
-  if (!_root.exists ())
-    throw std::string ("root '") + data_root + "' does not exist";
-
-  if (!_root.is_directory ())
-    throw std::string ("root '") + data_root + "' is not a directory";
-
-  if (!_root.readable ())
-    throw std::string ("root '") + data_root + "' is not readable";
-
-  if (!_root.readable ())
-    throw std::string ("root '") + data_root + "' is not writable";
-*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +70,7 @@ bool Database::authenticate (
   std::string key  = request.get ("key");
 
   // Verify existence of <root>/orgs/<org>
-  Directory org_dir (_root._data + "/orgs/" + org);
+  Directory org_dir (_config->get ("root") + "/orgs/" + org);
   if (! org_dir.exists ())
   {
     if (_log)
@@ -103,7 +83,7 @@ bool Database::authenticate (
   }
 
   // Verify non-existence of <root>/orgs/<org>/suspended
-  File org_suspended (_root._data + "/orgs/" + org + "/suspended");
+  File org_suspended (_config->get ("root") + "/orgs/" + org + "/suspended");
   if (org_suspended.exists ())
   {
     if (_log)
@@ -116,7 +96,7 @@ bool Database::authenticate (
   }
 
   // Verify existence of <root>/orgs/<org>/users/<user>
-  Directory user_dir (_root._data + "/orgs/" + org + "/users/" + user);
+  Directory user_dir (_config->get ("root") + "/orgs/" + org + "/users/" + user);
   if (! user_dir.exists ())
   {
     if (_log)
@@ -130,7 +110,7 @@ bool Database::authenticate (
   }
 
   // Verify non-existence of <root>/orgs/<org>/user/<user>/suspended
-  File user_suspended (_root._data + "/orgs/" + org + "/user/" + user + "/suspended");
+  File user_suspended (_config->get ("root") + "/orgs/" + org + "/user/" + user + "/suspended");
   if (user_suspended.exists ())
   {
     if (_log)
@@ -144,7 +124,7 @@ bool Database::authenticate (
   }
 
   // Match <key> against <root>/orgs/<org>/users/<user>/rc:<key>
-  Config user_rc (_root._data + "/orgs/" + org + "/users/" + user + "/config");
+  Config user_rc (_config->get ("root") + "/orgs/" + org + "/users/" + user + "/config");
   if (user_rc.get ("key") != key)
   {
     if (_log)
@@ -166,7 +146,7 @@ bool Database::authenticate (
 // if <root>/rc contains redirect.<org>=<server>:<port>, issue a 301.
 bool Database::redirect (const std::string& org, Msg& response)
 {
-  Config rc (_root._data + "/rc");
+  Config rc (_config->get ("root") + "/rc");
 
   std::string server = rc.get ("redirect." + org);
   if (server != "")

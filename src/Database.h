@@ -55,7 +55,6 @@ public:
   Config* _config;
 
 private:
-  Directory _root;
   Log* _log;
 };
 
