@@ -64,7 +64,7 @@ int main (int argc, const char** argv)
   if (args.size ())
   {
     if (args[0] == "-h" || closeEnough ("--help", args[0], 3))
-      status = command_help (config, args);
+      command_help (args);
 
     else if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
     {
@@ -142,7 +142,7 @@ int main (int argc, const char** argv)
              if (closeEnough ("init",        args[0], 3))          command_init    (db, positionals);
         else if (closeEnough ("config",      args[0], 3))          command_config  (db, positionals);
         else if (closeEnough ("status",      args[0], 3))          command_status  (db, args);
-        else if (closeEnough ("help",        args[0], 3)) status = command_help    (config, args);
+        else if (closeEnough ("help",        args[0], 3))          command_help    (    args);
         else if (closeEnough ("diagnostics", args[0], 3)) status = command_diag    (config, args);
         else if (closeEnough ("server",      args[0], 3)) status = command_server  (config, args);
 
@@ -177,7 +177,7 @@ int main (int argc, const char** argv)
         if (error == "usage")
         {
           std::vector <std::string> no_args;
-          command_help (config, no_args);
+          command_help (no_args);
         }
         else
           std::cout << error << "\n";
@@ -192,7 +192,7 @@ int main (int argc, const char** argv)
     }
   }
   else
-    status = command_help (config, args);
+    command_help (args);
 
   return status;
 }

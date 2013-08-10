@@ -32,7 +32,7 @@
 #include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-int command_help (Config& config, const std::vector <std::string>& args)
+void command_help (const std::vector <std::string>& args)
 {
   if (args.size () > 1)
   {
@@ -236,8 +236,6 @@ int command_help (Config& config, const std::vector <std::string>& args)
               << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
               << "  --NAME=VALUE   Temporary configuration override\n"
               << "\n";
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
