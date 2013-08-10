@@ -18,6 +18,7 @@ Bugs
 - #1290 The pki/generate.client script now takes an argument is used to name
         the files.
 - #1291 The 'taskdctl' script needs to use TASKDDATA for config command.
+- #1292 Allow --data as an arg to taskd, not just the command.
 - #1293 The operation.txt document details client.allow, client.deny.
 - #1295 Relaxed message parsing slightly.
 - #1296 Now uses permiѕsions 0600 and 0700 when creating files and directories.

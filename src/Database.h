@@ -51,8 +51,10 @@ public:
 
   std::string key_generate ();
 
-private:
+public:
   Config* _config;
+
+private:
   Directory _root;
   Log* _log;
 };

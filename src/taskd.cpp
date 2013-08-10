@@ -37,6 +37,7 @@
 #endif
 #include <Directory.h>
 #include <Color.h>
+#include <Database.h>
 #include <text.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
@@ -116,15 +117,35 @@ int main (int argc, const char** argv)
     {
       try
       {
+        // Some defaults come from the environment.
+        char* root_env = getenv ("TASKDDATA");
+        if (root_env)
+          config.set ("root", root_env);
+
+        // Process all the options.
+        std::vector <std::string> positionals;
+        std::vector <std::string>::iterator arg;
+        for (arg = args.begin (); arg != args.end (); ++arg)
+        {
+               if (closeEnough ("--data",  *arg, 3))   config.set ("root",    *(++arg));
+          else if (closeEnough ("--quiet", *arg, 3))   config.set ("verbose", 0);
+          else if (closeEnough ("--debug", *arg, 3))   config.set ("debug",   1);
+          else if (taskd_applyOverride (config, *arg)) ;
+          else                                         positionals.push_back (*arg);
+        }
+
+        // A database object interfaces to the data.
+        Database db (&config);
+
         // The highest-level commands are hard-coded:
-             if (closeEnough ("init",        args[0], 3)) status = command_init    (config, args);
+             if (closeEnough ("init",        args[0], 3))          command_init    (db, positionals);
         else if (closeEnough ("config",      args[0], 3)) status = command_config  (config, args);
         else if (closeEnough ("status",      args[0], 3)) status = command_status  (config, args);
         else if (closeEnough ("help",        args[0], 3)) status = command_help    (config, args);
         else if (closeEnough ("diagnostics", args[0], 3)) status = command_diag    (config, args);
         else if (closeEnough ("server",      args[0], 3)) status = command_server  (config, args);
 
-        else if (closeEnough ("add",         args[0], 3)) status = command_add     (config, args);
+        else if (closeEnough ("add",         args[0], 3))          command_add     (db, positionals);
         else if (closeEnough ("remove",      args[0], 3)) status = command_remove  (config, args);
         else if (closeEnough ("suspend",     args[0], 3)) status = command_suspend (config, args);
         else if (closeEnough ("resume",      args[0], 3)) status = command_resume  (config, args);

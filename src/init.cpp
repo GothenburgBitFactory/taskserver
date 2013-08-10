@@ -32,33 +32,10 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-int command_init (Config& config, const std::vector <std::string>& args)
+void command_init (Database& db, const std::vector <std::string>& args)
 {
-  int status = 0;
-
-  // Standard argument processing.
-  bool verbose     = true;
-  std::string root = "";
-
-  std::vector <std::string>::const_iterator i;
-  for (i = ++(args.begin ()); i != args.end (); ++i)
-  {
-         if (closeEnough ("--quiet",  *i, 3)) verbose = false;
-    else if (closeEnough ("--debug",  *i, 3)) ; // TODO Is this necessary?
-    else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i))   ;
-    else
-      throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
-  }
-
-  if (root == "")
-  {
-    char* root_env = getenv ("TASKDDATA");
-    if (root_env)
-      root = root_env;
-  }
-
   // Verify that root exists.
+  std::string root = db._config->get ("root");
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");
 
@@ -79,16 +56,15 @@ int command_init (Config& config, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' directory is not executable.");
 
   // Provide some defaults and overrides.
-  config.set ("extensions", TASKD_EXTDIR);
-
-  if (config.get ("log")            == "") config.set ("log",            "/tmp/taskd.log");
-  if (config.get ("queue.size")     == "") config.set ("queue.size",     "10");
-  if (config.get ("pid.file")       == "") config.set ("pid.file",       "/tmp/taskd.pid");
-  if (config.get ("ip.log")         == "") config.set ("ip.log",         "on");
-  if (config.get ("request.limit")  == "") config.set ("request.limit",  "1048576");
+  db._config->set ("extensions", TASKD_EXTDIR);
+  db._config->setIfBlank ("log",           "/tmp/taskd.log");
+  db._config->setIfBlank ("queue.size",    "10");
+  db._config->setIfBlank ("pid.file",      "/tmp/taskd.pid");
+  db._config->setIfBlank ("ip.log",        "on");
+  db._config->setIfBlank ("request.limit", "1048576");
 
   // Suggestions for missing items.
-  if (config.get ("server") == "")
+  if (db._config->get ("server") == "")
     std::cout << "You must specify the 'server' variable, for example:\n"
               << "  taskd config server localhost:6544\n"
               << "\n";
@@ -101,19 +77,17 @@ int command_init (Config& config, const std::vector <std::string>& args)
     throw std::string ("ERROR: Could not create '") + sub._data + "'.";
 
   // Dump the config file?
-  config._original_file = root_dir._data + "/config";
+  db._config->_original_file = root_dir._data + "/config";
 
-  if (! config._original_file.exists ())
-    config._original_file.create (0600);
+  if (! db._config->_original_file.exists ())
+    db._config->_original_file.create (0600);
 
-  if (config.dirty ())
+  if (db._config->dirty ())
   {
-    config.save ();
-    if (verbose)
-      std::cout << "Created " << std::string (config._original_file) << "\n";
+    db._config->save ();
+    if (db._config->getBoolean ("verbose"))
+      std::cout << "Created " << std::string (db._config->_original_file) << "\n";
   }
-
-  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
