@@ -33,21 +33,6 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool add_group (
-  const Directory& root,
-  const std::string& org,
-  const std::string& group)
-{
-  Directory new_group (root);
-  new_group += "orgs";
-  new_group += org;
-  new_group += "groups";
-  new_group += group;
-
-  return new_group.create (0700);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static bool add_user (
   const Directory& root,
   const std::string& org,
@@ -201,7 +186,7 @@ void command_add (Database& db, const std::vector <std::string>& args)
       if (taskd_is_group (root_dir, args[2], args[i]))
         throw std::string ("ERROR: Group '") + args[i] + "' already exists.";
 
-      if (add_group (root_dir, args[2], args[i]))
+      if (db.add_group (args[2], args[i]))
       {
         if (verbose)
           std::cout << "Created group '" << args[i] << "' for organization '" << args[2] << "'\n";

@@ -183,6 +183,20 @@ bool Database::add_org (const std::string& org)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Database::add_group (
+  const std::string& org,
+  const std::string& group)
+{
+  Directory new_group (_config->get ("root"));
+  new_group += "orgs";
+  new_group += org;
+  new_group += "groups";
+  new_group += group;
+
+  return new_group.create (0700);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 std::string Database::key_generate ()
 {
   return uuid ();
