@@ -148,7 +148,7 @@ int main (int argc, const char** argv)
         else if (closeEnough ("server",      args[0], 3)) status = command_server  (config, args);
 
         else if (closeEnough ("add",         args[0], 3))          command_add     (db, positionals);
-        else if (closeEnough ("remove",      args[0], 3)) status = command_remove  (config, args);
+        else if (closeEnough ("remove",      args[0], 3))          command_remove  (db, positionals);
         else if (closeEnough ("suspend",     args[0], 3)) status = command_suspend (config, args);
         else if (closeEnough ("resume",      args[0], 3)) status = command_resume  (config, args);
 
