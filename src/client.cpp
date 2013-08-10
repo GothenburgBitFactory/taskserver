@@ -38,14 +38,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // This is a debugging-only command that uploads a file to the server, and then
 // displays the result.
-int command_client (Config& config, const std::vector <std::string>& args)
+void command_client (Database& db, const std::vector <std::string>& args)
 {
 #ifdef FEATURE_CLIENT_INTERFACE
   // Parse arguments.
   if (args.size () < 3)
     throw std::string ("ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]");
 
-  config.set ("server", args[1]);
+  db._config->set ("server", args[1]);
 
   for (unsigned int i = 2; i < args.size (); ++i)
   {
@@ -60,7 +60,7 @@ int command_client (Config& config, const std::vector <std::string>& args)
     request.set ("time", Date ().toISO ());
 
     Msg response;
-    if (! taskd_sendMessage (config, "server", request, response))
+    if (! taskd_sendMessage (*db._config, "server", request, response))
       throw std::string ("ERROR: Task server not responding.");
 
     std::cout << "<<<\n"
@@ -69,8 +69,6 @@ int command_client (Config& config, const std::vector <std::string>& args)
 #else
   throw std::string ("ERROR: Client interface feature not enabled.");
 #endif
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

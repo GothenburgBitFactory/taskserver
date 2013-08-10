@@ -46,7 +46,7 @@ void command_add      (Database&, const std::vector <std::string>&);
 int command_remove    (Config&, const std::vector <std::string>&);
 int command_suspend   (Config&, const std::vector <std::string>&);
 int command_resume    (Config&, const std::vector <std::string>&);
-int command_client    (Config&, const std::vector <std::string>&);
+void command_client   (Database&, const std::vector <std::string>&);
 
 // api.cpp
 bool taskd_applyOverride (Config&, const std::string&);

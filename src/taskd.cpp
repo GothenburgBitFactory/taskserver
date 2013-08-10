@@ -153,7 +153,7 @@ int main (int argc, const char** argv)
         else if (closeEnough ("resume",      args[0], 3)) status = command_resume  (config, args);
 
         // For debugging purposes.  Will be removed later.  Maybe.
-        else if (closeEnough ("client",      args[0], 3)) status = command_client  (config, args);
+        else if (closeEnough ("client",      args[0], 3))          command_client  (db, positionals);
         else
         {
           File subcommand (std::string (TASKD_EXTDIR) + "/taskd_" + args[0]);
