@@ -8,10 +8,14 @@ taskdrc \- Configuration file for the taskd(1) server
 Valid variable names and their default values are:
 
 .TP
+.B confirmation=on
+Determines whether certain commands are confirmed.  Defaults to on.
+
+.TP
 .B client.allow=[Tt]ask [2-9]+
 A comma-separated list of regular expressions that are matched against the
 reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
-special meaning.  Overidden by and 'client.deny' entry.
+special meaning.  Overidden by any 'client.deny' entry.
 
 .TP
 .B client.cert
