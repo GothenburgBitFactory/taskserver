@@ -36,13 +36,13 @@
 #include <Directory.h>
 #include <Database.h>
 
-void command_init      (Database&, const std::vector <std::string>&);
-int command_config    (Config&, const std::vector <std::string>&);
+void command_init     (Database&, const std::vector <std::string>&);
+void command_config   (Database&, const std::vector <std::string>&);
 int command_status    (Config&, const std::vector <std::string>&);
 int command_help      (Config&, const std::vector <std::string>&);
 int command_diag      (Config&, const std::vector <std::string>&);
 int command_server    (Config&, const std::vector <std::string>&);
-void command_add       (Database&, const std::vector <std::string>&);
+void command_add      (Database&, const std::vector <std::string>&);
 int command_remove    (Config&, const std::vector <std::string>&);
 int command_suspend   (Config&, const std::vector <std::string>&);
 int command_resume    (Config&, const std::vector <std::string>&);

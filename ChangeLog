@@ -13,6 +13,7 @@ Features
 - Now requires libuuid.
 
 Bugs
+- #1287 'taskd config' ignored $TASKDDATA.
 - #1289 The 'init' command no longer defaults the 'server' variable, and
         provides feedback when it is not specified.
 - #1290 The pki/generate.client script now takes an argument is used to name

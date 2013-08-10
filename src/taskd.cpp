@@ -127,9 +127,10 @@ int main (int argc, const char** argv)
         std::vector <std::string>::iterator arg;
         for (arg = args.begin (); arg != args.end (); ++arg)
         {
-               if (closeEnough ("--data",  *arg, 3))   config.set ("root",    *(++arg));
-          else if (closeEnough ("--quiet", *arg, 3))   config.set ("verbose", 0);
-          else if (closeEnough ("--debug", *arg, 3))   config.set ("debug",   1);
+               if (closeEnough ("--data",  *arg, 3))   config.set ("root",         *(++arg));
+          else if (closeEnough ("--quiet", *arg, 3))   config.set ("verbose",      0);
+          else if (closeEnough ("--debug", *arg, 3))   config.set ("debug",        1);
+          else if (closeEnough ("--force", *arg, 3))   config.set ("confirmation", 0);
           else if (taskd_applyOverride (config, *arg)) ;
           else                                         positionals.push_back (*arg);
         }
@@ -139,7 +140,7 @@ int main (int argc, const char** argv)
 
         // The highest-level commands are hard-coded:
              if (closeEnough ("init",        args[0], 3))          command_init    (db, positionals);
-        else if (closeEnough ("config",      args[0], 3)) status = command_config  (config, args);
+        else if (closeEnough ("config",      args[0], 3))          command_config  (db, positionals);
         else if (closeEnough ("status",      args[0], 3)) status = command_status  (config, args);
         else if (closeEnough ("help",        args[0], 3)) status = command_help    (config, args);
         else if (closeEnough ("diagnostics", args[0], 3)) status = command_diag    (config, args);
