@@ -59,6 +59,7 @@ int main (int argc, const char** argv)
     args.push_back (argv[i]);
 
   Config config;
+  config.set ("verbose", "1");
 
   // Some options are hard-coded.
   if (args.size ())
@@ -141,9 +142,9 @@ int main (int argc, const char** argv)
         // The highest-level commands are hard-coded:
              if (closeEnough ("init",        args[0], 3))          command_init    (db, positionals);
         else if (closeEnough ("config",      args[0], 3))          command_config  (db, positionals);
-        else if (closeEnough ("status",      args[0], 3))          command_status  (db, args);
-        else if (closeEnough ("help",        args[0], 3))          command_help    (    args);
-        else if (closeEnough ("diagnostics", args[0], 3)) status = command_diag    (config, args);
+        else if (closeEnough ("status",      args[0], 3))          command_status  (db, positionals);
+        else if (closeEnough ("help",        args[0], 3))          command_help    (    positionals);
+        else if (closeEnough ("diagnostics", args[0], 3))          command_diag    (db, positionals);
         else if (closeEnough ("server",      args[0], 3)) status = command_server  (config, args);
 
         else if (closeEnough ("add",         args[0], 3))          command_add     (db, positionals);

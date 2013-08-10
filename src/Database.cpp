@@ -43,6 +43,7 @@ Database::Database (Config* config)
 , _root ()
 , _log (NULL)
 {
+/*
   std::string data_root = _config->get ("root");
   if (data_root == "")
     throw std::string ("root is not set");
@@ -60,6 +61,7 @@ Database::Database (Config* config)
 
   if (!_root.readable ())
     throw std::string ("root '") + data_root + "' is not writable";
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -44,7 +44,7 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-int command_diag (Config& config, const std::vector <std::string>& args)
+void command_diag (Database& config, const std::vector <std::string>& args)
 {
   // No argument processing.
 
@@ -160,8 +160,6 @@ int command_diag (Config& config, const std::vector <std::string>& args)
             << "n/a"
 #endif
             << "\n\n";
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
