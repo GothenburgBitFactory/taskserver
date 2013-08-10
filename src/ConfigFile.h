@@ -54,6 +54,9 @@ public:
   void set (const std::string&, const int);
   void set (const std::string&, const double);
   void set (const std::string&, const std::string&);
+
+  void setIfBlank (const std::string&, const std::string&);
+
   void all (std::vector <std::string>&) const;
 
   bool dirty ();
