@@ -49,6 +49,9 @@ public:
   bool redirect (const std::string&, Msg&);
 #endif
 
+  bool add_org (const std::string&);
+
+
   std::string key_generate ();
 
 public:

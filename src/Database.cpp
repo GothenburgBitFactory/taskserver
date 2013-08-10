@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <utf8.h>
 #include <Path.h>
+#include <Directory.h>
 #include <File.h>
 #include <text.h>
 #include <util.h>
@@ -162,6 +163,24 @@ bool Database::redirect (const std::string& org, Msg& response)
 }
 
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::add_org (const std::string& org)
+{
+  Directory new_org (_config->get ("root"));
+  new_org += "orgs";
+  new_org += org;
+
+  Directory groups (new_org);
+  groups += "groups";
+
+  Directory users (new_org);
+  users += "users";
+
+  return new_org.create (0700) &&
+         groups.create (0700) &&
+         users.create (0700);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string Database::key_generate ()
