@@ -128,10 +128,12 @@ int main (int argc, const char** argv)
         std::vector <std::string>::iterator arg;
         for (arg = args.begin (); arg != args.end (); ++arg)
         {
-               if (closeEnough ("--data",  *arg, 3))   config.set ("root",         *(++arg));
-          else if (closeEnough ("--quiet", *arg, 3))   config.set ("verbose",      0);
-          else if (closeEnough ("--debug", *arg, 3))   config.set ("debug",        1);
-          else if (closeEnough ("--force", *arg, 3))   config.set ("confirmation", 0);
+               if (closeEnough ("--data",   *arg, 3))  config.set ("root",         *(++arg));
+          else if (closeEnough ("--quiet",  *arg, 3))  config.set ("verbose",      0);
+          else if (closeEnough ("--debug",  *arg, 3))  config.set ("debug",        1);
+          else if (closeEnough ("--force",  *arg, 3))  config.set ("confirmation", 0);
+          else if (closeEnough ("--debug",  *arg, 3))  config.set ("debug",        1);
+          else if (closeEnough ("--daemon", *arg, 3))  config.set ("daemon",       1);
           else if (taskd_applyOverride (config, *arg)) ;
           else                                         positionals.push_back (*arg);
         }
@@ -140,20 +142,17 @@ int main (int argc, const char** argv)
         Database db (&config);
 
         // The highest-level commands are hard-coded:
-             if (closeEnough ("init",        args[0], 3))          command_init    (db, positionals);
-        else if (closeEnough ("config",      args[0], 3))          command_config  (db, positionals);
-        else if (closeEnough ("status",      args[0], 3))          command_status  (db, positionals);
-        else if (closeEnough ("help",        args[0], 3))          command_help    (    positionals);
-        else if (closeEnough ("diagnostics", args[0], 3))          command_diag    (db, positionals);
-        else if (closeEnough ("server",      args[0], 3)) status = command_server  (config, args);
-
-        else if (closeEnough ("add",         args[0], 3))          command_add     (db, positionals);
-        else if (closeEnough ("remove",      args[0], 3))          command_remove  (db, positionals);
-        else if (closeEnough ("suspend",     args[0], 3))          command_suspend (db, positionals);
-        else if (closeEnough ("resume",      args[0], 3))          command_resume  (db, positionals);
-
-        // For debugging purposes.  Will be removed later.  Maybe.
-        else if (closeEnough ("client",      args[0], 3))          command_client  (db, positionals);
+             if (closeEnough ("init",        args[0], 3)) command_init    (db, positionals);
+        else if (closeEnough ("config",      args[0], 3)) command_config  (db, positionals);
+        else if (closeEnough ("status",      args[0], 3)) command_status  (db, positionals);
+        else if (closeEnough ("help",        args[0], 3)) command_help    (    positionals);
+        else if (closeEnough ("diagnostics", args[0], 3)) command_diag    (db, positionals);
+        else if (closeEnough ("server",      args[0], 3)) command_server  (db, positionals);
+        else if (closeEnough ("add",         args[0], 3)) command_add     (db, positionals);
+        else if (closeEnough ("remove",      args[0], 3)) command_remove  (db, positionals);
+        else if (closeEnough ("suspend",     args[0], 3)) command_suspend (db, positionals);
+        else if (closeEnough ("resume",      args[0], 3)) command_resume  (db, positionals);
+        else if (closeEnough ("client",      args[0], 3)) command_client  (db, positionals);
         else
         {
           File subcommand (std::string (TASKD_EXTDIR) + "/taskd_" + args[0]);

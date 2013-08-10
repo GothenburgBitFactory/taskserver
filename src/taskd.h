@@ -41,7 +41,7 @@ void command_config   (Database&, const std::vector <std::string>&);
 void command_status   (Database&, const std::vector <std::string>&);
 void command_help     (           const std::vector <std::string>&);
 void command_diag     (Database&, const std::vector <std::string>&);
-int command_server    (Config&, const std::vector <std::string>&);
+void command_server   (Database&, const std::vector <std::string>&);
 void command_add      (Database&, const std::vector <std::string>&);
 void command_remove   (Database&, const std::vector <std::string>&);
 void command_suspend  (Database&, const std::vector <std::string>&);

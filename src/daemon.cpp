@@ -831,37 +831,13 @@ void Daemon::get_totals (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int command_server (Config& config, const std::vector <std::string>& args)
+void command_server (Database& db, const std::vector <std::string>& args)
 {
-  int status = 0;
-
-  // Standard argument processing.
-  bool verbose     = true;
-  bool debug       = false;
-  bool daemon      = false;
-  std::string root = "";
-
-  std::vector <std::string>::const_iterator i;
-  for (i = ++(args.begin ()); i != args.end (); ++i)
-  {
-         if (closeEnough ("--quiet",  *i, 3)) verbose = false;
-    else if (closeEnough ("--debug",  *i, 3)) debug   = true;
-    else if (closeEnough ("--daemon", *i, 3)) daemon  = true;
-    else if (closeEnough ("--data",   *i, 3)) root    = *(++i);
-    else if (taskd_applyOverride (config, *i) &&
-             taskd_applyOverride (_overrides, *i)) ;
-    else
-      throw std::string ("ERROR: Unrecognized argument '") + *i + "'";
-  }
-
-  if (root == "")
-  {
-    char* root_env = getenv ("TASKDDATA");
-    if (root_env)
-      root = root_env;
-  }
+  _overrides = *db._config;
+  bool daemon = db._config->getBoolean ("daemon");
 
   // Verify that root exists.
+  std::string root = db._config->get ("root");
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");
 
@@ -870,17 +846,12 @@ int command_server (Config& config, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' path does not exist.");
 
   // Load the config file.
-  config.load (root_dir._data + "/config");
-  config.set ("root", root_dir._data);
+  db._config->load (root_dir._data + "/config");
 
-  // Preserve the verbose setting for this run.
-  config.set ("verbose", verbose);
-  config.set ("debug", debug);
-
-  // Preserve all overrides, to reapply on config reload via SIGHUP.
-  _overrides.set ("root", root_dir._data);
-  _overrides.set ("verbose", verbose);
-  _overrides.set ("debug", debug);
+  // Apply overrides to db._config
+  Config::iterator i;
+  for (i = _overrides.begin (); i != _overrides.end (); ++i)
+    db._config->set (i->first, i->second);
 
   // Provide a set of attribute types.
   taskd_staticInitialize ();
@@ -889,7 +860,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
   try
   {
-    log.setFile (config.get ("log"));
+    log.setFile (db._config->get ("log"));
     log.write (std::string ("==== ")
                + PACKAGE_STRING
                + " "
@@ -901,10 +872,10 @@ int command_server (Config& config, const std::vector <std::string>& args)
 
     log.format ("Serving from %s", root.c_str ());
 
-    if (debug)
+    if (db._config->getBoolean ("debug"))
       log.write ("Debug mode");
 
-    std::string serverDetails = config.get ("server");
+    std::string serverDetails = db._config->get ("server");
     std::string::size_type colon = serverDetails.find (':');
 
     if (colon == std::string::npos)
@@ -913,14 +884,14 @@ int command_server (Config& config, const std::vector <std::string>& args)
     std::string port = serverDetails.substr (colon + 1);
 
     // Create a taskd server object.
-    Daemon server        (config);
+    Daemon server        (*db._config);
     server.setLog        (&log);
     server._db.setLog    (&log);
-    server.setConfig     (&config);
+    server.setConfig     (db._config);
     server.setPort       (port);
-    server.setQueueSize  (config.getInteger ("queue.size"));
-    server.setLimit      (config.getInteger ("request.limit"));
-    server.setLogClients (config.getBoolean ("ip.log"));
+    server.setQueueSize  (db._config->getInteger ("queue.size"));
+    server.setLimit      (db._config->getInteger ("request.limit"));
+    server.setLogClients (db._config->getBoolean ("ip.log"));
 
     // Client allow/deny lists are important - make them visible.
     std::vector <std::string>::iterator i;
@@ -934,17 +905,17 @@ int command_server (Config& config, const std::vector <std::string>& args)
     if (daemon)
     {
       server.setDaemon   ();
-      server.setPidFile  (config.get ("pid.file"));
+      server.setPidFile  (db._config->get ("pid.file"));
     }
 
     // It just runs until you kill it.
-    File cert (config.get ("server.cert"));
+    File cert (db._config->get ("server.cert"));
     server.setCertFile (cert._data);
 
-    File key (config.get ("server.key"));
+    File key (db._config->get ("server.key"));
     server.setKeyFile (key._data);
 
-    File crl (config.get ("server.crl"));
+    File crl (db._config->get ("server.crl"));
     server.setCRLFile (crl._data);
 
     server.beginServer ();
@@ -953,7 +924,6 @@ int command_server (Config& config, const std::vector <std::string>& args)
   catch (std::string& error)
   {
     log.write (error);
-    return -1;
   }
 
   catch (...)
@@ -962,10 +932,7 @@ int command_server (Config& config, const std::vector <std::string>& args)
       log.format ("errno=%d %s", errno, strerror (errno));
     else
     log.write ("Unknown error");
-    return -2;
   }
-
-  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
