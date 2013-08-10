@@ -149,8 +149,8 @@ int main (int argc, const char** argv)
 
         else if (closeEnough ("add",         args[0], 3))          command_add     (db, positionals);
         else if (closeEnough ("remove",      args[0], 3))          command_remove  (db, positionals);
-        else if (closeEnough ("suspend",     args[0], 3)) status = command_suspend (config, args);
-        else if (closeEnough ("resume",      args[0], 3)) status = command_resume  (config, args);
+        else if (closeEnough ("suspend",     args[0], 3))          command_suspend (db, positionals);
+        else if (closeEnough ("resume",      args[0], 3))          command_resume  (db, positionals);
 
         // For debugging purposes.  Will be removed later.  Maybe.
         else if (closeEnough ("client",      args[0], 3))          command_client  (db, positionals);
