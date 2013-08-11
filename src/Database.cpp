@@ -197,6 +197,38 @@ bool Database::add_group (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Database::add_user (
+  const std::string& org,
+  const std::string& user)
+{
+  Directory new_user (_config->get ("root"));
+  new_user += "orgs";
+  new_user += org;
+  new_user += "users";
+  new_user += user;
+
+  if (new_user.create (0700))
+  {
+    // Generate new KEY
+    std::string key = taskd_generate_key ();
+
+    // Store KEY in <new_user>/config
+    File conf_file (new_user._data + "/config");
+    conf_file.create (0600);
+
+    Config conf (conf_file._data);
+    conf.set ("key", key);
+    conf.save ();
+
+    // User will need this key.
+    std::cout << "New user key: " << key << "\n";
+    return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Database::remove_org (const std::string& org)
 {
   Directory org_dir (_config->get ("root"));

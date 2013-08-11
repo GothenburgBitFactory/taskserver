@@ -33,39 +33,6 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool add_user (
-  const Directory& root,
-  const std::string& org,
-  const std::string& user)
-{
-  Directory new_user (root);
-  new_user += "orgs";
-  new_user += org;
-  new_user += "users";
-  new_user += user;
-
-  if (new_user.create (0700))
-  {
-    // Generate new KEY
-    std::string key = taskd_generate_key ();
-
-    // Store KEY in <new_user>/config
-    File conf_file (new_user._data + "/config");
-    conf_file.create (0600);
-
-    Config conf (conf_file._data);
-    conf.set ("key", key);
-    conf.save ();
-
-    // User will need this key.
-    std::cout << "New user key: " << key << "\n";
-    return true;
-  }
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static bool remove_user (
   const Directory& root,
   const std::string& org,
@@ -164,7 +131,7 @@ void command_add (Database& db, const std::vector <std::string>& args)
       if (taskd_is_user (root_dir, args[2], args[i]))
         throw std::string ("ERROR: User '") + args[i] + "' already exists.";
 
-      if (add_user (root_dir, args[2], args[i]))
+      if (db.add_user (args[2], args[i]))
       {
         if (verbose)
           std::cout << "Created user '" << args[i] << "' for organization '" << args[2] << "'\n";
