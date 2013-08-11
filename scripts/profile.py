@@ -83,22 +83,22 @@ def scan_log(file, data):
 
         if client not in data['clients']:
           data['clients'].append(client)
+      else:
+        matches = sync1.search(line)
+        if matches:
+          data['sync'] += 1
+          org    = matches.group(1)
+          user   = matches.group(1)+'/'+matches.group(2)
 
-      matches = sync1.search(line)
-      if matches:
-        data['sync'] += 1
-        org    = matches.group(1)
-        user   = matches.group(1)+'/'+matches.group(2)
+          if org in data['active_orgs']:
+            data['active_orgs'][org] += 1
+          else:
+            data['active_orgs'][org] = 1
 
-        if org in data['active_orgs']:
-          data['active_orgs'][org] += 1
-        else:
-          data['active_orgs'][org] = 1
-
-        if user in data['active_users']:
-          data['active_users'][user] += 1
-        else:
-          data['active_users'][user] = 1
+          if user in data['active_users']:
+            data['active_users'][user] += 1
+          else:
+            data['active_users'][user] = 1
 
       matches = sync_trivial.search(line)
       if matches:
