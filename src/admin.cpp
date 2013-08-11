@@ -66,23 +66,6 @@ static bool add_user (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool remove_group (
-  const Directory& root,
-  const std::string& org,
-  const std::string& group)
-{
-  Directory group_dir (root);
-  group_dir += "orgs";
-  group_dir += org;
-  group_dir += "groups";
-  group_dir += group;
-
-  // TODO Revoke user group membership.
-
-  return group_dir.remove ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static bool remove_user (
   const Directory& root,
   const std::string& org,
@@ -266,7 +249,7 @@ void command_remove (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, args[2], args[i]))
         throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
 
-      if (remove_group (root_dir, args[2], args[i]))
+      if (db.remove_group (args[2], args[i]))
       {
         if (verbose)
           std::cout << "Removed group '" << args[i] << "' from organization '" << args[2] << "'\n";
