@@ -210,7 +210,7 @@ bool Database::add_user (
   if (new_user.create (0700))
   {
     // Generate new KEY
-    std::string key = taskd_generate_key ();
+    std::string key = key_generate ();
 
     // Store KEY in <new_user>/config
     File conf_file (new_user._data + "/config");

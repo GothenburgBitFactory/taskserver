@@ -61,8 +61,6 @@ void taskd_requireHeader (const Msg&, const std::string&, const std::string&);
 bool taskd_at_least (const std::string&, const std::string&);
 bool taskd_createDirectory (Directory&, bool);
 
-std::string taskd_generate_key ();
-
 bool taskd_sendMessage (Config&, const std::string&, const Msg&);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
 void taskd_renderMap (const std::map <std::string, std::string>&, const std::string&, const std::string&);
