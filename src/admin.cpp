@@ -83,20 +83,6 @@ static bool remove_user (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool suspend_node (const Directory& node)
-{
-  File semaphore (node._data + "/suspended");
-  return semaphore.create (0600);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static bool resume_node (const Directory& node)
-{
-  File semaphore (node._data + "/suspended");
-  return semaphore.remove ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // taskd add org   <org>
 // taskd add group <org> <group>
 // taskd add user  <org> <user>
@@ -320,7 +306,7 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, args[i]))
         throw std::string ("ERROR: Organization '") + args[i] + "' does not exist.";
 
-      if (suspend_node (root_dir._data + "/orgs/" + args[i]))
+      if (db.suspend (root_dir._data + "/orgs/" + args[i]))
       {
         if (verbose)
           std::cout << "Suspended organization '" << args[i] << "'\n";
@@ -345,7 +331,7 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, args[2], args[i]))
         throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
 
-      if (suspend_node (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
+      if (db.suspend (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
       {
         if (verbose)
           std::cout << "Suspended group '" << args[i] << "' in organization '" << args[2] << "'\n";
@@ -370,7 +356,7 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, args[2], args[i]))
         throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
 
-      if (suspend_node (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
+      if (db.suspend (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
       {
         if (verbose)
           std::cout << "Suspended user '" << args[i] << "' in organization '" << args[2] << "'\n";
@@ -416,7 +402,7 @@ void command_resume (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_org (root_dir, args[i]))
         throw std::string ("ERROR: Organization '") + args[i] + "' does not exist.";
 
-      if (resume_node (root_dir._data + "/orgs/" + args[i]))
+      if (db.resume (root_dir._data + "/orgs/" + args[i]))
       {
         if (verbose)
           std::cout << "Resumed organization '" << args[i] << "'\n";
@@ -441,7 +427,7 @@ void command_resume (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_group (root_dir, args[2], args[i]))
         throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
 
-      if (resume_node (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
+      if (db.resume (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
       {
         if (verbose)
           std::cout << "Resumed group '" << args[i] << "' in organization '" << args[2] << "'\n";
@@ -466,7 +452,7 @@ void command_resume (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, args[2], args[i]))
         throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
 
-      if (resume_node (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
+      if (db.resume (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
       {
         if (verbose)
           std::cout << "Resumed user '" << args[i] << "' in organization '" << args[2] << "'\n";

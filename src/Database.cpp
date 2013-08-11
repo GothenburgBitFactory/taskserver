@@ -227,6 +227,20 @@ bool Database::remove_group (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Database::suspend (const Directory& node)
+{
+  File semaphore (node._data + "/suspended");
+  return semaphore.create (0600);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::resume (const Directory& node)
+{
+  File semaphore (node._data + "/suspended");
+  return semaphore.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 std::string Database::key_generate ()
 {
   return uuid ();

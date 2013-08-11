@@ -53,6 +53,8 @@ public:
   bool add_group (const std::string&, const std::string&);
   bool remove_org (const std::string&);
   bool remove_group (const std::string&, const std::string&);
+  bool suspend (const Directory&);
+  bool resume (const Directory&);
 
   std::string key_generate ();
 
