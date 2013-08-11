@@ -51,6 +51,7 @@ public:
 
   bool add_org (const std::string&);
   bool add_group (const std::string&, const std::string&);
+  bool remove_org (const std::string&);
 
   std::string key_generate ();
 

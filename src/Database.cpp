@@ -197,6 +197,20 @@ bool Database::add_group (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Database::remove_org (const std::string& org)
+{
+  Directory org_dir (_config->get ("root"));
+  org_dir += "orgs";
+  org_dir += org;
+
+  // TODO Remove users?
+  // TODO Remove groups?
+  // TODO Revoke user group membership.
+
+  return org_dir.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 std::string Database::key_generate ()
 {
   return uuid ();
