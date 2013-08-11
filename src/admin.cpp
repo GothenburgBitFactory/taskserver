@@ -33,23 +33,6 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool remove_user (
-  const Directory& root,
-  const std::string& org,
-  const std::string& user)
-{
-  Directory user_dir (root);
-  user_dir += "orgs";
-  user_dir += org;
-  user_dir += "users";
-  user_dir += user;
-
-  // TODO Revoke group memberships.
-
-  return user_dir.remove ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // taskd add org   <org>
 // taskd add group <org> <group>
 // taskd add user  <org> <user>
@@ -227,7 +210,7 @@ void command_remove (Database& db, const std::vector <std::string>& args)
       if (! taskd_is_user (root_dir, args[2], args[i]))
         throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
 
-      if (remove_user (root_dir, args[2], args[i]))
+      if (db.remove_user (args[2], args[i]))
       {
         if (verbose)
           std::cout << "Removed user '" << args[i] << "' from organization '" << args[2] << "'\n";

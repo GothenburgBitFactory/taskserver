@@ -259,6 +259,22 @@ bool Database::remove_group (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Database::remove_user (
+  const std::string& org,
+  const std::string& user)
+{
+  Directory user_dir (_config->get ("root"));
+  user_dir += "orgs";
+  user_dir += org;
+  user_dir += "users";
+  user_dir += user;
+
+  // TODO Revoke group memberships.
+
+  return user_dir.remove ();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Database::suspend (const Directory& node)
 {
   File semaphore (node._data + "/suspended");

@@ -54,6 +54,7 @@ public:
   bool add_user (const std::string&, const std::string&);
   bool remove_org (const std::string&);
   bool remove_group (const std::string&, const std::string&);
+  bool remove_user (const std::string&, const std::string&);
   bool suspend (const Directory&);
   bool resume (const Directory&);
 
