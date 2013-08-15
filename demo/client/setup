@@ -34,3 +34,35 @@ cp ../../pki/client.cert.pem $TW2
 echo
 tree $TW2
 
+echo
+echo "# Create negative testing requests"
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.0
+
+# Payload
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n"      > bad.10
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\r\r\r"  > bad.11
+
+# Protocol
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v10\n\n\n" > bad.20
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\n\n\n"                > bad.21
+
+# Client
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: NOPE\nprotocol: v1\n\n\n"         > bad.30
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient:\nprotocol: v1\n\n\n"              > bad.31
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nprotocol: v1\n\n\n"                       > bad.32
+
+# Type
+printf "type: Sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.40
+printf "type: sync \norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.41
+printf "type:sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"   > bad.42
+printf "type: \norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.43
+printf "type:\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.44
+printf "\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"            > bad.45
+printf "org: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"              > bad.46
+
+# Org
+
+# User
+
+# Key
+
