@@ -3,18 +3,47 @@
 # Use Case: Negative testing using malformed requests.
 
 echo '--- bad.0 ----------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.0
+
 echo '--- bad.10 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.10
+
 echo '--- bad.11 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.11
+
 echo '--- bad.20 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.20
+
 echo '--- bad.21 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.21
+
 echo '--- bad.30 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.30
+
 echo '--- bad.31 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.31
+
 echo '--- bad.32 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.32
+
 echo '--- bad.40 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.40
+
 echo '--- bad.41 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.41
+
 echo '--- bad.42 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.42
+
 echo '--- bad.43 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.43
+
 echo '--- bad.44 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.44
+
 echo '--- bad.45 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.45
+
 echo '--- bad.46 ---------------------------------------------------------'
+../../src/taskd client localhost:6544 bad.46
 
