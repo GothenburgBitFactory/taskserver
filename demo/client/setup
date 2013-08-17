@@ -38,20 +38,20 @@ echo
 echo "# Create negative testing requests"
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.0
 
-# Payload
+echo "# Payload"
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n"      > bad.10
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\r\r\r"  > bad.11
 
-# Protocol
+echo "# Protocol"
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v10\n\n\n" > bad.20
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\n\n\n"                > bad.21
 
-# Client
+echo "# Client"
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: NOPE\nprotocol: v1\n\n\n"         > bad.30
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient:\nprotocol: v1\n\n\n"              > bad.31
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nprotocol: v1\n\n\n"                       > bad.32
 
-# Type
+echo "# Type"
 printf "type: Sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.40
 printf "type: sync \norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.41
 printf "type:sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"   > bad.42
@@ -60,9 +60,27 @@ printf "type:\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol
 printf "\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"            > bad.45
 printf "org: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"              > bad.46
 
-# Org
+echo "# Org"
+printf "type: sync\norg: Foo\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"     > bad.50
+printf "type: sync\norg:\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"         > bad.51
+printf "type: sync\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"               > bad.52
 
-# User
+echo "# User"
+printf "type: sync\norg: Public\nuser: USERX\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.60
+printf "type: sync\norg: Public\nuser: USE\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"   > bad.60
+printf "type: sync\norg: Public\nuser:\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.60
+printf "type: sync\norg: Public\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"              > bad.60
 
-# Key
+echo "# Key"
+printf "type: sync\norg: Public\nuser: USER\nkey: 00000000-0000-0000-0000-000000000000\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.70
+printf "type: sync\norg: Public\nuser: USER\nkey: 0000000-000-000-000-00000000000\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.71
+printf "type: sync\norg: Public\nuser: USER\nkey:0\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.72
+printf "type: sync\norg: Public\nuser: USER\nkey:\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.73
+printf "type: sync\norg: Public\nuser: USER\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"             > bad.74
+
+echo "# Garbage"
+printf "type: sync\norg: Public\nuser: USER\nhello: there\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.80
+printf "\n\n\n"  > bad.81
+printf "Ice cream and candy floss.  Parents with dosh.  Those were the times we liked best."  > bad.82
+printf ""  > bad.83
 
