@@ -221,10 +221,7 @@ void Server::beginServer ()
       std::string output;
       handler (input, output);
       if (output.length ())
-      {
         tx.send (output);
-        tx.bye ();
-      }
 
       if (_log)
       {

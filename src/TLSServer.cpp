@@ -251,6 +251,7 @@ void TLSTransaction::init (TLSServer& server)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// NOTE: Calling this is not necessary.
 void TLSTransaction::bye ()
 {
   gnutls_bye (_session, GNUTLS_SHUT_RDWR);
