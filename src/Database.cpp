@@ -96,8 +96,8 @@ bool Database::authenticate (
     return false;
   }
 
-  // Verify existence of <root>/orgs/<org>/users/<user>
-  Directory user_dir (_config->get ("root") + "/orgs/" + org + "/users/" + user);
+  // Verify existence of <root>/orgs/<org>/users/<key>
+  Directory user_dir (_config->get ("root") + "/orgs/" + org + "/users/" + key);
   if (! user_dir.exists ())
   {
     if (_log)
@@ -110,8 +110,8 @@ bool Database::authenticate (
     return false;
   }
 
-  // Verify non-existence of <root>/orgs/<org>/user/<user>/suspended
-  File user_suspended (_config->get ("root") + "/orgs/" + org + "/user/" + user + "/suspended");
+  // Verify non-existence of <root>/orgs/<org>/user/<key>/suspended
+  File user_suspended (_config->get ("root") + "/orgs/" + org + "/user/" + key + "/suspended");
   if (user_suspended.exists ())
   {
     if (_log)
@@ -124,9 +124,9 @@ bool Database::authenticate (
     return false;
   }
 
-  // Match <key> against <root>/orgs/<org>/users/<user>/rc:<key>
-  Config user_rc (_config->get ("root") + "/orgs/" + org + "/users/" + user + "/config");
-  if (user_rc.get ("key") != key)
+  // Match <user> against <root>/orgs/<org>/users/<key>/rc:<user>
+  Config user_rc (_config->get ("root") + "/orgs/" + org + "/users/" + key + "/config");
+  if (user_rc.get ("user") != user)
   {
     if (_log)
       _log->format ("INFO Auth failure: org '%s' user '%s' bad key",
@@ -201,23 +201,23 @@ bool Database::add_user (
   const std::string& org,
   const std::string& user)
 {
+  // Generate new KEY
+  std::string key = key_generate ();
+
   Directory new_user (_config->get ("root"));
   new_user += "orgs";
   new_user += org;
   new_user += "users";
-  new_user += user;
+  new_user += key;
 
   if (new_user.create (0700))
   {
-    // Generate new KEY
-    std::string key = key_generate ();
-
-    // Store KEY in <new_user>/config
+    // Store USER in <new_user>/config
     File conf_file (new_user._data + "/config");
     conf_file.create (0600);
 
     Config conf (conf_file._data);
-    conf.set ("key", key);
+    conf.set ("user", user);
     conf.save ();
 
     // User will need this key.
@@ -261,13 +261,13 @@ bool Database::remove_group (
 ////////////////////////////////////////////////////////////////////////////////
 bool Database::remove_user (
   const std::string& org,
-  const std::string& user)
+  const std::string& key)
 {
   Directory user_dir (_config->get ("root"));
   user_dir += "orgs";
   user_dir += org;
   user_dir += "users";
-  user_dir += user;
+  user_dir += key;
 
   // TODO Revoke group memberships.
 

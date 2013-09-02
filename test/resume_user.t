@@ -28,7 +28,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 # Create the data dir.
 my $data = 'resume_user.data';
@@ -50,19 +50,21 @@ ok (-d $data.'/orgs/ORG/users',      "'$data/orgs/ORG/users' dir exists");
 # Simple user.
 $output = qx{../src/taskd add --data $data user ORG USER 2>&1};
 unlike ($output, qr/^ERROR/,         "'taskd add --data $data user ORG USER' - no errors");
-ok (-d $data.'/orgs/ORG/users/USER', "'$data/orgs/ORG/users/USER' dir exists");
+like ($output, qr/New user key: \S{36}/, "New user key generated");
+my ($key) = $output =~ /New user key: (\S{36})/;
+ok (-d $data.'/orgs/ORG/users/'.$key, "'$data/orgs/ORG/users/KEY' dir exists");
 
 # Suspend user.
-$output = qx{../src/taskd suspend --data $data user ORG USER 2>&1};
-unlike ($output, qr/^ERROR/,         "'taskd suspend --data $data user ORG USER' - no errors");
-ok (-f $data.'/orgs/ORG/users/USER/suspended',
-                                     "'$data/orgs/ORG/users/USER/suspended' file exists");
+$output = qx{../src/taskd suspend --data $data user ORG $key 2>&1};
+unlike ($output, qr/^ERROR/,         "'taskd suspend --data $data user ORG $key' - no errors");
+ok (-f $data.'/orgs/ORG/users/'.$key.'/suspended',
+                                     "'$data/orgs/ORG/users/$key/suspended' file exists");
 
 # Resume user.
-$output = qx{../src/taskd resume --data $data user ORG USER 2>&1};
-unlike ($output, qr/^ERROR/,         "'taskd resume --data $data user ORG USER' - no errors");
-ok (! -f $data.'/orgs/ORG/users/USER/suspended',
-                                     "'$data/orgs/ORG/users/USER/suspended' file gone");
+$output = qx{../src/taskd resume --data $data user ORG $key 2>&1};
+unlike ($output, qr/^ERROR/,         "'taskd resume --data $data user ORG $key' - no errors");
+ok (! -f $data.'/orgs/ORG/users/'.$key.'/suspended',
+                                     "'$data/orgs/ORG/users/$key/suspended' file gone");
 
 # Cleanup.
 qx{rm -rf $data};

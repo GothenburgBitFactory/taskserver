@@ -313,8 +313,9 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   taskd_requireHeader (in, "protocol", "v1");
 
   // Note: org/user already validated during authentication.
-  std::string org  = in.get ("org");
-  std::string user = in.get ("user");
+  std::string org      = in.get ("org");
+  std::string user     = in.get ("user");
+  std::string password = in.get ("key");
 
   if (_log)
     _log->format ("[%d] 'sync' from '%s/%s' using '%s' at %s:%d",
@@ -332,7 +333,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
   // Load all user data.
   std::vector <std::string> server_data;               // Data loaded on server.
-  load_server_data (org, user, server_data);
+  load_server_data (org, password, server_data);
 
   std::vector <std::string> new_server_data;           // New tasks for tx.data.
   std::vector <std::string> new_client_data;           // New tasks for client.
@@ -415,7 +416,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     _log->format ("[%d] New sync key '%s'", _txn_count, new_client_key.c_str ());
 
     // Append new_server_data to file.
-    append_server_data (org, user, new_server_data);
+    append_server_data (org, password, new_server_data);
   }
   else
   {
@@ -497,14 +498,14 @@ void Daemon::parse_payload (
 ////////////////////////////////////////////////////////////////////////////////
 void Daemon::load_server_data (
   const std::string& org,
-  const std::string& user,
+  const std::string& password,
   std::vector <std::string>& data) const
 {
   Directory user_dir (_config.get ("root"));
   user_dir += "orgs";
   user_dir += org;
   user_dir += "users";
-  user_dir += user;
+  user_dir += password;
   File user_data (user_dir._data + "/tx.data");
 
   if (user_data.exists ())
@@ -518,14 +519,14 @@ void Daemon::load_server_data (
 ////////////////////////////////////////////////////////////////////////////////
 void Daemon::append_server_data (
   const std::string& org,
-  const std::string& user,
+  const std::string& password,
   const std::vector <std::string>& data) const
 {
   Directory user_dir (_config.get ("root"));
   user_dir += "orgs";
   user_dir += org;
   user_dir += "users";
-  user_dir += user;
+  user_dir += password;
   File user_data (user_dir._data + "/tx.data");
 
   if (!user_data.exists ())

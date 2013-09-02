@@ -467,13 +467,13 @@ bool taskd_is_group (
 bool taskd_is_user (
   const Directory& root,
   const std::string& org,
-  const std::string& user)
+  const std::string& password)
 {
   Directory d (root);
   d += "orgs";
   d += org;
   d += "users";
-  d += user;
+  d += password;
   return d.exists ();
 }
 

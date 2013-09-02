@@ -200,7 +200,7 @@ void command_remove (Database& db, const std::vector <std::string>& args)
   else if (closeEnough ("user", args[1], 3))
   {
     if (args.size () < 4)
-      throw std::string ("Usage: taskd remove [options] user <org> <user>");
+      throw std::string ("Usage: taskd remove [options] user <org> <password>");
 
     if (! taskd_is_org (root_dir, args[2]))
       throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
@@ -292,11 +292,11 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
   }
 
   // Suspend a user.
-  //   user <org> <user>
+  //   user <org> <password>
   else if (closeEnough ("user", args[1], 3))
   {
     if (args.size () < 4)
-      throw std::string ("Usage: taskd suspend [options] user <org> <user>");
+      throw std::string ("Usage: taskd suspend [options] user <org> <password>");
 
     if (! taskd_is_org (root_dir, args[2]))
       throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
@@ -392,7 +392,7 @@ void command_resume (Database& db, const std::vector <std::string>& args)
   else if (closeEnough ("user", args[1], 3))
   {
     if (args.size () < 4)
-      throw std::string ("Usage: taskd resume [options] user <org> <user>");
+      throw std::string ("Usage: taskd resume [options] user <org> <password>");
 
     if (! taskd_is_org (root_dir, args[2]))
       throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
