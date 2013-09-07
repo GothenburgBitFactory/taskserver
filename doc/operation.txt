@@ -316,9 +316,9 @@ Table of Contents
    using these commands:
 
       $ taskd add     user <org> <user>
-      $ taskd remove  user <org> <user>
-      $ taskd suspend user <org> <user>
-      $ taskd resume  user <org> <user>
+      $ taskd remove  user <org> <key>
+      $ taskd suspend user <org> <key>
+      $ taskd resume  user <org> <key>
 
 
 7  Backups
