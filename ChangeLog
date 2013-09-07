@@ -11,6 +11,7 @@ Features
 - Added statistics for orgs, users and data size.
 - Added data profiling script.
 - Now requires libuuid.
+- Restructured the data root so that users are made unique by a UUID.
 
 Bugs
 - #1287 'taskd config' ignored $TASKDDATA.

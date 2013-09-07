@@ -40,7 +40,8 @@ sync_trivial    = re.compile('still valid')
 sync_nontrivial = re.compile('New sync key')
 loaded          = re.compile('Loaded (\d+)')
 merged          = re.compile('merged (\d+)')
-error           = re.compile('ERROR')
+error           = re.compile('ERROR (\d+)')
+error_internal  = re.compile('ERROR')
 warning         = re.compile('WARNING')
 
 ################################################################################
@@ -119,6 +120,15 @@ def scan_log(file, data):
       matches = error.search(line)
       if matches:
         data['errors'] += 1
+        code    = matches.group(1)
+        if code in data['errorcode']:
+          data['errorcode'][code] += 1
+        else:
+          data['errorcode'][code] = 1
+      else:
+        matches = error_internal.search(line)
+        if matches:
+          data['errors'] += 1
 
       matches = warning.search(line)
       if matches:
@@ -153,6 +163,11 @@ def show_profile(root, data):
   print "  Warnings:               ", data['warnings']
   if root:
     print "  Data stored:            ", data['bytes'], 'bytes'
+
+  if len(data['errorcode']):
+    print "  Error Codes"
+    for code, count in sorted(data['errorcode'].iteritems()):
+      print "    Error %3s         %6d" % (code, count)
 
   print "[1mConfiguration[0m"
   if root:
@@ -230,6 +245,7 @@ def main(args):
            'newest'          : 0,
            'bytes'           : 0,
            'errors'          : 0,
+           'errorcode'       : {},
            'warnings'        : 0 }
 
   for log in args.log:
