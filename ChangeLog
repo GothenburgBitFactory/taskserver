@@ -1,6 +1,6 @@
-1.0.0 ()
+------ current release ---------------------------
 
-1.0.0.beta ()
+1.0.0.beta1 ()
 
 Features
 - #1294 SIGHUP now forces a server config file reload.
@@ -30,7 +30,7 @@ Bugs
         Boeckel).
 - #1306 Server never seems to sends a 201, always 200.
 
------- current release ---------------------------
+------ old releases ------------------------------
 
 1.0.0.alpha (2013-06-23)
 - Supports CRL (Certificate Revocation List).
@@ -46,8 +46,6 @@ Bugs
     - PKI
 - Supports 'client.allow' and 'client.deny' lists.
 - Client interface now an optional feature.
-
------- old releases ------------------------------
 
 0.12.0 (2013-06-03
 - Added IP logging option.

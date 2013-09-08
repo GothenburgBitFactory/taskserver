@@ -16,7 +16,7 @@ my $server = 'localhost:6544';
 # average request bytes: 0
 # average response bytes: 0
 # average response time: 0.000000
-# client: taskd 1.0.0.alpha1
+# client: taskd 1.0.0.beta1
 # code: 200
 # errors: 0
 # idle: 1.000000
