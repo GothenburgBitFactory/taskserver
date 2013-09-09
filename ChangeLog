@@ -13,6 +13,7 @@ Features
 - Now requires libuuid.
 - Restructured the data root so that users are made unique by a UUID.
 - Implemented org-level redirects.
+- Documented redirects.
 
 Bugs
 - #1287 'taskd config' ignored $TASKDDATA.

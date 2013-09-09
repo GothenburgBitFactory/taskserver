@@ -37,6 +37,7 @@ Table of Contents
    6.2      Organizations
    6.3      Groups
    6.4      Users
+   6.5      Redirects
    7      Backups
    8      Monitoring
    9      References
@@ -319,6 +320,23 @@ Table of Contents
       $ taskd remove  user <org> <key>
       $ taskd suspend user <org> <key>
       $ taskd resume  user <org> <key>
+
+
+6.5  Redirects
+
+   If traffic on a server becomes too great, organizations can be relocated to
+   another server instance.  This simply requires duplicating the disk structure
+   under:
+
+      <root>/orgs/<org>
+
+   Then adding a redirect file, like this:
+
+      $ echo 'server.domain.com:1234' > <root>/orgs/<org>/redirect
+
+   Will cause the server to issue 301 codes to the client, with an "info" header
+   variable that points to 'server.domain.com:1234'.  The client SHOULD then
+   update it's configuration and make a new request.
 
 
 7  Backups
