@@ -45,9 +45,7 @@ public:
 
   // These throw on failure.
   bool authenticate (const Msg&, Msg&);
-#ifdef NONE_OF_THIS_WORKS
   bool redirect (const std::string&, Msg&);
-#endif
 
   bool add_org (const std::string&);
   bool add_group (const std::string&, const std::string&);

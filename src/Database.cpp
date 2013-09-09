@@ -142,27 +142,33 @@ bool Database::authenticate (
   return true;
 }
 
-#ifdef NONE_OF_THIS_WORKS
 ////////////////////////////////////////////////////////////////////////////////
-// if <root>/rc contains redirect.<org>=<server>:<port>, issue a 301.
+// if <root>/orgs/<org>/redirect exists, read it and send contents as a 301.
 bool Database::redirect (const std::string& org, Msg& response)
 {
-  Config rc (_config->get ("root") + "/rc");
+  File redirect (_config->get ("root"));
+  redirect += "orgs";
+  redirect += org;
+  redirect += "redirect";
 
-  std::string server = rc.get ("redirect." + org);
-  if (server != "")
+  if (redirect.exists ())
   {
-    if (_log)
-      _log->write ("Database::redirect: " + org + " -> " + server);
+    std::string server;
+    redirect.read (server);
+    response.set ("code", 301);
+    response.set ("info", trim (server, " \n"));
 
-    response.addStatus (301, server, "");
+    if (_log)
+      _log->format ("INFO Redirecting org '%s' to '%s'",
+                    org.c_str (),
+                    response.get ("info").c_str ());
+
     return true;
   }
 
   return false;
 }
 
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Database::add_org (const std::string& org)

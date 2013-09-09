@@ -1,6 +1,6 @@
 ------ current release ---------------------------
 
-1.0.0.beta1 ()
+1.0.0.beta1 (2013-09-08)
 
 Features
 - #1294 SIGHUP now forces a server config file reload.
@@ -12,6 +12,7 @@ Features
 - Added data profiling script.
 - Now requires libuuid.
 - Restructured the data root so that users are made unique by a UUID.
+- Implemented org-level redirects.
 
 Bugs
 - #1287 'taskd config' ignored $TASKDDATA.

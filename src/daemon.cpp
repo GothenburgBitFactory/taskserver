@@ -326,6 +326,10 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
                   _client_address.c_str (),
                   _client_port);
 
+  // Redirect if instructed.
+  if (_db.redirect (org, out))
+    return;
+
   // Separate payload into client_data and client_key.
   std::vector <std::string> client_data;               // Incoming client data.
   std::string client_key;                              // Incoming client key.
