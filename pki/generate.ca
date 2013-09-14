@@ -1,7 +1,16 @@
 #!/bin/bash
 
+CERTTOOL=$(which gnutls-certtool)
+if [ -z $CERTTOOL ]; then
+  CERTTOOL=$(which certtool)
+  if [ -z $CERTTOOL ]; then
+    echo Cannot find gnutls-certtool or certtool.
+    exit 1
+  fi
+fi
+
 # Create a CA key.
-gnutls-certtool \
+$CERTTOOL \
   --generate-privkey \
   --outfile ca.key.pem
 
@@ -14,7 +23,7 @@ ca
 cert_signing_key
 EOF
 
-gnutls-certtool \
+$CERTTOOL \
   --generate-self-signed \
   --load-privkey ca.key.pem \
   --template ca.info \

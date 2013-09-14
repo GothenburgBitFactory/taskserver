@@ -1,12 +1,21 @@
 #!/bin/bash
 
+CERTTOOL=$(which gnutls-certtool)
+if [ -z $CERTTOOL ]; then
+  CERTTOOL=$(which certtool)
+  if [ -z $CERTTOOL ]; then
+    echo Cannot find gnutls-certtool or certtool.
+    exit 1
+  fi
+fi
+
 NAME=client
 if [ $# -gt 0 ] ; then
   NAME=$1
 fi
 
 # Create a client key.
-gnutls-certtool \
+$CERTTOOL \
   --generate-privkey \
   --outfile ${NAME}.key.pem
 
@@ -23,7 +32,7 @@ encryption_key
 signing_key
 EOF
 
-gnutls-certtool \
+$CERTTOOL \
   --generate-certificate \
   --load-privkey ${NAME}.key.pem \
   --load-ca-certificate ca.cert.pem \

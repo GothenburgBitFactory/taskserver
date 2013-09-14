@@ -14,6 +14,7 @@ Features
 - Restructured the data root so that users are made unique by a UUID.
 - Implemented org-level redirects.
 - Documented redirects.
+- PKI examples can now use gnutls-certtool otherwise certtool.
 
 Bugs
 - #1287 'taskd config' ignored $TASKDDATA.
