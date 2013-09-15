@@ -239,7 +239,11 @@ void TLSTransaction::init (TLSServer& server)
               << _port
               << "\n";
 
+#if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
+#else
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
+#endif
 
   // Key exchange.
   int ret;
