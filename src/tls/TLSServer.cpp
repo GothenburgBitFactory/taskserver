@@ -112,7 +112,11 @@ void TLSServer::init (
   gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
 
 #if GNUTLS_VERSION_NUMBER >= 0x020b00
+#if GNUTLS_VERSION_NUMBER >= 0x03000d
   unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
+#else
+  unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
+#endif
 #else
   unsigned int bits = DH_BITS;
 #endif
@@ -242,7 +246,7 @@ void TLSTransaction::init (TLSServer& server)
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
 #else
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) _socket);
 #endif
 
   // Key exchange.
