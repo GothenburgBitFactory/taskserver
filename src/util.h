@@ -30,7 +30,11 @@
 
 #include <string>
 #include <vector>
+#ifdef FREEBSD
+#include <uuid.h>
+#else
 #include <uuid/uuid.h>
+#endif
 
 bool confirm (const std::string&);
 std::string formatBytes (size_t);
