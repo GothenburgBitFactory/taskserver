@@ -45,7 +45,3 @@ set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
 
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})
 
-set (CMAKE_BUILD_TYPE debug)
-set (CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -g -Wall")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wall")
-
