@@ -160,7 +160,12 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) _socket);
 
   // Perform the TLS handshake
-  int ret = gnutls_handshake (_session);
+  int ret;
+  do
+  {
+    ret = gnutls_handshake (_session);
+  }
+  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
   if (ret < 0)
   {
     if (_debug)

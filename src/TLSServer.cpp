@@ -112,9 +112,11 @@ void TLSServer::init (
   gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
 
+  unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
   gnutls_dh_params_init (&_params);
-  gnutls_dh_params_generate2 (_params, DH_BITS);
-  gnutls_priority_init (&_priorities, "NORMAL", NULL);
+  gnutls_dh_params_generate2 (_params, bits);
+//  gnutls_priority_init (&_priorities, "NORMAL", NULL);
+  gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 }
 
@@ -183,10 +185,11 @@ TLSTransaction::TLSTransaction ()
 ////////////////////////////////////////////////////////////////////////////////
 TLSTransaction::~TLSTransaction ()
 {
-  gnutls_bye (_session, GNUTLS_SHUT_WR);
-
   if (_socket)
+  {
     close (_socket);
+    _socket = 0;
+  }
 
   gnutls_deinit (_session);
 }
@@ -204,20 +207,21 @@ void TLSTransaction::init (TLSServer& server)
   // TODO Can we require the cert instead?
   //gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE);
 
+/*
   // Set maximum compatibility mode. This is only suggested on public
   // webservers that need to trade security for compatibility
   gnutls_session_enable_compatibility_mode (_session);
+*/
 
   struct sockaddr_in sa_cli = {0};
   socklen_t client_len = sizeof sa_cli;
-  int sd;
   do
   {
-    sd = accept (server._socket, (struct sockaddr *) &sa_cli, &client_len);
+    _socket = accept (server._socket, (struct sockaddr *) &sa_cli, &client_len);
   }
   while (errno == EINTR);
 
-  if (sd < 0)
+  if (_socket < 0)
     throw "ERROR: " + std::string (::strerror (errno));
 
   // Obtain client info.
@@ -231,27 +235,24 @@ void TLSTransaction::init (TLSServer& server)
               << _port
               << "\n";
 
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) sd);
+  gnutls_transport_set_int (_session, _socket);
 
   // Key exchange.
-  int ret = gnutls_handshake (_session);
-  if (ret < 0)
+  int ret;
+  do
   {
-    close (sd);
-    gnutls_deinit (_session);
-    if (_debug)
-      std::cout << "s: ERROR Handshake has failed ("
-                << gnutls_strerror (ret)
-                << ")\n\n";
-    return;
+    ret = gnutls_handshake (_session);
   }
+  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+
+  if (ret < 0)
+    throw std::string ("ERROR: Handshake has failed (") + gnutls_strerror (ret) + ")";
 
   if (_debug)
     std::cout << "s: INFO Handshake was completed\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// NOTE: Calling this is not necessary.
 void TLSTransaction::bye ()
 {
   gnutls_bye (_session, GNUTLS_SHUT_RDWR);
