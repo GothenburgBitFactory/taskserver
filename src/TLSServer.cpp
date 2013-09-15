@@ -140,12 +140,12 @@ void TLSServer::bind (const std::string& port)
 
   struct addrinfo* res;
   if (::getaddrinfo (NULL, port.c_str (), &hints, &res) != 0)
-    throw "ERROR: " + std::string (::gai_strerror (errno));
+    throw std::string (::gai_strerror (errno));
 
   if ((_socket = ::socket (res->ai_family,
                            res->ai_socktype,
                            res->ai_protocol)) == -1)
-    throw "ERROR: Can not bind to port " + port;
+    throw std::string ("Can not bind to port ") + port;
 
   // When a socket is closed, it remains unavailable for a while (netstat -an).
   // Setting SO_REUSEADDR allows this program to assume control of a closed, but
@@ -156,17 +156,17 @@ void TLSServer::bind (const std::string& port)
                     SO_REUSEADDR,
                     (const void*) &on,
                     sizeof (on)) == -1)
-    throw "ERROR: " + std::string (::strerror (errno));
+    throw std::string (::strerror (errno));
 
   if (::bind (_socket, res->ai_addr, res->ai_addrlen) == -1)
-    throw "ERROR: " + std::string (::strerror (errno));
+    throw std::string (::strerror (errno));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::listen ()
 {
   if (::listen (_socket, _queue) < 0)
-    throw "ERROR: " + std::string (::strerror (errno));
+    throw std::string (::strerror (errno));
 
   if (_debug)
     std::cout << "s: INFO Server listening.\n";
@@ -231,7 +231,7 @@ void TLSTransaction::init (TLSServer& server)
   while (errno == EINTR);
 
   if (_socket < 0)
-    throw "ERROR: " + std::string (::strerror (errno));
+    throw std::string (::strerror (errno));
 
   // Obtain client info.
   char topbuf[512];
@@ -259,7 +259,7 @@ void TLSTransaction::init (TLSServer& server)
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 
   if (ret < 0)
-    throw std::string ("ERROR: Handshake has failed (") + gnutls_strerror (ret) + ")";
+    throw std::string ("Handshake has failed (") + gnutls_strerror (ret) + ")";
 
   if (_debug)
     std::cout << "s: INFO Handshake was completed\n";
@@ -378,7 +378,7 @@ void TLSTransaction::recv (std::string& data)
 
     // Something happened.
     if (received < 0)
-      throw "ERROR: " + std::string (gnutls_strerror (received));
+      throw std::string (gnutls_strerror (received));
 
     buffer [received] = '\0';
     data += buffer;
