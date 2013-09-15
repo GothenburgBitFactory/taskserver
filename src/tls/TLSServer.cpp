@@ -111,9 +111,14 @@ void TLSServer::init (
   gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
 
+#if GNUTLS_VERSION_NUMBER >= 0x020b00
   unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
+#else
+  unsigned int bits = DH_BITS;
+#endif
   gnutls_dh_params_init (&_params);
   gnutls_dh_params_generate2 (_params, bits);
+
 //  gnutls_priority_init (&_priorities, "NORMAL", NULL);
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
