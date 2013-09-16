@@ -124,7 +124,6 @@ void TLSServer::init (
   gnutls_dh_params_init (&_params);
   gnutls_dh_params_generate2 (_params, bits);
 
-//  gnutls_priority_init (&_priorities, "NORMAL", NULL);
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 }
