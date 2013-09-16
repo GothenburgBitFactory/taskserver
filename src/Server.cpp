@@ -43,6 +43,7 @@
 #include <Server.h>
 #include <TLSServer.h>
 #include <Timer.h>
+#include <text.h>
 
 // Indicates that certain signals were caught.
 bool _sighup  = false;
@@ -133,6 +134,9 @@ void Server::setCertFile (const std::string& file)
 {
   if (_log) _log->format ("Certificate %s", file.c_str ());
   _cert_file = file;
+  File cert (file);
+  if (! cert.exists ())
+    throw format ("Certificate not found: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +144,9 @@ void Server::setKeyFile (const std::string& file)
 {
   if (_log) _log->format ("Private Key %s", file.c_str ());
   _key_file = file;
+  File key (file);
+  if (! key.exists ())
+    throw format ("Private key not found: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,6 +154,9 @@ void Server::setCRLFile (const std::string& file)
 {
   if (_log) _log->format ("CRL %s", file.c_str ());
   _crl_file = file;
+  File crl (file);
+  if (! crl.exists ())
+    throw format ("CRL not found: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

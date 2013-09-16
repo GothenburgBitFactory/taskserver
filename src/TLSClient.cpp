@@ -34,12 +34,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <TLSClient.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <File.h>
+#include <TLSClient.h>
 
 #define MAX_BUF 16384
 
@@ -94,6 +95,9 @@ void TLSClient::debug (int level)
 void TLSClient::init (const std::string& ca)
 {
   _ca = ca;
+  File ca_file (_ca);
+  if (!ca_file.exists ())
+    throw std::string ("CA certificate not found.");
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
