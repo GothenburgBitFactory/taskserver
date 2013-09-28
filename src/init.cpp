@@ -75,8 +75,9 @@ void command_init (Database& db, const std::vector <std::string>& args)
   Directory sub (root_dir);
   sub.cd ();
   sub += "orgs";
-  if (!sub.create (0700))
-    throw std::string ("ERROR: Could not create '") + sub._data + "'.";
+  if (!sub.exists ())
+    if (!sub.create (0700))
+      throw std::string ("ERROR: Could not create '") + sub._data + "'.";
 
   // Dump the config file?
   db._config->_original_file = root_dir._data + "/config";

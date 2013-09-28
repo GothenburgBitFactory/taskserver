@@ -3,6 +3,8 @@
 Features
 
 Bugs
+- #1397 existing org folder breaks init action in taskd (thanks to Axel
+        Gschaider)
 - #1398 man and help pages are different concerning $TASKDATA (thanks to Axel
         Gschaider)
 
