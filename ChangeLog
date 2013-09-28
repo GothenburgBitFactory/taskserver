@@ -1,6 +1,7 @@
 1.0.0.beta2 ()
 
 Features
+- Improved test suite.
 
 Bugs
 - #1397 existing org folder breaks init action in taskd (thanks to Axel
