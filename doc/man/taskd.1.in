@@ -18,18 +18,20 @@ Taskd supports several commands, which provide adminstrative capabilities.  The
 commands are:
 
 .TP
-.B taskd init --data <root> [options]
+.B taskd init [--data <root>] [options]
 Performs a one-time initialization of the task server instance.  Creates the
 bare data structure.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd help <command> [options]
 Provides option and syntax help for each command.
 
 .TP
-.B taskd config [options] [--force] [<name> [<value>]]
+.B taskd config [options] [--data <root>] [--force] [<name> [<value>]]
 Allows modification of the taskd configuration.  Can add, remove, modify or list
 all configuration settings.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd status [options]
@@ -44,36 +46,40 @@ Note that sending the HUP signal to the taskd server causes a configuration
 file reload before the next request is handled.
 
 .TP
-.B taskd add --data <root> org <org>
+.B taskd add [--data <root>] org <org>
 .TP
-.B taskd add --data <root> group <org> <group>
+.B taskd add [--data <root>] group <org> <group>
 .TP
-.B taskd add --data <root> user <org> <user>
+.B taskd add [--data <root>] user <org> <user>
 Adds organizations, groups and users.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
-.B taskd remove --data <root> org <org>
+.B taskd remove [--data <root>] org <org>
 .TP
-.B taskd remove --data <root> group <org> <group>
+.B taskd remove [--data <root>] group <org> <group>
 .TP
-.B taskd remove --data <root> user <org> <user>
+.B taskd remove [--data <root>] user <org> <user>
 Removes organizations, groups and users.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
-.B taskd suspend --data <root> org <org>
+.B taskd suspend [--data <root>] org <org>
 .TP
-.B taskd suspend --data <root> group <org> <group>
+.B taskd suspend [--data <root>] group <org> <group>
 .TP
-.B taskd suspend --data <root> user <org> <user>
+.B taskd suspend [--data <root>] user <org> <user>
 Suspends organizations, groups and users.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
-.B taskd resume --data <root> org <org>
+.B taskd resume [--data <root>] org <org>
 .TP
-.B taskd resume --data <root> group <org> <group>
+.B taskd resume [--data <root>] group <org> <group>
 .TP
-.B taskd resume --data <root> user <org> <user>
+.B taskd resume [--data <root>] user <org> <user>
 Resumes organizations, groups and users.
+Either '--data <root>' must be specified, or TASKDDATA must be set.
 
 .SH COMMON OPTIONS
 Most commands support the following options:
@@ -93,6 +99,11 @@ Suppresses verbose output.
 .TP
 .B --debug
 Shows debugging information.
+
+.TP
+.B --data <root>
+Many commands require the location of the data root, so either it must be
+provided as shown, or via the TASKDDATA environment variable.
 
 .SH CONFIGURATION
 The taskd configuration file can be found in the top level of the data root.  It
