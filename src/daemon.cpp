@@ -884,7 +884,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
     std::string::size_type colon = serverDetails.find (':');
 
     if (colon == std::string::npos)
-      throw std::string ("ERROR: Malformed configuration setting 'server'");
+      throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 
     std::string port = serverDetails.substr (colon + 1);
 
