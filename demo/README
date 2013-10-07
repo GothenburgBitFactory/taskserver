@@ -13,7 +13,7 @@ Build / Install
 Follow these commands to build and install taskd.
 
   $ git clone git://tasktools.org/taskd.git taskd.git
-  $ cd task.git
+  $ cd taskd.git
   $ cmake .
   $ make
   $ cd test
