@@ -20,6 +20,11 @@ int main (void)
     client.bye ();
   }
 
+  catch (std::string& e)
+  {
+    std::cout << "ERROR " << e << "\n";
+  }
+
   catch (...)
   {
     std::cout << "ERROR\n";

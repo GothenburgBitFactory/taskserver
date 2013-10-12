@@ -28,11 +28,21 @@ int main (void)
         tx.bye ();
       }
 
+      catch (std::string& e)
+      {
+        std::cout << "ERROR " << e << "\n";
+      }
+
       catch (...)
       {
         std::cout << "ERROR\n";
       }
     }
+  }
+
+  catch (std::string& e)
+  {
+    std::cout << "ERROR " << e << "\n";
   }
 
   catch (...)
