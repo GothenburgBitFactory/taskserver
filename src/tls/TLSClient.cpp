@@ -41,10 +41,45 @@
 
 #define MAX_BUF 16384
 
+static bool trust_override = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
   std::cout << "c: " << level << " " << message;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static int verify_certificate_callback (gnutls_session_t session)
+{
+  if (trust_override)
+    return 0;
+
+  // Read hostname.
+  const char* hostname = (const char*) gnutls_session_get_ptr (session);
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status;
+  int ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  std::cout << "c: INFO " << out.data << "\n";
+
+  gnutls_free (out.data);
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,9 +124,23 @@ void TLSClient::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::init (const std::string& ca)
+void TLSClient::trust (bool value)
 {
-  _ca = ca;
+  trust_override = value;
+  if (_debug)
+    if (trust_override)
+      std::cout << "c: INFO Server certificate trusted automatically.\n";
+    else
+      std::cout << "c: INFO Server certificate trust verified.\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void TLSClient::init (
+  const std::string& cert,
+  const std::string& key)
+{
+  _cert = cert;
+  _key  = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);

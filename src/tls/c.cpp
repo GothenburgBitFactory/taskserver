@@ -9,7 +9,8 @@ int main (void)
     TLSClient client;
     client.debug (0);
     client.limit (1024);
-    client.init ("../../pki/client.cert.pem");
+    client.init ("../../pki/client.cert.pem",
+                 "../../pki/client.key.pem");
     client.connect ("127.0.0.1", "5556");
 
     client.send ("This is a test.");
