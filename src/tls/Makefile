@@ -1,5 +1,5 @@
-CFLAGS  = -I. -Wall -pedantic -D HAVE_LIBGNUTLS=1
-LFLAGS  = 
+CFLAGS  = -I. -I/usr/local/include -Wall -pedantic -D HAVE_LIBGNUTLS=1
+LFLAGS  = -L/usr/local/lib
 LIBS    = -lgnutls
 
 all: c s
