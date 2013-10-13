@@ -128,10 +128,12 @@ void TLSClient::trust (bool value)
 {
   trust_override = value;
   if (_debug)
+  {
     if (trust_override)
       std::cout << "c: INFO Server certificate trusted automatically.\n";
     else
       std::cout << "c: INFO Server certificate trust verified.\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +146,17 @@ void TLSClient::init (
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
-  gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM);
+
+  if (_cert != "" &&
+      gnutls_certificate_set_x509_trust_file (_credentials, _cert.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+    throw std::string ("Missing CA file.");
+
+  if (_cert != "" &&
+      _key != "" &&
+      gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+    throw std::string ("Missing CERT file.");
+
+  gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
   gnutls_init (&_session, GNUTLS_CLIENT);
 
   // Use default priorities.
