@@ -19,7 +19,9 @@ chmod 600 server.key.pem
 # Sign a server cert using the key.
 cat <<EOF >server.info
 organization = Göteborg Bit Factory
-cn = tasktools.org
+cn = Göteborg Bit Factory
+dns_name = "tasktools.org"
+ip_address = "97.107.141.107"
 tls_www_server
 encryption_key
 signing_key

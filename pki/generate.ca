@@ -18,7 +18,11 @@ chmod 600 ca.key.pem
 
 # Sign a CA cert.
 cat <<EOF >ca.info
+organization = Göteborg Bit Factory
 cn = Göteborg Bit Factory
+country = SE
+state = Västra Götaland
+locality = Göteborg
 ca
 cert_signing_key
 EOF

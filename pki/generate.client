@@ -22,11 +22,8 @@ $CERTTOOL \
 # Sign a client cert with the key.
 chmod 600 ${NAME}.key.pem
 cat <<EOF >client.info
-country = SE
-state = Västra Götaland
-locality = Göteborg
 organization = Göteborg Bit Factory
-cn = Taskwarrior
+cn = Göteborg Bit Factory
 tls_www_client
 encryption_key
 signing_key
