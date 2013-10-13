@@ -177,6 +177,9 @@ void TLSClient::init (
 ////////////////////////////////////////////////////////////////////////////////
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
+  // Set server name, for verification.
+  gnutls_server_name_set (_session, GNUTLS_NAME_DNS, host.c_str (), host.length ());
+
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
   hints.ai_family   = AF_UNSPEC;
