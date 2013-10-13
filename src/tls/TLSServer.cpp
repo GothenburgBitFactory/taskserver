@@ -94,13 +94,15 @@ void TLSServer::debug (int level)
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
+  const std::string& ca,
   const std::string& crl,
   const std::string& cert,
   const std::string& key)
 {
-  _crl = crl;
+  _ca   = ca;
+  _crl  = crl;
   _cert = cert;
-  _key = key;
+  _key  = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
