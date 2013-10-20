@@ -8,6 +8,7 @@ int main (void)
     // This is a sample TLS 1.0 echo server, using X.509 authentication.
     TLSServer server;
     server.debug (0);
+    server.trust (false);
     server.init ("../../pki/ca.cert.pem",     // CA
                  "../../pki/server.crl.pem",  // CRL
                  "../../pki/server.cert.pem", // Cert

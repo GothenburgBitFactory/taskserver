@@ -43,10 +43,42 @@
 #define DH_BITS 1024
 #define MAX_BUF 16384
 
+static bool trust_override = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
   std::cout << "s: " << level << " " << message;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static int verify_certificate_callback (gnutls_session_t session)
+{
+  if (trust_override)
+    return 0;
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status;
+  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  std::cout << "s: INFO " << out.data << "\n";
+
+  gnutls_free (out.data);
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +125,19 @@ void TLSServer::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSServer::trust (bool value)
+{
+  trust_override = value;
+  if (_debug)
+  {
+    if (trust_override)
+      std::cout << "s: INFO Client certificate trusted automatically.\n";
+    else
+      std::cout << "s: INFO Client certificate trust verified.\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
   const std::string& ca,
   const std::string& crl,
@@ -133,6 +178,8 @@ void TLSServer::init (
 
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
+
+  gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
