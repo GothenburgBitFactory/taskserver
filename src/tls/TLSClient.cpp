@@ -55,7 +55,7 @@ static int verify_certificate_callback (gnutls_session_t session)
   if (trust_override)
     return 0;
 
-  // Read hostname.
+  // Get the hostname from the session.
   const char* hostname = (const char*) gnutls_session_get_ptr (session);
 
   // This verification function uses the trusted CAs in the credentials
@@ -177,8 +177,9 @@ void TLSClient::init (
 ////////////////////////////////////////////////////////////////////////////////
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
-  // Set server name, for verification.
-  gnutls_server_name_set (_session, GNUTLS_NAME_DNS, host.c_str (), host.length ());
+  // Store the host name, so the verification callback can access it during the
+  // handshake below.
+  gnutls_session_set_ptr (_session, (void*) host.c_str ());
 
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
