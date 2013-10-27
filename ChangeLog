@@ -9,6 +9,7 @@ Bugs
 - #1398 man and help pages are different concerning $TASKDATA (thanks to Axel
         Gschaider).
 - #1434 Taskd client spec: unknown field MUST vs SHALL (thanks to Profpatsch).
+- #1435 Type of “modification” field is not clear (thanks to Profpatsch).
 - Fixed demo documentation (thanks to Rainer Müller).
 
 ------ current release ---------------------------

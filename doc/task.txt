@@ -564,7 +564,7 @@ Table of Contents
 3.19  Field: modification
 
    A task MUST have a "modification" field set if it is modified.  This field is
-   used as a reference when merging tasks.
+   of type "date", and is used as a reference when merging tasks.
 
 
 3.20  Field: scheduled
