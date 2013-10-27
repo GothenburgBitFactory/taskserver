@@ -155,7 +155,7 @@ Table of Contents
    so will send all task data, which should be stored as above.  This should be
    the case for a client making its first sync call.
 
-   If an unrecognized attribute is present in the task data, the client SHALL
+   If an unrecognized attribute is present in the task data, the client MUST
    preserve the attribute unmodified, and assume it is of type 'string'.  This
    permits individual clients to augment the task data without other clients
    stripping it meaningful data.  This is how UDAs (user defined attributes) are
