@@ -45,6 +45,8 @@
 #define DH_BITS 1024
 #define MAX_BUF 16384
 
+static bool trust_override = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -96,10 +98,12 @@ void TLSServer::debug (int level)
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
+  const std::string& ca,
   const std::string& crl,
   const std::string& cert,
   const std::string& key)
 {
+  _ca   = ca;
   _crl = crl;
   _cert = cert;
   _key = key;

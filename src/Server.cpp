@@ -74,9 +74,10 @@ Server::Server ()
   , _pid_file ("")
   , _request_count (0)
   , _limit (0)        // Unlimited
-  , _cert_file ()
-  , _key_file ()
-  , _crl_file ()
+  , _ca_file ("")
+  , _cert_file ("")
+  , _key_file ("")
+  , _crl_file ("")
 {
 }
 
@@ -127,6 +128,16 @@ void Server::setLimit (int max)
   if (_log) _log->format ("Request size limit %d bytes", max);
   assert (max >= 0);
   _limit = max;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Server::setCAFile (const std::string& file)
+{
+  if (_log) _log->format ("CA %s", file.c_str ());
+  _ca_file = file;
+  File cert (file);
+  if (! cert.exists ())
+    throw format ("Certificate not found: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,10 +208,10 @@ void Server::beginServer ()
   if (_config)
     server.debug (_config->getInteger ("debug.tls"));
 
-  server.init (/*"pki/ca.cert.pem",*/    // CA
-               _crl_file,                // CRL
-               _cert_file,               // Cert
-               _key_file);               // Key
+  server.init (_ca_file,        // CA
+               _crl_file,       // CRL
+               _cert_file,      // Cert
+               _key_file);      // Key
   server.queue (_queue_size);
   server.bind (_port);
   server.listen ();

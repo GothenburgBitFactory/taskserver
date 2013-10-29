@@ -47,6 +47,7 @@ public:
   void setLog (Log*);
   void setConfig (Config*);
   void setLimit (int);
+  void setCAFile (const std::string&);
   void setCertFile (const std::string&);
   void setKeyFile (const std::string&);
   void setCRLFile (const std::string&);
@@ -77,6 +78,7 @@ private:
   std::string _pid_file;
   int _request_count;
   int _limit;
+  std::string _ca_file;
   std::string _cert_file;
   std::string _key_file;
   std::string _crl_file;

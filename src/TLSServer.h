@@ -41,7 +41,8 @@ public:
   ~TLSServer ();
   void queue (int);
   void debug (int);
-  void init (/*const std::string&,*/ const std::string&, const std::string&, const std::string&);
+  void trust (bool);
+  void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&);
   void listen ();
   void accept (TLSTransaction&);
@@ -49,6 +50,7 @@ public:
   friend class TLSTransaction;
 
 private:
+  std::string                      _ca;
   std::string                      _crl;
   std::string                      _cert;
   std::string                      _key;
