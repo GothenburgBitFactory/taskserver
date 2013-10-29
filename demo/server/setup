@@ -46,6 +46,8 @@ echo "# cp ../../pki/server.key.pem $ROOT"
 cp ../../pki/server.key.pem $ROOT
 echo "# cp ../../pki/server.crl.pem $ROOT"
 cp ../../pki/server.crl.pem $ROOT
+echo "# cp ../../pki/ca.cert.pem $ROOT"
+cp ../../pki/ca.cert.pem $ROOT
 
 echo "# taskd config --force --data $ROOT client.cert $ROOT/client.cert.pem"
 ../../src/taskd config --force --data $ROOT client.cert $ROOT/client.cert.pem
@@ -55,6 +57,8 @@ echo "# taskd config --force --data $ROOT server.key $ROOT/server.key.pem"
 ../../src/taskd config --force --data $ROOT server.key $ROOT/server.key.pem
 echo "# taskd config --force --data $ROOT server.crl $ROOT/server.crl.pem"
 ../../src/taskd config --force --data $ROOT server.crl $ROOT/server.crl.pem
+echo "# taskd config --force --data $ROOT ca.cert $ROOT/ca.cert.pem"
+../../src/taskd config --force --data $ROOT ca.cert $ROOT/ca.cert.pem
 
 echo "# taskd config --force --data $ROOT log $PWD/taskd.log"
 ../../src/taskd config --force --data $ROOT log $PWD/taskd.log
