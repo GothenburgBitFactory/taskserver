@@ -122,6 +122,10 @@ void TLSClient::init (const std::string& ca)
 ////////////////////////////////////////////////////////////////////////////////
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
+  // Store the host name, so the verification callback can access it during the
+  // handshake below.
+  gnutls_session_set_ptr (_session, (void*) host.c_str ());
+
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
   hints.ai_family   = AF_UNSPEC;
