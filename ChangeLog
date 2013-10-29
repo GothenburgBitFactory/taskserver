@@ -10,6 +10,7 @@ Bugs
         Gschaider).
 - #1434 Taskd client spec: unknown field MUST vs SHALL (thanks to Profpatsch).
 - #1435 Type of “modification” field is not clear (thanks to Profpatsch).
+- Fixed portability (thanks to qbit).
 - Fixed demo documentation (thanks to Rainer Müller).
 
 ------ current release ---------------------------
