@@ -44,6 +44,8 @@
 
 #define MAX_BUF 16384
 
+static bool trust_override = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -92,12 +94,25 @@ void TLSClient::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::init (const std::string& ca)
+void TLSClient::trust (bool value)
 {
-  _ca = ca;
-  File ca_file (_ca);
-  if (!ca_file.exists ())
-    throw std::string ("CA certificate not found.");
+  trust_override = value;
+  if (_debug)
+  {
+    if (trust_override)
+      std::cout << "c: INFO Server certificate trusted automatically.\n";
+    else
+      std::cout << "c: INFO Server certificate trust verified.\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void TLSClient::init (
+  const std::string& cert,
+  const std::string& key)
+{
+  _cert = cert;
+  _key  = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
