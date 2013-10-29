@@ -54,6 +54,36 @@ static void gnutls_log_function (int level, const char* message)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+static int verify_certificate_callback (gnutls_session_t session)
+{
+  if (trust_override)
+    return 0;
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status;
+  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  std::cout << "s: INFO " << out.data << "\n";
+
+  gnutls_free (out.data);
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
 : _crl ("")
 , _cert ("")
