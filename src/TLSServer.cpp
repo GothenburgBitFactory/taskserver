@@ -127,6 +127,19 @@ void TLSServer::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSServer::trust (bool value)
+{
+  trust_override = value;
+  if (_debug)
+  {
+    if (trust_override)
+      std::cout << "s: INFO Client certificate trusted automatically.\n";
+    else
+      std::cout << "s: INFO Client certificate trust verified.\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
   const std::string& ca,
   const std::string& crl,
