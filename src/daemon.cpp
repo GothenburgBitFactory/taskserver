@@ -914,6 +914,10 @@ void command_server (Database& db, const std::vector <std::string>& args)
     }
 
     // It just runs until you kill it.
+    File ca (db._config->get ("ca.cert"));
+    if (ca.exists ())
+      server.setCAFile (ca._data);
+
     File cert (db._config->get ("server.cert"));
     server.setCertFile (cert._data);
 
