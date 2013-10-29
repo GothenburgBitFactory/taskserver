@@ -197,7 +197,11 @@ void TLSClient::connect (const std::string& host, const std::string& port)
     throw std::string ("Handshake failed.  ") + gnutls_strerror (ret);
 
   if (_debug)
-    std::cout << "c: INFO Handshake was completed\n";
+  {
+    char* desc = gnutls_session_get_desc (_session);
+    std::cout << "c: INFO Handshake was completed: " << desc << "\n";
+    gnutls_free (desc);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
