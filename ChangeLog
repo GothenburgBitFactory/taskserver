@@ -2,6 +2,9 @@
 
 Features
 - Improved test suite.
+- Server now requires the client to provide a cert, and validates it.
+- Server allows an optional 'ca.cert' setting to specify the CA cert when the
+  'server.cert' is self-signed.
 
 Bugs
 - #1397 existing org folder breaks init action in taskd (thanks to Axel

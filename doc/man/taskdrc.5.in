@@ -8,6 +8,10 @@ taskdrc \- Configuration file for the taskd(1) server
 Valid variable names and their default values are:
 
 .TP
+.B ca.cert
+Fully qualified path to the CA certificate.  Optional.
+
+.TP
 .B confirmation=on
 Determines whether certain commands are confirmed.  Defaults to on.
 
