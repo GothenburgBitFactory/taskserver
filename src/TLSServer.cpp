@@ -153,11 +153,18 @@ void TLSServer::init (
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
-/*
-  gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM);
-*/
-  gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM);
-  gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM);
+  if (_ca != "" &&
+      gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+    throw std::string ("Missing CA file.");
+
+  if ( _crl != "" &&
+      gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+    throw std::string ("Missing CRL file.");
+
+  if (_cert != "" &&
+      _key != "" &&
+      gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+    throw std::string ("Missing CERT file.");
 
 #if GNUTLS_VERSION_NUMBER >= 0x020b00
 #if GNUTLS_VERSION_NUMBER >= 0x03000d
@@ -173,6 +180,8 @@ void TLSServer::init (
 
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
+
+  gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,11 +265,8 @@ void TLSTransaction::init (TLSServer& server)
   gnutls_priority_set (_session, server._priorities);
   gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, server._credentials);
 
-  // Request client certificate if any.
-  gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUEST);
-
-  // TODO Can we require the cert instead?
-  //gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE);
+  // Require client certificate.
+  gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE);
 
 /*
   // Set maximum compatibility mode. This is only suggested on public
