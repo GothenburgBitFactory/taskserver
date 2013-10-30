@@ -199,6 +199,12 @@ Table of Contents
       $ taskd config server.key $TASKDDATA/server.key.pem
       $ taskd config server.crl $TASKDDATA/server.crl.pem
 
+   If the server.cert is self-signed, you may want to include the ca.cert.pem
+   file like this:
+
+      $ cp ca.cert.pem $TASKDDATA
+      $ taskd config ca.cert $TASKDDATA/ca.cert.pem
+
    Note that the 'client.cert.pem' is intended for use by Task Server clients
    clients like Taskwarrior and the 'taskd client ...' interface.
 
