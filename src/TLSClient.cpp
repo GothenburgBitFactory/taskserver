@@ -39,7 +39,6 @@
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <netdb.h>
-#include <File.h>
 #include <TLSClient.h>
 
 #define MAX_BUF 16384
@@ -88,6 +87,8 @@ static int verify_certificate_callback (gnutls_session_t session)
 ////////////////////////////////////////////////////////////////////////////////
 TLSClient::TLSClient ()
 : _ca ("")
+, _cert ("")
+, _key ("")
 , _socket (0)
 , _limit (0)
 , _debug (false)

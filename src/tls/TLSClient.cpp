@@ -34,7 +34,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <errno.h>
+#include <sys/errno.h>
 #include <sys/types.h>
 #include <netdb.h>
 #include <TLSClient.h>
@@ -85,6 +85,8 @@ static int verify_certificate_callback (gnutls_session_t session)
 ////////////////////////////////////////////////////////////////////////////////
 TLSClient::TLSClient ()
 : _ca ("")
+, _cert ("")
+, _key ("")
 , _socket (0)
 , _limit (0)
 , _debug (false)
