@@ -63,7 +63,11 @@ static int verify_certificate_callback (gnutls_session_t session)
   // This verification function uses the trusted CAs in the credentials
   // structure. So you must have installed one or more CA certificates.
   unsigned int status;
-  int ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
+#if GNUTLS_VERSION_NUMBER >= 0x030104
+  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
+#else
+  int ret = gnutls_certificate_verify_peers2 (session, &status);
+#endif
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
 
