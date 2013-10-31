@@ -116,6 +116,10 @@ Table of Contents
 
       taskwarrior 2.3.0
 
+   DO NOT spoof any other software using this client value.  If another client
+   is spoofed, then patches supporting protocol errors may break working
+   software.
+
 
 2.3  Auth Data
 
