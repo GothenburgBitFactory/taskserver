@@ -189,7 +189,9 @@ void TLSServer::init (
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 
+#if GNUTLS_VERSION_NUMBER >= 0x02090a
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

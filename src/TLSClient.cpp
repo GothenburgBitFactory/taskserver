@@ -168,7 +168,9 @@ void TLSClient::init (
       gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
     throw std::string ("Missing CERT file.");
 
+#if GNUTLS_VERSION_NUMBER >= 0x02090a
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
+#endif
   gnutls_init (&_session, GNUTLS_CLIENT);
 
   // Use default priorities.
