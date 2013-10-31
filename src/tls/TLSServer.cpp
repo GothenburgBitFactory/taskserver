@@ -43,6 +43,8 @@
 #define DH_BITS 1024
 #define MAX_BUF 16384
 
+static int verify_certificate_callback (gnutls_session_t);
+
 static bool trust_override = false;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,11 +61,16 @@ static int verify_certificate_callback (gnutls_session_t session)
 
   // This verification function uses the trusted CAs in the credentials
   // structure. So you must have installed one or more CA certificates.
-  unsigned int status;
+  unsigned int status = 0;
+#if GNUTLS_VERSION_NUMBER >= 0x030104
   int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
+#else
+  int ret = gnutls_certificate_verify_peers2 (session, &status);
+#endif
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
 
+#if GNUTLS_VERSION_NUMBER >= 0x030105
   gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
   gnutls_datum_t out;
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
@@ -73,6 +80,7 @@ static int verify_certificate_callback (gnutls_session_t session)
   std::cout << "s: INFO " << out.data << "\n";
 
   gnutls_free (out.data);
+#endif
 
   if (status != 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
@@ -179,7 +187,9 @@ void TLSServer::init (
   gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 
+#if GNUTLS_VERSION_NUMBER >= 0x02090a
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
