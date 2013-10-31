@@ -70,6 +70,7 @@ static int verify_certificate_callback (gnutls_session_t session)
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
 
+#if GNUTLS_VERSION_NUMBER >= 0x030105
   gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
   gnutls_datum_t out;
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
@@ -79,6 +80,7 @@ static int verify_certificate_callback (gnutls_session_t session)
 //  std::cout << "s: INFO " << out.data << "\n";
 
   gnutls_free (out.data);
+#endif
 
   if (status != 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
