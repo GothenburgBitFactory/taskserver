@@ -43,6 +43,8 @@
 
 #define MAX_BUF 16384
 
+static int verify_certificate_callback (gnutls_session_t);
+
 static bool trust_override = false;
 
 ////////////////////////////////////////////////////////////////////////////////
