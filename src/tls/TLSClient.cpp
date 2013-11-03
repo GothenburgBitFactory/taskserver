@@ -151,16 +151,12 @@ void TLSClient::trust (bool value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::ca (const std::string& ca)
-{
-  _ca = ca;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void TLSClient::init (
+  const std::string& ca,
   const std::string& cert,
   const std::string& key)
 {
+  _ca   = ca;
   _cert = cert;
   _key  = key;
 
