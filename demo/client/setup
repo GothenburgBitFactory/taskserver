@@ -18,9 +18,12 @@ echo "taskd.server=localhost:6544"            >> $TW1/rc
 echo "taskd.credentials=Public/USER/$KEY"     >> $TW1/rc
 echo "taskd.certificate=$TW1/client.cert.pem" >> $TW1/rc
 echo "taskd.key=$TW1/client.key.pem"          >> $TW1/rc
+echo "taskd.ca=$TW1/ca.cert.pem"              >> $TW1/rc
+#echo "taskd.trust=yes"                        >> $TW1/rc
 echo "confirmation=off"                       >> $TW1/rc
 cp ../../pki/client.cert.pem $TW1
 cp ../../pki/client.key.pem $TW1
+cp ../../pki/ca.cert.pem $TW1
 echo
 tree $TW1
 
@@ -32,9 +35,12 @@ echo "taskd.server=localhost:6544"            >> $TW2/rc
 echo "taskd.credentials=Public/USER/$KEY"     >> $TW2/rc
 echo "taskd.certificate=$TW2/client.cert.pem" >> $TW2/rc
 echo "taskd.key=$TW2/client.key.pem"          >> $TW2/rc
+echo "taskd.ca=$TW2/ca.cert.pem"              >> $TW2/rc
+#echo "taskd.trust=yes"                        >> $TW2/rc
 echo "confirmation=off"                       >> $TW2/rc
 cp ../../pki/client.cert.pem $TW2
 cp ../../pki/client.key.pem $TW2
+cp ../../pki/ca.cert.pem $TW2
 echo
 tree $TW2
 
@@ -85,6 +91,6 @@ printf "type: sync\norg: Public\nuser: USER\nclient: taskd 1.0.0\nprotocol: v1\n
 echo "# Garbage"
 printf "type: sync\norg: Public\nuser: USER\nhello: there\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.80
 printf "\n\n\n"  > bad.81
-printf "Ice cream and candy floss.  Parents with dosh.  Those were the times we liked best."  > bad.82
+printf "Ice cream and candy floss.  Parents with dosh."  > bad.82
 printf ""  > bad.83
 
