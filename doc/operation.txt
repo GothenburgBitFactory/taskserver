@@ -216,7 +216,8 @@ Table of Contents
       $ cd taskd.git/pki
       $ ./generate.client
 
-   The resultant 'client.cert.pem' file is needed by the client.
+   The resultant 'client.cert.pem' and 'client.key.pem' files are needed by the
+   client.
 
 
 5  Server Start/Stop

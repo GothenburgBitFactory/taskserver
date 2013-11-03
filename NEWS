@@ -1,5 +1,5 @@
 
-New Features in taskd 1.0.0.beta1
+New Features in taskd 1.0.0.beta2
 
   - Functioning sync algorithm
   - IPv4 and IPv6 support
@@ -9,6 +9,7 @@ New Features in taskd 1.0.0.beta1
   - Client allow/deny lists
   - Documentation
   - Requires libuuid
+  - Validates certs, allows CA or trust override settings
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
