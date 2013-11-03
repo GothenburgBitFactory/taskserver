@@ -151,6 +151,12 @@ void TLSClient::trust (bool value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSClient::ca (const std::string& ca)
+{
+  _ca = ca;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSClient::init (
   const std::string& cert,
   const std::string& key)
@@ -161,8 +167,8 @@ void TLSClient::init (
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
 
-  if (_cert != "" &&
-      gnutls_certificate_set_x509_trust_file (_credentials, _cert.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+  if (_ca != "" &&
+      gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
     throw std::string ("Missing CA file.");
 
   if (_cert != "" &&
