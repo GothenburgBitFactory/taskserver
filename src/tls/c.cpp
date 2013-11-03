@@ -8,7 +8,7 @@ int main (void)
     // A very basic TLS client, with X.509 authentication.
     TLSClient client;
     client.debug (0);
-    client.trust (true);
+    client.ca ("../../pki/ca.cert.pem");
     client.limit (1024);
     client.init ("../../pki/client.cert.pem",
                  "../../pki/client.key.pem");
