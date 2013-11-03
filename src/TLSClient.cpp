@@ -154,17 +154,19 @@ void TLSClient::trust (bool value)
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSClient::init (
+  const std::string& ca,
   const std::string& cert,
   const std::string& key)
 {
+  _ca   = ca;
   _cert = cert;
   _key  = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
 
-  if (_cert != "" &&
-      gnutls_certificate_set_x509_trust_file (_credentials, _cert.c_str (), GNUTLS_X509_FMT_PEM) < 0)
+  if (_ca != "" &&
+      gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
     throw std::string ("Missing CA file.");
 
   if (_cert != "" &&
@@ -365,7 +367,10 @@ void TLSClient::recv (std::string& data)
 
     // Something happened.
     if (received < 0 && gnutls_error_is_fatal (received) == 0)
+    {
+      if (_debug)
       std::cout << "c: WARNING " << gnutls_strerror (received) << "\n";
+    }
 
     else if (received < 0)
       throw std::string (gnutls_strerror (received));
