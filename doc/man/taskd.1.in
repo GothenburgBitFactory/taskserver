@@ -8,7 +8,11 @@ taskd \- Task Server
 .br
 .B taskd -v|--version
 .br
-.B taskd -d|--diagnostics
+.B taskd -h|--help
+.br
+.B taskd diagnostics
+.br
+.B taskd help [<command>]
 
 .SH DESCRIPTION
 Taskd is a sync server for Taskwarrior and related products.
