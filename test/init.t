@@ -57,17 +57,26 @@ if ($platform eq 'cygwin')
 }
 else
 {
-  qx{chmod 000 $data};
-  $output = qx{../src/taskd init --data $data 2>&1};
-  like ($output, qr/^ERROR: The '--data' directory is not readable\./, "'taskd init --data $data' - data not readable");
+  if ($> != 0)
+  {
+    qx{chmod 000 $data};
+    $output = qx{../src/taskd init --data $data 2>&1};
+    like ($output, qr/^ERROR: The '--data' directory is not readable\./, "'taskd init --data $data' - data not readable");
 
-  qx{chmod +r $data};
-  $output = qx{../src/taskd init --data $data 2>&1};
-  like ($output, qr/^ERROR: The '--data' directory is not writable\./, "'taskd init --data $data' - data not writable");
+    qx{chmod +r $data};
+    $output = qx{../src/taskd init --data $data 2>&1};
+    like ($output, qr/^ERROR: The '--data' directory is not writable\./, "'taskd init --data $data' - data not writable");
 
-  qx{chmod +w $data};
-  $output = qx{../src/taskd init --data $data 2>&1};
-  like ($output, qr/^ERROR: The '--data' directory is not executable\./, "'taskd init --data $data' - data not executable");
+    qx{chmod +w $data};
+    $output = qx{../src/taskd init --data $data 2>&1};
+    like ($output, qr/^ERROR: The '--data' directory is not executable\./, "'taskd init --data $data' - data not executable");
+  }
+  else
+  {
+    pass ("'taskd init --data $data' - permissions test skipped by root");
+    pass ("'taskd init --data $data' - permissions test skipped by root");
+    pass ("'taskd init --data $data' - permissions test skipped by root");
+  }
 }
 
 qx{chmod +x $data};
