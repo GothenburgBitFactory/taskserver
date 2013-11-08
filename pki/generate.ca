@@ -1,16 +1,15 @@
 #!/bin/bash
 
-CERTTOOL=$(which gnutls-certtool)
-if [ -z $CERTTOOL ]; then
-  CERTTOOL=$(which certtool)
-  if [ -z $CERTTOOL ]; then
-    echo Cannot find gnutls-certtool or certtool.
-    exit 1
-  fi
+# Take the correct binary to create the certificates
+CERTTOOL=$(which gnutls-certtool || which certtool)
+if [[ -z "${CERTTOOL}" ]]
+then
+  echo "ERROR: No certtool found" >&2
+  exit 1
 fi
 
 # Create a CA key.
-$CERTTOOL \
+${CERTTOOL} \
   --generate-privkey \
   --outfile ca.key.pem
 
@@ -18,16 +17,12 @@ chmod 600 ca.key.pem
 
 # Sign a CA cert.
 cat <<EOF >ca.info
-organization = Göteborg Bit Factory
 cn = Göteborg Bit Factory
-country = SE
-state = Västra Götaland
-locality = Göteborg
 ca
 cert_signing_key
 EOF
 
-$CERTTOOL \
+${CERTTOOL} \
   --generate-self-signed \
   --load-privkey ca.key.pem \
   --template ca.info \

@@ -1,16 +1,15 @@
 #!/bin/bash
 
-CERTTOOL=$(which gnutls-certtool)
-if [ -z $CERTTOOL ]; then
-  CERTTOOL=$(which certtool)
-  if [ -z $CERTTOOL ]; then
-    echo Cannot find gnutls-certtool or certtool.
-    exit 1
-  fi
+# Take the correct binary to create the certificates
+CERTTOOL=$(which gnutls-certtool || which certtool)
+if [[ -z "${CERTTOOL}" ]]
+then
+  echo "ERROR: No certtool found" >&2
+  exit 1
 fi
 
 # Create a server key.
-$CERTTOOL \
+${CERTTOOL} \
   --generate-privkey \
   --outfile server.key.pem
 
@@ -19,15 +18,13 @@ chmod 600 server.key.pem
 # Sign a server cert using the key.
 cat <<EOF >server.info
 organization = Göteborg Bit Factory
-cn = Göteborg Bit Factory
-dns_name = "tasktools.org"
-ip_address = "97.107.141.107"
+cn = tasktools.org
 tls_www_server
 encryption_key
 signing_key
 EOF
 
-$CERTTOOL \
+${CERTTOOL} \
   --generate-certificate \
   --load-privkey server.key.pem \
   --load-ca-certificate ca.cert.pem \
