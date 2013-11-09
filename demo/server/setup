@@ -2,6 +2,9 @@
 
 ROOT=$PWD/root
 
+# Check for tree binary
+TREE=$(which tree || echo "ls -1R")
+
 if [ -d $ROOT ]; then
   echo "# Cleanup"
   echo "# rm -rf $ROOT"
@@ -77,7 +80,7 @@ echo "# taskd config --force --data $ROOT client.allow '^task [2-9],^taskd,^libt
 ../../src/taskd config --force --data $ROOT client.allow '^task [2-9],^taskd,^libtaskd'
 
 echo
-tree $ROOT
+${TREE} $ROOT
 
 echo
 echo "# taskd config --data $ROOT"

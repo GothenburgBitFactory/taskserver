@@ -3,6 +3,9 @@
 TW1=$PWD/tw1
 TW2=$PWD/tw2
 
+# Check for tree binary
+TREE=$(which tree || echo "ls -1R")
+
 echo "# Cleanup"
 if [ -d $TW1 ]; then rm -r $TW1; fi
 if [ -d $TW2 ]; then rm -r $TW2; fi
@@ -25,7 +28,7 @@ cp ../../pki/client.cert.pem $TW1
 cp ../../pki/client.key.pem $TW1
 cp ../../pki/ca.cert.pem $TW1
 echo
-tree $TW1
+${TREE} $TW1
 
 echo
 echo "# Create second taskwarrior client"
@@ -42,7 +45,7 @@ cp ../../pki/client.cert.pem $TW2
 cp ../../pki/client.key.pem $TW2
 cp ../../pki/ca.cert.pem $TW2
 echo
-tree $TW2
+${TREE} $TW2
 
 echo
 echo "# Create negative testing requests"
