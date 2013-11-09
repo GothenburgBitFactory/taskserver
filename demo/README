@@ -99,7 +99,7 @@ be removed before release.  In the meantime it serves as a means to send
 requests to the server.  The requests are fully-formed API messages, in files,
 sent using the 'client' command.
 
-  taskd client localhost:6544 stats.0
-  taskd client localhost:6544 sync.1
+  taskd client localhost:53589 stats.0
+  taskd client localhost:53589 sync.1
 
 ---

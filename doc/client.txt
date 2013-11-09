@@ -112,7 +112,7 @@ Table of Contents
    The server address and port are the network location of the server.  An
    example of this value is:
 
-      tasktools.org:6544
+      tasktools.org:53589
 
    In addition to a DNS name, this can be an IPv4 or IPv6 address.
 

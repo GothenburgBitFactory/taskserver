@@ -8,7 +8,7 @@ $datafile = shift if @ARGV;;
 die "Could not find data file: $datafile\n"
   unless -f $datafile;
 
-my $server = 'localhost:6544';
+my $server = 'localhost:53589';
 
 # $ taskd client <server>:<port> stats.request 
 # >>> stats.request

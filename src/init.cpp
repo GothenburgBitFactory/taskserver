@@ -68,7 +68,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
     std::cout << "You must specify the 'server' variable, for example:\n"
-              << "  taskd config server localhost:6544\n"
+              << "  taskd config server localhost:53589\n"
               << "\n";
 
   // Create the data structure.

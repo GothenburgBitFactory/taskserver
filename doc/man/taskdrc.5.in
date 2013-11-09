@@ -66,7 +66,7 @@ Size of the connection backlog.  See 'man listen'.
 Size limit of incoming requests, in bytes.
 
 .TP
-.B server=localhost:6544
+.B server=localhost:53589
 The address (IPv4, IPv6 or DNS) of the taskd server, followed by a colon and the
 port number.
 

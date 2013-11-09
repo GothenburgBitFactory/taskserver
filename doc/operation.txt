@@ -59,7 +59,7 @@ Table of Contents
    - Connectivity from your client to your server.  This may involve firewall or
      VPN, but access is needed.
 
-   - An open port.  The default is 6544.
+   - An open port.  The default is 53589.
 
    - Tools:  C++ compiler, CMake, make, Perl and Python, Gnu certtools
 
@@ -379,7 +379,7 @@ Table of Contents
    file, use the 'client' command to send the request to the server.  The
    response is shown in raw form:
 
-      $ taskd client localhost:6544 stats.request
+      $ taskd client localhost:53589 stats.request
       >>> stats.request
       <<<
       average request bytes: 0
