@@ -12,6 +12,11 @@ Valid variable names and their default values are:
 Fully qualified path to the CA certificate.  Optional.
 
 .TP
+.B ciphers
+List of GnuTLS ciphers to use.  Default is "PERFORMANCE:%SERVER_PRECEDENCE".
+See your GnuTLS documentation for full details.
+
+.TP
 .B confirmation=on
 Determines whether certain commands are confirmed.  Defaults to on.
 

@@ -19,6 +19,7 @@ New configuration options in taskd 1.0.0.beta1
   - $TASKDDATA specifies the data root directory, otherwise '--data <root>' is
     needed for most commands.
   - Supports 'ip.log' to turn on/off logging of client IP address and port.
+  - Supports 'ciphers' list of ciphers to use.  See GnuTLS documentation.
   - Sending a HUP signal to the task server forces a configuration file reload.
   - Added more statistics.
 

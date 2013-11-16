@@ -206,7 +206,16 @@ void Server::beginServer ()
 
   TLSServer server;
   if (_config)
+  {
     server.debug (_config->getInteger ("debug.tls"));
+
+    std::string ciphers = _config->get ("ciphers");
+    if (ciphers != "")
+    {
+      server.ciphers (ciphers);
+      if (_log) _log->format ("Using ciphers: %s", ciphers.c_str ());
+    }
+  }
 
   server.init (_ca_file,        // CA
                _crl_file,       // CRL
