@@ -39,8 +39,8 @@
 #include <commit.h>
 #endif
 
-#ifdef HAVE_LIBGNUTLS                                                                                                               
-#include <gnutls/gnutls.h>                                                                                                          
+#ifdef HAVE_LIBGNUTLS
+#include <gnutls/gnutls.h>
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

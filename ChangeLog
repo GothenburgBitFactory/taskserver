@@ -66,7 +66,7 @@ Bugs
 - Supports new user key generation.
 - Documentation for:
     - operations
-    - writing a client 
+    - writing a client
     - task data interchange format
     - task server protocol
     - sync algorithm
