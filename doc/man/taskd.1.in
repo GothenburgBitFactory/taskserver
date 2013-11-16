@@ -23,7 +23,7 @@ The commands are:
 
 .TP
 .B taskd init [--data <root>] [options]
-Performs a one-time initialization of the task server instance.  Creates the
+Performs a one-time initialization of the Taskserver instance.  Creates the
 bare data structure.
 Either '--data <root>' must be specified, or TASKDDATA must be set.
 

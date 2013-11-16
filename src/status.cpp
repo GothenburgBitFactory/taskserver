@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskd - Task Server
+// taskd - Taskserver
 //
 // Copyright 2010 - 2013, Göteborg Bit Factory.
 //
@@ -69,7 +69,7 @@ int status_statistics (Config& config)
   }
   else
   {
-    std::cout << Color ("red").colorize ("ERROR: Task server not responding.") << "\n";
+    std::cout << Color ("red").colorize ("ERROR: Taskserver not responding.") << "\n";
     status = 1;
   }
 

@@ -205,12 +205,12 @@ Table of Contents
       $ cp ca.cert.pem $TASKDDATA
       $ taskd config ca.cert $TASKDDATA/ca.cert.pem
 
-   Note that the 'client.cert.pem' is intended for use by Task Server clients
+   Note that the 'client.cert.pem' is intended for use by Taskserver clients
    clients like Taskwarrior and the 'taskd client ...' interface.
 
    Ordinarily, a new 'client.cert.pem' is generated for each user.
 
-   For every client of the Task Server, you will need to generate a new
+   For every client of the Taskserver, you will need to generate a new
    'client.cert.pem' file, using this:
 
       $ cd taskd.git/pki
@@ -356,12 +356,12 @@ Table of Contents
       $ <your backup program here>
       $ taskdctl start
 
-   Rotating the task server log file requires the same care.
+   Rotating the Taskserver log file requires the same care.
 
 
 8  Monitoring
 
-   The task server has a client interface, where arbitrary requests can be sent.
+   The Taskserver has a client interface, where arbitrary requests can be sent.
    This can include the 'statistics' request.  Here is an example:
 
       $ cat stats.request

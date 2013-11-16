@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskd - Task Server
+// taskd - Taskserver
 //
 // Copyright 2010 - 2013, Göteborg Bit Factory.
 //
@@ -247,7 +247,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   if (! _db.authenticate (in, out))
     return;
 
-  // Support only task server protocol v1.
+  // Support only Taskserver protocol v1.
   taskd_requireHeader (in, "protocol", "v1");
 
   if (_log)
@@ -309,7 +309,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   if (! _db.authenticate (in, out))
     return;
 
-  // Support only task server protocol v1.
+  // Support only Taskserver protocol v1.
   taskd_requireHeader (in, "protocol", "v1");
 
   // Note: org/user already validated during authentication.

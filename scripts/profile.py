@@ -1,7 +1,7 @@
 #! /usr/bin/env python2.7
 # coding=UTF-8
 ################################################################################
-## taskd = Task Server
+## taskd = Taskserver
 ##
 ## Copyright 2010 - 2013, Göteborg Bit Factory.
 ##

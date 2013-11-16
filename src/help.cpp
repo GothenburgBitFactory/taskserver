@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskd - Task Server
+// taskd - Taskserver
 //
 // Copyright 2010 - 2013, Göteborg Bit Factory.
 //
@@ -117,7 +117,7 @@ void command_help (const std::vector <std::string>& args)
       std::cout << "\n"
                 << "taskd client [options] <host:port> <file> [<file> ...]\n"
                 << "\n"
-                << "Sends <file> to task server on <host:port> and displays "
+                << "Sends <file> to Taskserver on <host:port> and displays "
                 << "the response.\n"
                 << "\n"
                 << "Options:\n"

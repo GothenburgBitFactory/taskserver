@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// taskd - Task Server
+// taskd - Taskserver
 //
 // Copyright 2010 - 2013, Göteborg Bit Factory.
 //
@@ -61,7 +61,7 @@ void command_client (Database& db, const std::vector <std::string>& args)
 
     Msg response;
     if (! taskd_sendMessage (*db._config, "server", request, response))
-      throw std::string ("ERROR: Task server not responding.");
+      throw std::string ("ERROR: Taskserver not responding.");
 
     std::cout << "<<<\n"
               << response.serialize ();

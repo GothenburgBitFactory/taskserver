@@ -516,7 +516,7 @@ Table of Contents
 
 7  Reference Implementation
 
-   The Task Server codebase contains a reference implementation of an SSL/TLS
+   The Taskserver codebase contains a reference implementation of an SSL/TLS
    client and server program, which communicate text strings.
 
       taskd.git/src/tls/Makefile             # To build the example

@@ -69,7 +69,7 @@ Bugs
     - operations
     - writing a client
     - task data interchange format
-    - task server protocol
+    - Taskserver protocol
     - sync algorithm
     - taskd.1 man page
     - taskdrc.5 man page
