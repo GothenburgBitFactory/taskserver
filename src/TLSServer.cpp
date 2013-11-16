@@ -98,6 +98,7 @@ TLSServer::TLSServer ()
 : _crl ("")
 , _cert ("")
 , _key ("")
+, _ciphers ("")
 , _socket (0)
 , _queue (5)
 , _debug (false)
@@ -150,6 +151,12 @@ void TLSServer::trust (bool value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSServer::ciphers (const std::string& cipher_list)
+{
+  _ciphers = cipher_list;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
   const std::string& ca,
   const std::string& crl,
@@ -157,9 +164,9 @@ void TLSServer::init (
   const std::string& key)
 {
   _ca   = ca;
-  _crl = crl;
+  _crl  = crl;
   _cert = cert;
-  _key = key;
+  _key  = key;
 
   gnutls_global_init ();
   gnutls_certificate_allocate_credentials (&_credentials);
@@ -188,7 +195,9 @@ void TLSServer::init (
   gnutls_dh_params_init (&_params);
   gnutls_dh_params_generate2 (_params, bits);
 
-  gnutls_priority_init (&_priorities, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
+  if (_ciphers == "")
+    _ciphers = "PERFORMANCE:%SERVER_PRECEDENCE";
+  gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
