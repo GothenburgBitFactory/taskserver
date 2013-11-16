@@ -1,6 +1,7 @@
 1.0.0 ()
 
 Bugs
+- #1408 Denial of Service Vulnerability in taskd (thanks to Yves Agostini).
 - Skipped tests that fail for root (thanks to Patrick R McDonald).
 
 ------ current release ---------------------------
