@@ -1,7 +1,7 @@
 .TH taskd 1 2013-09-08 "${PACKAGE_STRING}" "User Manuals"
 
 .SH NAME
-taskd \- Task Server
+taskd \- Taskserver
 
 .SH SYNOPSIS
 .B taskd <command> [options] [<args>]
@@ -15,11 +15,11 @@ taskd \- Task Server
 .B taskd help [<command>]
 
 .SH DESCRIPTION
-Taskd is a sync server for Taskwarrior and related products.
+Taskserver is a sync server for Taskwarrior and related products.
 
 .SH COMMANDS
-Taskd supports several commands, which provide adminstrative capabilities.  The
-commands are:
+Taskserver supports several commands, which provide adminstrative capabilities.
+The commands are:
 
 .TP
 .B taskd init [--data <root>] [options]
@@ -36,10 +36,6 @@ Provides option and syntax help for each command.
 Allows modification of the taskd configuration.  Can add, remove, modify or list
 all configuration settings.
 Either '--data <root>' must be specified, or TASKDDATA must be set.
-
-.TP
-.B taskd status [options]
-Shows the server status, and statistics.
 
 .TP
 .B taskd server [--daemon] [options]
@@ -110,8 +106,9 @@ Many commands require the location of the data root, so either it must be
 provided as shown, or via the TASKDDATA environment variable.
 
 .SH CONFIGURATION
-The taskd configuration file can be found in the top level of the data root.  It
-is recommended that the 'taskd config' command is used to manipulate this file.
+The Taskserver configuration file can be found in the top level of the data
+root.  It is recommended that the 'taskd config' command is used to manipulate
+this file.
 
 Note that any configuration variable may be overridden on the command line using
 this syntax:
@@ -134,13 +131,13 @@ both are provided, the command line overrides the environment.
 .SH "CREDITS & COPYRIGHTS"
 Copyright (C) 2010 \- 2013, Göteborg Bit Factory.
 
-Taskd is distributed under the MIT license. See
+Taskserver is distributed under the MIT license. See
 http://www.opensource.org/licenses/mit-license.php for more information.
 
 .SH SEE ALSO
 .BR taskdrc(5)
 
-For more information regarding taskd, see the following:
+For more information regarding Taskserver, see the following:
 
 .TP
 The official site at
@@ -156,6 +153,6 @@ You can contact the project by emailing
 
 .SH REPORTING BUGS
 .TP
-Bugs in taskd may be reported to the issue-tracker at
+Bugs in Taskserver may be reported to the issue-tracker at
 <http://taskwarrior.org
 

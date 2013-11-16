@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                               October 2012
 
-                           Task Server Sync Algorithm
+                           Taskserver Sync Algorithm
                                    Version 1
 
 
@@ -18,8 +18,8 @@ Copyright Notice
 
 Abstract
 
-   This document describes how task changes are merged by the Task Server.  It
-   does not describe the protocol [1] used by the Task Server.
+   This document describes how task changes are merged by the Taskserver.  It
+   does not describe the protocol [1] used by the Taskserver.
 
 
 Table of Contents
@@ -46,7 +46,7 @@ Table of Contents
 
 1  Introduction
 
-   The Task Server merges tasks from multiple sources, resulting in conflict-
+   The Taskserver merges tasks from multiple sources, resulting in conflict-
    free syncing of data.  The algorithm used to achieve this is simple and
    effective, paralleling what SCM systems do to perform a rebase.
 
@@ -294,7 +294,7 @@ Table of Contents
 
 5  References
 
-   [1] Beckingham, P., Hernandez, F., "Task Server Protocol", Version 1, June
+   [1] Beckingham, P., Hernandez, F., "Taskserver Protocol", Version 1, June
         2013.
 
    [RFC1122] IETF, "Requirements for Internet Hosts - Communication

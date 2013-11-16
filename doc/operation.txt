@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                                  June 2013
 
-                          Task Server Operation Guide
+                          Taskserver Operation Guide
                                    Version 1
 
 
@@ -18,10 +18,10 @@ Copyright Notice
 
 Abstract
 
-   This document describes the care and feeding of Task Server.  If you wish to
-   run your own Task Server, this document provides all the information you
+   This document describes the care and feeding of Taskserver.  If you wish to
+   run your own Taskserver, this document provides all the information you
    need, provided you have sufficient working knowledge regarding the upkeep of
-   servers.  Operating a Task Server is not for casual users.
+   servers.  Operating a Taskserver is not for casual users.
 
 
 Table of Contents
@@ -48,12 +48,12 @@ Table of Contents
 
 1  Introduction
 
-   Operating your own Task Server is straightforward.  You will need the
+   Operating your own Taskserver is straightforward.  You will need the
    following:
 
-   - A machine capable of running the Task Server.  See the NEWS file for a list
-     of platforms and operating systems on which Task Server has been tested.
-     There are likely other combinations that support Task Server that have not
+   - A machine capable of running the Taskserver.  See the NEWS file for a list
+     of platforms and operating systems on which Taskserver has been tested.
+     There are likely other combinations that support Taskserver that have not
      been tested.
 
    - Connectivity from your client to your server.  This may involve firewall or
@@ -149,7 +149,7 @@ Table of Contents
 
 3  Updates
 
-   Updating Task Server involves a clone of the repository, build, test and
+   Updating Taskserver involves a clone of the repository, build, test and
    install, then a server bounce.
 
       $ git clone git://tasktools.org/taskd.git taskd.git
@@ -249,9 +249,10 @@ Table of Contents
 
 6  User Configuration
 
-   The 'config' command is used here to illustrate how to manage users of a task
-   server.  The structure of the user accounts is such that future expansion to
-   include organizations and groups will not require changes to the data root.
+   The 'config' command is used here to illustrate how to manage users of a
+   Taskserver.  The structure of the user accounts is such that future expansion
+   to include organizations and groups will not require changes to the data
+   root.
 
 
 6.1  General
@@ -397,7 +398,7 @@ Table of Contents
       uptime: 28
       client: taskd 1.0.0
 
-   This response shows a task server that has been running for only 28 seconds,
+   This response shows a Taskserver that has been running for only 28 seconds,
    and has processed one transaction.  This response can be easily parsed and
    stored for monitoring purposes.
 

@@ -1,19 +1,22 @@
-Welcome To Task Server BETA
-----------------------------
+Welcome To Taskserver
+---------------------
 
-The beta release of the task server is intended to test the functionality and
-documentation.  It is not for casual users.  It is not for anyone who wishes to
-use the server in a production environment.  It is not for anyone who is
-unfamiliar with the operation of daemons.  It is not for anyone who does not
-take proper precautions with their data.
+Taskserver will allow you set up a server so your Taskwarrior client (and
+others, coming soon) can share tasks.
+
+Taskserver is a complex daemon process.  It is not for anyone who is unfamiliar
+with the operation of daemons.
 
 
 Demonstration
 -------------
 
-There is a demonstration, which illustrates various aspects of the task server:
+There is a demonstration, which illustrates various aspects of the Taskserver:
 
   demo/README
+
+Please note that the demonstration makes use of self-signed certificates, which
+are not intended for production use.
 
 
 Documentation
@@ -38,7 +41,7 @@ Known Issues
 Please see this page for a list of issues, and their status:
 
   Taskwarrior 2.3.0   http://taskwarrior.org/versions/show/46
-  Task Server 1.0.0   http://taskwarrior.org/versions/show/53
+  Taskserver 1.0.0    http://taskwarrior.org/versions/show/53
 
 It is generally recommended that you pull latest changes for both projects as
 often as possible, to benefit from bug fixes.

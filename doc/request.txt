@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                                  June 2013
 
-                           Task Server Message Format
+                           Taskserver Message Format
                                    Version 1
 
 
@@ -18,8 +18,8 @@ Copyright Notice
 
 Abstract
 
-   The Task Server accepts and emits only messages.  These messages look
-   somewhat like email [RFC821, RFC2822].
+   The Taskserver accepts and emits only messages.  These messages look somewhat
+   like email [RFC821, RFC2822].
 
 
 Table of Contents
@@ -44,7 +44,7 @@ Table of Contents
 1   Introduction
 
    The message format allows for data, metadata, and extensibility.  This
-   combination allows the Task Server to accommodate current and future needs.
+   combination allows the Taskserver to accommodate current and future needs.
    This document describes the message format, and the supported message types.
 
 
@@ -142,7 +142,7 @@ Table of Contents
 
 2.4  Status Data
 
-   Every response from the Task Server SHALL contain status data:
+   Every response from the Taskserver SHALL contain status data:
 
       code: <code>
       status: <status text>
@@ -159,7 +159,7 @@ Table of Contents
 
 3  Message Types
 
-   The task server supports several message types, thus providing a set of
+   The Taskserver supports several message types, thus providing a set of
    primitives for use by clients.
 
    It is expected that the number of supported ticket types will increase over
@@ -256,7 +256,7 @@ Table of Contents
 
 4  References
  
-   [1] Beckingham P., Hernandez, F., "Task Server Protocol", Version 1,
+   [1] Beckingham P., Hernandez, F., "Taskserver Protocol", Version 1,
         June 2013.
 
    [2] Beckingham, P., Hernandez, F., "Taskwarrior Data Interchange Format

@@ -20,7 +20,7 @@ Abstract
 
    When Taskwarrior exchanges data, it uses JSON [1].  This document describes
    the structure and semantics for tasks exported from Taskwarrior, imported to
-   Taskwarrior, or synced with the Task Server.
+   Taskwarrior, or synced with the Taskserver.
 
 
 Table of Contents
@@ -68,7 +68,7 @@ Table of Contents
 
 1  Introduction
 
-   Any client of the Task Server will need to communicate task information.
+   Any client of the Taskserver will need to communicate task information.
    This document describes the format of a single task.  It does not describe
    the communication and sync protocol between client and server.
 
@@ -328,7 +328,7 @@ Table of Contents
 
    Recurring Child
       A recurring child task is not created by the user, but is cloned from the
-      recurring parent task by the task server.  It may be modified by the user.
+      recurring parent task by the Taskserver.  It may be modified by the user.
       On completion, there is special handling to be done.  See section 3.11.
 
 

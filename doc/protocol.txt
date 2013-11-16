@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                                  June 2013
 
-                             Task Server Protocol
+                             Taskserver Protocol
                                    Version 1
 
 
@@ -18,7 +18,7 @@ Copyright Notice
 
 Abstract
 
-   The Task Server Protocol is a TCP transaction based query/response protocol
+   The Taskserver Protocol is a TCP transaction based query/response protocol
    that allows a client to access tasks on a distributed server as the basis for
    a variety of front end task clients and data sharing.
 
@@ -54,20 +54,20 @@ Table of Contents
    merging at all - just simple file overwrite, despite many people believing
    that the data is somehow combined and preserved.
 
-   The task server is a solution.  It is an online/cloud storage and sync
+   The Taskserver is a solution.  It is an online/cloud storage and sync
    service for taskwarrior data.  It performs conflict-free data merging, and
    minimizes bandwidth use.
 
-   The task server also provides multi-client access, so that a task added using
+   The Taskserver also provides multi-client access, so that a task added using
    a web client could be immediately viewed using a mobile client, or modified
    using taskwarrior.  Choice of clients is important - people have widely
    varying behaviors and tastes.
 
-   The task server also provides multi-user access, which introduces new
+   The Taskserver also provides multi-user access, which introduces new
    capabilities, such as list sharing and delegation.  These will require later
    modification to this protocol.
 
-   The task server protocol will be implemented by the taskd project and first
+   The Taskserver protocol will be implemented by the taskd project and first
    used in taskwarrior 2.3.0.  Other clients will follow.
 
 
@@ -90,8 +90,8 @@ Table of Contents
 
 2.1  Link Level
 
-   The Task Server protocol assumes a reliable data stream such as provided by
-   TCP.  When TCP is used, a task server listens on a single predetermined port
+   The Taskserver protocol assumes a reliable data stream such as provided by
+   TCP.  When TCP is used, a Taskserver listens on a single predetermined port
    _for the given client_ only.  This means the server may be using multiple
    ports to serve distinct sets of clients.
 
@@ -105,7 +105,7 @@ Table of Contents
    message.  All communication therefore consists of a single 'send', followed
    by a single 'receive', then termination.  There are no sessions, and
    no continuously open connections.  The message format is described in the
-   "Task Server Message Format" [2] document.
+   "Taskserver Message Format" [2] document.
 
 
 2.3  Responsibilities of the Server
@@ -198,7 +198,7 @@ Table of Contents
        201 No change
 
        300 Deprecated message type
-           This message will not be supported in future task server releases.
+           This message will not be supported in future Taskserver releases.
        301 Redirect
            Further requests should be made to the specified server/port.
        302 Retry
@@ -222,7 +222,7 @@ Table of Contents
 
 5  Security Considerations
 
-   All communication with the task server uses SSL 3.0 or TLS 1.0, 1.1 or 1.2.
+   All communication with the Taskserver uses SSL 3.0 or TLS 1.0, 1.1 or 1.2.
    Encryption is mandatory.  Data is never transmitted in plain text.
 
 
@@ -246,7 +246,7 @@ Table of Contents
    [1] Beckingham, P., Hernandez, F., "Taskwarrior Data Interchange Format
         (JSON)", Version 1, June 2013.
 
-   [2] Beckingham, P., Hernandez, F., "Task Server Message Format", Version 1,
+   [2] Beckingham, P., Hernandez, F., "Taskserver Message Format", Version 1,
         June 2013.
 
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,

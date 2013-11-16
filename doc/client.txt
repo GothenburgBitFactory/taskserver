@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                                  June 2013
 
-                        Writing a Client for Task Server
+                        Writing a Client for Taskserver
                                    Version 1
 
 
@@ -18,7 +18,7 @@ Copyright Notice
 
 Abstract
 
-   A Task Server client is a todo-list manager.  It may be as simple as a
+   A Taskserver client is a todo-list manager.  It may be as simple as a
    program that captures a single task, as complex as Taskwarrior, or anything
    in between.  It can be a mobile client, a web application, or any other type
    of program.
@@ -30,10 +30,10 @@ Table of Contents
 
    1      Introduction
    1.1    Requirements
-   2      Task Server Account
+   2      Taskserver Account
    2.1      Credentials
    2.2      Registration
-   3      Description of a Task Server client
+   3      Description of a Taskserver client
    3.1      Encryption
    3.2      Configuration
    3.3      Local Storage
@@ -65,8 +65,8 @@ Table of Contents
 
 1  Introduction
 
-   A client to the Task Server is a program that manages a task list, and
-   wishes to exchange data with the server so that the task list may be shared.
+   A client to the Taskserver is a program that manages a task list, and wishes
+   to exchange data with the server so that the task list may be shared.
 
    In order to do this, a client must store tasks locally, upload local changes,
    download remote changes, and apply remote changes to the local tasks.
@@ -91,15 +91,15 @@ Table of Contents
    is optional, and may be omitted without careful consideration.
 
 
-2  Task Server Account
+2  Taskserver Account
 
-   A Task Server account must be created.  This process creates a storage area,
+   A Taskserver account must be created.  This process creates a storage area,
    and generates the necessary credentials.
 
 
 2.1  Credentials
 
-   A Task Server client needs the following credentials in order to communicate
+   A Taskserver client needs the following credentials in order to communicate
    with a server:
 
       - Server address and port
@@ -152,16 +152,16 @@ Table of Contents
    -------------
 
 
-3  Description of a Task Server client
+3  Description of a Taskserver client
 
    This section describes how a client might behave in order to facilitate
-   integration with the Task Server.
+   integration with the Taskserver.
 
 
 3.1  Encryption
 
-   The Task Server only communicates using encryption.  Therefore all user data
-   is encrypted while in transit.  The Task Server currently uses GnuTLS
+   The Taskserver only communicates using encryption.  Therefore all user data
+   is encrypted while in transit.  The Taskserver currently uses GnuTLS
    [GnuTLS] to support this encryption, and therefore supports the following
    protocols:
 
@@ -176,7 +176,7 @@ Table of Contents
 3.2  Configuration
 
    The client needs to store configuration, which matches the credentials needed
-   for Task Server communication.  See section 2.1 "Credentials".
+   for Taskserver communication.  See section 2.1 "Credentials".
 
    The credentials may not be modified by the user without losing server access.
 
@@ -261,7 +261,7 @@ Table of Contents
 
 4  Synchronizing
 
-   Synchronizing with the Task Server consists of a single transaction.  Once an
+   Synchronizing with the Taskserver consists of a single transaction.  Once an
    encrypted connection is made with the server, the client MUST compose a
    sync request message (See [Message]).  This message includes credentials and
    local changes.  The response message contains status and remote changes,
@@ -270,7 +270,7 @@ Table of Contents
 
 4.1  Establish Encrypted Connection
 
-   All communication with the Task Server is encrypted using the certificate
+   All communication with the Taskserver is encrypted using the certificate
    and key provided to each user.  Using the 'server' configuration setting,
    establish a connection.
 
@@ -548,9 +548,9 @@ Table of Contents
 
    [Task JSON] "Taskwarrior Data Interchange Format", taskd.git/doc/task.txt
 
-   [Message] "Taskwarrior Server Message Format", taskd.git/doc/request.txt
+   [Message] "Taskserver Message Format", taskd.git/doc/request.txt
 
-   [Protocol] "Task Server Protocol", taskd.git/doc/protocol.txt
+   [Protocol] "Taskserver Protocol", taskd.git/doc/protocol.txt
 
 
 9  Acknowledgements

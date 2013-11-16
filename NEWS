@@ -1,5 +1,5 @@
 
-New Features in taskd 1.0.0.beta2
+New Features in Taskserver 1.0.0
 
   - Functioning sync algorithm
   - IPv4 and IPv6 support
@@ -14,18 +14,18 @@ New Features in taskd 1.0.0.beta2
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
-New configuration options in taskd 1.0.0.beta1
+New configuration options in Taskserver 1.0.0
 
   - $TASKDDATA specifies the data root directory, otherwise '--data <root>' is
     needed for most commands.
   - Supports 'ip.log' to turn on/off logging of client IP address and port.
   - Supports 'ciphers' list of ciphers to use.  See GnuTLS documentation.
-  - Sending a HUP signal to the task server forces a configuration file reload.
+  - Sending a HUP signal to the Taskserver forces a configuration file reload.
   - Added more statistics.
 
 ---
 
-Taskd has been built and tested on the following configurations:
+Taskserver has been built and tested on the following configurations:
 
   * OS X 10.9 Mavericks and 10.8 Mountain Lion
   * Ubuntu 10.04 Lucid Lynx, 13.04 Raring Ringtail and 13.10 Saucy Salamander
@@ -38,8 +38,8 @@ Taskd has been built and tested on the following configurations:
 
 ---
 
-While taskd has undergone testing, bugs are sure to remain.  If you encounter a
-bug, please enter a new issue at:
+While Taskserver has undergone testing, bugs are sure to remain.  If you
+encounter a bug, please enter a new issue at:
 
   http://taskwarrior.org/projects/taskwarrior/issues/new
 

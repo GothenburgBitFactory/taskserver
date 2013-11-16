@@ -1,6 +1,6 @@
 Göteborg Bit Factory                                                  June 2013
 
-                             Task Server Extensions
+                             Taskserver Extensions
                                    Version 1
 
 
@@ -18,7 +18,7 @@ Copyright Notice
 
 Abstract
 
-   Task Server Extensions are not supported in release 1.x.  This document is a
+   Taskserver Extensions are not supported in release 1.x.  This document is a
    placeholder.
 
 
@@ -37,7 +37,7 @@ Table of Contents
 
 1  Introduction
 
-   The Task Server will support extensions in the form of executable scripts
+   The Taskserver will support extensions in the form of executable scripts
    that are run when certain events occur.  The server will define a set of
    events (data modified, new user added ...) and extensions will be able to
    hook into the events.
