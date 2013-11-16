@@ -42,6 +42,7 @@ public:
   void queue (int);
   void debug (int);
   void trust (bool);
+  void ciphers (const std::string&);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&);
   void listen ();
@@ -54,6 +55,7 @@ private:
   std::string                      _crl;
   std::string                      _cert;
   std::string                      _key;
+  std::string                      _ciphers;
   gnutls_certificate_credentials_t _credentials;
   gnutls_dh_params_t               _params;
   gnutls_priority_t                _priorities;
