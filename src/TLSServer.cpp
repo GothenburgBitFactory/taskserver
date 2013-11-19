@@ -272,6 +272,7 @@ TLSTransaction::~TLSTransaction ()
 {
   if (_socket)
   {
+    shutdown (_socket, SHUT_RDWR);
     close (_socket);
     _socket = 0;
   }
