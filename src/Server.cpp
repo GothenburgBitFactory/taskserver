@@ -136,8 +136,8 @@ void Server::setCAFile (const std::string& file)
   if (_log) _log->format ("CA %s", file.c_str ());
   _ca_file = file;
   File cert (file);
-  if (! cert.exists ())
-    throw format ("Certificate not found: '{1}'", file);
+  if (! cert.readable ())
+    throw format ("Certificate not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +146,8 @@ void Server::setCertFile (const std::string& file)
   if (_log) _log->format ("Certificate %s", file.c_str ());
   _cert_file = file;
   File cert (file);
-  if (! cert.exists ())
-    throw format ("Certificate not found: '{1}'", file);
+  if (! cert.readable ())
+    throw format ("Certificate not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,8 +156,8 @@ void Server::setKeyFile (const std::string& file)
   if (_log) _log->format ("Private Key %s", file.c_str ());
   _key_file = file;
   File key (file);
-  if (! key.exists ())
-    throw format ("Private key not found: '{1}'", file);
+  if (! key.readable ())
+    throw format ("Private key not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,8 +166,8 @@ void Server::setCRLFile (const std::string& file)
   if (_log) _log->format ("CRL %s", file.c_str ());
   _crl_file = file;
   File crl (file);
-  if (! crl.exists ())
-    throw format ("CRL not found: '{1}'", file);
+  if (! crl.readable ())
+    throw format ("CRL not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
