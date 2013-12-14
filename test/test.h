@@ -55,11 +55,11 @@ public:
   void skip (const std::string&);
 
 private:
-  int mPlanned;
-  int mCounter;
-  int mPassed;
-  int mFailed;
-  int mSkipped;
+  int _planned;
+  int _counter;
+  int _passed;
+  int _failed;
+  int _skipped;
 };
 
 #endif
