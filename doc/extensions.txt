@@ -13,7 +13,7 @@ Status of this Memo
 
 Copyright Notice
 
-   Copyright (C) 2010 - 2013, Göteborg Bit Factory.
+   Copyright (C) 2010 - 2014, Göteborg Bit Factory.
 
 
 Abstract
@@ -87,7 +87,7 @@ X  References
 
 3  Full Copyright Statement
 
-   Copyright 2010 - 2013, Göteborg Bit Factory.
+   Copyright 2010 - 2014, Göteborg Bit Factory.
    All rights reserved.
 
    This document and translations of it may be copied and furnished to others,

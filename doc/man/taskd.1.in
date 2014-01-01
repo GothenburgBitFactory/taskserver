@@ -129,7 +129,7 @@ Most command require either '--data <root>' or this environment variable.  If
 both are provided, the command line overrides the environment.
 
 .SH "CREDITS & COPYRIGHTS"
-Copyright (C) 2010 \- 2013, Göteborg Bit Factory.
+Copyright (C) 2010 \- 2014, Göteborg Bit Factory.
 
 Taskserver is distributed under the MIT license. See
 http://www.opensource.org/licenses/mit-license.php for more information.
