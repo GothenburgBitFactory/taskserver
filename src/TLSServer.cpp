@@ -196,7 +196,7 @@ void TLSServer::init (
   gnutls_dh_params_generate2 (_params, bits);
 
   if (_ciphers == "")
-    _ciphers = "PERFORMANCE:%SERVER_PRECEDENCE";
+    _ciphers = "NORMAL";
   gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 
