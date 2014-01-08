@@ -6,6 +6,7 @@ Bugs
   Jorarard).
 - Skipped tests that fail for root (thanks to Patrick R McDonald).
 - Added socket shutdown (thanks to Yves Agostini).
+- Removed need for PATH_MAX (thanks to Jakub Wilk).
 - Changed name to 'Taskserver'.
 
 ------ current release ---------------------------
