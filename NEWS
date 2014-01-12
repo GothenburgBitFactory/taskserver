@@ -1,7 +1,7 @@
 
 New Features in Taskserver 1.0.0
 
-  - Functioning sync algorithm
+  - Efficient sync algorithm
   - IPv4 and IPv6 support
   - TLS
   - JSON Support

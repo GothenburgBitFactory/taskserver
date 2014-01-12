@@ -3,15 +3,16 @@
 Bugs
 - #1408 Denial of Service Vulnerability in taskd (thanks to Yves Agostini).
 - #1448 specify secure ssl cipher list for tls connection (thanks to Zed
-  Jorarard).
+        Jorarard).
 - Skipped tests that fail for root (thanks to Patrick R McDonald).
 - Added socket shutdown (thanks to Yves Agostini).
 - Removed need for PATH_MAX (thanks to Jakub Wilk).
 - Changed name to 'Taskserver'.
+- Minor documentation corrections.
 
 ------ current release ---------------------------
 
-1.0.0.beta2 ()
+1.0.0.beta2 (2013-11-03)
 
 Features
 - Improved test suite.
