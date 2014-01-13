@@ -40,10 +40,11 @@ Table of Contents
    6.5      Redirects
    7      Backups
    8      Monitoring
-   9      References
-   10     Acknowledgements
-   11     Authors' Addresses
-   12     Full Copyright Statement
+   9      Troubleshooting
+   10     References
+   11     Acknowledgements
+   12     Authors' Addresses
+   13     Full Copyright Statement
 
 
 1  Introduction
@@ -403,7 +404,43 @@ Table of Contents
    stored for monitoring purposes.
 
 
-9  References
+9  Troubleshooting
+
+   During the alpha and beta stages, some hints for troubleshooting have been
+   assembled.  They are:
+
+   - Is the client (taskwarrior) able to communicate through your firewall to
+     the server (taskserver)?  By default, port 53589 is used, and must be open
+     on the server.
+
+   - If you are unable to open firewall ports, you can use an SSH Tunnel to
+     route port 53589 traffic over port 22.
+
+   - Did you follow the instructions for setup exactly?  This is the largest
+     cause of misconfiguration.
+
+   - Setting 'debug.tls=2' for both client and server generates diagnostic
+     output that can help diagnose problems with TLS handshake, certs, keys,
+     and ciphers.  For Taskserver, with debug.cls=2, run the server
+     interactively rather than as a daemon, to see the diagnostics.
+
+   - Setting 'ciphers' (Taskserver) or 'taskd.ciphers' (Taskwarrior) can force
+     the use of different ciphers.  Use 'gnutls-cli --list' to see a list of
+     installed ciphers, and confirm that there is overlap between client and
+     server.
+
+   - In the event of a self-signed cert being used, is the CA cert configured?
+     Alternatively, is 'taskd.trust=yes' set for Taskwarrior?
+
+   - Please report problems that you see to support@taskwarrior.org.  When
+     reporting a problem, please include:
+
+      * Output from 'taskd diagnostics' command
+      * Output from 'task diagnostics' command
+      * The taskd.log contents
+
+
+10  References
  
    [RFC640] Postel, J., "Revised FTP Reply Codes", RFC 640, June,
         1975.
@@ -412,14 +449,13 @@ Table of Contents
         Layers", October 1989.
 
 
-10  Acknowledgements
+11  Acknowledgements
 
-   Thanks to ... for testing and feedback.
+   Thanks to everyone listed in the AUTHORS file, for your help in the
+   specification, implementation, testing and documentation of this project.
 
-   Thanks to ... whose comments helped improve this document.
 
-
-11  Authors' Addresses
+12  Authors' Addresses
 
    Federico Hernandez
    Email: fredde@taskwarrior.org
@@ -428,7 +464,7 @@ Table of Contents
    Email: paul@taskwarrior.org
 
 
-12  Full Copyright Statement
+13  Full Copyright Statement
 
    Copyright 2010 - 2014, Göteborg Bit Factory.
    All rights reserved.
