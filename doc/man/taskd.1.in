@@ -1,4 +1,4 @@
-.TH taskd 1 2013-09-08 "${PACKAGE_STRING}" "User Manuals"
+.TH taskd 1 2014-01-15 "${PACKAGE_STRING}" "User Manuals"
 
 .SH NAME
 taskd \- Taskserver
