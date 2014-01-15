@@ -494,7 +494,7 @@ void Task::parseJSON (const std::string& line)
         }
 
         // Tags are an array of JSON strings.
-        else if (i->first == "tags")
+        else if (i->first == "tags" && i->second->type() == json::j_array)
         {
           json::array* tags = (json::array*)i->second;
           json_array_iter t;
@@ -505,6 +505,13 @@ void Task::parseJSON (const std::string& line)
             json::string* tag = (json::string*)*t;
             addTag (tag->_data);
           }
+        }
+        // This is a temporary measure to allow Mirakel sync, and will be removed
+        // in a future release.
+        else if (i->first == "tags" && i->second->type() == json::j_string)
+        {
+          json::string* tag = (json::string*)i->second;
+          addTag (tag->_data);
         }
 
         // Strings are decoded.
