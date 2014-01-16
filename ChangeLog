@@ -2,6 +2,11 @@
 
 1.1.0 ()
 
+Features
+
+Bugs
+- Removed debug output.
+
 ------ old releases ------------------------------
 
 1.0.0 (2014-01-15) 3a2142f2708bad9ffad9f70ab4b163de2068e6c7

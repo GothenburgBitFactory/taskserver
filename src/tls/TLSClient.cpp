@@ -82,7 +82,7 @@ static int verify_certificate_callback (gnutls_session_t session)
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
 
-  std::cout << "c: INFO " << out.data << "\n";
+  //std::cout << "c: INFO " << out.data << "\n";
 
   gnutls_free (out.data);
 #endif
