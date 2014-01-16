@@ -1,4 +1,4 @@
-1.0.0 (2014-01-15)
+1.0.0 (2014-01-15) 3a2142f2708bad9ffad9f70ab4b163de2068e6c7
 
 Bugs
 - #1408 Denial of Service Vulnerability in taskd (thanks to Yves Agostini).
