@@ -1,27 +1,14 @@
 
-New Features in Taskserver 1.0.0
+New Features in Taskserver 1.1.0
 
-  - Efficient sync algorithm
-  - IPv4 and IPv6 support
-  - TLS
-  - JSON Support
-  - CRL Support
-  - Client allow/deny lists
-  - Documentation
-  - Requires libuuid
-  - Validates certs, allows CA or trust override settings
+  - 
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
-New configuration options in Taskserver 1.0.0
+New configuration options in Taskserver 1.1.0
 
-  - $TASKDDATA specifies the data root directory, otherwise '--data <root>' is
-    needed for most commands.
-  - Supports 'ip.log' to turn on/off logging of client IP address and port.
-  - Supports 'ciphers' list of ciphers to use.  See GnuTLS documentation.
-  - Sending a HUP signal to the Taskserver forces a configuration file reload.
-  - Added more statistics.
+  - 
 
 ---
 
