@@ -3,6 +3,8 @@
 1.1.0 ()
 
 Features
+- 'validate' command will parse/validate a JSON string or file.  Used for
+  debugging Taskserver clients.
 
 Bugs
 - Removed debug output.

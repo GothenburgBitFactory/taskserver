@@ -33,6 +33,8 @@
 #include <ConfigFile.h>
 #include <Color.h>
 #include <Msg.h>
+#include <File.h>
+#include <JSON.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>
@@ -159,6 +161,41 @@ void command_diag (Database& config, const std::vector <std::string>& args)
             << "n/a"
 #endif
             << "\n\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void command_validate (Database& config, const std::vector <std::string>& args)
+{
+  try
+  {
+    if (args.size () < 2)
+    {
+      std::cout << "You must specify either a JSON string or a JSON file.\n";
+      return;
+    }
+
+    json::value* root;
+    File file (args[1]);
+    if (file.exists ())
+    {
+      std::string contents;
+      file.read (contents);
+      root = json::parse (contents);
+    }
+    else
+      root = json::parse (args[1]);
+
+    if (root)
+    {
+      std::cout << "JSON syntax ok.\n\n"
+                << root->dump () << "\n";
+    }
+
+    delete root;
+  }
+
+  catch (const std::string& e) { std::cout << e << "\n";         }
+  catch (...)                  { std::cout << "Unknown error\n"; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

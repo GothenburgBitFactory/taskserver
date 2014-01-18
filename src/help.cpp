@@ -198,6 +198,15 @@ void command_help (const std::vector <std::string>& args)
                 << "Show installation details.\n"
                 << "\n";
     }
+    else if (closeEnough ("validate", args[1], 3))
+    {
+      std::cout << "\n"
+                << "taskd validate <JSON | file>\n"
+                << "\n"
+                << "Run the JSON parser over the provided JSON string or file.\n"
+                << "For debugging.\n"
+                << "\n";
+    }
     else
       std::cout << "No help for '" << args[1] << "'.\n";
   }
@@ -206,6 +215,7 @@ void command_help (const std::vector <std::string>& args)
               << "Usage: taskd -v|--version\n"
               << "       taskd -h|--help\n"
               << "       taskd diagnostics\n"
+              << "       taskd validate <JSON | file>\n"
               << "       taskd help [<command>]\n"
               << "\n"
               << "Commands run only on server:\n"
