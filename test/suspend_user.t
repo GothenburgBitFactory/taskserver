@@ -1,6 +1,5 @@
 #! /usr/bin/env perl
 ################################################################################
-## taskd = Taskserver
 ##
 ## Copyright 2010 - 2014, Göteborg Bit Factory.
 ##
