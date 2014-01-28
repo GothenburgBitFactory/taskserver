@@ -924,7 +924,8 @@ void command_server (Database& db, const std::vector <std::string>& args)
     server.setKeyFile (key._data);
 
     File crl (db._config->get ("server.crl"));
-    server.setCRLFile (crl._data);
+    if (crl.exists ())
+      server.setCRLFile (crl._data);
 
     server.beginServer ();
   }
