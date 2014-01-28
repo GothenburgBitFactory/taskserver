@@ -36,6 +36,7 @@ class Server
 public:
   Server ();
   virtual ~Server ();
+  void setAddr (const std::string&);
   void setPort (const std::string&);
   void setPoolSize (int);
   void setQueueSize (int);
@@ -70,6 +71,7 @@ protected:
   int _client_port;
 
 private:
+  std::string _addr;
   std::string _port;
   int _pool_size;
   int _queue_size;

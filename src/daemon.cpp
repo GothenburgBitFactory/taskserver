@@ -885,6 +885,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 
+    std::string addr = serverDetails.substr (0, colon);
     std::string port = serverDetails.substr (colon + 1);
 
     // Create a taskd server object.
@@ -892,6 +893,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
     server.setLog        (&log);
     server._db.setLog    (&log);
     server.setConfig     (db._config);
+    server.setAddr       (addr);
     server.setPort       (port);
     server.setQueueSize  (db._config->getInteger ("queue.size"));
     server.setLimit      (db._config->getInteger ("request.limit"));

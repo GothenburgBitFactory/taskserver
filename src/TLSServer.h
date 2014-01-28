@@ -43,7 +43,7 @@ public:
   void trust (bool);
   void ciphers (const std::string&);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
-  void bind (const std::string&);
+  void bind (const std::string&, const std::string&);
   void listen ();
   void accept (TLSTransaction&);
 
