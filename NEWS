@@ -3,13 +3,14 @@ New Features in Taskserver 1.1.0
 
   - 'validate' command will parse/validate a JSON string or file.  Used for
     debugging Taskserver clients.
+  - When hosting, the configured server name is no longer ignored.
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
 
 New configuration options in Taskserver 1.1.0
 
-  - 
+  - Server CRL is now optional.
 
 ---
 

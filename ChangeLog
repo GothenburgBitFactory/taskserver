@@ -5,6 +5,10 @@
 Features
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
+- Server name is no longer ignored when binding to a port (thanks to Anton
+  Khirnov).
+- CRL cert is now optional (thanks to Anton Khirnov).
+- Improved support for IPv6 host names (thanks to Anton Khirnov).
 
 Bugs
 - Removed debug output.
