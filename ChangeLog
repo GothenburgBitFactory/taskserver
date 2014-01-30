@@ -9,6 +9,7 @@ Features
         (thanks to Anton Khirnov, Renato Alves).
 - CRL cert is now optional (thanks to Anton Khirnov).
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
+- Documentation corrections.
 
 Bugs
 - Removed debug output.
