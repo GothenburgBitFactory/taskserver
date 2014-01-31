@@ -11,6 +11,8 @@ Features
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
 
 Bugs
+- #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
+        (thanks to Natanael Copa)
 - Removed debug output.
 
 ------ old releases ------------------------------

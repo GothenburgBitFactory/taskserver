@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2014, Göteborg Bit Factory.
+// Copyright 2006 - 2014, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,15 @@
 #include <Directory.h>
 #include <Path.h>
 
+// Fixes build with musl libc.
+#ifndef GLOB_TILDE
+#define GLOB_TILDE 0
+#endif
+
+#ifndef GLOB_BRACE
+#define GLOB_BRACE 0
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 std::ostream& operator<< (std::ostream& out, const Path& path)
 {
@@ -55,7 +64,7 @@ Path::Path (const Path& other)
   if (this != &other)
   {
     _original = other._original;
-    _data = other._data;
+    _data     = other._data;
   }
 }
 
@@ -77,7 +86,7 @@ Path& Path::operator= (const Path& other)
   if (this != &other)
   {
     this->_original = other._original;
-    this->_data = other._data;
+    this->_data     = other._data;
   }
 
   return *this;
