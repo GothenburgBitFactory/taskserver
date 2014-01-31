@@ -5,10 +5,11 @@
 Features
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
-- Server name is no longer ignored when binding to a port (thanks to Anton
-  Khirnov).
+- #1497 taskd ignores the host definition and always listens on 0.0.0.0
+        (thanks to Anton Khirnov, Renato Alves).
 - CRL cert is now optional (thanks to Anton Khirnov).
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
+- Documentation corrections.
 
 Bugs
 - #1511 sync init crashes if client certification file is empty or invalid
