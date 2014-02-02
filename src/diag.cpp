@@ -29,11 +29,13 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
 #include <unistd.h>
 #include <ConfigFile.h>
 #include <Color.h>
 #include <Msg.h>
 #include <File.h>
+#include <Directory.h>
 #include <JSON.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
@@ -161,6 +163,83 @@ void command_diag (Database& config, const std::vector <std::string>& args)
             << "n/a"
 #endif
             << "\n\n";
+
+  // Configuration details, if possible.
+  char* root_env = getenv ("TASKDDATA");
+  std::cout << bold.colorize ("Configuration")
+            << "\n"
+            << "   TASKDDATA: " << (root_env ? root_env : "") << "\n";
+
+  // Verify that root exists.
+  std::string root = config._config->get ("root");
+  if (root == "")
+  {
+    std::cout << "\nBy specifiying the '--data' location, more diagnostics can be generated.\n";
+  }
+  else
+  {
+    Directory root_dir (config._config->get ("root"));
+    if (! root_dir.exists ())
+      std::cout << "  root directory does not exist.\n";
+    else
+    {
+      std::cout << "        root: "
+                << root_dir._data << (root_dir.readable ()
+                    ? " (readable)"
+                    : " (not readable)")
+                << "\n";
+
+      File config_file (root_dir._data + "/config");
+      std::cout << "      config: "
+                << config_file._data << (config_file.readable () ? " (readable)" : " (missing)")
+                << "\n";
+
+      if (config_file.readable ())
+      {
+        // Load the config file.
+        config._config->load (config_file._data);
+
+        File ca_cert (config._config->get ("ca.cert"));
+        File server_cert (config._config->get ("server.cert"));
+        File server_key (config._config->get ("server.key"));
+        File server_crl (config._config->get ("server.crl"));
+        File client_cert (config._config->get ("client.cert"));
+        File client_key (config._config->get ("client.key"));
+
+        std::cout << "          CA: "
+                  << ca_cert._data << (ca_cert.readable () ? " (readable)" : "")
+                  << "\n";
+        std::cout << "        Cert: "
+                  << server_cert._data << (server_cert.readable () ? " (readable)" : " (missing)")
+                  << "\n";
+        std::cout << "         Key: "
+                  << server_key._data << (server_key.readable () ? " (readable)" : " (missing)")
+                  << "\n";
+        std::cout << "         CRL: "
+                  << server_crl._data << (server_crl.readable () ? " (readable)" : "")
+                  << "\n";
+
+        File log (config._config->get ("log"));
+        std::cout << "         Log: "
+                  << log._data << (log.exists () ? " (found)" : " (missing)")
+                  << "\n";
+
+        File pid (config._config->get ("pid.file"));
+        std::cout << "    PID File: "
+                  << pid._data << (pid.exists () ? " (found)" : " (missing)")
+                  << "\n";
+
+        std::cout << "Client Allow: " << config._config->get ("client.allow") << "\n";
+        std::cout << " Client Deny: " << config._config->get ("client.deny") << "\n";
+
+        std::cout << "      Server: " << config._config->get ("server") << "\n";
+        std::cout << " Max Request: " << config._config->get ("request.limit") << " bytes\n";
+        std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";
+      }
+    }
+  }
+
+  std::cout << "\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
