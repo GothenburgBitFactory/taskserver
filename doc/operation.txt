@@ -88,7 +88,7 @@ Table of Contents
 
    Clone the git source repository using:
 
-      $ git clone git://tasktools.org/taskd.git taskd.git
+      $ git clone https://git.tasktools.org/scm/tm/taskd.git taskd.git
 
    Use the 'master' branch, which always represents the current stable release,
    build and install.
@@ -153,7 +153,7 @@ Table of Contents
    Updating Taskserver involves a clone of the repository, build, test and
    install, then a server bounce.
 
-      $ git clone git://tasktools.org/taskd.git taskd.git
+      $ git clone https://git.tasktools.org/scm/tm/taskd.git taskd.git
       $ cd taskd.git
       $ cmake .
       $ make
