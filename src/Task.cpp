@@ -323,6 +323,17 @@ void Task::setStatus (Task::status status)
 
 #ifdef PRODUCT_TASKWARRIOR
 ////////////////////////////////////////////////////////////////////////////////
+// Ready means pending, not blocked and either not scheduled or scheduled before
+// now.
+bool Task::is_ready () const
+{
+  return getStatus () == Task::pending &&
+         !is_blocked                   &&
+         (! has ("scheduled")          ||
+          Date ("now").operator> (get_date ("scheduled")));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Task::is_due () const
 {
   if (has ("due"))
@@ -341,6 +352,24 @@ bool Task::is_due () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Task::is_dueyesterday () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      if (Date ("yesterday").sameDay (get_date ("due")))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Task::is_duetoday () const
 {
   if (has ("due"))
@@ -351,6 +380,86 @@ bool Task::is_duetoday () const
         status != Task::deleted)
     {
       if (getDueState (get ("due")) == 2)
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_duetomorrow () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      if (Date ("tomorrow").sameDay (get_date ("due")))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_dueweek () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      Date now;
+      Date due (get_date ("due"));
+      if (now.year () == due.year () &&
+          now.week () == due.week ())
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_duemonth () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      Date now;
+      Date due (get_date ("due"));
+      if (now.year () == due.year () &&
+          now.month () == due.month ())
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_dueyear () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      Date now;
+      Date due (get_date ("due"));
+      if (now.year () == due.year ())
         return true;
     }
   }
@@ -428,6 +537,10 @@ void Task::parse (const std::string& input)
                 value[value.length () - 1] == 'm')
               value += 'o';
 
+            // TW-1274, Standardization.
+            if (name == "modification")
+              name = "modified";
+
             if (name.substr (0, 11) == "annotation_")
               ++annotation_count;
 
@@ -484,6 +597,13 @@ void Task::parseJSON (const std::string& line)
         // Urgency, if present, is ignored.
         else if (i->first == "urgency")
           ;
+
+        // TW-1274 Standardization.
+        else if (i->first == "modification")
+        {
+          Date d (unquoteText (i->second->dump ()));
+          set ("modified", d.toEpochString ());
+        }
 
         // Dates are converted from ISO to epoch.
         else if (type == "date")
@@ -714,7 +834,10 @@ std::string Task::composeF4 () const
     {
       ff4 += (first ? "" : " ")
            + it->first
-           + ":\"" + encode (json::encode (it->second)) + "\"";
+           + ":\""
+           + encode (json::encode (it->second))
+           + "\"";
+
       first = false;
     }
   }
@@ -739,12 +862,12 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
   Task::const_iterator i;
   for (i = this->begin (); i != this->end (); ++i)
   {
-    if (attributes_written)
-      out << ",";
-
     // Annotations are not written out here.
     if (i->first.substr (0, 11) == "annotation_")
       continue;
+
+    if (attributes_written)
+      out << ",";
 
     std::string type = Task::attributes[i->first];
     if (type == "")
@@ -754,11 +877,16 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     if (type == "date")
     {
       Date d (i->second);
-      out << "\""
-          << i->first
-          << "\":\""
-          << d.toISO ()
-          << "\"";
+      if (i->first == "modification")
+        out << "\"modified\":\""
+            << d.toISO ()
+            << "\"";
+      else
+        out << "\""
+            << i->first
+            << "\":\""
+            << d.toISO ()
+            << "\"";
 
       ++attributes_written;
     }
@@ -1026,10 +1154,16 @@ bool Task::hasTag (const std::string& tag) const
   if (tag == "UNBLOCKED") return !is_blocked;
   if (tag == "BLOCKING")  return is_blocking;
 #ifdef PRODUCT_TASKWARRIOR
+  if (tag == "READY")     return is_ready ();
   if (tag == "DUE")       return is_due ();
   if (tag == "DUETODAY")  return is_duetoday ();
   if (tag == "TODAY")     return is_duetoday ();
+  if (tag == "YESTERDAY") return is_dueyesterday ();
+  if (tag == "TOMORROW")  return is_duetomorrow ();
   if (tag == "OVERDUE")   return is_overdue ();
+  if (tag == "WEEK")      return is_dueweek ();
+  if (tag == "MONTH")     return is_duemonth ();
+  if (tag == "YEAR")      return is_dueyear ();
 #endif
   if (tag == "ACTIVE")    return has ("start");
   if (tag == "SCHEDULED") return has ("scheduled");
@@ -1037,17 +1171,7 @@ bool Task::hasTag (const std::string& tag) const
   if (tag == "UNTIL")     return has ("until");
   if (tag == "WAITING")   return has ("wait");
   if (tag == "ANNOTATED") return hasAnnotations ();
-
-/*
-  TODO YESTERDAY - due yesterday
-  TODO TOMORROW  - due tomorrow
-  TODO WEEK      - due this week
-  TODO MONTH     - due this month
-  TODO YEAR      - due this year
-  TODO READY     - is ready
-  TODO WAITING   - is waiting
-  TODO PARENT    - is a parent
-*/
+  if (tag == "PARENT")    return has ("mask");
 
   // Concrete tags.
   std::vector <std::string> tags;

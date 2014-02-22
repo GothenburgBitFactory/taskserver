@@ -7,6 +7,8 @@ Features
   debugging Taskserver clients.
 - #1497 taskd ignores the host definition and always listens on 0.0.0.0
         (thanks to Anton Khirnov, Renato Alves).
+- TD-39 Documents refer to "modification" and "modified" dates, need to
+        collapse to one (thanks to jck).
 - CRL cert is now optional (thanks to Anton Khirnov).
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
 - When '--data' is specified, the 'diagnostics' command shows more details.
