@@ -205,7 +205,7 @@ void TLSServer::init (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSServer::bind (const std::string& addr, const std::string& port)
+void TLSServer::bind (const std::string& host, const std::string& port)
 {
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
@@ -214,13 +214,13 @@ void TLSServer::bind (const std::string& addr, const std::string& port)
   hints.ai_flags    = AI_PASSIVE; // use my IP
 
   struct addrinfo* res;
-  if (::getaddrinfo (addr.c_str (), port.c_str (), &hints, &res) != 0)
+  if (::getaddrinfo (host.c_str (), port.c_str (), &hints, &res) != 0)
     throw std::string (::gai_strerror (errno));
 
   if ((_socket = ::socket (res->ai_family,
                            res->ai_socktype,
                            res->ai_protocol)) == -1)
-    throw std::string ("Can not bind to  ") + addr + port;
+    throw std::string ("Can not bind to  ") + host + port;
 
   // When a socket is closed, it remains unavailable for a while (netstat -an).
   // Setting SO_REUSEADDR allows this program to assume control of a closed, but

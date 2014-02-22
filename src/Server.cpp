@@ -66,7 +66,7 @@ Server::Server ()
   , _log_clients (false)
   , _client_address ("")
   , _client_port (0)
-  , _addr ("::")
+  , _host ("::")
   , _port ("12345")
   , _pool_size (4)
   , _queue_size (10)
@@ -94,10 +94,10 @@ void Server::setPort (const std::string& port)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::setAddr (const std::string& addr)
+void Server::setHost (const std::string& host)
 {
-  if (_log) _log->format ("Using address %s", addr.c_str ());
-  _addr = addr;
+  if (_log) _log->format ("Using address %s", host.c_str ());
+  _host = host;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ void Server::beginServer ()
                _cert_file,      // Cert
                _key_file);      // Key
   server.queue (_queue_size);
-  server.bind (_addr, _port);
+  server.bind (_host, _port);
   server.listen ();
 
   _request_count = 0;
