@@ -1,7 +1,7 @@
-Göteborg Bit Factory                                                  June 2013
+Göteborg Bit Factory                                              February 2014
 
                         Writing a Client for Taskserver
-                                   Version 1
+                                   Version 2
 
 
 Status of this Memo
@@ -209,9 +209,9 @@ Table of Contents
    Effectively, the client should maintain a separate list of tasks changed
    since the last successful sync operation.
 
-   Note that tasks have a "modification" attribute, which should be updated
-   whenever a change is made.  This attribute contributes to conflict
-   resolution on the server.
+   Note that tasks have a "modified" attribute, which should be updated whenever
+   a change is made.  This attribute contributes to conflict resolution on the
+   server.
 
 
 3.5  Remote Changes

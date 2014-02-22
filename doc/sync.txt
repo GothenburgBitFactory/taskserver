@@ -35,9 +35,9 @@ Table of Contents
    3.3      Two Branch Case Example
    4      Use Cases
    4.1      Use Case 1: New Local Task
-   4.2      Use Case 2: Local Modification
-   4.3      Use Case 3: Local and Remote Modification
-   4.4      Use Case 4: Multiple Local and Remote Modifications
+   4.2      Use Case 2: Local Changes
+   4.3      Use Case 3: Local and Remote Changes
+   4.4      Use Case 4: Multiple Local and Remote Changes
    5      References
    6      Acknowledgements
    7      Authors' Addresses
@@ -86,8 +86,8 @@ Table of Contents
    the legend:
 
       T0   Represents the original task, the base.
-      T1   Represents the task with a non-trivial set of modifications.
-      T2   Represents the task with further modifications.
+      T1   Represents the task with a non-trivial set of changes.
+      T2   Represents the task with further changes.
 
 
 2.2  Deltas
@@ -134,9 +134,8 @@ Table of Contents
    The application of deltas is not commutative, except in the trivial case
    where the two deltas are identical, or the deltas do not overlap.  The deltas
    therefore need to be applied in the correct sequence.  Tasks have metadata
-   that indicates the last modification time, which dictates the sequence.
-   Assuming d1 occurred before d2, this neatly collapses down to a single branch
-   sequence:
+   that indicates the last modified time, which dictates the sequence.  Assuming
+   d1 occurred before d2, this neatly collapses down to a single branch sequence:
 
       T0 + d1 + d2 = T3
 
@@ -162,7 +161,7 @@ Table of Contents
 
       d1, d3, d5, d2, d4
 
-   Then the deltas are sorted by modification time:
+   Then the deltas are sorted by modified time:
 
       d1, d2, d3, d4, d5
 
@@ -226,7 +225,7 @@ Table of Contents
       Client:  T0
 
 
-4.2  Use Case 2: Local Modification
+4.2  Use Case 2: Local Change
 
    Initial state:
 
@@ -244,7 +243,7 @@ Table of Contents
       Client:  T1
 
 
-4.3  Use Case 3: Local and Remote Modification
+4.3  Use Case 3: Local and Remote Change
 
    Initial state:
 
@@ -266,7 +265,7 @@ Table of Contents
       Client:  T3
 
 
-4.4  Use Case 4: Multiple Local and Remote Modifications
+4.4  Use Case 4: Multiple Local and Remote Changes
 
    Initial state:
 

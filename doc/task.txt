@@ -1,7 +1,7 @@
-Göteborg Bit Factory                                                  June 2013
+Göteborg Bit Factory                                              February 2014
 
                    Taskwarrior Data Interchange Format (JSON)
-                                   Version 1
+                                   Version 2
 
 
 Status of this Memo
@@ -56,7 +56,7 @@ Table of Contents
    3.16      Field: tags
    3.17      Field: priority
    3.18      Field: depends
-   3.19      Field: modification
+   3.19      Field: modified
    3.20      Field: scheduled
    3.21      User Defined Attributes
 
@@ -561,9 +561,9 @@ Table of Contents
    a JSON array of strings, like the "tags" field.
 
 
-3.19  Field: modification
+3.19  Field: modified
 
-   A task MUST have a "modification" field set if it is modified.  This field is
+   A task MUST have a "modified" field set if it is modified.  This field is
    of type "date", and is used as a reference when merging tasks.
 
 
