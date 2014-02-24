@@ -47,6 +47,7 @@
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
+#include <i18n.h>
 
 // Indicates that signals were caught.
 extern bool _sighup;
@@ -579,10 +580,20 @@ void Daemon::extract_subset (
   const unsigned int branch_point,
   std::vector <Task>& subset) const
 {
-  if (branch_point < data.size ())
-    for (unsigned int i = branch_point; i < data.size (); ++i)
-      if (data[i][0] == '{')
-        subset.push_back (Task (data[i]));
+  unsigned int i;
+
+  try
+  {
+    if (branch_point < data.size ())
+      for (i = branch_point; i < data.size (); ++i)
+        if (data[i][0] == '{')
+          subset.push_back (Task (data[i]));
+  }
+
+  catch (const std::string& e)
+  {
+    throw e + format (STRING_RECORD_LINE, i);
+  }
 
   _log->format ("[%d] Subset %u tasks", _txn_count, subset.size ());
 }

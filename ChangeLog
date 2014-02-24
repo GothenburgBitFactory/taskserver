@@ -20,6 +20,8 @@ Bugs
         (thanks to Marton Suranyi).
 - #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
         (thanks to Natanael Copa).
+- Includes line numbers when reporting parse errors in data (thanks to Kosta
+  Harlan).
 - Removed debug output.
 
 ------ old releases ------------------------------

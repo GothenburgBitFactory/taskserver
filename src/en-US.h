@@ -115,6 +115,7 @@
 #define STRING_RECORD_EMPTY          "Empty record in input."
 #define STRING_RECORD_JUNK_AT_EOL    "Unrecognized characters at end of line."
 #define STRING_RECORD_NOT_FF4        "Record not recognized as format 4."
+#define STRING_RECORD_LINE           " at line {1}"
 
 #define STRING_TASK_VALID_DESC       "A task must have a description."
 #define STRING_TASK_VALID_BLANK      "Cannot add a task that is blank."
