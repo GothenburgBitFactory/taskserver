@@ -1,0 +1,13 @@
+[Unit]
+Description=Secure server providing multi-user, multi-client access to task data
+After=network.target
+Documentation=http://tasktools.org/projects/taskd.html
+
+[Service]
+ExecStart=/usr/bin/taskd server --data /var/lib/taskd
+Type=simple
+User=taskd
+Group=taskd
+
+[Install]
+WantedBy=multi-user.target
