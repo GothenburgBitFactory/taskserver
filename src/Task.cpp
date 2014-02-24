@@ -203,12 +203,12 @@ void Task::setStart ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::setModified ()                                                       
-{                                                                               
-  char now[16];                                                                 
-  sprintf (now, "%u", (unsigned int) time (NULL));                              
-  set ("modified", now);                                                        
-}                                                                               
+void Task::setModified ()
+{
+  char now[16];
+  sprintf (now, "%u", (unsigned int) time (NULL));
+  set ("modified", now);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Task::has (const std::string& name) const
@@ -290,12 +290,12 @@ void Task::set (const std::string& name, const std::string& value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::set (const std::string& name, int value)                             
-{                                                                               
-  (*this)[name] = format (value);                                               
+void Task::set (const std::string& name, int value)
+{
+  (*this)[name] = format (value);
 
   recalc_urgency = true;
-}                                                                               
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void Task::remove (const std::string& name)
