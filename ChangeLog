@@ -7,12 +7,12 @@ Features
         (thanks to Anton Khirnov, Renato Alves).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
+- TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman Inflianskas).
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
 - CRL cert is now optional (thanks to Anton Khirnov).
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
 - When '--data' is specified, the 'diagnostics' command shows more details.
-- Systemd 'taskd.service' script (thanks to Ralph Bean).
 - Documentation corrections.
 - Updated URLs.
 
