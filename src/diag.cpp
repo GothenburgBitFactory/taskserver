@@ -158,7 +158,11 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 
   std::cout << "   libgnutls: "
 #ifdef HAVE_LIBGNUTLS
+#ifdef GNUTLS_VERSION
             << GNUTLS_VERSION
+#elif LIBGNUTLS_VERSION
+            << LIBGNUTLS_VERSION
+#endif
 #else
             << "n/a"
 #endif
