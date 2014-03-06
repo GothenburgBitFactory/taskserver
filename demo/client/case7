@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Use Case 7: Recurring task added, then child tasks created in separate places,
+#             followed by a sync.
+
+echo '--- add 1 ---------------------------------------------------------------'
+task rc:tw1/rc add Recurring due:today recur:daily
+
+echo '--- sync 1,2 ------------------------------------------------------------'
+task rc:tw1/rc sync
+task rc:tw2/rc sync
+
+echo '--- list 1 generate instances -------------------------------------------'
+task rc:tw1/rc list
+
+echo '--- list 2 generate instances -------------------------------------------'
+task rc:tw2/rc list
+
+echo '--- sync 1,2 ------------------------------------------------------------'
+task rc:tw1/rc sync
+task rc:tw2/rc sync
+
+echo '--- sync 1,2 ------------------------------------------------------------'
+task rc:tw1/rc sync
+task rc:tw2/rc sync
