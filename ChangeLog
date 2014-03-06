@@ -19,6 +19,7 @@ Features
 Bugs
 - TD-42 Cannot compile taskd - GNUTLS_VERSION undefined in diag.cpp (thanks
         to Michele Vetturi).
+- TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
 - #1511 sync init crashes if client certification file is empty or invalid
         (thanks to Marton Suranyi).
 - #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE

@@ -160,7 +160,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #ifdef HAVE_LIBGNUTLS
 #ifdef GNUTLS_VERSION
             << GNUTLS_VERSION
-#elif LIBGNUTLS_VERSION
+#elif defined LIBGNUTLS_VERSION
             << LIBGNUTLS_VERSION
 #endif
 #else
