@@ -320,7 +320,7 @@ void TLSTransaction::init (TLSServer& server)
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
 #else
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) _socket);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) _socket);
 #endif
 
   // Key exchange.

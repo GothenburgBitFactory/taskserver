@@ -252,7 +252,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
 #else
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (long) _socket);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) _socket);
 #endif
 
   // Perform the TLS handshake
