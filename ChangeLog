@@ -14,6 +14,8 @@ Features
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
 - When '--data' is specified, the 'diagnostics' command shows more details.
 - Documentation corrections.
+- Added certificate verification to GnuTLS versions < 2.9.10 (thanks to Alexander
+  Sulfrian)
 - Updated URLs.
 
 Bugs

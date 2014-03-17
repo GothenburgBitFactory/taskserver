@@ -62,9 +62,6 @@ static int verify_certificate_callback (gnutls_session_t session)
   if (trust_override)
     return 0;
 
-  // Get the hostname from the session.
-  const char* hostname = (const char*) gnutls_session_get_ptr (session);
-
   // This verification function uses the trusted CAs in the credentials
   // structure. So you must have installed one or more CA certificates.
   unsigned int status = 0;
@@ -82,8 +79,6 @@ static int verify_certificate_callback (gnutls_session_t session)
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
-
-  //std::cout << "c: INFO " << out.data << "\n";
 
   gnutls_free (out.data);
 #endif
@@ -181,6 +176,10 @@ void TLSClient::init (
     throw std::string ("Missing CERT file.");
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
+  // The automatic verification for the server certificate with
+  // gnutls_certificate_set_verify_function only works with gnutls
+  // >=2.9.10. So with older versions we should call the verify function
+  // manually after the gnutls handshake.
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
 #endif
   gnutls_init (&_session, GNUTLS_CLIENT);
@@ -264,6 +263,20 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
   if (ret < 0)
     throw std::string ("Handshake failed.  ") + gnutls_strerror (ret);
+
+#if GNUTLS_VERSION_NUMBER < 0x02090a
+  // The automatic verification for the server certificate with
+  // gnutls_certificate_set_verify_function does only work with gnutls
+  // >=2.9.10. So with older versions we should call the verify function
+  // manually after the gnutls handshake.
+  ret = verify_certificate_callback(_session);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "c: ERROR Certificate verification failed.\n";
+    throw std::string ("Error initializing TLS.");
+  }
+#endif
 
   if (_debug)
   {

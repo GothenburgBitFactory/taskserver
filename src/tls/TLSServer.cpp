@@ -198,6 +198,10 @@ void TLSServer::init (
   gnutls_certificate_set_dh_params (_credentials, _params);
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
+  // The automatic verification for the server certificate with
+  // gnutls_certificate_set_verify_function only works with gnutls
+  // >=2.9.10. So with older versions we should call the verify function
+  // manually after the gnutls handshake.
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
 #endif
 }
@@ -331,6 +335,20 @@ void TLSTransaction::init (TLSServer& server)
 
   if (ret < 0)
     throw std::string ("Handshake has failed (") + gnutls_strerror (ret) + ")";
+
+#if GNUTLS_VERSION_NUMBER < 0x02090a
+  // The automatic verification for the server certificate with
+  // gnutls_certificate_set_verify_function does only work with gnutls
+  // >=2.9.10. So with older versions we should call the verify function
+  // manually after the gnutls handshake.
+  ret = verify_certificate_callback(_session);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "s: ERROR Certificate verification failed.\n";
+    throw std::string ("Error initializing TLS.");
+  }
+#endif
 
   if (_debug)
     std::cout << "s: INFO Handshake was completed\n";
