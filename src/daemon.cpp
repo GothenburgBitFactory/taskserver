@@ -493,7 +493,7 @@ void Daemon::parse_payload (
     }
   }
 
-  _log->format ("[%d] Client key '%s' %u",
+  _log->format ("[%d] Client key '%s' + %u txns",
                 _txn_count,
                 key.c_str (),
                 data.size ());
