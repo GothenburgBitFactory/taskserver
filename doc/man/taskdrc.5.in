@@ -69,7 +69,8 @@ Size of the connection backlog.  See 'man listen'.
 
 .TP
 .B request.limit=1048576
-Size limit of incoming requests, in bytes.
+Size limit of incoming requests, in bytes.  Use a value of zero '0' to indicate
+no size limit.
 
 .TP
 .B server=localhost:53589
