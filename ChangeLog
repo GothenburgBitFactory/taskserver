@@ -3,6 +3,8 @@
 1.1.0 ()
 
 Features
+- TW-1296 make test/run_all exit with non-zero code if a test fail (thanks to
+          Jakub Wilk).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
 - TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman Inflianskas).
