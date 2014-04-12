@@ -2,13 +2,19 @@
 
 1.1.0 ()
 
-Features
+- #1497 taskd ignores the host definition and always listens on 0.0.0.0
+- #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
+        (thanks to Natanael Copa).
+- #1511 sync init crashes if client certification file is empty or invalid
+        (thanks to Marton Suranyi).
 - TW-1296 make test/run_all exit with non-zero code if a test fail (thanks to
           Jakub Wilk).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
 - TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman Inflianskas).
-- #1497 taskd ignores the host definition and always listens on 0.0.0.0
+- TD-42 Cannot compile taskd - GNUTLS_VERSION undefined in diag.cpp (thanks
+        to Michele Vetturi).
+- TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
         (thanks to Anton Khirnov, Renato Alves).
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
@@ -18,19 +24,10 @@ Features
 - Documentation corrections.
 - Added certificate verification to GnuTLS versions < 2.9.10 (thanks to Alexander
   Sulfrian)
-- Updated URLs.
-
-Bugs
-- TD-42 Cannot compile taskd - GNUTLS_VERSION undefined in diag.cpp (thanks
-        to Michele Vetturi).
-- TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
-- #1511 sync init crashes if client certification file is empty or invalid
-        (thanks to Marton Suranyi).
-- #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
-        (thanks to Natanael Copa).
 - Includes line numbers when reporting parse errors in data (thanks to Kosta
   Harlan).
 - Removed debug output.
+- Updated URLs.
 
 ------ old releases ------------------------------
 
