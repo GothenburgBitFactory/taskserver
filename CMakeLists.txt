@@ -29,6 +29,12 @@ else (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set (UNKNOWN true)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+if (NETBSD)
+   #Since readline, etc likely to be in /usr/pkg/lib, not standard library
+   #Otherwise will remove links during install
+   set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif (NETBSD)
+
 if (FREEBSD)
 SET (TASKD_MAN1DIR man/man1  CACHE STRING "Installation directory for man pages, section 1")
 SET (TASKD_MAN5DIR man/man5  CACHE STRING "Installation directory for man pages, section 5")
