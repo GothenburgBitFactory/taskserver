@@ -33,7 +33,6 @@
 
 1.0.0 (2014-01-15) 3a2142f2708bad9ffad9f70ab4b163de2068e6c7
 
-Bugs
 - #1408 Denial of Service Vulnerability in taskd (thanks to Yves Agostini).
 - #1448 specify secure ssl cipher list for tls connection (thanks to Zed
         Jorarard).
@@ -46,13 +45,6 @@ Bugs
 
 1.0.0.beta2 (2013-11-03)
 
-Features
-- Improved test suite.
-- Server now requires the client to provide a cert, and validates it.
-- Server allows an optional 'ca.cert' setting to specify the CA cert when the
-  'server.cert' is self-signed.
-
-Bugs
 - #1397 existing org folder breaks init action in taskd (thanks to Axel
         Gschaider).
 - #1398 man and help pages are different concerning $TASKDATA (thanks to Axel
@@ -61,11 +53,29 @@ Bugs
 - #1435 Type of “modification” field is not clear (thanks to Profpatsch).
 - Fixed portability (thanks to qbit).
 - Fixed demo documentation (thanks to Rainer Müller).
+- Improved test suite.
+- Server now requires the client to provide a cert, and validates it.
+- Server allows an optional 'ca.cert' setting to specify the CA cert when the
+  'server.cert' is self-signed.
 
 1.0.0.beta1 (2013-09-08)
 
-Features
+- #1287 'taskd config' ignored $TASKDDATA.
+- #1289 The 'init' command no longer defaults the 'server' variable, and
+        provides feedback when it is not specified.
+- #1290 The pki/generate.client script now takes an argument is used to name
+        the files.
+- #1291 The 'taskdctl' script needs to use TASKDDATA for config command.
+- #1292 Allow --data as an arg to taskd, not just the command.
+- #1293 The operation.txt document details client.allow, client.deny.
 - #1294 SIGHUP now forces a server config file reload.
+- #1295 Relaxed message parsing slightly.
+- #1296 Now uses permiѕsions 0600 and 0700 when creating files and directories.
+- #1299 Now properly counts bytes sent back to client.
+- #1300 Encode/decode pairing is now properly balanced.
+- #1305 Commit should be available from 'git archive' tarballs (thanks to Ben
+        Boeckel).
+- #1306 Server never seems to sends a 201, always 200.
 - Improved error handling for unrecognized requests.
 - Improved test suite for Cygwin.
 - Improved log entries, for brevity and clarity.
@@ -78,24 +88,8 @@ Features
 - Documented redirects.
 - PKI examples can now use gnutls-certtool otherwise certtool.
 
-Bugs
-- #1287 'taskd config' ignored $TASKDDATA.
-- #1289 The 'init' command no longer defaults the 'server' variable, and
-        provides feedback when it is not specified.
-- #1290 The pki/generate.client script now takes an argument is used to name
-        the files.
-- #1291 The 'taskdctl' script needs to use TASKDDATA for config command.
-- #1292 Allow --data as an arg to taskd, not just the command.
-- #1293 The operation.txt document details client.allow, client.deny.
-- #1295 Relaxed message parsing slightly.
-- #1296 Now uses permiѕsions 0600 and 0700 when creating files and directories.
-- #1299 Now properly counts bytes sent back to client.
-- #1300 Encode/decode pairing is now properly balanced.
-- #1305 Commit should be available from 'git archive' tarballs (thanks to Ben
-        Boeckel).
-- #1306 Server never seems to sends a 201, always 200.
-
 1.0.0.alpha (2013-06-23)
+
 - Supports CRL (Certificate Revocation List).
 - Supports new user key generation.
 - Documentation for:
@@ -111,10 +105,12 @@ Bugs
 - Client interface now an optional feature.
 
 0.12.0 (2013-06-03
+
 - Added IP logging option.
 - JSON support.
 
 0.11.0 (2013-05-18)
+
 - Implemented 'config' command.
 - Implemented 'remove' command.
 - Supports $TASKDDATA in config command.
@@ -122,20 +118,24 @@ Bugs
 - Consistent use of command line options for all commands.
 
 0.10.0 (2013-05-12)
+
 - Full TLS support, for encrypted-only communication.
 - Added 'diagnostics' command.
 - Bug: Statistics 'tps' value now floating point.
 
 0.9.0 (2012-10-16)
+
 - IPv4 and IPv6 support.
 - Sync use cases and test.
 
 0.8.0 (2012-10-11)
+
 - Functioning sync algorithm.
 - Initial documentation.
 - Demo scripts (early unit tests).
 
 0.7.0 (2012-09-30)
+
 - Added program shell.
 - Added SSL support.
 - Added server command, responding to 'statistics' and 'sync' requests.
