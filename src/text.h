@@ -35,7 +35,6 @@ std::string trimLeft (const std::string& in, const std::string& t = " ");
 std::string trimRight (const std::string& in, const std::string& t = " ");
 std::string trim (const std::string& in, const std::string& t = " ");
 std::string unquoteText (const std::string&);
-void splitq (std::vector<std::string>&, const std::string&, const char);
 void split (std::vector<std::string>&, const std::string&, const char);
 void split (std::vector<std::string>&, const std::string&, const std::string&);
 void split_minimal (std::vector<std::string>&, const std::string&, const char);
