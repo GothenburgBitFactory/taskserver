@@ -109,8 +109,8 @@ bool Database::authenticate (
     return false;
   }
 
-  // Verify non-existence of <root>/orgs/<org>/user/<key>/suspended
-  File user_suspended (_config->get ("root") + "/orgs/" + org + "/user/" + key + "/suspended");
+  // Verify non-existence of <root>/orgs/<org>/users/<key>/suspended
+  File user_suspended (_config->get ("root") + "/orgs/" + org + "/users/" + key + "/suspended");
   if (user_suspended.exists ())
   {
     if (_log)
