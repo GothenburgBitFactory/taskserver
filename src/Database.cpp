@@ -125,7 +125,7 @@ bool Database::authenticate (
 
   // Match <user> against <root>/orgs/<org>/users/<key>/rc:<user>
   Config user_rc (_config->get ("root") + "/orgs/" + org + "/users/" + key + "/config");
-  if (user_rc.get ("user") != user)
+  if (!user.empty () && user_rc.get ("user") != user)
   {
     if (_log)
       _log->format ("INFO Auth failure: org '%s' user '%s' bad key",
