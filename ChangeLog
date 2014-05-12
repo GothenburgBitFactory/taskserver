@@ -29,7 +29,7 @@
   Alexander Sulfrian)
 - Includes line numbers when reporting parse errors in data (thanks to Kosta
   Harlan).
-- Removed debug output.
+- Removed unnecessary debug output.
 - Updated URLs.
 
 ------ old releases ------------------------------
