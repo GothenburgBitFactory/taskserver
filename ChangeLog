@@ -12,7 +12,8 @@
 - TW-1304 Minor build and install fix for NetBSD (thanks to atomicules).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
-- TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman Inflianskas).
+- TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman
+        Inflianskas).
 - TD-42 Cannot compile taskd - GNUTLS_VERSION undefined in diag.cpp (thanks
         to Michele Vetturi).
 - TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
@@ -24,8 +25,8 @@
 - Improved support for IPv6 host names (thanks to Anton Khirnov).
 - When '--data' is specified, the 'diagnostics' command shows more details.
 - Documentation corrections.
-- Added certificate verification to GnuTLS versions < 2.9.10 (thanks to Alexander
-  Sulfrian)
+- Added certificate verification to GnuTLS versions < 2.9.10 (thanks to
+  Alexander Sulfrian)
 - Includes line numbers when reporting parse errors in data (thanks to Kosta
   Harlan).
 - Removed debug output.
