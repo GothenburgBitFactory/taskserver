@@ -171,16 +171,16 @@ void TLSServer::init (
   gnutls_certificate_allocate_credentials (&_credentials);
   if (_ca != "" &&
       gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Missing CA file.");
+    throw std::string ("Bad CA file.");
 
   if ( _crl != "" &&
       gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Missing CRL file.");
+    throw std::string ("Bad CRL file.");
 
   if (_cert != "" &&
       _key != "" &&
       gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Missing CERT file.");
+    throw std::string ("Bad CERT file.");
 
 #if GNUTLS_VERSION_NUMBER >= 0x020b00
 #if GNUTLS_VERSION_NUMBER >= 0x03000d
