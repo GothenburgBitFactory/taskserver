@@ -31,6 +31,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include <ConfigFile.h>
 #include <Color.h>
 #include <Msg.h>
@@ -119,10 +120,11 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #ifdef _LP64
             << " +LP64"
 #endif
-            << " +c" << sizeof (char)
-            << " +i" << sizeof (int)
-            << " +l" << sizeof (long)
-            << " +vp" << sizeof (void*)
+            << " +c"      << 8 * sizeof (char)
+            << " +i"      << 8 * sizeof (int)
+            << " +l"      << 8 * sizeof (long)
+            << " +vp"     << 8 * sizeof (void*)
+            << " +time_t" << 8 * sizeof (time_t)
             << "\n\n";
 
   std::cout << bold.colorize ("Build Features")
