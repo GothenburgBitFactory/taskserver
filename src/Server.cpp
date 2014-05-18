@@ -232,6 +232,8 @@ void Server::beginServer ()
   server.bind (_host, _port);
   server.listen ();
 
+  if (_log) _log->write ("Server ready");
+
   _request_count = 0;
   while (1)
   {

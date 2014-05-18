@@ -19,6 +19,7 @@
 - TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
         (thanks to Anton Khirnov, Renato Alves).
 - TD-48 Empty username is not an error (thanks to Ben Boeckel).
+- TD-53 Log message when server is ready for action (thanks to Renato Alves).
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
 - CRL cert is now optional (thanks to Anton Khirnov).
