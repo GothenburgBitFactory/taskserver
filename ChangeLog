@@ -38,6 +38,7 @@
   Harlan).
 - Removed debug output.
 - Updated URLs.
+- Improved I/O performance with better defaults for buffer sizes.
 
 ------ old releases ------------------------------
 
