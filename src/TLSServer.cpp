@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <TLSServer.h>
 #include <sys/socket.h>
@@ -324,7 +325,7 @@ void TLSTransaction::init (TLSServer& server)
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
 #else
-  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) _socket);
+  gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (intptr_t) _socket);
 #endif
 
   // Key exchange.
