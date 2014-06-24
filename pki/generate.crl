@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/bin/sh
+
+. ./vars
 
 # CRL - Certificate Revocation List
 cat <<EOF >crl.info
-expiration_days = 365
+expiration_days = $EXPIRATION_DAYS
 EOF
 
 # Take the correct binary to create the certificates

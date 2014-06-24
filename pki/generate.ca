@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Take the correct binary to create the certificates
 CERTTOOL=$(which gnutls-certtool || which certtool)
@@ -8,20 +8,23 @@ then
   exit 1
 fi
 
+. ./vars
+
 # Create a CA key.
 ${CERTTOOL} \
   --generate-privkey \
+  --bits=$BITS \
   --outfile ca.key.pem
 
 chmod 600 ca.key.pem
 
 # Sign a CA cert.
 cat <<EOF >ca.info
-organization = Göteborg Bit Factory
-cn = Göteborg Bit Factory
-country = SE
-state = Västra Götaland
-locality = Göteborg
+organization = $ORGANIZATION
+cn = $CN
+country = $COUNTRY
+state = $STATE
+locality = $LOCALITY
 ca
 cert_signing_key
 EOF

@@ -1,0 +1,11 @@
+# Uncomment these variables below to override automatic discovery.
+#DNSNAMES="example.com example.net"
+#IPADDRS="10.11.12.13 10.20.30.40"
+
+BITS=4096
+EXPIRATION_DAYS=365
+ORGANIZATION="Göteborg Bit Factory"
+CN="Göteborg Bit Factory"
+COUNTRY=SE
+STATE="Västra Götaland"
+LOCALITY="Göteborg"

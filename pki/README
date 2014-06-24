@@ -27,3 +27,5 @@ There is a 'generate' script here that will perform the above steps.  Take a
 look at it to see the individual steps it takes to generate the proper set of
 keys and certs.
 
+Note that you should modify the 'vars' file to provide your own identity and
+chosen parameters.

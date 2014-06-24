@@ -26,6 +26,7 @@
         Heuser).
 - TD-57 taskdctl script assumes /bin/sh is /bin/bash (thanks to Tatjana
         Heuser).
+- TD-60 Make PKI scripts easier to use (thanks to viq).
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
 - CRL cert is now optional (thanks to Anton Khirnov).

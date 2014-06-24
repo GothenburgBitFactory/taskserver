@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 NAME=client
 if [ $# -gt 0 ] ; then
@@ -13,16 +13,19 @@ then
   exit 1
 fi
 
+. ./vars
+
 # Create a client key.
 ${CERTTOOL} \
   --generate-privkey \
+  --bits=$BITS \
   --outfile ${NAME}.key.pem
 
 # Sign a client cert with the key.
 chmod 600 ${NAME}.key.pem
 cat <<EOF >client.info
-organization = Göteborg Bit Factory
-cn = Göteborg Bit Factory
+organization = $ORGANIZATION
+cn = $CN
 tls_www_client
 encryption_key
 signing_key

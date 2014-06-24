@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # For a public or production server, purchase a cert from a known CA, and skip
 # the next step.
