@@ -186,7 +186,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     else
     {
       if (_log)
-        _log->format ("[%d] ERROR Unrecognized message type '%s'", _txn_count, type.c_str ());
+        _log->format ("[%d] ERROR: Unrecognized message type '%s'", _txn_count, type.c_str ());
 
       throw 500;
     }
@@ -213,7 +213,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] ERROR %d %s", _txn_count, e, taskd_error (e).c_str ());
+      _log->format ("[%d] ERROR: %d %s", _txn_count, e, taskd_error (e).c_str ());
   }
 
   // Handlers can throw a string, for a 500 code with specific text.

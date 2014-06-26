@@ -144,7 +144,7 @@ void Server::setCAFile (const std::string& file)
   _ca_file = file;
   File cert (file);
   if (! cert.readable ())
-    throw format ("Certificate not readable: '{1}'", file);
+    throw format ("CA Certificate not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +154,7 @@ void Server::setCertFile (const std::string& file)
   _cert_file = file;
   File cert (file);
   if (! cert.readable ())
-    throw format ("Certificate not readable: '{1}'", file);
+    throw format ("Server Certificate not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ void Server::setKeyFile (const std::string& file)
   _key_file = file;
   File key (file);
   if (! key.readable ())
-    throw format ("Private key not readable: '{1}'", file);
+    throw format ("Server key not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ void Server::setCRLFile (const std::string& file)
   _crl_file = file;
   File crl (file);
   if (! crl.readable ())
-    throw format ("CRL not readable: '{1}'", file);
+    throw format ("CRL Certificate not readable: '{1}'", file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
