@@ -10,6 +10,8 @@
 - TW-1296 make test/run_all exit with non-zero code if a test fail (thanks to
           Jakub Wilk).
 - TW-1304 Minor build and install fix for NetBSD (thanks to atomicules).
+- TW-1366 In diagnostics it's called 'Cert', and in config it's called
+          'certificate' (thanks to Jack).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
 - TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman

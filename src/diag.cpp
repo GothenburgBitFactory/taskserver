@@ -215,7 +215,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
         std::cout << "          CA: "
                   << ca_cert._data << (ca_cert.readable () ? " (readable)" : "")
                   << "\n";
-        std::cout << "        Cert: "
+        std::cout << " Certificate: "
                   << server_cert._data << (server_cert.readable () ? " (readable)" : " (missing)")
                   << "\n";
         std::cout << "         Key: "
