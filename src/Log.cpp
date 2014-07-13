@@ -91,24 +91,39 @@ void Log::write (const std::string& line, bool multiline /* = false */)
 
     _prior = line;
 
-    if (!_fh)
-      _fh = fopen (_filename.c_str (), "a");
-
-    if (_fh)
+    if (_filename == "-")
     {
       timestamp ();
 
       if (_repetition)
       {
-        fprintf (_fh, "%s (Repeated %d times)\n", _now, _repetition);
+        printf ("%s (Repeated %d times)\n", _now, _repetition);
         _repetition = 0;
       }
 
-      fprintf (_fh, "%s %s\n", _now, printable (line).c_str ());
+      printf ("%s %s\n", _now, printable (line).c_str ());
+    }
+    else
+    {
+      if (!_fh)
+        _fh = fopen (_filename.c_str (), "a");
 
-      // To get around the auto file close of the daemonization process.
-      fclose (_fh);
-      _fh = NULL;
+      if (_fh)
+      {
+        timestamp ();
+
+        if (_repetition)
+        {
+          fprintf (_fh, "%s (Repeated %d times)\n", _now, _repetition);
+          _repetition = 0;
+        }
+
+        fprintf (_fh, "%s %s\n", _now, printable (line).c_str ());
+
+        // To get around the auto file close of the daemonization process.
+        fclose (_fh);
+        _fh = NULL;
+      }
     }
   }
 }

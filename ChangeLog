@@ -43,6 +43,7 @@
 - Removed debug output.
 - Updated URLs.
 - Improved I/O performance with better defaults for buffer sizes.
+- Can log to STDOUT when configuration setting 'log' is set to '-'.
 
 ------ old releases ------------------------------
 
