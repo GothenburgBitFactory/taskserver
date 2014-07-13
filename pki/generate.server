@@ -10,7 +10,10 @@ fi
 
 DNSNAMES="`hostname`"
 IPADDRS=$(for ip in `ifconfig -a | awk '/inet/ {print $2}' | egrep -v '(^::1$|^fe80:|^127\.)'` ; do
-        echo -n "$ip "
+  if [[ -Z "$ip" ]]
+  then
+    echo -n "$ip "
+  fi
 done)
 
 . ./vars
