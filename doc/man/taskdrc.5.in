@@ -56,7 +56,9 @@ Logs the IP addresses of incoming requests.
 
 .TP
 .B log=/tmp/taskd.log
-Fully-qualified path name to the Taskserver log file.
+Fully-qualified path name to the Taskserver log file.  Alternately, specifying
+the value '-' will cause all logging to go to STDOUT.  This does not apply when
+the server is run as a daemon.
 
 .TP
 .B pid.file=/tmp/taskd.pid
