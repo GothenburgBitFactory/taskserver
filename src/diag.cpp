@@ -235,9 +235,6 @@ void command_diag (Database& config, const std::vector <std::string>& args)
                   << pid._data << (pid.exists () ? " (found)" : " (missing)")
                   << "\n";
 
-        std::cout << "Client Allow: " << config._config->get ("client.allow") << "\n";
-        std::cout << " Client Deny: " << config._config->get ("client.deny") << "\n";
-
         std::cout << "      Server: " << config._config->get ("server") << "\n";
         std::cout << " Max Request: " << config._config->get ("request.limit") << " bytes\n";
         std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";

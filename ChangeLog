@@ -46,6 +46,7 @@
 - Updated URLs.
 - Improved I/O performance with better defaults for buffer sizes.
 - Can log to STDOUT when configuration setting 'log' is set to '-'.
+- Removed support for client.allow/client.deny settings.
 
 ------ old releases ------------------------------
 

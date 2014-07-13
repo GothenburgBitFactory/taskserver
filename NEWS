@@ -16,6 +16,10 @@ New configuration options in Taskserver 1.1.0
 
   - Server CRL is now optional.
 
+Removed features in 1.1.0
+
+  - Configuration using 'client.allow' and 'client.deny' removed.
+
 ---
 
 Taskserver has been built and tested on the following configurations:

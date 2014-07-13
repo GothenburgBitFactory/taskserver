@@ -21,20 +21,8 @@ documentation for full details.
 Determines whether certain commands are confirmed.  Defaults to on.
 
 .TP
-.B client.allow=[Tt]ask [2-9]+
-A comma-separated list of regular expressions that are matched against the
-reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
-special meaning.  Overidden by any 'client.deny' entry.
-
-.TP
 .B client.cert
 Fully qualified path of the client cert.  This is used by the 'client' command.
-
-.TP
-.B client.deny=[Tt]ask [2-9]+
-A comma-separated list of regular expressions that are matched against the
-reported client id (such as "task 2.3.0").  The values 'all' or 'none' have
-special meaning.  Any 'client.deny' entry overrides any 'client.allow' entry.
 
 .TP
 .B debug=off
