@@ -9,13 +9,13 @@ EOF
 
 # Take the correct binary to create the certificates
 CERTTOOL=$(which gnutls-certtool || which certtool)
-if [[ -z "${CERTTOOL}" ]]
+if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
   exit 1
 fi
 
-${CERTTOOL} \
+$CERTTOOL \
   --generate-crl \
   --load-ca-privkey ca.key.pem \
   --load-ca-certificate ca.cert.pem \
@@ -28,12 +28,12 @@ exit 0
 
 # To create a CRL that contains some revoked certificates, place the
 # certificates in a file and use --load-certificate as follows:
-# ${CERTTOOL} \
+# $CERTTOOL \
 #   --generate-crl \
 #   --load-ca-privkey ca.key.pem \
 #   --load-ca-certificate ca.cert.pem \
 #   --load-certificate revoked-certs.pem
 
 # To verify a CRL:
-#   ${CERTTOOL} --verify-crl --load-ca-certificate ca.cert.pem --infile server.crl.pem
+#   $CERTTOOL --verify-crl --load-ca-certificate ca.cert.pem --infile server.crl.pem
 
