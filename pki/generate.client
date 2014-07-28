@@ -7,7 +7,7 @@ fi
 
 # Take the correct binary to create the certificates
 CERTTOOL=$(which gnutls-certtool || which certtool)
-if [[ -z "${CERTTOOL}" ]]
+if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
   exit 1
@@ -16,7 +16,7 @@ fi
 . ./vars
 
 # Create a client key.
-${CERTTOOL} \
+$CERTTOOL \
   --generate-privkey \
   --bits=$BITS \
   --outfile ${NAME}.key.pem
@@ -31,7 +31,7 @@ encryption_key
 signing_key
 EOF
 
-${CERTTOOL} \
+$CERTTOOL \
   --generate-certificate \
   --load-privkey ${NAME}.key.pem \
   --load-ca-certificate ca.cert.pem \
