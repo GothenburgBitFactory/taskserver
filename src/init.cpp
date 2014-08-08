@@ -66,7 +66,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
 
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
-    std::cout << "You must specify the 'server' variable, for example:\n"
+    std::cout << "You must specify the 'server' variable before attempting a server start, for example:\n"
               << "  taskd config server localhost:53589\n"
               << "\n";
 
