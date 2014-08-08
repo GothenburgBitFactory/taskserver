@@ -123,5 +123,10 @@
 #define STRING_TASK_VALID_RECUR      "The recurrence value '{1}' is not valid."
 #define STRING_TASK_VALID_PRIORITY   "Priority values may be 'H', 'M' or 'L', not '{1}'."
 
+#define STRING_JSON_VALIDATE         "You must specify either a JSON string or a JSON file."
+#define STRING_JSON_SYNTAX_OK        "JSON syntax ok."
+
+#define STRING_ERROR_UNKNOWN         "Unknown error"
+
 #endif
 
