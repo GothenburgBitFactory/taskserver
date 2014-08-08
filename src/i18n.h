@@ -43,7 +43,7 @@
 // Translators:
 //   Add more, as appropriate.
 #if PACKAGE_LANGUAGE == LANGUAGE_EN_US
-#include <en-US.h>
+#include <eng-USA.h>
 #endif
 
 #endif
