@@ -222,6 +222,31 @@ void TLSServer::bind (const std::string& host, const std::string& port)
   if (::getaddrinfo (host.c_str (), port.c_str (), &hints, &res) != 0)
     throw std::string (::gai_strerror (errno));
 
+  for (struct addrinfo* p = res; p != NULL; p = p->ai_next)
+  {
+    // IPv4
+    void *addr;
+    int ipver;
+    if (p->ai_family == AF_INET)
+    {
+      struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+      addr = &(ipv4->sin_addr);
+      ipver = 4;
+    }
+    // IPv6
+    else
+    {
+      struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+      addr = &(ipv6->sin6_addr);
+      ipver = 6;
+    }
+
+    // Convert the IP to a string and print it:
+    char ipstr[INET6_ADDRSTRLEN];
+    inet_ntop (p->ai_family, addr, ipstr, sizeof ipstr);
+    std::cout << "s: INFO IPv" << ipver << ": " << ipstr << "\n";
+  }
+
   if ((_socket = ::socket (res->ai_family,
                            res->ai_socktype,
                            res->ai_protocol)) == -1)
