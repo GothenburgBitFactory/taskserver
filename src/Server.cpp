@@ -140,7 +140,7 @@ void Server::setLimit (int max)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCAFile (const std::string& file)
 {
-  if (_log) _log->format ("CA %s", file.c_str ());
+  if (_log) _log->format ("CA          %s", file.c_str ());
   _ca_file = file;
   File cert (file);
   if (! cert.readable ())
@@ -170,7 +170,7 @@ void Server::setKeyFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCRLFile (const std::string& file)
 {
-  if (_log) _log->format ("CRL %s", file.c_str ());
+  if (_log) _log->format ("CRL         %s", file.c_str ());
   _crl_file = file;
   File crl (file);
   if (! crl.readable ())
