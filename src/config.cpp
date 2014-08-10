@@ -32,6 +32,7 @@
 #include <taskd.h>
 #include <text.h>
 #include <util.h>
+#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd config --data <root> [<name> [<value>]]
@@ -61,7 +62,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
   std::string root = db._config->get ("root");
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string ("ERROR: The '--data' path does not exist.");
+    throw std::string (STRING_CONFIG_NO_PATH);
 
   // Load the config file.
   Config config;
@@ -92,8 +93,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
       {
         found = true;
         if (!confirmation ||
-            confirm (format ("Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?",
-                             name, config.get (name), value)))
+            confirm (format (STRING_CONFIG_OVERWRITE, name, config.get (name), value)))
         {
           if (comment != std::string::npos)
             *line = name + "=" + value + " " + line->substr (comment);
@@ -108,7 +108,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
     // Not found, so append instead.
     if (!found &&
         (!confirmation ||
-         confirm (format ("Are you sure you want to add '{1}' with a value of '{2}'?", name, value))))
+         confirm (format (STRING_CONFIG_ADD, name, value))))
     {
       contents.push_back (name + "=" + value);
       change = true;
@@ -119,14 +119,13 @@ void command_config (Database& db, const std::vector <std::string>& args)
     {
       File::write (config._original_file, contents);
       if (verbose)
-        std::cout << format ("Config file {1} modified.",
-                             config._original_file._data)
+        std::cout << format (STRING_CONFIG_MODIFIED, config._original_file._data)
                   << "\n";
     }
     else
     {
       if (verbose)
-        std::cout << "No changes made.\n";
+        std::cout << STRING_CONFIG_NO_CHANGE << "\n";
     }
   }
 
@@ -155,7 +154,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
         // Remove name
         if (!confirmation ||
-            confirm (format ("Are you sure you want to remove '{1}'?", name)))
+            confirm (format (STRING_CONFIG_REMOVE, name)))
         {
           *line = "";
           change = true;
@@ -164,7 +163,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
     }
 
     if (!found)
-      throw format ("ERROR: No entry named '{1}' found.", name);
+      throw format (STRING_CONFIG_NOT_FOUND, name);
 
     // Write .taskd (or equivalent)
     if (change)
@@ -174,14 +173,15 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
       File::write (config._original_file, contents);
       if (verbose)
-        std::cout << format ("Config file {1} modified.",
+        std::cout << format (STRING_CONFIG_MODIFIED,
                              config._original_file._data)
                   << "\n";
     }
     else
     {
       if (verbose)
-        std::cout << "No changes made.\n";
+        std::cout << STRING_CONFIG_NO_CHANGE
+                  << "\n";
     }
   }
 
@@ -190,7 +190,9 @@ void command_config (Database& db, const std::vector <std::string>& args)
   else
   {
     if (verbose)
-      std::cout << "\nConfiguration read from " << config._original_file._data << "\n\n";
+      std::cout << "\n"
+                << format (STRING_CONFIG_SOURCE, config._original_file._data)
+                << "\n\n";
     taskd_renderMap (config, "Variable", "Value");
   }
 }

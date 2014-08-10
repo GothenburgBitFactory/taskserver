@@ -126,6 +126,15 @@
 #define STRING_JSON_VALIDATE         "You must specify either a JSON string or a JSON file."
 #define STRING_JSON_SYNTAX_OK        "JSON syntax ok."
 
+#define STRING_CONFIG_NO_PATH        "ERROR: The '--data' path does not exist."
+#define STRING_CONFIG_OVERWRITE      "Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?"
+#define STRING_CONFIG_ADD            "Are you sure you want to add '{1}' with a value of '{2}'?"
+#define STRING_CONFIG_MODIFIED       "Config file {1} modified."
+#define STRING_CONFIG_NO_CHANGE      "No changes made."
+#define STRING_CONFIG_REMOVE         "Are you sure you want to remove '{1}'?"
+#define STRING_CONFIG_NOT_FOUND      "ERROR: No entry named '{1}' found."
+#define STRING_CONFIG_SOURCE         "Configuration read from {1}"
+
 #define STRING_ERROR_UNKNOWN         "Unknown error"
 
 #endif
