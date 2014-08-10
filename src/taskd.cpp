@@ -42,6 +42,7 @@
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
+#include <i18n.h>
 
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
@@ -168,7 +169,7 @@ int main (int argc, const char** argv)
             std::cout << output;
           }
           else
-            throw std::string ("ERROR: Did not recognize command '") + args[0] + "'.";
+            throw format (STRING_TASKD_BAD_COMMAND, args[0]);
         }
       }
 
@@ -186,7 +187,8 @@ int main (int argc, const char** argv)
 
       catch (...)
       {
-        std::cerr << "Unknown error.\n";
+        std::cerr << STRING_ERROR_UNKNOWN
+                  << "\n";
         status = -2;
       }
     }

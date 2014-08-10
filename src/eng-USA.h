@@ -148,6 +148,8 @@
 #define STRING_CLIENT_USAGE          "ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]"
 #define STRING_CLIENT_DISABLED       "ERROR: Client interface feature not enabled."
 
+#define STRING_TASKD_BAD_COMMAND     "ERROR: Did not recognize command '{1}'."
+
 #define STRING_ERROR_UNKNOWN         "Unknown error"
 #define STRING_SERVER_DOWN           "ERROR: Taskserver not responding."
 

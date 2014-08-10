@@ -34,6 +34,7 @@
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
+#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int status_statistics (Config& config)
