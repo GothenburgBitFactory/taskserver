@@ -135,6 +135,16 @@
 #define STRING_CONFIG_NOT_FOUND      "ERROR: No entry named '{1}' found."
 #define STRING_CONFIG_SOURCE         "Configuration read from {1}"
 
+#define STRING_INIT_DATA_REQUIRED    "ERROR: The '--data' option is required."
+#define STRING_INIT_PATH_MISSING     "ERROR: The '--data' path does not exist."
+#define STRING_INIT_PATH_NOT_DIR     "ERROR: The '--data' path is not a directory."
+#define STRING_INIT_PATH_NOT_READ    "ERROR: The '--data' directory is not readable."
+#define STRING_INIT_PATH_NOT_WRITE   "ERROR: The '--data' directory is not writable."
+#define STRING_INIT_PATH_NOT_EXE     "ERROR: The '--data' directory is not executable."
+#define STRING_INIT_SERVER           "You must specify the 'server' variable before attempting a server start, for example:"
+#define STRING_INIT_COULD_NOT_CREATE "ERROR: Could not create '{1}'."
+#define STRING_INIT_CREATED          "Created {1}"
+
 #define STRING_ERROR_UNKNOWN         "Unknown error"
 
 #endif

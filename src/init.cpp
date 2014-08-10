@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <taskd.h>
 #include <text.h>
+#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 void command_init (Database& db, const std::vector <std::string>& args)
@@ -36,23 +37,23 @@ void command_init (Database& db, const std::vector <std::string>& args)
   // Verify that root exists.
   std::string root = db._config->get ("root");
   if (root == "")
-    throw std::string ("ERROR: The '--data' option is required.");
+    throw std::string (STRING_INIT_DATA_REQUIRED);
 
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string ("ERROR: The '--data' path does not exist.");
+    throw std::string (STRING_INIT_PATH_MISSING);
 
   if (!root_dir.is_directory ())
-     throw std::string ("ERROR: The '--data' path is not a directory.");
+    throw std::string (STRING_INIT_PATH_NOT_DIR);
 
   if (!root_dir.readable ())
-    throw std::string ("ERROR: The '--data' directory is not readable.");
+    throw std::string (STRING_INIT_PATH_NOT_READ);
 
   if (!root_dir.writable ())
-    throw std::string ("ERROR: The '--data' directory is not writable.");
+    throw std::string (STRING_INIT_PATH_NOT_WRITE);
 
   if (!root_dir.executable ())
-    throw std::string ("ERROR: The '--data' directory is not executable.");
+    throw std::string (STRING_INIT_PATH_NOT_EXE);
 
   // Provide some defaults and overrides.
   db._config->set ("extensions", TASKD_EXTDIR);
@@ -66,7 +67,8 @@ void command_init (Database& db, const std::vector <std::string>& args)
 
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
-    std::cout << "You must specify the 'server' variable before attempting a server start, for example:\n"
+    std::cout << STRING_INIT_SERVER
+              << "\n"
               << "  taskd config server localhost:53589\n"
               << "\n";
 
@@ -76,7 +78,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
   sub += "orgs";
   if (!sub.exists ())
     if (!sub.create (0700))
-      throw std::string ("ERROR: Could not create '") + sub._data + "'.";
+      throw format (STRING_INIT_COULD_NOT_CREATE, sub._data);
 
   // Dump the config file?
   db._config->_original_file = root_dir._data + "/config";
@@ -88,7 +90,8 @@ void command_init (Database& db, const std::vector <std::string>& args)
   {
     db._config->save ();
     if (db._config->getBoolean ("verbose"))
-      std::cout << "Created " << std::string (db._config->_original_file) << "\n";
+      std::cout << format (STRING_INIT_CREATED, db._config->_original_file)
+                << "\n";
   }
 }
 
