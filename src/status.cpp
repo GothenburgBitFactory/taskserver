@@ -68,7 +68,8 @@ int status_statistics (Config& config)
   }
   else
   {
-    std::cout << Color ("red").colorize ("ERROR: Taskserver not responding.") << "\n";
+    std::cout << Color ("red").colorize (STRING_SERVER_DOWN)
+              << "\n";
     status = 1;
   }
 

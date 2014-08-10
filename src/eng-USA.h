@@ -146,10 +146,10 @@
 #define STRING_INIT_CREATED          "Created {1}"
 
 #define STRING_CLIENT_USAGE          "ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]"
-#define STRING_CLIENT_SERVER_DOWN    "ERROR: Taskserver not responding."
 #define STRING_CLIENT_DISABLED       "ERROR: Client interface feature not enabled."
 
 #define STRING_ERROR_UNKNOWN         "Unknown error"
+#define STRING_SERVER_DOWN           "ERROR: Taskserver not responding."
 
 #endif
 

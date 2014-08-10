@@ -61,7 +61,7 @@ void command_client (Database& db, const std::vector <std::string>& args)
 
     Msg response;
     if (! taskd_sendMessage (*db._config, "server", request, response))
-      throw std::string (STRING_CLIENT_SERVER_DOWN);
+      throw std::string (STRING_SERVER_DOWN);
 
     std::cout << "<<<\n"
               << response.serialize ();
