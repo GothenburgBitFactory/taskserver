@@ -33,6 +33,7 @@
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
+#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // This is a debugging-only command that uploads a file to the server, and then
@@ -42,7 +43,7 @@ void command_client (Database& db, const std::vector <std::string>& args)
 #ifdef FEATURE_CLIENT_INTERFACE
   // Parse arguments.
   if (args.size () < 3)
-    throw std::string ("ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]");
+    throw std::string (STRING_CLIENT_USAGE);
 
   db._config->set ("server", args[1]);
 
@@ -60,13 +61,13 @@ void command_client (Database& db, const std::vector <std::string>& args)
 
     Msg response;
     if (! taskd_sendMessage (*db._config, "server", request, response))
-      throw std::string ("ERROR: Taskserver not responding.");
+      throw std::string (STRING_CLIENT_SERVER_DOWN);
 
     std::cout << "<<<\n"
               << response.serialize ();
   }
 #else
-  throw std::string ("ERROR: Client interface feature not enabled.");
+  throw std::string (STRING_CLIENT_DISABLED);
 #endif
 }
 

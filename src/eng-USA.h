@@ -145,6 +145,10 @@
 #define STRING_INIT_COULD_NOT_CREATE "ERROR: Could not create '{1}'."
 #define STRING_INIT_CREATED          "Created {1}"
 
+#define STRING_CLIENT_USAGE          "ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]"
+#define STRING_CLIENT_SERVER_DOWN    "ERROR: Taskserver not responding."
+#define STRING_CLIENT_DISABLED       "ERROR: Client interface feature not enabled."
+
 #define STRING_ERROR_UNKNOWN         "Unknown error"
 
 #endif
