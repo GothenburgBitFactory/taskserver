@@ -21,7 +21,7 @@ done)
 # Create a server key.
 $CERTTOOL \
   --generate-privkey \
-  --bits=$BITS \
+  --bits $BITS \
   --outfile server.key.pem
 
 chmod 600 server.key.pem

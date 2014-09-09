@@ -13,7 +13,7 @@ fi
 # Create a CA key.
 $CERTTOOL \
   --generate-privkey \
-  --bits=$BITS \
+  --bits $BITS \
   --outfile ca.key.pem
 
 chmod 600 ca.key.pem
