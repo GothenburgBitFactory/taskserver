@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2014, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2014, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@
 #endif
 #include <sys/types.h>
 #include <netdb.h>
+#include <text.h>
 
 #define DH_BITS 1024
 #define MAX_BUF 16384
@@ -168,20 +169,26 @@ void TLSServer::init (
   _cert = cert;
   _key  = key;
 
-  gnutls_global_init ();
-  gnutls_certificate_allocate_credentials (&_credentials);
+  int ret = gnutls_global_init ();
+  if (ret < 0)
+    throw format ("TLS init error. {1}", gnutls_strerror (ret));
+
+  ret = gnutls_certificate_allocate_credentials (&_credentials);
+  if (ret < 0)
+    throw format ("TLS allocation error. {1}", gnutls_strerror (ret));
+
   if (_ca != "" &&
-      gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Bad CA file.");
+      (ret = gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
+    throw format ("Bad CA file. {1}", gnutls_strerror (ret));
 
   if ( _crl != "" &&
-      gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Bad CRL file.");
+      (ret = gnutls_certificate_set_x509_crl_file (_credentials, _crl.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
+    throw format ("Bad CRL file. {1}", gnutls_strerror (ret));
 
   if (_cert != "" &&
       _key != "" &&
-      gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Bad CERT file.");
+      (ret = gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
+    throw format ("Bad CERT file. {1}", gnutls_strerror (ret));
 
 #if GNUTLS_VERSION_NUMBER >= 0x020b00
 #if GNUTLS_VERSION_NUMBER >= 0x03000d
@@ -201,7 +208,7 @@ void TLSServer::init (
   gnutls_certificate_set_dh_params (_credentials, _params);
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
-  // The automatic verification for the server certificate with
+  // The automatic verification for the client certificate with
   // gnutls_certificate_set_verify_function only works with gnutls
   // >=2.9.10. So with older versions we should call the verify function
   // manually after the gnutls handshake.
