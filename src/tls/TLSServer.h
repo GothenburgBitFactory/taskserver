@@ -77,6 +77,7 @@ public:
   void debug ();
   void trust (const enum TLSServer::trust_level);
   void limit (int);
+  int verify_certificate () const;
   void send (const std::string&);
   void recv (std::string&);
   void getClient (std::string&, int&);

@@ -48,8 +48,6 @@
 #define DH_BITS 1024
 #define MAX_BUF 16384
 
-static bool trust_override = false;
-
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -59,35 +57,8 @@ static void gnutls_log_function (int level, const char* message)
 ////////////////////////////////////////////////////////////////////////////////
 static int verify_certificate_callback (gnutls_session_t session)
 {
-  if (trust_override)
-    return 0;
-
-  // This verification function uses the trusted CAs in the credentials
-  // structure. So you must have installed one or more CA certificates.
-  unsigned int status = 0;
-#if GNUTLS_VERSION_NUMBER >= 0x030104
-  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
-#else
-  int ret = gnutls_certificate_verify_peers2 (session, &status);
-#endif
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-#if GNUTLS_VERSION_NUMBER >= 0x030105
-  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
-  gnutls_datum_t out;
-  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  gnutls_free (out.data);
-#endif
-
-  if (status != 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  // Continue handshake.
-  return 0;
+  const TLSTransaction* tx = (TLSTransaction*) gnutls_session_get_ptr (session);
+  return tx->verify_certificate ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -337,6 +308,10 @@ void TLSTransaction::init (TLSServer& server)
   gnutls_priority_set (_session, server._priorities);
   gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, server._credentials);
 
+  // Store the TLSTransaction instance, so that the verification callback can
+  // access it during the handshake below and call the verifcation method.
+  gnutls_session_set_ptr (_session, (void*) this);
+
   // Require client certificate.
   gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE);
 
@@ -390,7 +365,7 @@ void TLSTransaction::init (TLSServer& server)
   // gnutls_certificate_set_verify_function does only work with gnutls
   // >=2.9.10. So with older versions we should call the verify function
   // manually after the gnutls handshake.
-  ret = verify_certificate_callback(_session);
+  ret = verify_certificate ();
   if (ret < 0)
   {
     if (_debug)
@@ -418,9 +393,49 @@ void TLSTransaction::debug ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSTransaction::trust (const enum TLSServer::trust_level value)
+{
+  _trust = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSTransaction::limit (int max)
 {
   _limit = max;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int TLSTransaction::verify_certificate () const
+{
+  if (_trust == TLSServer::allow_all)
+    return 0;
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status = 0;
+#if GNUTLS_VERSION_NUMBER >= 0x030104
+  int ret = gnutls_certificate_verify_peers3 (_session, NULL, &status);
+#else
+  int ret = gnutls_certificate_verify_peers2 (_session, &status);
+#endif
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+#if GNUTLS_VERSION_NUMBER >= 0x030105
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (_session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  gnutls_free (out.data);
+#endif
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
