@@ -48,6 +48,7 @@ public:
   void bind (const std::string&, const std::string&);
   void listen ();
   void accept (TLSTransaction&);
+  int verify_certificate() const;
 
   friend class TLSTransaction;
 
