@@ -304,9 +304,18 @@ TLSTransaction::~TLSTransaction ()
 ////////////////////////////////////////////////////////////////////////////////
 void TLSTransaction::init (TLSServer& server)
 {
-  gnutls_init (&_session, GNUTLS_SERVER);
-  gnutls_priority_set (_session, server._priorities);
-  gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, server._credentials);
+  int ret = gnutls_init (&_session, GNUTLS_SERVER);
+  if (ret < 0)
+    throw format ("TLS server init error. {1}", gnutls_strerror (ret));
+
+  ret = gnutls_priority_set (_session, server._priorities);
+  if (ret < 0)
+    throw format ("Error initializing TLS. {1}", gnutls_strerror (ret));
+
+  // Apply the x509 credentials to the current session.
+  ret = gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, server._credentials);
+  if (ret < 0)
+    throw format ("TLS credentials error. {1}", gnutls_strerror (ret));
 
   // Store the TLSTransaction instance, so that the verification callback can
   // access it during the handshake below and call the verifcation method.
@@ -350,7 +359,6 @@ void TLSTransaction::init (TLSServer& server)
 #endif
 
   // Key exchange.
-  int ret;
   do
   {
     ret = gnutls_handshake (_session);
@@ -375,7 +383,15 @@ void TLSTransaction::init (TLSServer& server)
 #endif
 
   if (_debug)
-    std::cout << "s: INFO Handshake was completed\n";
+  {
+#if GNUTLS_VERSION_NUMBER >= 0x03010a
+    char* desc = gnutls_session_get_desc (_session);
+    std::cout << "c: INFO Handshake was completed: " << desc << "\n";
+    gnutls_free (desc);
+#else
+    std::cout << "c: INFO Handshake was completed.\n";
+#endif
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
