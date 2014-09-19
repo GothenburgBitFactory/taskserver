@@ -36,11 +36,13 @@ class TLSTransaction;
 class TLSServer
 {
 public:
+  enum trust_level { strict, ignore_hostname, allow_all };
+
   TLSServer ();
   ~TLSServer ();
   void queue (int);
   void debug (int);
-  void trust (bool);
+  void trust (const enum trust_level);
   void ciphers (const std::string&);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&);
@@ -61,6 +63,7 @@ private:
   int                              _socket;
   int                              _queue;
   bool                             _debug;
+  enum trust_level                 _trust;
 };
 
 class TLSTransaction

@@ -135,15 +135,17 @@ void TLSServer::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSServer::trust (bool value)
+void TLSServer::trust (const enum trust_level value)
 {
-  trust_override = value;
+  _trust = value;
   if (_debug)
   {
-    if (trust_override)
-      std::cout << "s: INFO Client certificate trusted automatically.\n";
+    if (_trust == allow_all)
+      std::cout << "s: INFO Server certificate trusted automatically.\n";
+    else if (_trust == ignore_hostname)
+      std::cout << "s: INFO Server certificate trust verified but hostname ignored.\n";
     else
-      std::cout << "s: INFO Client certificate trust verified.\n";
+      std::cout << "s: INFO Server certificate trust verified.\n";
   }
 }
 
