@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2014, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2014, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#if (defined OPENBSD || defined SOLARIS)
+#if (defined OPENBSD || defined SOLARIS || defined NETBSD)
 #include <errno.h>
 #else
 #include <sys/errno.h>
@@ -44,12 +44,12 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <TLSClient.h>
+#include <gnutls/x509.h>
+#include <text.h>
 
 #define MAX_BUF 16384
 
 static int verify_certificate_callback (gnutls_session_t);
-
-static bool trust_override = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
@@ -60,35 +60,8 @@ static void gnutls_log_function (int level, const char* message)
 ////////////////////////////////////////////////////////////////////////////////
 static int verify_certificate_callback (gnutls_session_t session)
 {
-  if (trust_override)
-    return 0;
-
-  // This verification function uses the trusted CAs in the credentials
-  // structure. So you must have installed one or more CA certificates.
-  unsigned int status = 0;
-#if GNUTLS_VERSION_NUMBER >= 0x030104
-  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
-#else
-  int ret = gnutls_certificate_verify_peers2 (session, &status);
-#endif
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-#if GNUTLS_VERSION_NUMBER >= 0x030105
-  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
-  gnutls_datum_t out;
-  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  gnutls_free (out.data);
-#endif
-
-  if (status != 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  // Continue handshake.
-  return 0;
+  const TLSClient* client = (TLSClient*) gnutls_session_get_ptr (session);
+  return client->verify_certificate ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +69,13 @@ TLSClient::TLSClient ()
 : _ca ("")
 , _cert ("")
 , _key ("")
+, _host ("")
+, _port ("")
 , _session(0)
 , _socket (0)
 , _limit (0)
 , _debug (false)
+, _trust(strict)
 {
 }
 
@@ -136,13 +112,15 @@ void TLSClient::debug (int level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSClient::trust (bool value)
+void TLSClient::trust (const enum trust_level value)
 {
-  trust_override = value;
+  _trust = value;
   if (_debug)
   {
-    if (trust_override)
+    if (_trust == allow_all)
       std::cout << "c: INFO Server certificate trusted automatically.\n";
+    else if (_trust == ignore_hostname)
+      std::cout << "c: INFO Server certificate trust verified but hostname ignored.\n";
     else
       std::cout << "c: INFO Server certificate trust verified.\n";
   }
@@ -164,17 +142,22 @@ void TLSClient::init (
   _cert = cert;
   _key  = key;
 
-  gnutls_global_init ();
-  gnutls_certificate_allocate_credentials (&_credentials);
+  int ret = gnutls_global_init ();
+  if (ret < 0)
+    throw format ("TLS init error. {1}", gnutls_strerror (ret));
+
+  ret = gnutls_certificate_allocate_credentials (&_credentials);
+  if (ret < 0)
+    throw format ("TLS allocation error. {1}", gnutls_strerror (ret));
 
   if (_ca != "" &&
-      gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Missing CA file.");
+      (ret = gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
+    throw format ("Bad CA file. {1}", gnutls_strerror (ret));
 
   if (_cert != "" &&
       _key != "" &&
-      gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM) < 0)
-    throw std::string ("Missing CERT file.");
+      (ret = gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
+    throw format ("Bad CERT file. {1}", gnutls_strerror (ret));
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
   // The automatic verification for the server certificate with
@@ -183,32 +166,39 @@ void TLSClient::init (
   // manually after the gnutls handshake.
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback);
 #endif
-  gnutls_init (&_session, GNUTLS_CLIENT);
+  ret = gnutls_init (&_session, GNUTLS_CLIENT);
+  if (ret < 0)
+    throw format ("TLS client init error. {1}", gnutls_strerror (ret));
 
   // Use default priorities unless overridden.
   if (_ciphers == "")
     _ciphers = "NORMAL";
 
   const char *err;
-  int ret = gnutls_priority_set_direct (_session, _ciphers.c_str (), &err);
+  ret = gnutls_priority_set_direct (_session, _ciphers.c_str (), &err);
   if (ret < 0)
   {
     if (_debug && ret == GNUTLS_E_INVALID_REQUEST)
       std::cout << "c: ERROR Priority error at: " << err << "\n";
 
-    throw std::string ("Error initializing TLS.");
+    throw format ("Error initializingTLS. {1}", gnutls_strerror (ret));
   }
 
   // Apply the x509 credentials to the current session.
-  gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, _credentials);
+  ret = gnutls_credentials_set (_session, GNUTLS_CRD_CERTIFICATE, _credentials);
+  if (ret < 0)
+    throw format ("TLS credentials error. {1}", gnutls_strerror (ret));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TLSClient::connect (const std::string& host, const std::string& port)
 {
-  // Store the host name, so the verification callback can access it during the
-  // handshake below.
-  gnutls_session_set_ptr (_session, (void*) host.c_str ());
+  _host = host;
+  _port = port;
+
+  // Store the TLSClient instance, so that the verification callback can access
+  // it during the handshake below and call the verifcation method.
+  gnutls_session_set_ptr (_session, (void*) this);
 
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
@@ -247,7 +237,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   free (res);
 
   if (p == NULL)
-    throw std::string ("Could not connect to ") + host + " " + port;
+    throw format ("Could not connect to {1} {2}", host, port);
 
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket);
@@ -263,19 +253,19 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
   if (ret < 0)
-    throw std::string ("Handshake failed.  ") + gnutls_strerror (ret);
+    throw format ("Handshake failed. {1}", gnutls_strerror (ret));
 
 #if GNUTLS_VERSION_NUMBER < 0x02090a
   // The automatic verification for the server certificate with
   // gnutls_certificate_set_verify_function does only work with gnutls
   // >=2.9.10. So with older versions we should call the verify function
   // manually after the gnutls handshake.
-  ret = verify_certificate_callback(_session);
+  ret = verify_certificate();
   if (ret < 0)
   {
     if (_debug)
       std::cout << "c: ERROR Certificate verification failed.\n";
-    throw std::string ("Error initializing TLS.");
+    throw format ("Error Initializing TLS. {1}", gnutls_strerror (ret));
   }
 #endif
 
@@ -295,6 +285,104 @@ void TLSClient::connect (const std::string& host, const std::string& port)
 void TLSClient::bye ()
 {
   gnutls_bye (_session, GNUTLS_SHUT_RDWR);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int TLSClient::verify_certificate () const
+{
+  if (_trust == TLSClient::allow_all)
+    return 0;
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status = 0;
+
+  const char* hostname = _host.c_str();
+#if GNUTLS_VERSION_NUMBER >= 0x030104
+  if (_trust == TLSClient::ignore_hostname)
+    hostname = NULL;
+
+  int ret = gnutls_certificate_verify_peers3 (_session, hostname, &status);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "c: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << "\n";
+    return GNUTLS_E_CERTIFICATE_ERROR;
+  }
+#else
+  int ret = gnutls_certificate_verify_peers2 (_session, &status);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "c: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << "\n";
+    return GNUTLS_E_CERTIFICATE_ERROR;
+  }
+
+  if ((status == 0) && (_trust != TLSClient::ignore_hostname))
+  {
+    if (gnutls_certificate_type_get (_session) == GNUTLS_CRT_X509)
+    {
+      const gnutls_datum* cert_list;
+      unsigned int cert_list_size;
+      gnutls_x509_crt cert;
+
+      cert_list = gnutls_certificate_get_peers (_session, &cert_list_size);
+      if (cert_list_size == 0)
+      {
+        if (_debug)
+          std::cout << "c: ERROR Certificate get peers failed. " << gnutls_strerror (ret) << "\n";
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      ret = gnutls_x509_crt_init (&cert);
+      if (ret < 0)
+      {
+        if (_debug)
+          std::cout << "c: ERROR x509 init failed. " << gnutls_strerror (ret) << "\n";
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      ret = gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER);
+      if (ret < 0)
+      {
+        if (_debug)
+          std::cout << "c: ERROR x509 cert import. " << gnutls_strerror (ret) << "\n";
+        gnutls_x509_crt_deinit(cert);
+        status = GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      if (gnutls_x509_crt_check_hostname (cert, hostname) == 0)
+      {
+        if (_debug)
+          std::cout << "c: ERROR x509 cert check hostname. " << gnutls_strerror (ret) << "\n";
+        gnutls_x509_crt_deinit(cert);
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+    }
+    else
+      return GNUTLS_E_CERTIFICATE_ERROR;
+  }
+#endif
+
+#if GNUTLS_VERSION_NUMBER >= 0x030105
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (_session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "c: ERROR certificate verification status. " << gnutls_strerror (ret) << "\n";
+    return GNUTLS_E_CERTIFICATE_ERROR;
+  }
+
+  gnutls_free (out.data);
+#endif
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -394,7 +482,6 @@ void TLSClient::recv (std::string& data)
       if (_debug)
       std::cout << "c: WARNING " << gnutls_strerror (received) << "\n";
     }
-
     else if (received < 0)
       throw std::string (gnutls_strerror (received));
 
