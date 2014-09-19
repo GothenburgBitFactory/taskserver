@@ -13,7 +13,7 @@ int main (void)
     client.init ("../../pki/ca.cert.pem",
                  "../../pki/client.cert.pem",
                  "../../pki/client.key.pem");
-    client.connect ("127.0.0.1", "5556");
+    client.connect ("localhost", "5556");
 
     client.send ("This is a test.");
 

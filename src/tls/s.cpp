@@ -13,7 +13,7 @@ int main (void)
                  "../../pki/server.crl.pem",  // CRL
                  "../../pki/server.cert.pem", // Cert
                  "../../pki/server.key.pem"); // Key
-    server.bind ("127.0.0.1", "5556");
+    server.bind ("localhost", "5556");
     server.listen ();
 
     for (;;)
