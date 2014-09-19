@@ -358,13 +358,12 @@ void TLSTransaction::init (TLSServer& server)
   gnutls_transport_set_ptr (_session, (gnutls_transport_ptr_t) (intptr_t) _socket);
 #endif
 
-  // Key exchange.
+  // Perform the TLS handshake
   do
   {
     ret = gnutls_handshake (_session);
   }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
-
   if (ret < 0)
     throw std::string ("Handshake has failed (") + gnutls_strerror (ret) + ")";
 
@@ -431,8 +430,65 @@ int TLSTransaction::verify_certificate () const
   unsigned int status = 0;
 #if GNUTLS_VERSION_NUMBER >= 0x030104
   int ret = gnutls_certificate_verify_peers3 (_session, NULL, &status);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "s: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << "\n";
+    return GNUTLS_E_CERTIFICATE_ERROR;
+  }
 #else
   int ret = gnutls_certificate_verify_peers2 (_session, &status);
+  if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "s: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << "\n";
+    return GNUTLS_E_CERTIFICATE_ERROR;
+  }
+
+  if ((status == 0) && (_trust != TLSServer::ignore_hostname))
+  {
+    if (gnutls_certificate_type_get (_session) == GNUTLS_CRT_X509)
+    {
+      const gnutls_datum* cert_list;
+      unsigned int cert_list_size;
+      gnutls_x509_crt cert;
+
+      cert_list = gnutls_certificate_get_peers (_session, &cert_list_size);
+      if (cert_list_size == 0)
+      {
+        if (_debug)
+          std::cout << "s: ERROR Certificate get peers failed. " << gnutls_strerror (ret) << "\n";
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      ret = gnutls_x509_crt_init (&cert);
+      if (ret < 0)
+      {
+        if (_debug)
+          std::cout << "s: ERROR x509 init failed. " << gnutls_strerror (ret) << "\n";
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      ret = gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER);
+      if (ret < 0)
+      {
+        if (_debug)
+          std::cout << "s: ERROR x509 cert import. " << gnutls_strerror (ret) << "\n";
+        gnutls_x509_crt_deinit(cert);
+        status = GNUTLS_E_CERTIFICATE_ERROR;
+      }
+
+      if (gnutls_x509_crt_check_hostname (cert, hostname) == 0)
+      {
+        if (_debug)
+          std::cout << "s: ERROR x509 cert check hostname. " << gnutls_strerror (ret) << "\n";
+        gnutls_x509_crt_deinit(cert);
+        return GNUTLS_E_CERTIFICATE_ERROR;
+      }
+    }
+    else
+      return GNUTLS_E_CERTIFICATE_ERROR;
+  }
 #endif
   if (ret < 0)
     return GNUTLS_E_CERTIFICATE_ERROR;
@@ -442,7 +498,11 @@ int TLSTransaction::verify_certificate () const
   gnutls_datum_t out;
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
   if (ret < 0)
+  {
+    if (_debug)
+      std::cout << "s: ERROR certificate verification status. " << gnutls_strerror (ret) << "\n";
     return GNUTLS_E_CERTIFICATE_ERROR;
+  }
 
   gnutls_free (out.data);
 #endif
