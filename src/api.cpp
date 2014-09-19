@@ -326,10 +326,10 @@ bool taskd_sendMessage (
   {
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
-/*
-    client.limit (1024 * 1024);
-*/
-    client.trust (config.getBoolean ("server.trust"));
+    std::string trust_level = config.get ("server.trust");
+    client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
+                  trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
+                                                     TLSClient::strict);
     client.init (config.get ("ca.cert"), config.get ("client.cert"), config.get ("client.key"));
     client.connect (server, port);
 
@@ -373,7 +373,10 @@ bool taskd_sendMessage (
 /*
     client.limit (1024 * 1024);
 */
-    client.trust (config.getBoolean ("server.trust"));
+    std::string trust_level = config.get ("server.trust");
+    client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
+                  trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
+                                                     TLSClient::strict);
     client.init (config.get ("ca.cert"), config.get ("client.cert"), config.get ("client.key"));
     client.connect (server, port);
 
