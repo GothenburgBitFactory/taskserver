@@ -209,7 +209,7 @@ void TLSServer::init (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSServer::bind (const std::string& port)
+void TLSServer::bind (const std::string& host, const std::string& port)
 {
   // use IPv4 or IPv6, does not matter.
   struct addrinfo hints = {0};
@@ -218,13 +218,38 @@ void TLSServer::bind (const std::string& port)
   hints.ai_flags    = AI_PASSIVE; // use my IP
 
   struct addrinfo* res;
-  if (::getaddrinfo (NULL, port.c_str (), &hints, &res) != 0)
+  if (::getaddrinfo (host.c_str (), port.c_str (), &hints, &res) != 0)
     throw std::string (::gai_strerror (errno));
+
+  for (struct addrinfo* p = res; p != NULL; p = p->ai_next)
+  {
+    // IPv4
+    void *addr;
+    int ipver;
+    if (p->ai_family == AF_INET)
+    {
+      struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+      addr = &(ipv4->sin_addr);
+      ipver = 4;
+    }
+    // IPv6
+    else
+    {
+      struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+      addr = &(ipv6->sin6_addr);
+      ipver = 6;
+    }
+
+    // Convert the IP to a string and print it:
+    char ipstr[INET6_ADDRSTRLEN];
+    inet_ntop (p->ai_family, addr, ipstr, sizeof ipstr);
+    std::cout << "s: INFO IPv" << ipver << ": " << ipstr << "\n";
+  }
 
   if ((_socket = ::socket (res->ai_family,
                            res->ai_socktype,
                            res->ai_protocol)) == -1)
-    throw std::string ("Can not bind to port ") + port;
+    throw std::string ("Can not bind to  ") + host + port;
 
   // When a socket is closed, it remains unavailable for a while (netstat -an).
   // Setting SO_REUSEADDR allows this program to assume control of a closed, but
@@ -238,7 +263,14 @@ void TLSServer::bind (const std::string& port)
     throw std::string (::strerror (errno));
 
   if (::bind (_socket, res->ai_addr, res->ai_addrlen) == -1)
+  {
+    // TODO This is research to determine whether this is the right location to
+    //      inject a helpful log message, such as
+    //
+    //      "Check to see if the server is already running."
+    std::cout << "### bind failed\n";
     throw std::string (::strerror (errno));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
