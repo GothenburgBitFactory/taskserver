@@ -1,6 +1,9 @@
-# Uncomment these variables below to override automatic discovery.
-#DNSNAMES="example.com example.net"
-#IPADDRS="10.11.12.13 10.20.30.40"
+# Commenting out the DNSNAMES and IPADDRS lines forces the script to perform
+# automatic discovery. Either way, the values here (or discovered) will need
+# to match the actual server configuration, for example, the server must serve
+# from "localhost", and the client must connect to "localhost".
+DNSNAMES="localhost"
+IPADDRS="127.0.0.1"
 
 BITS=4096
 EXPIRATION_DAYS=365
