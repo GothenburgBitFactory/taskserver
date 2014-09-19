@@ -385,10 +385,10 @@ void TLSTransaction::init (TLSServer& server)
   {
 #if GNUTLS_VERSION_NUMBER >= 0x03010a
     char* desc = gnutls_session_get_desc (_session);
-    std::cout << "c: INFO Handshake was completed: " << desc << "\n";
+    std::cout << "s: INFO Handshake was completed: " << desc << "\n";
     gnutls_free (desc);
 #else
-    std::cout << "c: INFO Handshake was completed.\n";
+    std::cout << "s: INFO Handshake was completed.\n";
 #endif
   }
 }
