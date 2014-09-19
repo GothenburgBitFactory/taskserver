@@ -47,8 +47,6 @@
 
 #define MAX_BUF 16384
 
-static int verify_certificate_callback (gnutls_session_t);
-
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -258,7 +256,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   // gnutls_certificate_set_verify_function does only work with gnutls
   // >=2.9.10. So with older versions we should call the verify function
   // manually after the gnutls handshake.
-  ret = verify_certificate();
+  ret = verify_certificate ();
   if (ret < 0)
   {
     if (_debug)
