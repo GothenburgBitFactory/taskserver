@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2014, Göteborg Bit Factory.
+// Copyright 2006 - 2014, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,6 @@ public:
   void bind (const std::string&, const std::string&);
   void listen ();
   void accept (TLSTransaction&);
-  int verify_certificate() const;
 
   friend class TLSTransaction;
 
