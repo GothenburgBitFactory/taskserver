@@ -177,7 +177,7 @@ void TLSClient::init (
     if (_debug && ret == GNUTLS_E_INVALID_REQUEST)
       std::cout << "c: ERROR Priority error at: " << err << "\n";
 
-    throw format ("Error initializingTLS. {1}", gnutls_strerror (ret));
+    throw format ("Error initializing TLS. {1}", gnutls_strerror (ret));
   }
 
   // Apply the x509 credentials to the current session.
