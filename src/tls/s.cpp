@@ -21,6 +21,7 @@ int main (void)
       try
       {
         TLSTransaction tx;
+        tx.trust (server.trust ());
         server.accept (tx);
 
         std::string request;

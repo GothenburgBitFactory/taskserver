@@ -42,6 +42,7 @@ public:
   ~TLSServer ();
   void queue (int);
   void debug (int);
+  enum trust_level trust () const;
   void trust (const enum trust_level);
   void ciphers (const std::string&);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
@@ -74,18 +75,20 @@ public:
   void init (TLSServer&);
   void bye ();
   void debug ();
+  void trust (const enum TLSServer::trust_level);
   void limit (int);
   void send (const std::string&);
   void recv (std::string&);
   void getClient (std::string&, int&);
 
 private:
-  int              _socket;
-  gnutls_session_t _session;
-  int              _limit;
-  bool             _debug;
-  std::string      _address;
-  int              _port;
+  int                         _socket;
+  gnutls_session_t            _session;
+  int                         _limit;
+  bool                        _debug;
+  std::string                 _address;
+  int                         _port;
+  enum TLSServer::trust_level _trust;
 };
 
 #endif

@@ -92,13 +92,15 @@ static int verify_certificate_callback (gnutls_session_t session)
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
-: _crl ("")
+: _ca ("")
+, _crl ("")
 , _cert ("")
 , _key ("")
 , _ciphers ("")
 , _socket (0)
 , _queue (5)
 , _debug (false)
+, _trust (TLSServer::strict)
 {
 }
 
@@ -132,6 +134,12 @@ void TLSServer::debug (int level)
 
   gnutls_global_set_log_function (gnutls_log_function);
   gnutls_global_set_log_level (level);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+enum TLSServer::trust_level TLSServer::trust () const
+{
+  return _trust;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,6 +313,7 @@ TLSTransaction::TLSTransaction ()
 , _debug (false)
 , _address ("")
 , _port (0)
+, _trust (TLSServer::strict)
 {
 }
 
