@@ -49,8 +49,6 @@
 
 static int verify_certificate_callback (gnutls_session_t);
 
-static bool trust_override = false;
-
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -63,42 +61,6 @@ static int verify_certificate_callback (gnutls_session_t session)
   const TLSServer* server = (TLSServer*) gnutls_session_get_ptr (session);
   return server->verify_certificate ();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/*
-static int verify_certificate_callback (gnutls_session_t session)
-{
-  if (trust_override)
-    return 0;
-
-  // This verification function uses the trusted CAs in the credentials
-  // structure. So you must have installed one or more CA certificates.
-  unsigned int status = 0;
-#if GNUTLS_VERSION_NUMBER >= 0x030104
-  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
-#else
-  int ret = gnutls_certificate_verify_peers2 (session, &status);
-#endif
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-#if GNUTLS_VERSION_NUMBER >= 0x030105
-  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
-  gnutls_datum_t out;
-  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  gnutls_free (out.data);
-#endif
-
-  if (status != 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  // Continue handshake.
-  return 0;
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
@@ -423,6 +385,42 @@ void TLSTransaction::limit (int max)
 {
   _limit = max;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/*
+static int verify_certificate_callback (gnutls_session_t session)
+{
+  if (trust_override)
+    return 0;
+
+  // This verification function uses the trusted CAs in the credentials
+  // structure. So you must have installed one or more CA certificates.
+  unsigned int status = 0;
+#if GNUTLS_VERSION_NUMBER >= 0x030104
+  int ret = gnutls_certificate_verify_peers3 (session, NULL, &status);
+#else
+  int ret = gnutls_certificate_verify_peers2 (session, &status);
+#endif
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+#if GNUTLS_VERSION_NUMBER >= 0x030105
+  gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
+  gnutls_datum_t out;
+  ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
+  if (ret < 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  gnutls_free (out.data);
+#endif
+
+  if (status != 0)
+    return GNUTLS_E_CERTIFICATE_ERROR;
+
+  // Continue handshake.
+  return 0;
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 int TLSServer::verify_certificate () const
