@@ -9,10 +9,10 @@ then
 fi
 
 DNSNAMES="`hostname`"
-IPADDRS=$(for ip in `ifconfig -a | awk '/inet/ {print $2}' | egrep -v '(^::1$|^fe80:|^127\.)'` ; do
+IPADDRS=$(for ip in $(ifconfig -a | awk '/inet/ {print $2}' | egrep -v '(^::1$|^fe80:|^127\.)') ; do
   if [ -n "$ip" ]
   then
-    echo -n "$ip "
+    echo "$ip "
   fi
 done)
 
