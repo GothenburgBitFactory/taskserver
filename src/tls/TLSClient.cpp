@@ -116,11 +116,11 @@ void TLSClient::trust (const enum trust_level value)
   if (_debug)
   {
     if (_trust == allow_all)
-      std::cout << "c: INFO Server certificate trusted automatically.\n";
+      std::cout << "c: INFO Server certificate will be trusted automatically.\n";
     else if (_trust == ignore_hostname)
-      std::cout << "c: INFO Server certificate trust verified but hostname ignored.\n";
+      std::cout << "c: INFO Server certificate will be verified but hostname ignored.\n";
     else
-      std::cout << "c: INFO Server certificate trust verified.\n";
+      std::cout << "c: INFO Server certificate will be verified.\n";
   }
 }
 
