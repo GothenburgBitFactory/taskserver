@@ -223,8 +223,11 @@ void Server::beginServer ()
       if (_log) _log->format ("Using ciphers: %s", ciphers.c_str ());
     }
 
-    // TODO Make this dynamic from configuration..
-    server.trust (TLSServer::strict);
+    std::string trust = _config->get ("trust");
+    if (trust == "allow all")
+      server.trust (TLSServer::allow_all);
+    else
+      server.trust (TLSServer::strict);
   }
 
   server.init (_ca_file,        // CA
