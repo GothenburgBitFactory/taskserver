@@ -181,7 +181,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
   std::string root = config._config->get ("root");
   if (root == "")
   {
-    std::cout << "\nBy specifiying the '--data' location, more diagnostics can be generated.\n";
+    std::cout << "\nBy specifying the '--data' location, more diagnostics can be generated.\n";
   }
   else
   {
