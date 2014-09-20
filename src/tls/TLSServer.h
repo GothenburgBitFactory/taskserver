@@ -36,7 +36,7 @@ class TLSTransaction;
 class TLSServer
 {
 public:
-  enum trust_level { strict, ignore_hostname, allow_all };
+  enum trust_level { strict, allow_all };
 
   TLSServer ();
   ~TLSServer ();

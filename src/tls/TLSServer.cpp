@@ -121,8 +121,6 @@ void TLSServer::trust (const enum trust_level value)
   {
     if (_trust == allow_all)
       std::cout << "s: INFO Client certificate will be trusted automatically.\n";
-    else if (_trust == ignore_hostname)
-      std::cout << "s: INFO Client certificate will be verified but hostname ignored.\n";
     else
       std::cout << "s: INFO Client certificate will be verified.\n";
   }
@@ -445,7 +443,7 @@ int TLSTransaction::verify_certificate () const
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 
-  if ((status == 0) && (_trust != TLSServer::ignore_hostname))
+  if (status == 0)
   {
     if (gnutls_certificate_type_get (_session) == GNUTLS_CRT_X509)
     {
