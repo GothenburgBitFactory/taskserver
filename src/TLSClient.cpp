@@ -49,8 +49,6 @@
 
 #define MAX_BUF 16384
 
-static int verify_certificate_callback (gnutls_session_t);
-
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -118,11 +116,11 @@ void TLSClient::trust (const enum trust_level value)
   if (_debug)
   {
     if (_trust == allow_all)
-      std::cout << "c: INFO Server certificate trusted automatically.\n";
+      std::cout << "c: INFO Server certificate will be trusted automatically.\n";
     else if (_trust == ignore_hostname)
-      std::cout << "c: INFO Server certificate trust verified but hostname ignored.\n";
+      std::cout << "c: INFO Server certificate will be verified but hostname ignored.\n";
     else
-      std::cout << "c: INFO Server certificate trust verified.\n";
+      std::cout << "c: INFO Server certificate will be verified.\n";
   }
 }
 
@@ -181,7 +179,7 @@ void TLSClient::init (
     if (_debug && ret == GNUTLS_E_INVALID_REQUEST)
       std::cout << "c: ERROR Priority error at: " << err << "\n";
 
-    throw format ("Error initializingTLS. {1}", gnutls_strerror (ret));
+    throw format ("Error initializing TLS. {1}", gnutls_strerror (ret));
   }
 
   // Apply the x509 credentials to the current session.
@@ -260,7 +258,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   // gnutls_certificate_set_verify_function does only work with gnutls
   // >=2.9.10. So with older versions we should call the verify function
   // manually after the gnutls handshake.
-  ret = verify_certificate();
+  ret = verify_certificate ();
   if (ret < 0)
   {
     if (_debug)
