@@ -222,6 +222,9 @@ void Server::beginServer ()
       server.ciphers (ciphers);
       if (_log) _log->format ("Using ciphers: %s", ciphers.c_str ());
     }
+
+    // TODO Make this dynamic from configuration..
+    server.trust (TLSServer::strict);
   }
 
   server.init (_ca_file,        // CA
@@ -240,6 +243,7 @@ void Server::beginServer ()
     try
     {
       TLSTransaction tx;
+      tx.trust (server.trust ());
       server.accept (tx);
 
       // Get client address and port, for logging.
