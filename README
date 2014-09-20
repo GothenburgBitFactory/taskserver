@@ -7,6 +7,8 @@ others, coming soon) can share tasks.
 Taskserver is a complex daemon process.  It is not for anyone who is unfamiliar
 with the operation of daemons.
 
+Taskserver is compatible with Taskwarrior version 2.3.0 and later.
+
 
 Demonstration
 -------------

@@ -8,6 +8,7 @@ New Features in Taskserver 1.1.0
   - Systemd script: taskd.service.
   - Improved pki scripts.
   - Can log to STDOUT.
+  - Configurable client certificate verification.
 
   Please refer to the ChangeLog file for full details.  There are too many to
   list here.
@@ -15,6 +16,8 @@ New Features in Taskserver 1.1.0
 New configuration options in Taskserver 1.1.0
 
   - Server CRL is now optional.
+  - New 'trust' setting can be either 'strict' or 'allow all', and defaults to
+    'strict'.
 
 Removed features in 1.1.0
 
@@ -24,7 +27,7 @@ Removed features in 1.1.0
 
 Taskserver has been built and tested on the following configurations:
 
-  * OS X 10.9 Mavericks and 10.8 Mountain Lion
+  * OS X 10.10 Yosemite and 10.9 Mavericks
   * Ubuntu 10.04 Lucid Lynx, 13.04 Raring Ringtail and 13.10 Saucy Salamander
   * Fedora 19 Schrodinger's Cat
   * Debian 7.0 Wheezy (stable) and 6.0 Squeeze (oldstable)
@@ -38,11 +41,7 @@ Taskserver has been built and tested on the following configurations:
 While Taskserver has undergone testing, bugs are sure to remain.  If you
 encounter a bug, please enter a new issue at:
 
-  http://taskwarrior.org/projects/taskwarrior/issues/new
-
-Or you can also report the issue in the forums at:
-
-  http://taskwarrior.org/projects/taskwarrior/boards
+  https://bug.tasktools.org
 
 Or just send a message to:
 

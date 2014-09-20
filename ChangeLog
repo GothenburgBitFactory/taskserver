@@ -48,6 +48,8 @@
 - Can log to STDOUT when configuration setting 'log' is set to '-'.
 - Removed support for client.allow/client.deny settings.
 - Corrected pki scripts use of '--bits' option (thanks to Pierre Calligaro).
+- Server now supports a configuration setting 'trust', which can be either
+  'strict' or 'allow all', and defaults to 'strict'.
 
 ------ old releases ------------------------------
 
