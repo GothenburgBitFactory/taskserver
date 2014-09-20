@@ -43,6 +43,7 @@
 #endif
 #include <sys/types.h>
 #include <netdb.h>
+#include <gnutls/x509.h>
 #include <text.h>
 
 #define DH_BITS 1024
