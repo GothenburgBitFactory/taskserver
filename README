@@ -24,12 +24,9 @@ are not intended for production use.
 Documentation
 -------------
 
-You will find documents in the doc directory, but specifically you will find the
-operation guide:
+The documentation has been moved online, so we can continually improve it:
 
-  doc/operation.txt
-
-This document guides you through installation and setup.
+  http://taskwarrior.org/docs/
 
 In addition there are two man pages installed:
 
