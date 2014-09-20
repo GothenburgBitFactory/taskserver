@@ -478,14 +478,6 @@ int TLSTransaction::verify_certificate () const
         gnutls_x509_crt_deinit(cert);
         status = GNUTLS_E_CERTIFICATE_ERROR;
       }
-
-      if (gnutls_x509_crt_check_hostname (cert, hostname) == 0)
-      {
-        if (_debug)
-          std::cout << "s: ERROR x509 cert check hostname. " << gnutls_strerror (ret) << "\n";
-        gnutls_x509_crt_deinit(cert);
-        return GNUTLS_E_CERTIFICATE_ERROR;
-      }
     }
     else
       return GNUTLS_E_CERTIFICATE_ERROR;
