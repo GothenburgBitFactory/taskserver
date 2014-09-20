@@ -36,11 +36,14 @@ class TLSTransaction;
 class TLSServer
 {
 public:
+  enum trust_level { strict, allow_all };
+
   TLSServer ();
   ~TLSServer ();
   void queue (int);
   void debug (int);
-  void trust (bool);
+  enum trust_level trust () const;
+  void trust (const enum trust_level);
   void ciphers (const std::string&);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&, const std::string&);
@@ -61,6 +64,7 @@ private:
   int                              _socket;
   int                              _queue;
   bool                             _debug;
+  enum trust_level                 _trust;
 };
 
 class TLSTransaction
@@ -71,7 +75,9 @@ public:
   void init (TLSServer&);
   void bye ();
   void debug ();
+  void trust (const enum TLSServer::trust_level);
   void limit (int);
+  int verify_certificate () const;
   void send (const std::string&);
   void recv (std::string&);
   void getClient (std::string&, int&);
@@ -83,6 +89,7 @@ private:
   bool             _debug;
   std::string      _address;
   int              _port;
+  enum TLSServer::trust_level _trust;
 };
 
 #endif
