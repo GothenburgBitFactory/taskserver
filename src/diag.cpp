@@ -239,6 +239,12 @@ void command_diag (Database& config, const std::vector <std::string>& args)
         std::cout << "      Server: " << config._config->get ("server") << "\n";
         std::cout << " Max Request: " << config._config->get ("request.limit") << " bytes\n";
         std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";
+
+        // Show trust level.
+        if (config._config->get ("trust") == "allow all")
+          std::cout << "       Trust: allow all\n";
+        else
+          std::cout << "       Trust: strict\n";
       }
     }
   }
