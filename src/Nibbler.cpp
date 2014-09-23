@@ -40,7 +40,7 @@
 #include <util.h>
 
 static const char*        _uuid_pattern    = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
-static const unsigned int _uuid_min_length = 14;
+static const unsigned int _uuid_min_length = 8;
 
 ////////////////////////////////////////////////////////////////////////////////
 Nibbler::Nibbler ()
@@ -330,6 +330,26 @@ bool Nibbler::getDigit4 (int& result)
     {
       result = strtoimax (_input.substr (_cursor, 4).c_str (), NULL, 10);
       _cursor += 4;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Nibbler::getDigit3 (int& result)
+{
+  std::string::size_type i = _cursor;
+  if (i < _length &&
+      _length - i >= 3)
+  {
+    if (isdigit (_input[i + 0]) &&
+        isdigit (_input[i + 1]) &&
+        isdigit (_input[i + 2]))
+    {
+      result = strtoimax (_input.substr (_cursor, 3).c_str (), NULL, 10);
+      _cursor += 3;
       return true;
     }
   }
@@ -1016,7 +1036,7 @@ bool Nibbler::getName (std::string& result)
     {
       ++i;
       while (i < _length &&
-             ! ispunct (_input[i]) &&
+             (_input[i] == '_' || ! ispunct (_input[i])) &&
              ! isspace (_input[i]))
       {
         ++i;
@@ -1140,6 +1160,18 @@ bool Nibbler::skipRx (const std::string& regex)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+bool Nibbler::backN (const int quantity /*= 1*/)
+{
+  if (_cursor >= (unsigned) quantity)
+  {
+    _cursor -= (unsigned) quantity;
+    return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Nibbler::getRemainder (std::string& result)
 {
   if (_cursor < _length)
@@ -1223,7 +1255,7 @@ bool Nibbler::depleted ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Override of ispunct, that considers #, $ and @ not to be punctuation.
+// Override of ispunct, that considers #, $, _ and @ not to be punctuation.
 //
 // ispunct:      ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
 // Punctuation:  ! "     % & ' ( ) * + , - . / : ; < = > ?   [ \ ] ^ _ ` { | } ~
@@ -1231,7 +1263,7 @@ bool Nibbler::depleted ()
 //
 bool Nibbler::isPunctuation (char c)
 {
-  if (c == '@' || c == '#' || c == '$')
+  if (c == '@' || c == '#' || c == '$' || c == '_')
     return false;
 
   return ispunct (c);

@@ -65,6 +65,7 @@ public:
   bool getDigit (int&);
   bool getDigit6 (int&);
   bool getDigit4 (int&);
+  bool getDigit3 (int&);
   bool getDigit2 (int&);
   bool getInt (int&);
   bool getHex (int&);
@@ -95,6 +96,8 @@ public:
 #ifdef NIBBLER_FEATURE_REGEX
   bool skipRx (const std::string&);
 #endif
+
+  bool backN (const int quantity = 1);
 
   void getRemainder (std::string&);
 

@@ -39,6 +39,7 @@ unsigned int utf8_width (const std::string& str);
 unsigned int utf8_text_width (const std::string&);
 const std::string utf8_substr (const std::string&, unsigned int, unsigned int length = 0);
 
+int mk_wcwidth (wchar_t);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////

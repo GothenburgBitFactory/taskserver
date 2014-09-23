@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <stdlib.h>
 #include <Nibbler.h>
 #ifdef NIBBLER_FEATURE_DATE
 #include <Date.h>
@@ -36,15 +37,15 @@ int main (int argc, char** argv)
 {
 #ifdef NIBBLER_FEATURE_DATE
 #ifdef NIBBLER_FEATURE_REGEX
-  UnitTest t (402);
+  UnitTest t (417);
 #else
-  UnitTest t (378);
+  UnitTest t (387);
 #endif
 #else
 #ifdef NIBBLER_FEATURE_REGEX
-  UnitTest t (338);
+  UnitTest t (353);
 #else
-  UnitTest t (314);
+  UnitTest t (329);
 #endif
 #endif
 
@@ -71,6 +72,7 @@ int main (int argc, char** argv)
     t.notok (n.skip ('x'),               "trivial: skip");
     t.notok (n.skipAll ('x'),            "trivial: skipAll");
     t.notok (n.skipAllOneOf ("abc"),     "trivial: skipAllOneOf");
+    t.notok (n.backN (1),                "trivial: backN");
     t.notok (n.getQuoted ('"', s),       "trivial: getQuoted");
     t.notok (n.getDigit (i),             "trivial: getDigit");
     t.notok (n.getInt (i),               "trivial: getInt"); // 10
@@ -198,6 +200,15 @@ int main (int argc, char** argv)
     t.ok    (n.skipRx ("...."),       "    ' two' :         skipRx ('....') -> true");
     t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
 #endif
+
+    // bool backN (const int quantity = 1);
+    t.diag ("Nibbler::backN");
+    n = Nibbler ("/a/b/");
+    t.ok (n.getQuoted ('/', s),       "   '/a/b/' :         getQuoted ('/') -> true");
+    t.is (s, "a",                     "      'b/' :         getQuoted ('/') -> 'a'");
+    t.ok (n.backN (),                 "      'b/' :         backN ()        -> true");
+    t.ok (n.getQuoted ('/', s),       "     '/b/' :         getQuoted ('/') -> true");
+    t.is (s, "b",                     "     '/b/' :         getQuoted ('/') -> 'b'");
 
     // bool getQuoted (char, std::string&);
     t.diag ("Nibbler::getQuoted");
@@ -480,28 +491,34 @@ int main (int argc, char** argv)
     t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3-e4f5");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [13] not found");
-    t.notok (n.depleted (),                          "depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [13] found");
+    t.is (s, "a0b1c2d3-e4f5",                        "partial uuid [13] -> correct");
+    t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3-e4f");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [12] not found");
-    t.notok (n.depleted (),                          "depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [12] found");
+    t.is (s, "a0b1c2d3-e4f",                         "partial uuid [12] -> correct");
+    t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3-e4");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [11] not found");
-    t.notok (n.depleted (),                          "depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [11] found");
+    t.is (s, "a0b1c2d3-e4",                          "partial uuid [11] -> correct");
+    t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3-e");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [10] not found");
-    t.notok (n.depleted (),                          "depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [10] found");
+    t.is (s, "a0b1c2d3-e",                           "partial uuid [10] -> correct");
+    t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3-");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [9] not found");
-    t.notok (n.depleted (),                          "depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [9] found");
+    t.is (s, "a0b1c2d3-",                            "partial uuid [9] -> correct");
+    t.ok (n.depleted (),                             "depleted");
 
     n = Nibbler ("a0b1c2d3");
-    t.notok (n.getPartialUUID (s),                   "partial uuid [8] not found");
-    t.notok (n.depleted (),                          "not depleted");
+    t.ok (n.getPartialUUID (s),                      "partial uuid [8] found");
+    t.is (s, "a0b1c2d3",                             "partial uuid [8] -> correct");
+    t.ok (n.depleted (),                             "not depleted");
 
     // bool getDateISO (time_t&);
     t.diag ("Nibbler::getDateISO");
@@ -635,25 +652,29 @@ int main (int argc, char** argv)
 
     // bool getName (std::string&);
     t.diag ("Nibbler::getName");
-    n = Nibbler ("a1 one one.two 9");
-    t.ok    (n.getName (s),       "'a1 one one.two 9' getName -> ok");
-    t.is    (s, "a1",             "  ' one one.two 9' getName -> 'a1'");
-    t.ok    (n.skipWS (),         "   'one one.two 9' skipWS  -> ok");
+    n = Nibbler ("a1 one one.two 9 foo_bar");
+    t.ok    (n.getName (s),       "'a1 one one.two 9 foo_bar' getName -> ok");
+    t.is    (s, "a1",             "  ' one one.two 9 foo_bar' getName -> 'a1'");
+    t.ok    (n.skipWS (),         "   'one one.two 9 foo_bar' skipWS  -> ok");
 
-    t.ok    (n.getName (s),       "   'one one.two 9' getName -> ok");
-    t.is    (s, "one",            "      ' one.two 9' getName -> 'one'");
-    t.ok    (n.skipWS (),         "       'one.two 9' skipWS  -> ok");
+    t.ok    (n.getName (s),       "   'one one.two 9 foo_bar' getName -> ok");
+    t.is    (s, "one",            "      ' one.two 9 foo_bar' getName -> 'one'");
+    t.ok    (n.skipWS (),         "       'one.two 9 foo_bar' skipWS  -> ok");
 
-    t.ok    (n.getName (s),       "       'one.two 9' getName -> ok");
-    t.is    (s, "one",            "          '.two 9' getName -> 'one'");
-    t.ok    (n.skip ('.'),        "           'two 9' skip .  -> ok");
+    t.ok    (n.getName (s),       "       'one.two 9 foo_bar' getName -> ok");
+    t.is    (s, "one",            "          '.two 9 foo_bar' getName -> 'one'");
+    t.ok    (n.skip ('.'),        "           'two 9 foo_bar' skip .  -> ok");
 
-    t.ok    (n.getName (s),       "           'two 9' getName -> ok");
-    t.is    (s, "two",            "              ' 9' getName -> 'two'");
-    t.ok    (n.skipWS (),         "               '9' skipWS  -> ok");
+    t.ok    (n.getName (s),       "           'two 9 foo_bar' getName -> ok");
+    t.is    (s, "two",            "              ' 9 foo_bar' getName -> 'two'");
+    t.ok    (n.skipWS (),         "               '9 foo_bar' skipWS  -> ok");
 
-    t.notok (n.getName (s),       "               '9' getName -> not ok");
-    t.ok    (n.skip ('9'),        "                '' skip 9  -> ok");
+    t.notok (n.getName (s),       "               '9 foo_bar' getName -> not ok");
+    t.ok    (n.skip ('9'),        "                ' foo_bar' skip 9  -> ok");
+    t.ok    (n.skipWS (),         "                 'foo_bar' skipWS  -> ok");
+
+    t.ok    (n.getName (s),       "                 'foo_bar' getName -> ok");
+    t.is    (s, "foo_bar",        "                        '' getName -> 'foo_bar'");
     t.ok    (n.depleted (),       "depleted");
 
     n = Nibbler ("entrée");

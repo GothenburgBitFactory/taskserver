@@ -29,8 +29,6 @@
 #include <string.h>
 #include <RX.h>
 
-//#define _POSIX_C_SOURCE 1      // Forgot why this is here.  Moving on...
-
 ////////////////////////////////////////////////////////////////////////////////
 RX::RX ()
 : _compiled (false)
@@ -99,7 +97,7 @@ void RX::compile ()
     {
       char message[256];
       regerror (result, &_regex, message, 256);
-      throw "ERROR: " + std::string (message);
+      throw std::string (message);
     }
 
     _compiled = true;

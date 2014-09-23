@@ -161,7 +161,7 @@ bool Path::is_directory () const
 {
   struct stat s = {0};
   if (! stat (_data.c_str (), &s) &&
-      s.st_mode & S_IFDIR)
+      S_ISDIR (s.st_mode))
     return true;
 
   return false;
@@ -171,6 +171,17 @@ bool Path::is_directory () const
 bool Path::is_absolute () const
 {
   if (_data.length () && _data[0] == '/')
+    return true;
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Path::is_link () const
+{
+  struct stat s = {0};
+  if (! lstat (_data.c_str (), &s) &&
+      S_ISLNK (s.st_mode))
     return true;
 
   return false;
