@@ -241,10 +241,12 @@ void command_diag (Database& config, const std::vector <std::string>& args)
         std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";
 
         // Show trust level.
-        if (config._config->get ("trust") == "allow all")
-          std::cout << "       Trust: allow all\n";
+        std::string trust_value = config._config->get ("trust");
+        if (trust_value == "strict" ||
+            trust_value == "allow all")
+          std::cout << "       Trust: " << trust_value << "\n";
         else
-          std::cout << "       Trust: strict\n";
+          std::cout << "       Trust: Bad value - see 'man taskdrc'\n";
       }
     }
   }

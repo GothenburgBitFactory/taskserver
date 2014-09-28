@@ -226,8 +226,10 @@ void Server::beginServer ()
     std::string trust = _config->get ("trust");
     if (trust == "allow all")
       server.trust (TLSServer::allow_all);
-    else
+    else if (trust == "strict")
       server.trust (TLSServer::strict);
+    else if (_log)
+      _log->format ("Invalid 'trust' setting value of '%s'", trust.c_str ());
   }
 
   server.init (_ca_file,        // CA

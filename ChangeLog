@@ -50,6 +50,8 @@
 - Corrected pki scripts use of '--bits' option (thanks to Pierre Calligaro).
 - Server now supports a configuration setting 'trust', which can be either
   'strict' or 'allow all', and defaults to 'strict'.
+- If the 'trust' setting contains a bad value, the 'diag' command will
+  indicate this, and the server will log it.
 
 ------ old releases ------------------------------
 
