@@ -76,6 +76,8 @@ echo "# taskd config --force --data $ROOT server localhost:53589"
 ../../src/taskd config --force --data $ROOT server localhost:53589
 echo "# taskd config --force --data $ROOT ip.log 1"
 ../../src/taskd config --force --data $ROOT ip.log 1
+echo "# taskd config --force --data $ROOT trust strict"
+../../src/taskd config --force --data $ROOT trust strict
 
 echo
 ${TREE} $ROOT
