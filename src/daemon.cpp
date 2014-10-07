@@ -350,6 +350,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     Task task (*client_task);
     std::string uuid = task.get ("uuid");
     task.validate ();
+    task.upgradeLegacyValues ();
 
     // If task is in subset
     if (contains (server_subset, uuid))
