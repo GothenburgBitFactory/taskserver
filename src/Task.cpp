@@ -164,10 +164,10 @@ Task::status Task::textToStatus (const std::string& input)
 std::string Task::statusToText (Task::status s)
 {
        if (s == Task::pending)   return "pending";
-  else if (s == Task::completed) return "completed";
-  else if (s == Task::deleted)   return "deleted";
   else if (s == Task::recurring) return "recurring";
   else if (s == Task::waiting)   return "waiting";
+  else if (s == Task::completed) return "completed";
+  else if (s == Task::deleted)   return "deleted";
 
   return "pending";
 }
