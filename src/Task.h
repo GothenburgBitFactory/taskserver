@@ -148,6 +148,8 @@ public:
   float urgency_c () const;
   float urgency ();
 
+  void upgradeLegacyValues ();
+
 private:
   int determineVersion (const std::string&);
   void parseJSON (const std::string&);
