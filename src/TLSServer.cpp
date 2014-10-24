@@ -204,8 +204,9 @@ void TLSServer::bind (const std::string& host, const std::string& port)
   hints.ai_flags    = AI_PASSIVE; // use my IP
 
   struct addrinfo* res;
-  if (::getaddrinfo (host.c_str (), port.c_str (), &hints, &res) != 0)
-    throw std::string (::gai_strerror (errno));
+  int ret = ::getaddrinfo (host.c_str (), port.c_str (), &hints, &res);
+  if (ret != 0)
+    throw std::string (::gai_strerror (ret));
 
   for (struct addrinfo* p = res; p != NULL; p = p->ai_next)
   {
