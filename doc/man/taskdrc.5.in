@@ -80,7 +80,7 @@ Fully qualified path to the server certificate revocation list.
 Fully qualified path to the server key.
 
 .TP
-.b trust
+.B trust
 Trust level of the server, which determines how the client certificates are
 verified.  If the value is 'allow all' then no verification is performed.
 Defaults to 'strict'.
