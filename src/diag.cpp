@@ -38,6 +38,7 @@
 #include <File.h>
 #include <Directory.h>
 #include <JSON.h>
+#include <text.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>
@@ -126,6 +127,21 @@ void command_diag (Database& config, const std::vector <std::string>& args)
             << " +l"      << 8 * sizeof (long)
             << " +vp"     << 8 * sizeof (void*)
             << " +time_t" << 8 * sizeof (time_t)
+            << "\n";
+
+  // Compiler compliance level.
+  std::string compliance = "non-compliant";
+#ifdef __cplusplus
+  int level = __cplusplus;
+  if (level == 199711)
+    compliance = "C++98/03";
+  else if (level == 201103)
+    compliance = "C++11";
+  else
+    compliance = format (level);
+#endif
+  std::cout << "  Compliance: "
+            << compliance
             << "\n\n";
 
   std::cout << bold.colorize ("Build Features")
