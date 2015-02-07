@@ -32,6 +32,8 @@
 - TD-61 README.md has broken links (thanks to Jack).
 - TD-63 Support logging to stdout when running in foreground mode. (thanks to
         Christian Kampka).
+- TD-66 No reason given for sync failure when the cause is client.allow
+        mismatch (thanks to Jack).
 - TD-79 Bad error message for wrong hostname configuration (thanks to Jens
         Erat).
 - 'validate' command will parse/validate a JSON string or file.  Used for
