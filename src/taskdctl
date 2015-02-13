@@ -134,14 +134,24 @@ do
       fi
       ;;
 
+    status)
+      if [ $RUNNING -eq 0 ]; then
+        echo "$0 $ARG: daemon not running"
+        ERROR=1
+      else
+        echo "$0 $ARG: daemon is running"
+      fi
+      ;;
+
     *)
-      echo "usage: $0 (start|stop|restart|graceful|help)"
+      echo "usage: $0 (start|stop|restart|graceful|status|help)"
       cat <<EOF
 
 start         - start daemon
 stop          - stop daemon
 restart       - restart daemon if running by sending a SIGHUP or start if not running
 graceful      - do a graceful restart by sending a SIGUSR1 or start if not running
+status        - reports the status of the server - exits 0 if running 1 otherwise
 help          - this screen
 
 EOF
