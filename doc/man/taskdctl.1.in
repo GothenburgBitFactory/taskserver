@@ -1,0 +1,77 @@
+.TH taskdctl 1 2014-02-22 "${PACKAGE_STRING}" "User Manuals"
+
+.SH NAME
+taskdctl \- Taskserver control program
+
+.SH SYNOPSIS
+.B taskdctl [start|stop|restart|graceful|status]
+
+.SH DESCRIPTION
+The taskdctl program allows you to start and stop Taskserver. The TASKDDATA
+environment variable is used to locate the root data structure, and query the
+configuration to obtain the location of the pid file.
+
+.SH COMMANDS
+Taskdctl supports several commands:
+
+.TP
+.B taskdctl start
+Starts the server as a daemon, if it is not already running.
+It is harmless to run this command if the server is already running.
+
+.TP
+.B taskdctl stop
+Stops the server, if it is running.
+It is harmless to run this command if the server is not running.
+
+.TP
+.B taskdctl restart
+Stops the server, if it is running, then starts the server again.
+This is done by sending SIGHUP signal to the server.
+This will interrupt any current sync sessions, probably causing an error.
+It is harmless to run this command if the server is not running.
+
+.TP
+.B taskdctl graceful
+Stops the server, if it is running, by waiting for the server to go idle, then
+restarts the server again.
+This is done by sending SIGUSR1 signal to the server.
+This will not interrupt any current sync sessions.
+It is harmless to run this command if the server is not running.
+
+.TP
+.B taskdctl status
+Shows the status of the Taskserver, whether it is running or not.
+
+.SH ENVIRONMENT VARIABLES
+Taskdctl requires that the TAKSDDATA environment variable be properly set. This
+is because the root data structure is accessed.
+
+.SH "CREDITS & COPYRIGHTS"
+Copyright (C) 2010 \- 2015, Göteborg Bit Factory.
+
+Taskserver is distributed under the MIT license. See
+http://www.opensource.org/licenses/mit-license.php for more information.
+
+.SH SEE ALSO
+.BR taskd(1), taskdrc(5)
+
+For more information regarding Taskserver, see the following:
+
+.TP
+The official site at
+<http://taskwarrior.org>
+
+.TP
+The official code repository at
+<https://git.tasktools.org/scm/tm/taskd.git>
+
+.TP
+You can contact the project by emailing
+<support@taskwarrior.org>
+
+.SH REPORTING BUGS
+.TP
+Bugs in Taskserver may be reported to the issue-tracker at
+<http://taskwarrior.org
+

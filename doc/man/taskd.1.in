@@ -146,7 +146,7 @@ Taskserver is distributed under the MIT license. See
 http://www.opensource.org/licenses/mit-license.php for more information.
 
 .SH SEE ALSO
-.BR taskdrc(5)
+.BR taskdrc(5), taskdctl(1)
 
 For more information regarding Taskserver, see the following:
 
