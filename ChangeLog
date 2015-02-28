@@ -20,6 +20,7 @@
         to Michele Vetturi).
 - TD-45 Fix preprocessor define (thanks to Jochen Sprickerhof).
         (thanks to Anton Khirnov, Renato Alves).
+- TD-46 gnutls: -54 Error in the pull function.
 - TD-48 Empty username is not an error (thanks to Ben Boeckel).
 - TD-53 Log message when server is ready for action (thanks to Renato Alves).
 - TD-55 TLSServer/Client need to include <errno.h> on Solaris (thanks to
