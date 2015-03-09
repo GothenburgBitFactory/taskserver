@@ -89,7 +89,8 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
-           comment > pos))
+           comment > pos) &&
+          trim (*line, " \t").find (name + "=") == 0)
       {
         found = true;
         if (!confirmation ||
