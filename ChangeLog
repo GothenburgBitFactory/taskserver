@@ -40,6 +40,8 @@
 - TD-79 Bad error message for wrong hostname configuration (thanks to Jens
         Erat).
 - TD-89 No man page for Taskctl (thanks to Jack Laxson).
+- TD-92 »taskd config« only checks the end of the key when changing config
+        entries (thanks to Dominik Heidler).
 - 'validate' command will parse/validate a JSON string or file.  Used for
   debugging Taskserver clients.
 - CRL cert is now optional (thanks to Anton Khirnov).
