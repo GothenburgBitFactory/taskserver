@@ -583,6 +583,12 @@ int Date::month () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+int Date::week () const
+{
+  return Date::weekOfYear (Date::dayOfWeek (weekStart));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 int Date::day () const
 {
   struct tm* t = localtime (&_t);
@@ -671,6 +677,16 @@ bool Date::sameDay (const Date& rhs) const
   if (this->year ()  == rhs.year ()  &&
       this->month () == rhs.month () &&
       this->day ()   == rhs.day ())
+    return true;
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Date::sameWeek (const Date& rhs) const
+{
+  if (this->year ()  == rhs.year () &&
+      this->week () == rhs.week ())
     return true;
 
   return false;
