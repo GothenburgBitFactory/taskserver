@@ -50,6 +50,8 @@
 
 #define MAX_BUF 16384
 
+static int verify_certificate_callback (gnutls_session_t);
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
