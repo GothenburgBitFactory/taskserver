@@ -38,6 +38,7 @@ public:
   Duration (const Duration&);            // Copy constructor
   Duration (time_t);                     // Constructor
   Duration (const std::string&);         // Parse
+  ~Duration ();                          // Destructor
   bool operator< (const Duration&);
   bool operator<= (const Duration&);
   bool operator> (const Duration&);
@@ -47,7 +48,6 @@ public:
   Duration operator+ (const Duration&);
   Duration& operator-= (const Duration&);
   Duration& operator+= (const Duration&);
-  ~Duration ();                          // Destructor
 
   operator time_t () const;
   operator std::string () const;
@@ -56,6 +56,7 @@ public:
   std::string formatCompact () const;
   std::string formatPrecise () const;
   std::string formatSeconds () const;
+  std::string formatISO () const;
 
   bool negative () const;
   static bool valid (const std::string&);

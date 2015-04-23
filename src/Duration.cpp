@@ -143,6 +143,11 @@ Duration::Duration (const std::string& input)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+Duration::~Duration ()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 Duration::operator time_t () const
 {
   return _secs;
@@ -308,6 +313,44 @@ std::string Duration::formatSeconds () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+std::string Duration::formatISO () const
+{
+  if (_secs)
+  {
+    time_t t = _secs;
+    int seconds = t % 60; t /= 60;
+    int minutes = t % 60; t /= 60;
+    int hours   = t % 24; t /= 24;
+    int days    = t % 30; t /= 30;
+    int months  = t % 12; t /= 12;
+    int years   = t;
+
+    std::stringstream s;
+    s << 'P';
+
+    if (_negative) s << "-";
+
+    if (years)  s << years  << 'Y';
+    if (months) s << months << 'M';
+    if (days)   s << days   << 'D';
+
+    if (hours || minutes || seconds)
+    {
+      s << 'T';
+      if (hours)   s << hours   << 'H';
+      if (minutes) s << minutes << 'M';
+      if (seconds) s << seconds << 'S';
+    }
+
+    return s.str ();
+  }
+  else
+  {
+    return "P0S";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Duration::operator< (const Duration& other)
 {
   long left  = (long) (      _negative ?       -_secs :       _secs);
@@ -341,11 +384,6 @@ bool Duration::operator>= (const Duration& other)
   long right = (long) (other._negative ? -other._secs : other._secs);
 
   return left >= right;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Duration::~Duration ()
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
