@@ -31,7 +31,6 @@ add_executable (taskd_executable taskd.cpp
                                  status.cpp
                                  Task.cpp       Task.h
                                  text.cpp       text.h
-                                 Thread.cpp     Thread.h
                                  Timer.cpp      Timer.h
                                  TLSClient.cpp  TLSClient.h
                                  TLSServer.cpp  TLSServer.h
