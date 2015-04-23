@@ -27,14 +27,13 @@ Removed features in 1.1.0
 
 Taskserver has been built and tested on the following configurations:
 
-  * OS X 10.10 Yosemite and 10.9 Mavericks
-  * Ubuntu 10.04 Lucid Lynx, 13.04 Raring Ringtail and 13.10 Saucy Salamander
-  * Fedora 19 Schrodinger's Cat
-  * Debian 7.0 Wheezy (stable) and 6.0 Squeeze (oldstable)
+  * OS X
+  * Fedora
+  * Ubuntu
+  * Debian
+  * Arch
   * FreeBSD
-  * OpenBSD
-  * Arch Linux
-  * Cygwin 1.7
+  * Cygwin
 
 ---
 
