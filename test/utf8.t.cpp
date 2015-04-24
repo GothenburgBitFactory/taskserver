@@ -25,14 +25,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
-#include <iostream>
 #include <utf8.h>
 #include <test.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (17);
+  UnitTest t (33);
 
   std::string ascii_text      = "This is a test";
   std::string utf8_text       = "más sábado miércoles";
@@ -74,6 +73,24 @@ int main (int argc, char** argv)
   t.is (utf8_substr (ascii_text, 0, 2),      "Th", "ASCII utf8_substr");
   t.is (utf8_substr (utf8_text, 0, 2),       "má", "UTF8 utf8_substr");
   t.is (utf8_substr (utf8_wide_text, 0, 2),  "改变", "UTF8 wide utf8_substr");
+
+  // int mk_wcwidth (wchar_t);
+  t.is (mk_wcwidth ('a'),                               1, "mk_wcwidth U+0061 --> 1");
+  t.is (mk_wcwidth (0x5149),                            2, "mk_wcwidth U+5149 --> 2");
+  t.is (mk_wcwidth (0x9a8c),                            2, "mk_wcwidth U+9a8c --> 2");
+  t.is (mk_wcwidth (0x4e70),                            2, "mk_wcwidth U+4e70 --> 2");
+  t.is (mk_wcwidth (0x94b1),                            2, "mk_wcwidth U+94b1 --> 2");
+  t.is (mk_wcwidth (0x5305),                            2, "mk_wcwidth U+5305 --> 2");
+  t.is (mk_wcwidth (0x91cd),                            2, "mk_wcwidth U+91cd --> 2");
+  t.is (mk_wcwidth (0x65b0),                            2, "mk_wcwidth U+65b0 --> 2");
+  t.is (mk_wcwidth (0x8bbe),                            2, "mk_wcwidth U+8bbe --> 2");
+  t.is (mk_wcwidth (0x8ba1),                            2, "mk_wcwidth U+8ba1 --> 2");
+  t.is (mk_wcwidth (0x5411),                            2, "mk_wcwidth U+5411 --> 2");
+  t.is (mk_wcwidth (0x4e0a),                            2, "mk_wcwidth U+4e0a --> 2");
+  t.is (mk_wcwidth (0x4e0b),                            2, "mk_wcwidth U+4e0b --> 2");
+  t.is (mk_wcwidth (0x7bad),                            2, "mk_wcwidth U+7bad --> 2");
+  t.is (mk_wcwidth (0x5934),                            2, "mk_wcwidth U+5934 --> 2");
+  t.is (mk_wcwidth (0xff0c),                            2, "mk_wcwidth U+ff0c --> 2"); // comma
 
   return 0;
 }
