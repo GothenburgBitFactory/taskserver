@@ -26,6 +26,7 @@
 
 #include <cmake.h>
 #include <iostream>
+#include <stdlib.h>
 #include <JSON.h>
 #include <test.h>
 
@@ -40,6 +41,8 @@ const char *positive_tests[] =
   "{\"one\":1}",
 
   "{\n\"one\"\n:\n1\n}\n",
+
+  "  {  \"one\"  :  1  }  ",
 
   "{\"name\":123, \"array\":[1,2,3.4], \"object\":{\"m1\":\"v1\", \"m2\":\"v2\"}}",
 
@@ -103,7 +106,7 @@ int main (int argc, char** argv)
   UnitTest t (NUM_POSITIVE_TESTS + NUM_NEGATIVE_TESTS + 22);
 
   // Positive tests.
-  for (int i = 0; i < NUM_POSITIVE_TESTS; ++i)
+  for (unsigned int i = 0; i < NUM_POSITIVE_TESTS; ++i)
   {
     try
     {
@@ -121,7 +124,7 @@ int main (int argc, char** argv)
   }
 
   // Negative tests.
-  for (int i = 0; i < NUM_NEGATIVE_TESTS; ++i)
+  for (unsigned int i = 0; i < NUM_NEGATIVE_TESTS; ++i)
   {
     try
     {
