@@ -7,15 +7,22 @@ Please follow the instructions below to build Taskserver with cmake.
 Pre-requisites
 --------------
 
-You will need the following tools:
-   cmake
-   make
+You will need the CMake build system installed in order to build taskwarrior
+from source. More information on cmake can be obtained at http://cmake.org
+
+You will need:
+  - make
+
+You will need a C++ compiler that supports full C++11, which includes:
+  - gcc 4.7   (released 2012-03-23)
+  - clang 3.3 (released 2013-01-07)
 
 You will need the following libraries:
-   libuuid
-   gnutls
+  - libuuid
+  - gnutls
 
-More information on cmake can be obtained at http://cmake.org
+It is HIGHLY RECOMMENDED that you build with a library that provides uuid_*
+functions, such as libuuid.
 
 
 Basic Installation
