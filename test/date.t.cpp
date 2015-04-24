@@ -26,13 +26,14 @@
 
 #include <cmake.h>
 #include <iostream>
+#include <stdlib.h>
 #include <Date.h>
 #include <test.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (205);
+  UnitTest t (208);
 
   try
   {
@@ -60,6 +61,7 @@ int main (int argc, char** argv)
     Date relative_now ("now");
     t.ok (relative_now.sameHour (now),  "Date ().sameHour (Date (now))");
     t.ok (relative_now.sameDay (now),   "Date ().sameDay (Date (now))");
+    t.ok (relative_now.sameWeek (now),  "Date ().sameWeek (Date (now))");
     t.ok (relative_now.sameMonth (now), "Date ().sameMonth (Date (now))");
     t.ok (relative_now.sameYear (now),  "Date ().sameYear (Date (now))");
 
@@ -67,6 +69,7 @@ int main (int argc, char** argv)
     Date left ("7/4/2008");
     Date comp1 ("7/4/2008");
     t.ok (left.sameDay   (comp1), "7/4/2008 is on the same day as 7/4/2008");
+    t.ok (left.sameWeek  (comp1), "7/4/2008 is on the same week as 7/4/2008");
     t.ok (left.sameMonth (comp1), "7/4/2008 is in the same month as 7/4/2008");
     t.ok (left.sameYear  (comp1), "7/4/2008 is in the same year as 7/4/2008");
 
@@ -77,11 +80,13 @@ int main (int argc, char** argv)
 
     Date comp3 ("8/4/2008");
     t.notok (left.sameDay   (comp3), "7/4/2008 is not on the same day as 8/4/2008");
+    t.notok (left.sameWeek  (comp3), "7/4/2008 is not on the same week as 8/4/2008");
     t.notok (left.sameMonth (comp3), "7/4/2008 is not in the same month as 8/4/2008");
     t.ok    (left.sameYear  (comp3), "7/4/2008 is in the same year as 8/4/2008");
 
     Date comp4 ("7/4/2009");
     t.notok (left.sameDay   (comp4), "7/4/2008 is not on the same day as 7/4/2009");
+    t.notok (left.sameWeek  (comp3), "7/4/2008 is not on the same week as 7/4/2009");
     t.notok (left.sameMonth (comp4), "7/4/2008 is not in the same month as 7/4/2009");
     t.notok (left.sameYear  (comp4), "7/4/2008 is not in the same year as 7/4/2009");
 
@@ -323,7 +328,7 @@ int main (int argc, char** argv)
     t.ok (r11 < now + (8 * 86400), "eow < 7 days away");
 
     Date r12 ("eocw");
-    t.ok (r12 < now + (8 * 86400), "eocw < 7 days away");
+    t.ok (r12 > now - (8 * 86400), "eocw < 7 days in the past");
 
     Date r13 ("eom");
     t.ok (r13.sameMonth (now), "eom in same month as now");
@@ -338,7 +343,7 @@ int main (int argc, char** argv)
     t.ok (r16 < now + (8 * 86400), "sow < 7 days away");
 
     Date r23 ("socw");
-    t.ok (r23 < now + (8 * 86400), "sow < 7 days away");
+    t.ok (r23 > now - (8 * 86400), "sow < 7 days in the past");
 
     Date r17 ("som");
     t.notok (r17.sameMonth (now), "som not in same month as now");
@@ -352,9 +357,6 @@ int main (int argc, char** argv)
     Date first ("1st");
     t.notok (first.sameMonth (now), "1st not in same month as now");
     t.is (first.day (),   1, "1st day is 1");
-
-    Date FIRST ("1ST");
-    t.ok (FIRST == first, "1st == 1ST");
 
     Date later ("later");
     t.is (later.month (),   1, "later -> m = 1");
