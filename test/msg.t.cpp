@@ -25,7 +25,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
-#include <iostream>
 #include <Msg.h>
 #include <test.h>
 
@@ -57,6 +56,7 @@ int main (int argc, char** argv)
   t.is (m3.get ("foo"),   "bar",       "Msg::get");
   t.is (m3.get ("name"),  "value",     "Msg::get");
   t.is (m3.getPayload (), "payload\n", "Msg::getPayload");
+
   return 0;
 }
 
