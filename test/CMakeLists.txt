@@ -5,8 +5,7 @@ include_directories (${CMAKE_SOURCE_DIR}
                      ${TASKD_INCLUDE_DIRS})
 
 set (test_SRCS color.t config.t date.t directory.t duration.t file.t msg.t
-               nibbler.t path.t rx.t text.t util.t utf8.t width.t json.t
-               json_test)
+               nibbler.t path.t rx.t text.t util.t utf8.t json.t json_test)
 
 message ("-- Configuring run_all")
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
