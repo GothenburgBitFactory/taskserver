@@ -7,18 +7,17 @@ others, coming soon) can share tasks.
 Taskserver is a complex daemon process.  It is not for anyone who is unfamiliar
 with the operation of daemons.
 
-Taskserver is compatible with Taskwarrior version 2.3.0 and later.
+Taskserver is compatible with Taskwarrior version 2.3.0 and later, but works
+best with the latest Taskwarrior.
 
 
-Demonstration
--------------
+Easy Setup
+----------
 
-There is a demonstration, which illustrates various aspects of the Taskserver:
+There is a setup script that will lead you through all necessary steps to setup
+the Taskserver, create certs, configure a client and sync:
 
-  demo/README
-
-Please note that the demonstration makes use of self-signed certificates, which
-are not intended for production use.
+  script/setup_server.bash
 
 
 Documentation
