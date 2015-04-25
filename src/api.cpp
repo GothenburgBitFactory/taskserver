@@ -211,23 +211,26 @@ bool taskd_sendMessage (
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
-  std::string server = destination.substr (0, colon);
-  std::string port   = destination.substr (colon + 1);
+  std::string server      = destination.substr (0, colon);
+  std::string port        = destination.substr (colon + 1);
+
+  std::string ca          = config.get ("ca.cert");
+  std::string certificate = config.get ("client.cert");
+  std::string key         = config.get ("client.key");
+  std::string ciphers     = config.get ("ciphers");
 
   try
   {
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
-/*
-    client.limit (1024 * 1024);
-*/
+
     std::string trust_level = config.get ("server.trust");
     client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
                   trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
-    client.init (config.get ("ca.cert"), config.get ("client.cert"), config.get ("client.key"));
+    client.ciphers (ciphers);
+    client.init (ca, certificate, key);
     client.connect (server, port);
-
     client.send (out.serialize () + "\n");
 
     std::string response;
