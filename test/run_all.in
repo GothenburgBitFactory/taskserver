@@ -1,17 +1,27 @@
-#! /usr/bin/env bash
+#! /bin/sh
+
+# Look for taskd in $PATH instead of task/src/
+export TASKD_USE_PATH=1
 
 rc=0
 if [ x"$1" = x"--verbose" ];
 then
   for i in ${TESTBLOB}
   do
-    echo '#' $i
-    $i > test.log 2>&1
-    while read LINE
-    do
-      echo "$LINE"
-    done < test.log || rc=1
-    rm test.log
+    if [ -x "$i" ]; then
+      echo '#' $i
+      $i > test.log 2>&1
+      while read LINE
+      do
+        echo "$LINE"
+      done < test.log
+      if [ $? -ne 0 ]; then
+        rc=1
+      fi
+      rm test.log
+    else
+      echo "# Skipping $(basename $i) execute bit not set"
+    fi
   done
   exit $rc
 else
@@ -21,7 +31,7 @@ else
   # because 'date +%s' isn't supported on Solaris.
   STARTEPOCH=`perl -e 'print time'`
 
-  VRAMSTEG=`which vramsteg`
+  VRAMSTEG=`which vramsteg 2>/dev/null`
   BAR=0
   if [ -x "$VRAMSTEG" ]; then
     BAR=1
@@ -32,14 +42,21 @@ else
 
   for i in ${TESTBLOB}
   do
-    echo '#' $i >>all.log
+    if [ -x "$i" ]; then
+      echo '#' $i >>all.log
+
+      $i >> all.log 2>&1
+      if [ $? -ne 0 ]; then
+        rc=1
+      fi
+    else
+      echo "# Skipping $(basename $i) execute bit not set" >> all.log 2>&1
+    fi
 
     if [ $BAR -eq 1 ]; then
       $VRAMSTEG --label 'All tests' --min 0 --max $TOTAL --current $COUNT --percentage --start $START --estimate
       COUNT=`expr $COUNT + 1`
     fi
-
-    $i >> all.log 2>&1 || rc=1
   done
 
   if [ $BAR -eq 1 ]; then
