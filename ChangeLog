@@ -1,4 +1,4 @@
------- current release ---------------------------
+t------ current release ---------------------------
 
 1.1.0 ()
 
@@ -12,6 +12,7 @@
 - TW-1304 Minor build and install fix for NetBSD (thanks to atomicules).
 - TW-1366 In diagnostics it's called 'Cert', and in config it's called
           'certificate' (thanks to Jack).
+- TD-37 Segfault when specifying '--data' with no path (thanks to iron_houzi).
 - TD-39 Documents refer to "modification" and "modified" dates, need to
         collapse to one (thanks to jck).
 - TD-41 Systemd 'taskd.service' script (thanks to Ralph Bean, Roman

@@ -126,6 +126,8 @@
 #define STRING_JSON_VALIDATE         "You must specify either a JSON string or a JSON file."
 #define STRING_JSON_SYNTAX_OK        "JSON syntax ok."
 
+#define STRING_TASKD_DATA            "ERROR: The '--data' option requireѕ an argument."
+
 #define STRING_CONFIG_NO_PATH        "ERROR: The '--data' path does not exist."
 #define STRING_CONFIG_OVERWRITE      "Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?"
 #define STRING_CONFIG_ADD            "Are you sure you want to add '{1}' with a value of '{2}'?"

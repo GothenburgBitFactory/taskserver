@@ -128,7 +128,14 @@ int main (int argc, const char** argv)
         std::vector <std::string>::iterator arg;
         for (arg = args.begin (); arg != args.end (); ++arg)
         {
-               if (closeEnough ("--data",   *arg, 3))  config.set ("root",         *(++arg));
+          if (closeEnough ("--data", *arg, 3))
+          {
+            ++arg;
+            if (arg == args.end () || (*arg)[0] == '-')
+              throw std::string (STRING_TASKD_DATA);
+
+            config.set ("root", *arg);
+          }
           else if (closeEnough ("--quiet",  *arg, 3))  config.set ("verbose",      0);
           else if (closeEnough ("--debug",  *arg, 3))  config.set ("debug",        1);
           else if (closeEnough ("--force",  *arg, 3))  config.set ("confirmation", 0);
