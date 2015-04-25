@@ -162,22 +162,7 @@ int main (int argc, const char** argv)
         else if (closeEnough ("client",      args[0], 3)) command_client   (db, positionals);
         else if (closeEnough ("validate",    args[0], 3)) command_validate (db, positionals);
         else
-        {
-          File subcommand (std::string (TASKD_EXTDIR) + "/taskd_" + args[0]);
-          if (subcommand.exists () &&
-              subcommand.executable ())
-          {
-            std::string command;
-            join (command, " ", args);
-            command = std::string (TASKD_EXTDIR) + "/taskd_" + command;
-
-            std::string output;
-            status = taskd_execute (command, output);
-            std::cout << output;
-          }
-          else
-            throw format (STRING_TASKD_BAD_COMMAND, args[0]);
-        }
+          throw format (STRING_TASKD_BAD_COMMAND, args[0]);
       }
 
       catch (std::string& error)
