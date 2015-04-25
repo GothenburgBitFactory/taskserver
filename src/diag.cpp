@@ -83,7 +83,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #elif defined (GNUHURD)
                "GNU/Hurd"
 #else
-               "<unknown>"
+               "unknown"
 #endif
             << "\n";
 
@@ -184,6 +184,14 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #endif
 #else
             << "n/a"
+#endif
+            << "\n";
+
+  std::cout << "  Build type: "
+#ifdef CMAKE_BUILD_TYPE
+            << CMAKE_BUILD_TYPE
+#else
+            << "-"
 #endif
             << "\n\n";
 

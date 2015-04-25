@@ -2,8 +2,8 @@
 PKI is a complex subject.  These scripts, and this description are not intended
 to be a complete and accurate example of PKI.
 
-Ideally you would purchase a server cert signed by a known CA, such as the
-following:
+Ideally you would purchase a server cert signed by a known CA, such as one of
+the following:
 
   Symantec
   Comodo
