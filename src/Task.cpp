@@ -58,14 +58,12 @@ static const float epsilon = 0.000001;
 #endif
 
 std::string Task::defaultProject  = "";
-std::string Task::defaultPriority = "";
 std::string Task::defaultDue      = "";
 bool Task::searchCaseSensitive    = true;
 bool Task::regex                  = false;
 std::map <std::string, std::string> Task::attributes;
 
 std::map <std::string, float> Task::coefficients;
-float Task::urgencyPriorityCoefficient    = 0.0;
 float Task::urgencyProjectCoefficient     = 0.0;
 float Task::urgencyActiveCoefficient      = 0.0;
 float Task::urgencyScheduledCoefficient   = 0.0;
@@ -1438,14 +1436,6 @@ void Task::validate (bool applyDefault /* = true */)
       set ("project", Task::defaultProject);
   }
 
-  // Override with default.priority, if not specified.
-  if (applyDefault && get ("priority") == "")
-  {
-    if (Task::defaultPriority != "" &&
-        context.columns["priority"]->validate (Task::defaultPriority))
-      set ("priority", Task::defaultPriority);
-  }
-
   // Override with default.due, if not specified.
   if (applyDefault && get ("due") == "")
   {
@@ -1519,16 +1509,6 @@ void Task::validate (bool applyDefault /* = true */)
     Duration d;
     if (! d.valid (get ("recur")))
       throw std::string (format (STRING_TASK_VALID_RECUR, get ("recur")));
-  }
-
-  // Priorities must be valid.
-  if (has ("priority"))
-  {
-    std::string priority = get ("priority");
-    if (priority != "H" &&
-        priority != "M" &&
-        priority != "L")
-      throw format (STRING_TASK_VALID_PRIORITY, priority);
   }
 }
 
@@ -1640,7 +1620,6 @@ float Task::urgency_c () const
 {
   float value = 0.0;
 #ifdef PRODUCT_TASKWARRIOR
-  value += fabsf (Task::urgencyPriorityCoefficient)    > epsilon ? (urgency_priority ()    * Task::urgencyPriorityCoefficient)    : 0.0;
   value += fabsf (Task::urgencyProjectCoefficient)     > epsilon ? (urgency_project ()     * Task::urgencyProjectCoefficient)     : 0.0;
   value += fabsf (Task::urgencyActiveCoefficient)      > epsilon ? (urgency_active ()      * Task::urgencyActiveCoefficient)      : 0.0;
   value += fabsf (Task::urgencyScheduledCoefficient)   > epsilon ? (urgency_scheduled ()   * Task::urgencyScheduledCoefficient)   : 0.0;
@@ -1656,7 +1635,6 @@ float Task::urgency_c () const
 /*
   // Very useful for debugging urgency problems.
   std::cout << "# Urgency for " << get ("uuid") << ":\n"
-          << "#     pri " << (urgency_priority ()    * Task::urgencyPriorityCoefficient)    << "\n"
           << "#     pro " << (urgency_project ()     * Task::urgencyProjectCoefficient)     << "\n"
           << "#     act " << (urgency_active ()      * Task::urgencyActiveCoefficient)      << "\n"
           << "#     sch " << (urgency_scheduled ()   * Task::urgencyScheduledCoefficient)   << "\n"
@@ -1726,18 +1704,6 @@ float Task::urgency ()
   }
 
   return urgency_value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-float Task::urgency_priority () const
-{
-  const std::string& value = get_ref ("priority");
-
-       if (value == "H") return 1.0;
-  else if (value == "M") return 0.65;
-  else if (value == "L") return 0.3;
-
-  return 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
