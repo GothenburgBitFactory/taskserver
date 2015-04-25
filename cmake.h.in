@@ -22,7 +22,7 @@
 
 /* Localization */
 #define PACKAGE_LANGUAGE  ${PACKAGE_LANGUAGE}
-#define LANGUAGE_EN_US ${LANGUAGE_EN_US}
+#define LANGUAGE_ENG_USA ${LANGUAGE_ENG_USA}
 
 /* git information */
 #cmakedefine HAVE_COMMIT

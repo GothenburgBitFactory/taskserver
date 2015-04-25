@@ -16,7 +16,7 @@ add_executable (taskd_executable taskd.cpp
                                  Date.cpp       Date.h
                                  Directory.cpp  Directory.h
                                  Duration.cpp   Duration.h
-                                 eng-USA.h
+                                 l10n/eng-USA.h
                                  File.cpp       File.h
                                  help.cpp
                                  i18n.h

@@ -152,7 +152,7 @@ else (LANGUAGE)
   set (PACKAGE_LANGUAGE 1)
 endif (LANGUAGE)
 
-set (LANGUAGE_EN_US 1)
+set (LANGUAGE_ENG_USA 1)
 
 message ("-- Configuring cmake.h")
 configure_file (
