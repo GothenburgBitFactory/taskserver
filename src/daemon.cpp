@@ -139,19 +139,19 @@ void Daemon::handler (const std::string& input, std::string& output)
          !input[3]))
       throw 401;
 
-    // A trapped SIGHUP results in a config reload.  Original command line
+    // A trapped SIGUSR1 results in a config reload.  Original command line
     // overrides are preserved.
-    if (_sighup)
+    if (_sigusr1)
     {
       if (_log)
-        _log->format ("[%d] SIGHUP triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
+        _log->format ("[%d] SIGUSR1 triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
 
       _config.load (_config._original_file._data);
       Config::iterator i;
       for (i = _overrides.begin (); i != _overrides.end (); ++i)
         _config[i->first] = i->second;
 
-      _sighup = false;
+      _sigusr1 = false;
     }
 
     unsigned int request_limit = (unsigned) _config.getInteger ("request.limit");

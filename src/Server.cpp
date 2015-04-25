@@ -54,8 +54,8 @@ static void signal_handler (int s)
 {
   switch (s)
   {
-  case SIGHUP:  _sighup  = true; break;
-  case SIGUSR1: _sigusr1 = true; break;
+  case SIGHUP:  _sighup  = true; break;  // Graceful stop
+  case SIGUSR1: _sigusr1 = true; break;  // Config reload
   case SIGUSR2: _sigusr2 = true; break;
   }
 }
@@ -207,8 +207,8 @@ void Server::beginServer ()
     writePidFile ();
   }
 
-  signal (SIGHUP,  signal_handler);
-  signal (SIGUSR1, signal_handler);
+  signal (SIGHUP,  signal_handler);  // Graceful stop
+  signal (SIGUSR1, signal_handler);  // Config reload
   signal (SIGUSR2, signal_handler);
 
   TLSServer server;
@@ -250,6 +250,9 @@ void Server::beginServer ()
       TLSTransaction tx;
       tx.trust (server.trust ());
       server.accept (tx);
+
+      if (_sighup)
+        throw "SIGHUP shutdown.";
 
       // Get client address and port, for logging.
       if (_log_clients)

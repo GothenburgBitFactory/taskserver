@@ -27,7 +27,7 @@ It is harmless to run this command if the server is not running.
 .TP
 .B taskdctl restart
 Stops the server, if it is running, then starts the server again.
-This is done by sending SIGHUP signal to the server.
+This is done by killing the server process.
 This will interrupt any current sync sessions, probably causing an error.
 It is harmless to run this command if the server is not running.
 
@@ -35,7 +35,7 @@ It is harmless to run this command if the server is not running.
 .B taskdctl graceful
 Stops the server, if it is running, by waiting for the server to go idle, then
 restarts the server again.
-This is done by sending SIGUSR1 signal to the server.
+This is done by sending SIGHUP signal to the server.
 This will not interrupt any current sync sessions.
 It is harmless to run this command if the server is not running.
 
