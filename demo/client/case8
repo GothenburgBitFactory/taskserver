@@ -3,5 +3,5 @@
 # Use Case 8: Statistics request
 
 echo '--- stats 0 -------------------------------------------------------------'
-../../src/taskd client localhost:53589 stats.0
+../../src/taskd client --trust='allow all' localhost:53589 stats.0
 

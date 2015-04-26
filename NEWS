@@ -22,6 +22,7 @@ New configuration options in Taskserver 1.1.0
 Removed features in 1.1.0
 
   - Configuration using 'client.allow' and 'client.deny' removed.
+  - Extension commands and hook script support removed.
 
 ---
 
