@@ -174,7 +174,7 @@ bool taskd_sendMessage (
   {
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
-    std::string trust_level = config.get ("server.trust");
+    std::string trust_level = config.get ("trust");
     client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
                   trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
@@ -224,7 +224,7 @@ bool taskd_sendMessage (
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
 
-    std::string trust_level = config.get ("server.trust");
+    std::string trust_level = config.get ("trust");
     client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
                   trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
