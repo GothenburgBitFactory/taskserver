@@ -55,6 +55,5 @@
 #cmakedefine HAVE_UUID_UNPARSE_LOWER
 
 /* Libraries */
-#cmakedefine HAVE_LIBPTHREAD
 #cmakedefine HAVE_LIBGNUTLS
 

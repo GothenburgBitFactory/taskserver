@@ -152,20 +152,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #ifdef HAVE_COMMIT
             << "      Commit: " << COMMIT << "\n"
 #endif
-            << "       CMake: " << CMAKE_VERSION << "\n"
-            << "        Caps:"
-#ifdef HAVE_LIBPTHREAD
-            << " +pthreads"
-#else
-            << " -pthreads"
-#endif
-
-#ifdef HAVE_LIBGNUTLS
-            << " +tls"
-#else
-            << " -tls"
-#endif
-            << "\n";
+            << "       CMake: " << CMAKE_VERSION << "\n";
 
   std::cout << "     libuuid: "
 #ifdef HAVE_UUID_UNPARSE_LOWER
