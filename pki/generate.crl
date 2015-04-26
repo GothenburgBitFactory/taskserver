@@ -1,12 +1,5 @@
 #!/bin/sh
 
-. ./vars
-
-# CRL - Certificate Revocation List
-cat <<EOF >crl.info
-expiration_days = $EXPIRATION_DAYS
-EOF
-
 # Take the correct binary to create the certificates
 CERTTOOL=$(which gnutls-certtool || which certtool)
 if [ -z "$CERTTOOL" ]
@@ -14,6 +7,13 @@ then
   echo "ERROR: No certtool found" >&2
   exit 1
 fi
+
+. ./vars
+
+# CRL - Certificate Revocation List
+cat <<EOF >crl.info
+expiration_days = $EXPIRATION_DAYS
+EOF
 
 $CERTTOOL \
   --generate-crl \

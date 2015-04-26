@@ -8,6 +8,8 @@ then
   exit 1
 fi
 
+. ./vars
+
 DNSNAMES="`hostname`"
 IPADDRS=$(for ip in $(ifconfig -a | awk '/inet/ {print $2}' | egrep -v '(^::1$|^fe80:|^127\.)') ; do
   if [ -n "$ip" ]
@@ -15,8 +17,6 @@ IPADDRS=$(for ip in $(ifconfig -a | awk '/inet/ {print $2}' | egrep -v '(^::1$|^
     echo "$ip "
   fi
 done)
-
-. ./vars
 
 # Create a server key.
 $CERTTOOL \

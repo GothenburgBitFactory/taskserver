@@ -29,3 +29,8 @@ keys and certs.
 
 Note that you should modify the 'vars' file to provide your own identity and
 chosen parameters.
+
+VAlidate a certificate with:
+
+  $ gnutls-certtool --verify --infile client.cert.pem --load-ca-certificate ca.cert.pem
+

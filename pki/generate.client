@@ -1,10 +1,5 @@
 #!/bin/sh
 
-NAME=client
-if [ $# -gt 0 ] ; then
-  NAME=$1
-fi
-
 # Take the correct binary to create the certificates
 CERTTOOL=$(which gnutls-certtool || which certtool)
 if [ -z "$CERTTOOL" ]
@@ -14,6 +9,11 @@ then
 fi
 
 . ./vars
+
+NAME=client
+if [ $# -gt 0 ] ; then
+  NAME=$1
+fi
 
 # Create a client key.
 $CERTTOOL \
