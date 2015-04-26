@@ -139,7 +139,6 @@ int main (int argc, const char** argv)
           else if (closeEnough ("--quiet",  *arg, 3))  config.set ("verbose",      0);
           else if (closeEnough ("--debug",  *arg, 3))  config.set ("debug",        1);
           else if (closeEnough ("--force",  *arg, 3))  config.set ("confirmation", 0);
-          else if (closeEnough ("--debug",  *arg, 3))  config.set ("debug",        1);
           else if (closeEnough ("--daemon", *arg, 3))  config.set ("daemon",       1);
           else if (taskd_applyOverride (config, *arg)) ;
           else                                         positionals.push_back (*arg);
