@@ -362,7 +362,7 @@ int TLSClient::verify_certificate () const
         if (_debug)
           std::cout << "c: ERROR x509 cert import. " << gnutls_strerror (ret) << "\n";
         gnutls_x509_crt_deinit(cert);
-        status = GNUTLS_E_CERTIFICATE_ERROR;
+        return GNUTLS_E_CERTIFICATE_ERROR;
       }
 
       if (gnutls_x509_crt_check_hostname (cert, hostname) == 0)
@@ -378,7 +378,7 @@ int TLSClient::verify_certificate () const
   }
 #endif
 
-#if GNUTLS_VERSION_NUMBER >= 0x030105
+#if GNUTLS_VERSION_NUMBER >= 0x030104
   gnutls_certificate_type_t type = gnutls_certificate_type_get (_session);
   gnutls_datum_t out;
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
