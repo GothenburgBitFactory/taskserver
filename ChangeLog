@@ -38,6 +38,8 @@ t------ current release ---------------------------
         mismatch (thanks to Jack).
 - TD-68 Error: Handshake has failed (A TLS packet with unexpected length was
         received.) (thanks to Jack, Mario, Joao Santos).
+- TD-78 Create the x509 PKI with a proper CN and don't use SubjectAlternativeName
+        (SANs) (thanks to Louis Opter).
 - TD-79 Bad error message for wrong hostname configuration (thanks to Jens
         Erat).
 - TD-89 No man page for Taskctl (thanks to Jack Laxson).

@@ -26,16 +26,9 @@ $CERTTOOL \
 
 chmod 600 server.key.pem
 
-# Sign a server cert using the key.
 cat <<EOF >server.info
 organization = $ORGANIZATION
 cn = $CN
-$(for host in $DNSNAMES ; do
-  echo dns_name = $host
-done)
-$(for ip in $IPADDRS ; do
-  echo ip_address = $ip
-done)
 tls_www_server
 encryption_key
 signing_key
