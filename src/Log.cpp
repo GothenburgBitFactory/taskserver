@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
@@ -102,6 +103,7 @@ void Log::write (const std::string& line, bool multiline /* = false */)
       }
 
       printf ("%s %s\n", _now, printable (line).c_str ());
+      fflush (stdout);
     }
     else
     {
@@ -121,6 +123,7 @@ void Log::write (const std::string& line, bool multiline /* = false */)
         fprintf (_fh, "%s %s\n", _now, printable (line).c_str ());
 
         // To get around the auto file close of the daemonization process.
+        fflush (_fh);
         fclose (_fh);
         _fh = NULL;
       }

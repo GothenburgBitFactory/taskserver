@@ -39,6 +39,7 @@ t------ current release ---------------------------
         mismatch (thanks to Jack).
 - TD-68 Error: Handshake has failed (A TLS packet with unexpected length was
         received.) (thanks to Jack, Mario, Joao Santos).
+- TD-72 Taskd appears to log everything at the end of a sync (thanks to Jack).
 - TD-75 Fix status_statistics (thanks to Jack).
 - TD-78 Create the x509 PKI with a proper CN and don't use SubjectAlternativeName
         (SANs) (thanks to Louis Opter).
