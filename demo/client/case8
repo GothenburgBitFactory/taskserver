@@ -3,5 +3,11 @@
 # Use Case 8: Statistics request
 
 echo '--- stats 0 -------------------------------------------------------------'
-../../src/taskd client --trust='allow all' localhost:53589 stats.0
+../../src/taskd client \
+  --ca.cert=tw1/ca.cert.pem \
+  --client.cert=tw1/client.cert.pem \
+  --client.key=tw1/client.key.pem \
+  --trust='allow all' \
+  localhost:53589 \
+  stats.0
 

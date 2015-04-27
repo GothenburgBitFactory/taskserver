@@ -22,8 +22,8 @@ echo "taskd.credentials=Public/USER/$KEY"     >> $TW1/rc
 echo "taskd.certificate=$TW1/client.cert.pem" >> $TW1/rc
 echo "taskd.key=$TW1/client.key.pem"          >> $TW1/rc
 echo "taskd.ca=$TW1/ca.cert.pem"              >> $TW1/rc
-#echo "taskd.trust=strict"                     >> $TW1/rc
-echo "taskd.trust=ignore hostname"            >> $TW1/rc
+echo "taskd.trust=strict"                     >> $TW1/rc
+#echo "taskd.trust=ignore hostname"            >> $TW1/rc
 #echo "taskd.trust=allow all"                  >> $TW1/rc
 echo "confirmation=off"                       >> $TW1/rc
 echo "verbose=sync"                           >> $TW1/rc
@@ -42,8 +42,8 @@ echo "taskd.credentials=Public/USER/$KEY"     >> $TW2/rc
 echo "taskd.certificate=$TW2/client.cert.pem" >> $TW2/rc
 echo "taskd.key=$TW2/client.key.pem"          >> $TW2/rc
 echo "taskd.ca=$TW2/ca.cert.pem"              >> $TW2/rc
-#echo "taskd.trust=strict"                     >> $TW2/rc
-echo "taskd.trust=ignore hostname"            >> $TW2/rc
+echo "taskd.trust=strict"                     >> $TW2/rc
+#echo "taskd.trust=ignore hostname"            >> $TW2/rc
 #echo "taskd.trust=allow all"                  >> $TW2/rc
 echo "confirmation=off"                       >> $TW2/rc
 echo "verbose=sync"                           >> $TW2/rc
@@ -102,4 +102,7 @@ printf "type: sync\norg: Public\nuser: USER\nhello: there\nkey: $KEY\nclient: ta
 printf "\n\n\n"  > bad.81
 printf "Ice cream and candy floss.  Parents with dosh."  > bad.82
 printf ""  > bad.83
+
+echo "# Stats"
+printf "type: statistics\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > stats.0
 

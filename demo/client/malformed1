@@ -2,86 +2,30 @@
 
 # Use Case: Negative testing using malformed requests.
 
-echo '--- bad.0 ---------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.0
+client()
+{
+  REQUEST=$1
 
-echo '--- bad.10 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.10
+  ../../src/taskd client \
+    --ca.cert=tw1/ca.cert.pem \
+    --client.cert=tw1/client.cert.pem \
+    --client.key=tw1/client.key.pem \
+    --trust='allow all' \
+    localhost:53589 \
+    $REQUEST
+}
 
-echo '--- bad.11 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.11
+for req in bad.0 \
+           bad.10 bad.11 \
+           bad.20 bad.21 \
+           bad.30 bad.31 bad.32 \
+           bad.40 bad.41 bad.42 bad.43 bad.44 bad.45 bad.46 \
+           bad.50 bad.51 bad.52 \
+           bad.60 \
+           bad.70 bad.71 bad.72 bad.73 bad.74 \
+           bad.80 bad.81 bad.82 bad.83 
+do
+  echo "--- $req ---------------------------------------------------------------"
+  client $req
+done
 
-echo '--- bad.20 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.20
-
-echo '--- bad.21 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.21
-
-echo '--- bad.30 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.30
-
-echo '--- bad.31 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.31
-
-echo '--- bad.32 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.32
-
-echo '--- bad.40 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.40
-
-echo '--- bad.41 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.41
-
-echo '--- bad.42 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.42
-
-echo '--- bad.43 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.43
-
-echo '--- bad.44 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.44
-
-echo '--- bad.45 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.45
-
-echo '--- bad.46 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.46
-
-echo '--- bad.50 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.50
-
-echo '--- bad.51 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.51
-
-echo '--- bad.52 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.52
-
-echo '--- bad.60 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.60
-
-echo '--- bad.70 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.70
-
-echo '--- bad.71 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.71
-
-echo '--- bad.72 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.72
-
-echo '--- bad.73 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.73
-
-echo '--- bad.74 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.74
-
-echo '--- bad.80 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.80
-
-echo '--- bad.81 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.81
-
-echo '--- bad.82 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.82
-
-echo '--- bad.83 --------------------------------------------------------------'
-../../src/taskd client localhost:53589 bad.83
