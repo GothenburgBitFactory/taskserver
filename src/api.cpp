@@ -95,7 +95,6 @@ bool taskd_applyOverride (Config& config, const std::string& arg)
       std::string value = arg.substr (equal + 1);
 
       config.set (name, value);
-      std::cout << "- Override " << name << '=' << value << "\n";
       return true;
     }
   }
@@ -160,49 +159,6 @@ bool taskd_createDirectory (Directory& d, bool verbose)
 bool taskd_sendMessage (
   Config& config,
   const std::string& to,
-  const Msg& out)
-{
-  std::string destination = config.get (to);
-  std::string::size_type colon = destination.rfind (':');
-  if (colon == std::string::npos)
-    throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
-
-  std::string server = destination.substr (0, colon);
-  std::string port   = destination.substr (colon + 1);
-
-  try
-  {
-    TLSClient client;
-    client.debug (config.getInteger ("debug.tls"));
-    std::string trust_level = config.get ("trust");
-    client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
-                  trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
-                                                     TLSClient::strict);
-    client.init (config.get ("ca.cert"), config.get ("client.cert"), config.get ("client.key"));
-    client.connect (server, port);
-
-    client.send (out.serialize () + "\n");
-
-    std::string response;
-    client.recv (response);  // Ignored.
-    client.bye ();
-
-    // Indicate message sent.
-    return true;
-  }
-
-  catch (std::string& error)
-  {
-  }
-
-  // Indicate message spooled.
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool taskd_sendMessage (
-  Config& config,
-  const std::string& to,
   const Msg& out,
   Msg& in)
 {
@@ -225,8 +181,8 @@ bool taskd_sendMessage (
     client.debug (config.getInteger ("debug.tls"));
 
     std::string trust_level = config.get ("trust");
-    client.trust (trust_level == "allow_all"       ? TLSClient::allow_all       :
-                  trust_level == "ignore_hostname" ? TLSClient::ignore_hostname :
+    client.trust (trust_level == "allow all"       ? TLSClient::allow_all       :
+                  trust_level == "ignore hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
     client.ciphers (ciphers);
     client.init (ca, certificate, key);
