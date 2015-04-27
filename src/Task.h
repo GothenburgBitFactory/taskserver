@@ -31,18 +31,17 @@
 #include <map>
 #include <string>
 #include <stdio.h>
+#include <time.h>
 
 class Task : public std::map <std::string, std::string>
 {
 public:
   static std::string defaultProject;
-  static std::string defaultPriority;
   static std::string defaultDue;
   static bool searchCaseSensitive;
   static bool regex;
   static std::map <std::string, std::string> attributes;  // name -> type
   static std::map <std::string, float> coefficients;
-  static float urgencyPriorityCoefficient;
   static float urgencyProjectCoefficient;
   static float urgencyActiveCoefficient;
   static float urgencyScheduledCoefficient;
@@ -155,8 +154,9 @@ private:
   void parseJSON (const std::string&);
   void parseLegacy (const std::string&);
   void validate_before (const std::string&, const std::string&);
+  const std::string encode (const std::string&) const;
+  const std::string decode (const std::string&) const;
 
-  inline float urgency_priority () const;
   inline float urgency_project () const;
   inline float urgency_active () const;
   inline float urgency_scheduled () const;

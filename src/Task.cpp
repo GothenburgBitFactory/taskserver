@@ -138,6 +138,7 @@ Task::Task (const std::string& input)
   is_blocked = false;
   is_blocking = false;
   annotation_count = 0;
+
   parse (input);
 }
 
@@ -282,7 +283,7 @@ time_t Task::get_date (const std::string& name) const
 ////////////////////////////////////////////////////////////////////////////////
 void Task::set (const std::string& name, const std::string& value)
 {
-  (*this)[name] = value;
+  (*this)[name] = json::decode (value);
 
   recalc_urgency = true;
 }
@@ -300,9 +301,10 @@ void Task::remove (const std::string& name)
 {
   Task::iterator it;
   if ((it = this->find (name)) != this->end ())
+  {
     this->erase (it);
-
-  recalc_urgency = true;
+    recalc_urgency = true;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -496,6 +498,7 @@ bool Task::is_overdue () const
 //
 void Task::parse (const std::string& input)
 {
+  // TODO Is this simply a 'chomp'?
   std::string copy;
   if (input[input.length () - 1] == '\n')
     copy = input.substr (0, input.length () - 1);
@@ -608,8 +611,9 @@ void Task::parseJSON (const std::string& line)
         // Dates are converted from ISO to epoch.
         else if (type == "date")
         {
-          Date d (unquoteText (i->second->dump ()));
-          set (i->first, d.toEpochString ());
+          std::string text = unquoteText (i->second->dump ());
+          Date d (text);
+          set (i->first, text == "" ? "" : d.toEpochString ());
         }
 
         // Tags are an array of JSON strings.
@@ -868,6 +872,10 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     if (i->first.substr (0, 11) == "annotation_")
       continue;
 
+    // If value is an empty string, do not ever output it
+    if (i->second == "")
+        continue;
+
     if (attributes_written)
       out << ",";
 
@@ -879,16 +887,22 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     if (type == "date")
     {
       Date d (i->second);
-      if (i->first == "modification")
-        out << "\"modified\":\""
-            << d.toISO ()
+      out << "\""
+          << (i->first == "modification" ? "modified" : i->first)
+          << "\":\""
+          // Date was deleted, do not export parsed empty string
+          << (i->second == "" ? "" : d.toISO ())
             << "\"";
-      else
+
+      ++attributes_written;
+    }
+
+    else if (type == "numeric")
+    {
         out << "\""
             << i->first
-            << "\":\""
-            << d.toISO ()
-            << "\"";
+          << "\":"
+          << i->second;
 
       ++attributes_written;
     }
@@ -911,6 +925,8 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
       }
 
       out << "]";
+
+      ++attributes_written;
     }
 
     // Everything else is a quoted value.
@@ -958,9 +974,8 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
   // Include urgency.
   if (decorate)
     out << ","
-        << "\"urgency\":\""
-        << urgency_c ()
-        <<"\"";
+        << "\"urgency\":"
+        << urgency_c ();
 #endif
 
   out << "}";
@@ -991,7 +1006,7 @@ void Task::addAnnotation (const std::string& description)
   }
   while (has (key));
 
-  (*this)[key] = description;
+  (*this)[key] = json::decode (description);
   ++annotation_count;
   recalc_urgency = true;
 }
@@ -1395,14 +1410,14 @@ void Task::validate (bool applyDefault /* = true */)
 
   // 1) Provide missing attributes where possible
   // Provide a UUID if necessary.
-  if (! has ("uuid"))
+  if (! has ("uuid") || get ("uuid") == "")
     set ("uuid", uuid ());
 
   // Recurring tasks get a special status.
   if (status == Task::pending &&
       has ("due")             &&
       has ("recur")           &&
-      ! has ("parent"))
+      (! has ("parent") || get ("parent") == ""))
     status = Task::recurring;
 
   // Tasks with a wait: date get a special status.
@@ -1411,7 +1426,7 @@ void Task::validate (bool applyDefault /* = true */)
     status = Task::waiting;
 
   // By default, tasks are pending.
-  else if (! has ("status"))
+  else if (! has ("status") || get ("status") == "")
     status = Task::pending;
 
   // Store the derived status.
@@ -1472,7 +1487,7 @@ void Task::validate (bool applyDefault /* = true */)
         std::string type    = context.config.get ("uda." + *uda + ".type");
         std::string defVal  = context.config.get ("uda." + *uda + ".default");
 
-        // If the default is empty, and we already have a value, skip it
+        // If the default is empty, or we already have a value, skip it
         if (defVal != "" && get (*uda) == "")
           set (*uda, defVal);
       }
@@ -1526,6 +1541,53 @@ void Task::validate_before (const std::string& left, const std::string& right)
       context.footnote (format (STRING_TASK_VALID_BEFORE, left, right));
   }
 #endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Encode values prior to serialization.
+//   [  -> &open;
+//   ]  -> &close;
+const std::string Task::encode (const std::string& value) const
+{
+  std::string modified = value;
+
+  str_replace (modified, "[",  "&open;");
+  str_replace (modified, "]",  "&close;");
+
+  return modified;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Decode values after parse.
+//   "  <- &dquot;
+//   '  <- &squot; or &quot;
+//   ,  <- &comma;
+//   [  <- &open;
+//   ]  <- &close;
+//   :  <- &colon;
+const std::string Task::decode (const std::string& value) const
+{
+  if (value.find ('&') != std::string::npos)
+  {
+    std::string modified = value;
+
+    // Supported encodings.
+    str_replace (modified, "&open;",  "[");
+    str_replace (modified, "&close;", "]");
+
+    // Support for deprecated encodings.  These cannot be removed or old files
+    // will not be parsable.  Not just old files - completed.data can contain
+    // tasks formatted/encoded using these.
+    str_replace (modified, "&dquot;", "\"");
+    str_replace (modified, "&quot;",  "'");
+    str_replace (modified, "&squot;", "'");  // Deprecated 2.0
+    str_replace (modified, "&comma;", ",");  // Deprecated 2.0
+    str_replace (modified, "&colon;", ":");  // Deprecated 2.0
+
+    return modified;
+  }
+
+  return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1631,22 +1693,6 @@ float Task::urgency_c () const
   value += fabsf (Task::urgencyDueCoefficient)         > epsilon ? (urgency_due ()         * Task::urgencyDueCoefficient)         : 0.0;
   value += fabsf (Task::urgencyBlockingCoefficient)    > epsilon ? (urgency_blocking ()    * Task::urgencyBlockingCoefficient)    : 0.0;
   value += fabsf (Task::urgencyAgeCoefficient)         > epsilon ? (urgency_age ()         * Task::urgencyAgeCoefficient)         : 0.0;
-
-/*
-  // Very useful for debugging urgency problems.
-  std::cout << "# Urgency for " << get ("uuid") << ":\n"
-          << "#     pro " << (urgency_project ()     * Task::urgencyProjectCoefficient)     << "\n"
-          << "#     act " << (urgency_active ()      * Task::urgencyActiveCoefficient)      << "\n"
-          << "#     sch " << (urgency_scheduled ()   * Task::urgencyScheduledCoefficient)   << "\n"
-          << "#     wai " << (urgency_waiting ()     * Task::urgencyWaitingCoefficient)     << "\n"
-          << "#     blk " << (urgency_blocked ()     * Task::urgencyBlockedCoefficient)     << "\n"
-          << "#     ann " << (urgency_annotations () * Task::urgencyAnnotationsCoefficient) << "\n"
-          << "#     tag " << (urgency_tags ()        * Task::urgencyTagsCoefficient)        << "\n"
-          << "#     nex " << (urgency_next ()        * Task::urgencyNextCoefficient)        << "\n"
-          << "#     due " << (urgency_due ()         * Task::urgencyDueCoefficient)         << "\n"
-          << "#     bkg " << (urgency_blocking ()    * Task::urgencyBlockingCoefficient)    << "\n"
-          << "#     age " << (urgency_age ()         * Task::urgencyAgeCoefficient)         << "\n";
-*/
 
   // Tag- and project-specific coefficients.
   std::map <std::string, float>::iterator var;
