@@ -31,6 +31,8 @@ t------ current release ---------------------------
         Heuser).
 - TD-57 taskdctl script assumes /bin/sh is /bin/bash (thanks to Tatjana
         Heuser).
+- TD-59 Taskd segfaults when syncing task whose annotations value is not a json
+        array (thanks to Felix Martin).
 - TD-60 Make PKI scripts easier to use (thanks to viq).
 - TD-61 README.md has broken links (thanks to Jack).
 - TD-63 Support logging to stdout when running in foreground mode. (thanks to

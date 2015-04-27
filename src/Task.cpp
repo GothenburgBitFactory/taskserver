@@ -651,7 +651,7 @@ void Task::parseJSON (const std::string& line)
       {
         // Annotations are an array of JSON objects with 'entry' and
         // 'description' values and must be converted.
-        if (i->first == "annotations")
+        if (i->first == "annotations" && i->second->type() == json::j_array)
         {
           std::map <std::string, std::string> annos;
 
