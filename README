@@ -17,7 +17,7 @@ Easy Setup
 There is a setup script that will lead you through all necessary steps to setup
 the Taskserver, create certs, configure a client and sync:
 
-  script/setup_server.bash
+  $ script/setup_server.bash
 
 
 Documentation
