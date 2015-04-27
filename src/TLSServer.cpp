@@ -230,7 +230,8 @@ void TLSServer::bind (const std::string& host, const std::string& port)
     // Convert the IP to a string and print it:
     char ipstr[INET6_ADDRSTRLEN];
     inet_ntop (p->ai_family, addr, ipstr, sizeof ipstr);
-    std::cout << "s: INFO IPv" << ipver << ": " << ipstr << "\n";
+    if (_debug)
+      std::cout << "s: INFO IPv" << ipver << ": " << ipstr << "\n";
   }
 
   if ((_socket = ::socket (res->ai_family,
@@ -367,7 +368,7 @@ void TLSTransaction::init (TLSServer& server)
   }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
   if (ret < 0)
-    throw std::string ("Handshake has failed (") + gnutls_strerror (ret) + ")";
+    throw format ("Handshake failed. {1}", gnutls_strerror (ret));
 
 #if GNUTLS_VERSION_NUMBER < 0x02090a
   // The automatic verification for the server certificate with
@@ -379,7 +380,7 @@ void TLSTransaction::init (TLSServer& server)
   {
     if (_debug)
       std::cout << "s: ERROR Certificate verification failed.\n";
-    throw std::string ("Error initializing TLS.");
+    throw format ("Error Initializing TLS. {1}", gnutls_strerror (ret));
   }
 #endif
 
@@ -427,6 +428,9 @@ int TLSTransaction::verify_certificate () const
   if (_trust == TLSServer::allow_all)
     return 0;
 
+  if (_debug)
+    std::cout << "s: INFO Verifying certificate.\n";
+
   // This verification function uses the trusted CAs in the credentials
   // structure. So you must have installed one or more CA certificates.
   unsigned int status = 0;
@@ -438,6 +442,9 @@ int TLSTransaction::verify_certificate () const
       std::cout << "s: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << "\n";
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
+
+  if (_debug && status)
+    std::cout << "s: ERROR Certificate status=" << status << "\n";
 #else
   int ret = gnutls_certificate_verify_peers2 (_session, &status);
   if (ret < 0)
@@ -446,6 +453,9 @@ int TLSTransaction::verify_certificate () const
       std::cout << "s: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << "\n";
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
+
+  if (_debug && status)
+    std::cout << "s: ERROR Certificate status=" << status << "\n";
 
   if (status == 0)
   {
@@ -484,10 +494,8 @@ int TLSTransaction::verify_certificate () const
       return GNUTLS_E_CERTIFICATE_ERROR;
   }
 #endif
-  if (ret < 0)
-    return GNUTLS_E_CERTIFICATE_ERROR;
 
-#if GNUTLS_VERSION_NUMBER >= 0x030105
+#if GNUTLS_VERSION_NUMBER >= 0x030104
   gnutls_certificate_type_t type = gnutls_certificate_type_get (_session);
   gnutls_datum_t out;
   ret = gnutls_certificate_verification_status_print (status, type, &out, 0);
@@ -498,6 +506,8 @@ int TLSTransaction::verify_certificate () const
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 
+  if (_debug)
+    std::cout << "s: INFO " << out.data << "\n";
   gnutls_free (out.data);
 #endif
 

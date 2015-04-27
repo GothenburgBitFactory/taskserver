@@ -83,12 +83,12 @@ public:
   void getClient (std::string&, int&);
 
 private:
-  int              _socket;
-  gnutls_session_t _session;
-  int              _limit;
-  bool             _debug;
-  std::string      _address;
-  int              _port;
+  int                         _socket;
+  gnutls_session_t            _session;
+  int                         _limit;
+  bool                        _debug;
+  std::string                 _address;
+  int                         _port;
   enum TLSServer::trust_level _trust;
 };
 
