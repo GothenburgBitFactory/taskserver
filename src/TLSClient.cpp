@@ -294,10 +294,12 @@ int TLSClient::verify_certificate () const
   if (_trust == TLSClient::allow_all)
     return 0;
 
+  if (_debug)
+    std::cout << "c: INFO Verifying certificate.\n";
+
   // This verification function uses the trusted CAs in the credentials
   // structure. So you must have installed one or more CA certificates.
   unsigned int status = 0;
-
   const char* hostname = _host.c_str();
 #if GNUTLS_VERSION_NUMBER >= 0x030104
   if (_trust == TLSClient::ignore_hostname)
@@ -310,6 +312,14 @@ int TLSClient::verify_certificate () const
       std::cout << "c: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << "\n";
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
+
+  // status 16450 == 0100000001000010
+  //   GNUTLS_CERT_INVALID             1<<1
+  //   GNUTLS_CERT_SIGNER_NOT_FOUND    1<<6
+  //   GNUTLS_CERT_UNEXPECTED_OWNER    1<<14  Hostname does not match
+
+  if (_debug && status)
+    std::cout << "c: ERROR Certificate status=" << status << "\n";
 #else
   int ret = gnutls_certificate_verify_peers2 (_session, &status);
   if (ret < 0)
@@ -318,6 +328,9 @@ int TLSClient::verify_certificate () const
       std::cout << "c: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << "\n";
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
+
+  if (_debug && status)
+    std::cout << "c: ERROR Certificate status=" << status << "\n";
 
   if ((status == 0) && (_trust != TLSClient::ignore_hostname))
   {
@@ -376,6 +389,8 @@ int TLSClient::verify_certificate () const
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 
+  if (_debug)
+    std::cout << "c: INFO " << out.data << "\n";
   gnutls_free (out.data);
 #endif
 
