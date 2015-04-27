@@ -44,6 +44,8 @@ t------ current release ---------------------------
         (SANs) (thanks to Louis Opter).
 - TD-79 Bad error message for wrong hostname configuration (thanks to Jens
         Erat).
+- TD-87 Error 500: Priority values may be 'H', 'M' or 'L', not '' (thanks to
+        Karsten Krohn).
 - TD-89 No man page for Taskctl (thanks to Jack Laxson).
 - TD-92 »taskd config« only checks the end of the key when changing config
         entries (thanks to Dominik Heidler).
