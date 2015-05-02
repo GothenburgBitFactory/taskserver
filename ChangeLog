@@ -31,6 +31,8 @@ t------ current release ---------------------------
         Heuser).
 - TD-57 taskdctl script assumes /bin/sh is /bin/bash (thanks to Tatjana
         Heuser).
+- TD-58 "Config file /var/taskd/config modified" message even when the file is
+        not writable (thanks to Alexey Kotlyarov).
 - TD-59 Taskd segfaults when syncing task whose annotations value is not a json
         array (thanks to Felix Martin).
 - TD-60 Make PKI scripts easier to use (thanks to viq).

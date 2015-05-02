@@ -48,7 +48,9 @@ void command_config (Database& db, const std::vector <std::string>& args)
   for (i = ++(args.begin ()); i != args.end (); ++i)
   {
     if (name == "")
+    {
       name = *i;
+    }
     else if (value == "")
     {
       nonNull = true;
@@ -73,6 +75,9 @@ void command_config (Database& db, const std::vector <std::string>& args)
   // - set <name> to <value>
   if (name != "" && nonNull)
   {
+    if (! config._original_file.writable ())
+      throw std::string (STRING_CONFIG_READ_ONLY);
+
     bool change = false;
 
     // Read .taskd/config
@@ -134,6 +139,9 @@ void command_config (Database& db, const std::vector <std::string>& args)
   // - remove <name>
   else if (name != "")
   {
+    if (! config._original_file.writable ())
+      throw std::string (STRING_CONFIG_READ_ONLY);
+
     // Read .taskd/config
     std::vector <std::string> contents;
     File::read (config._original_file, contents);

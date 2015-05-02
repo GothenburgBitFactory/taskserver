@@ -136,6 +136,7 @@
 #define STRING_CONFIG_REMOVE         "Are you sure you want to remove '{1}'?"
 #define STRING_CONFIG_NOT_FOUND      "ERROR: No entry named '{1}' found."
 #define STRING_CONFIG_SOURCE         "Configuration read from {1}"
+#define STRING_CONFIG_READ_ONLY      "Configuration file is read-only, no changes possible."
 
 #define STRING_INIT_DATA_REQUIRED    "ERROR: The '--data' option is required."
 #define STRING_INIT_PATH_MISSING     "ERROR: The '--data' path does not exist."
