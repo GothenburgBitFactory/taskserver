@@ -1,7 +1,8 @@
 Installation Instructions
 -------------------------
 
-Please follow the instructions below to build Taskserver with cmake.
+Please follow the instructions below to build and install Taskserver from
+source.
 
 
 Pre-requisites
@@ -88,6 +89,18 @@ to get absolute installation directoris:
   CMAKE_INSTALL_PREFIX/TASKD_MAN5DIR  /usr/local/share/man/man5
 
 
+Localizations
+-------------
+
+To make use of a translation, specify a language number, as found in cmake.h:
+
+  $ cmake -DLANGUAGE=1 .
+
+Currently the defined languages are:
+
+  eng_USA 1
+
+
 Uninstallation
 --------------
 
@@ -112,11 +125,13 @@ section, which includes instructions on how to contact us for help.
 Operating System Notes
 ----------------------
 
+None yet.
+
 
 Troubleshooting
 ---------------
 
-If you've recently made changes to dependencies (by reinstalling Lua, for
+If you've recently made changes to dependencies (by reinstalling them, for
 example) be sure to rerun 'cmake .' before trying to execute 'make' again.
 
 CMake will run and locate all the necessary pieces for the build, and create

@@ -1,29 +1,35 @@
 Welcome To Taskserver
 ---------------------
 
-Taskserver will allow you set up a server so your Taskwarrior client (and
-others, coming soon) can share tasks.
-
-Taskserver is a complex daemon process.  It is not for anyone who is unfamiliar
-with the operation of daemons.
+Taskserver is a daemon or service that will allow you to share tasks among
+different client applications, primarily Taskwarrior.
 
 Taskserver is compatible with Taskwarrior version 2.3.0 and later, but works
 best with the latest Taskwarrior.
 
+Taskserver is complex.  It is not for anyone who is unfamiliar with the
+operation of daemons.
 
-Easy Setup
-----------
+
+Easiest Setup
+-------------
 
 There is a setup script that will lead you through all necessary steps to setup
 the Taskserver, create certs, configure a client and sync:
 
   $ script/setup_server.bash
 
+Alternately there is online documentation that will lead you through the
+separate steps:
+
+  http://taskwarrior.org/docs/taskserver/setup.html
+
 
 Documentation
 -------------
 
-The documentation has been moved online, so we can continually improve it:
+Most of the documentation has been moved online, so we can continually improve
+it:
 
   http://taskwarrior.org/docs/
 
@@ -40,9 +46,6 @@ Please see this page for a list of issues, and their status:
 
   Taskwarrior         https://bug.tasktools.org/browse/TW
   Taskserver          https://bug.tasktools.org/browse/TD
-
-It is generally recommended that you pull latest changes for both projects as
-often as possible, to benefit from bug fixes.
 
 
 Feedback

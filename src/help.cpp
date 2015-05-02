@@ -99,6 +99,10 @@ void command_help (const std::vector <std::string>& args)
     else if (closeEnough ("status", args[1], 3))
     {
       std::cout << "\n"
+                << "Taskserver 'status' is not implemented.\n"
+                << "\n";
+/*
+      std::cout << "\n"
                 << "taskd status [options]\n"
                 << "\n"
                 << "Shows server status.\n"
@@ -109,6 +113,7 @@ void command_help (const std::vector <std::string>& args)
                 << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
                 << "  --NAME=VALUE   Temporary configuration override\n"
                 << "\n";
+*/
     }
 #ifdef FEATURE_CLIENT_INTERFACE
     else if (closeEnough ("client", args[1], 3))
