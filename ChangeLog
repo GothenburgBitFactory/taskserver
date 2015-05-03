@@ -24,6 +24,8 @@ t------ current release ---------------------------
         (thanks to Anton Khirnov, Renato Alves).
 - TD-46 gnutls: -54 Error in the pull function.
 - TD-48 Empty username is not an error (thanks to Ben Boeckel).
+- TD-51 Taskd should listen on all matching adresses and interfaces (thanks to
+        Anatolij Zelenin).
 - TD-53 Log message when server is ready for action (thanks to Renato Alves).
 - TD-54 Usage of flock() prevents compilation on Solaris (thanks to Tatjana
         Heuser).

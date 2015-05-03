@@ -101,6 +101,13 @@ void Server::setHost (const std::string& host)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Server::setFamily (const std::string& family)
+{
+  if (_log) _log->format ("Using family %s", family.c_str ());
+  _family = family;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Server::setQueueSize (int size)
 {
   if (_log) _log->format ("Queue size %d requests", size);
@@ -237,7 +244,7 @@ void Server::beginServer ()
                _cert_file,      // Cert
                _key_file);      // Key
   server.queue (_queue_size);
-  server.bind (_host, _port);
+  server.bind (_host, _port, _family);
   server.listen ();
 
   if (_log) _log->write ("Server ready");

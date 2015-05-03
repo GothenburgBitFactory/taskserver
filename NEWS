@@ -19,6 +19,8 @@ New configuration options in Taskserver 1.1.0
   - Server CRL is now optional.
   - New 'trust' setting can be either 'strict' or 'allow all', and defaults to
     'strict'.
+  - New 'family' setting can specify whether 'IPv4' or 'IPv6' are used to bind
+    to the host/port.
 
 Removed features in 1.1.0
 

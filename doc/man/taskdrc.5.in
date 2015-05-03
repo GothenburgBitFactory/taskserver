@@ -39,6 +39,11 @@ Fully qualified path of the Taskserver extension scripts.  Currently there are
 none.
 
 .TP
+.B family=IPv4
+Specifies the address family to use.  Can be 'IPv4', 'IPv6', or not specified
+which means 'any'.  Default is no value.
+
+.TP
 .B ip.log=on
 Logs the IP addresses of incoming requests.
 

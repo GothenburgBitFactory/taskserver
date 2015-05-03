@@ -38,6 +38,7 @@ public:
   virtual ~Server ();
   void setHost (const std::string&);
   void setPort (const std::string&);
+  void setFamily (const std::string&);
   void setPoolSize (int);
   void setQueueSize (int);
   void setDaemon ();
@@ -73,6 +74,7 @@ protected:
 private:
   std::string _host;
   std::string _port;
+  std::string _family;
   int _pool_size;
   int _queue_size;
   bool _daemon;

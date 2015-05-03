@@ -879,14 +879,16 @@ void command_server (Database& db, const std::vector <std::string>& args)
     if (db._config->getBoolean ("debug"))
       log.write ("Debug mode");
 
+    // It is important that the ':' found should be the *last* one, in order
+    // to accomodate IPv6 addresses.
     std::string serverDetails = db._config->get ("server");
     std::string::size_type colon = serverDetails.rfind (':');
-
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 
     std::string host = serverDetails.substr (0, colon);
     std::string port = serverDetails.substr (colon + 1);
+    std::string family = db._config->get ("family");
 
     // Create a taskd server object.
     Daemon server        (*db._config);
@@ -895,6 +897,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
     server.setConfig     (db._config);
     server.setHost       (host);
     server.setPort       (port);
+    server.setFamily     (family);
     server.setQueueSize  (db._config->getInteger ("queue.size"));
     server.setLimit      (db._config->getInteger ("request.limit"));
     server.setLogClients (db._config->getBoolean ("ip.log"));
