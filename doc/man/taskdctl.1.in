@@ -1,4 +1,4 @@
-.TH taskdctl 1 2014-02-22 "${PACKAGE_STRING}" "User Manuals"
+.TH taskdctl 1 2015-05-05 "${PACKAGE_STRING}" "User Manuals"
 
 .SH NAME
 taskdctl \- Taskserver control program

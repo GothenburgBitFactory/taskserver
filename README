@@ -4,7 +4,7 @@ Welcome To Taskserver
 Taskserver is a daemon or service that will allow you to share tasks among
 different client applications, primarily Taskwarrior.
 
-Taskserver is compatible with Taskwarrior version 2.3.0 and later, but works
+Taskserver is compatible with Taskwarrior version 2.4.x and later, but works
 best with the latest Taskwarrior.
 
 Taskserver is complex.  It is not for anyone who is unfamiliar with the
@@ -36,6 +36,7 @@ it:
 In addition there are two man pages installed:
 
   taskd(1)
+  taskdctl(1)
   taskdrc(5)
 
 
