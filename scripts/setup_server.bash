@@ -110,8 +110,8 @@ fi
 # Verify certtool or gnutls-certtool is available.
 log_line "Looking for certtool or gnutls-certtool"
 CERTTOOL=
-FOUND_GNUTLSCERTTOOL=$(which gnutls-certtool)
-FOUND_CERTTOOL=$(which certtool)
+FOUND_GNUTLSCERTTOOL=$(which gnutls-certtool 2>/dev/null)
+FOUND_CERTTOOL=$(which certtool 2>/dev/null)
 if [ -n "$FOUND_GNUTLSCERTTOOL" ]; then
   CERTTOOL=$FOUND_GNUTLSCERTTOOL
   log_ok "Found $FOUND_GNUTLSCERTTOOL"
@@ -127,8 +127,8 @@ fi
 
 # Verify taskd is in $PATH.
 log_line "Looking for 'taskd' in \$PATH"
-TASKD_BINARY=$(which taskd)
-if [ -n "TASKD_BINARY" ]; then
+TASKD_BINARY=$(which taskd 2>/dev/null)
+if [ -n "$TASKD_BINARY" ]; then
   log_ok "Found $TASKD_BINARY"
 else
   log_error "Not found"
@@ -140,8 +140,8 @@ fi
 
 # Verify taskdctl is in $PATH.
 log_line "Looking for 'taskdctl' in \$PATH"
-TASKDCTL_BINARY=$(which taskdctl)
-if [ -n "TASKDCTL_BINARY" ]; then
+TASKDCTL_BINARY=$(which taskdctl 2>/dev/null)
+if [ -n "$TASKDCTL_BINARY" ]; then
   log_ok "Found $TASKDCTL_BINARY"
 else
   log_error "Not found"
@@ -237,7 +237,7 @@ fi
 
 # Initialize $TASKDDATA.
 log_line "Running 'taskd init --data \$TASKDDATA' --log"
-OUTPUT=$($TASKD_BINARY init --data $TASKDDATA --log 2>&1)
+OUTPUT=$($TASKD_BINARY init --data "$TASKDDATA" --log 2>&1)
 if [ $? -eq 0 ]; then
   log_ok "Ok"
 else
