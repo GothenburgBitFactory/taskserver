@@ -263,10 +263,11 @@ configure "Configuring ciphers"       ciphers       NORMAL
 
 # Verify there are no certs in $DEFAULT_PKI
 cd $DEFAULT_PKI
-OUTPUT=$(ls $DEFAULT_PKI/*.pem 2>&1)
+log_line "Preparing PEM files in $DEFAULT_PKI"
+OUTPUT=$(ls *.pem 2>&1)
 if [ $? -eq 0 ]; then
-  log "There are PEM files in $DEFAULT_PKI, which will be overwritten"
-  log_line "Continue? [y|N]"
+  log_warning "Existing PEM files found - they will be overwritten"
+  log_line "Overwrite? [y|N]"
   read PROCEED
   PROCEED="${PROCEED:-N}"
   if [ "$PROCEED" != "y" ]; then
@@ -279,7 +280,7 @@ fi
 
 log_line "Generating server CA cert"
 
-OUTPUT=$($DEFAULT_PKI/generate.ca 2>&1)
+OUTPUT=$(./generate.ca 2>&1)
 if [ $? -eq 0 ]; then
   log_ok "Ok"
 
