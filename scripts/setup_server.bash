@@ -277,6 +277,8 @@ if [ $? -eq 0 ]; then
     log_error "Terminating"
     exit 1
   fi
+else
+  log_ok "Starting..."
 fi
 
 # TODO Verify there are no certs in $TASKDDATA/cert
