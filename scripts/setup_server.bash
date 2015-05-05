@@ -257,7 +257,7 @@ configure "Configuring ciphers"       ciphers       NORMAL
 
 # Verify there are no certs in $DEFAULT_PKI
 cd $DEFAULT_PKI
-OUTPUT=$(ls $DEFAULT_PKI/*.pem)
+OUTPUT=$(ls $DEFAULT_PKI/*.pem 2>&1)
 if [ $? -eq 0 ]; then
   log "There are PEM files in $DEFAULT_PKI, which will be overwritten"
   log_line "Continue? [y|N]"
