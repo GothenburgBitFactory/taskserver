@@ -34,6 +34,9 @@
 # 2. To provide an example of the setup process for advanced users to modify.
 
 ################################################################################
+# Ensure spaces are handled as-is in paths read from user
+IFS=''
+
 # Useful functions.
 log_ok()
 {
@@ -402,7 +405,7 @@ if [ "$ANSWER" == "y" ]; then
 
     if [ -n "$ORGNAME" ]; then
 
-      log_line "Enter the full user name (e.g. 'First Last')"
+      log_line "Enter the full user name (e.g. First Last)"
       read USERNAME
       if [ -n "$USERNAME" ]; then
 
@@ -516,11 +519,11 @@ fi
 
 log "Launch your Taskserver using this command:"
 log
-log "    TASKDDATA=$TASKDDATA $TASKDCTL_BINARY start"
+log "    TASKDDATA=\"$TASKDDATA\" \"$TASKDCTL_BINARY\" start"
 log
 log "Shut down your Taskserver using this command:"
 log
-log "    TASKDDATA=$TASKDDATA $TASKDCTL_BINARY stop"
+log "    TASKDDATA=\"$TASKDDATA\" \"$TASKDCTL_BINARY\" stop"
 log
 
 log_ok "Done"
