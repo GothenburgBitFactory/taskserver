@@ -52,7 +52,7 @@ log_error()
 
 log_line()
 {
-  printf "%-60s" "$1"
+  printf "%-60s " "$1"
 }
 
 log()
