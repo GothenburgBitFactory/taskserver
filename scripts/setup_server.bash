@@ -74,6 +74,28 @@ configure()
   fi
 }
 
+makedir()
+{
+  log_line " --> $1"
+  if [ -d "$2" ]; then
+    log_warning "Already exists"
+  else
+    PARENT=$(dirname $2)
+
+    if [ -w $PARENT ]; then
+      mkdir -p "$2"
+      if [ $? -eq 0 ]; then
+        log_ok "Ok"
+      else
+        log_error "Failed"
+        log
+        log "There was a problem creating $2"
+        exit 1
+      fi
+    fi
+  fi
+}
+
 ################################################################################
 # Taskserver defaults.
 DEFAULT_SETUP="$0"
@@ -211,29 +233,13 @@ if [ "$PROCEED" != "y" ]; then
   exit 1
 fi
 
-# Create $TASKDDATA.
-log_line "Creating TASKDDATA"
-if [ -d "$TASKDDATA" ]; then
-  log_warning "Already exists"
-else
-  PARENT=$(dirname $TASKDDATA)
-  if [ -w $PARENT ]; then
-    mkdir -p $TASKDDATA $TASKDDATA/cert $TASKDDATA/log $TASKDDATA/run
-    if [ $? -eq 0 ]; then
-      log_ok "Created"
-    else
-      log_error "Failed"
-      log
-      log "There was a problem creating $TASKDDATA"
-      exit 1
-    fi
-  else
-    log_error "Permission error"
-    log
-    log "$PARENT is not writable for $USER"
-    exit 1
-  fi
-fi
+# Create $TASKDDATA and subfolders
+log "Creating \$TASKDDATA and subfolders"
+
+makedir "\$TASKDDATA" $TASKDDATA
+makedir "\$TASKDDATA/cert" $TASKDDATA/cert
+makedir "\$TASKDDATA/log" $TASKDDATA/log
+makedir "\$TASKDDATA/run" $TASKDDATA/run
 
 # Initialize $TASKDDATA.
 log_line "Running 'taskd init --data \$TASKDDATA' --log"
