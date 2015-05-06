@@ -81,6 +81,7 @@ t------ current release ---------------------------
 - If the 'trust' setting contains a bad value, the 'diag' command will
   indicate this, and the server will log it.
 - Removed linking of pthreads.
+- 'trust' is now given a default 'strict' on config initialization
 
 ------ old releases ------------------------------
 

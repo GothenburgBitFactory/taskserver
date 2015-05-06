@@ -64,6 +64,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
   db._config->setIfBlank ("request.limit", "1048576");
   db._config->setIfBlank ("confirmation",  "1");
   db._config->setIfBlank ("verbose",       "1");
+  db._config->setIfBlank ("trust",         "strict");
 
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
