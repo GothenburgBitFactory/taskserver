@@ -109,13 +109,14 @@ DEFAULT_PORT=53589
 
 # Explain what is going to happen.
 log
-log_warning "This is an experimental script.  It does not work yet."
+log_warning "This is an experimental script. Please report any problems."
 log
 log "Simple Taskserver configuration and setup."
 log
 log "This script will check your system, then setup and launch a Taskserver"
 log "instance for you. You will be asked to confirm before anything is written."
-log "Please be careful with your answers."
+log "Please be careful with your answers and confirm that what the script"
+log "collected is correct."
 log
 
 # Show setup script location.
