@@ -1,3 +1,7 @@
+1.2.0 () -
+
+------- current release ---------------------------
+
 1.1.0 (2015-05-10) 6c431da4f3c3e9fb2b9cb7dd37a32d4822777071
 
 - #1497 taskd ignores the host definition and always listens on 0.0.0.0
@@ -83,7 +87,7 @@
 - Fixed several issues with scripts/setup_server.bash when folders contain
   spaces or relative paths are used
 
-------- current release ---------------------------
+------- old release ---------------------------
 
 1.0.0 (2014-01-15) 3a2142f2708bad9ffad9f70ab4b163de2068e6c7
 
@@ -96,8 +100,6 @@
 - Removed need for PATH_MAX (thanks to Jakub Wilk).
 - Changed name to 'Taskserver'.
 - Minor documentation corrections.
-
-------- old release ---------------------------
 
 1.0.0.beta2 (2013-11-03)
 
