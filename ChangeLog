@@ -162,7 +162,7 @@
 - Supports 'client.allow' and 'client.deny' lists.
 - Client interface now an optional feature.
 
-0.12.0 (2013-06-03
+0.12.0 (2013-06-03)
 
 - Added IP logging option.
 - JSON support.
