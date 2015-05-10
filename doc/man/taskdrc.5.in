@@ -1,4 +1,4 @@
-.TH taskd 5 2015-05-05 "${PACKAGE_STRING}" "User Manuals"
+.TH taskd 5 2015-05-10 "${PACKAGE_STRING}" "User Manuals"
 
 .SH NAME
 taskdrc \- Configuration details for the taskd(1) server
