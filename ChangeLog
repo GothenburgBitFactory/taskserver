@@ -1,4 +1,4 @@
-1.1.0 (2015-05-10) -
+1.1.0 (2015-05-10) 6c431da4f3c3e9fb2b9cb7dd37a32d4822777071
 
 - #1497 taskd ignores the host definition and always listens on 0.0.0.0
 - #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
