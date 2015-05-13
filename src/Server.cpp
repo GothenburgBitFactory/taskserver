@@ -214,9 +214,12 @@ void Server::beginServer ()
     writePidFile ();
   }
 
-  signal (SIGHUP,  signal_handler);  // Graceful stop
-  signal (SIGUSR1, signal_handler);  // Config reload
-  signal (SIGUSR2, signal_handler);
+  if (signal (SIGHUP,  signal_handler) == SIG_ERR) // Graceful stop
+    throw std::string ("Failed to register handler for SIGHUP... Exiting.");
+  if (signal (SIGUSR1, signal_handler) == SIG_ERR) // Config reload
+    throw std::string ("Failed to register handler for SIGUSR1... Exiting.");
+  if (signal (SIGUSR2, signal_handler) == SIG_ERR)
+    throw std::string ("Failed to register handler for SIGUSR2... Exiting.");
 
   TLSServer server;
   if (_config)
