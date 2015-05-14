@@ -1,9 +1,15 @@
 
 New Features in Taskserver 1.2.0
 
+  - When the server specified is ::, can use dual-stack IPv4/IPv6.
+
 New configuration options in Taskserver 1.2.0
 
+  -
+
 Removed features in 1.2.0
+
+  -
 
 ---
 
