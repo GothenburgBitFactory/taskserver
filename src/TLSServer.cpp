@@ -255,6 +255,19 @@ void TLSServer::bind (
                     sizeof (on)) == -1)
     throw std::string (::strerror (errno));
 
+  // Also listen to IPv4 with IPv6 in dual-stack situations
+  if (res->ai_family == AF_INET6)
+  {
+    int off = 0;
+    if (::setsockopt (_socket,
+                      IPPROTO_IPV6,
+                      IPV6_V6ONLY,
+                      (const void*) &off,
+                      sizeof (off)) == -1)
+      if (_debug)
+        std::cout << "s: Unable to use IPv6 dual stack\n";
+  }
+
   if (::bind (_socket, res->ai_addr, res->ai_addrlen) == -1)
   {
     // TODO This is research to determine whether this is the right location to
