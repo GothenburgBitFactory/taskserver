@@ -882,7 +882,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
     // It is important that the ':' found should be the *last* one, in order
     // to accomodate IPv6 addresses.
     std::string serverDetails = db._config->get ("server");
-    std::string::size_type colon = serverDetails.rfind (':');
+    auto colon = serverDetails.rfind (':');
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 

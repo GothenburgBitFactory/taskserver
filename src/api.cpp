@@ -84,7 +84,7 @@ bool taskd_applyOverride (Config& config, const std::string& arg)
   // If the arg looks like '--NAME=VALUE' or '--NAME:VALUE', apply it to config.
   if (arg.substr (0, 2) == "--")
   {
-    std::string::size_type equal = arg.find ('=', 2);
+    auto equal = arg.find ('=', 2);
     if (equal == std::string::npos)
       equal = arg.find (':', 2);
 
@@ -163,7 +163,7 @@ bool taskd_sendMessage (
   Msg& in)
 {
   std::string destination = config.get (to);
-  std::string::size_type colon = destination.rfind (':');
+  auto colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 

@@ -239,7 +239,7 @@ const std::string escape (const std::string& value, char c)
   std::string search  = tmp;
   std::string replace = "\\" + search;
 
-  std::string::size_type pos = modified.find (search);
+  auto pos = modified.find (search);
   while (pos != std::string::npos) {
     if ( modified[pos-1] != '\\' )
       modified.replace (pos, 1, replace);

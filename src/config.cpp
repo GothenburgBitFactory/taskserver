@@ -89,8 +89,8 @@ void command_config (Database& db, const std::vector <std::string>& args)
     for (line = contents.begin (); line != contents.end (); ++line)
     {
       // If there is a comment on the line, it must follow the pattern.
-      std::string::size_type comment = line->find ("#");
-      std::string::size_type pos     = line->find (name + "=");
+      auto comment = line->find ("#");
+      auto pos     = line->find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
@@ -152,8 +152,8 @@ void command_config (Database& db, const std::vector <std::string>& args)
     for (line = contents.begin (); line != contents.end (); ++line)
     {
       // If there is a comment on the line, it must follow the pattern.
-      std::string::size_type comment = line->find ("#");
-      std::string::size_type pos     = line->find (name + "=");
+      auto comment = line->find ("#");
+      auto pos     = line->find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
