@@ -25,8 +25,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
-#include <iostream>
+// If <iostream> is included, put it after <stdio.h>, because it includes
+// <stdio.h>, and therefore would ignore the _WITH_GETLINE.
+#ifdef FREEBSD
+#define _WITH_GETLINE
+#endif
 #include <stdio.h>
+#include <iostream>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
