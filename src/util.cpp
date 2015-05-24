@@ -40,10 +40,7 @@
 // std::getline, the newline can be detected, and the prompt re-written.
 bool confirm (const std::string& question)
 {
-  std::vector <std::string> options;
-  options.push_back ("yes");
-  options.push_back ("no");
-
+  std::vector <std::string> options {"yes", "no"};
   std::string answer;
   std::vector <std::string> matches;
 
