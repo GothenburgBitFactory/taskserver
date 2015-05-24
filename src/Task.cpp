@@ -789,7 +789,7 @@ void Task::parseLegacy (const std::string& line)
               for (size_t i = 0; i < pairs.size (); ++i)
               {
                 std::string pair = pairs[i];
-                std::string::size_type colon = pair.find (":");
+                auto colon = pair.find (":");
                 if (colon != std::string::npos)
                 {
                   std::string name = pair.substr (0, colon);
@@ -1471,7 +1471,7 @@ void Task::validate (bool applyDefault /* = true */)
       if (var->first.substr (0, 4) == "uda." &&
           var->first.find (".default") != std::string::npos)
       {
-        std::string::size_type period = var->first.find ('.', 4);
+        auto period = var->first.find ('.', 4);
         if (period != std::string::npos)
           udas.push_back (var->first.substr (4, period - 4));
       }
@@ -1615,9 +1615,9 @@ int Task::determineVersion (const std::string& line)
     //   uuid status [tags] [attributes] [annotations] description\n
     //
     // Scan for the number of [] pairs.
-    std::string::size_type tagAtts  = line.find ("] [", 0);
-    std::string::size_type attsAnno = line.find ("] [", tagAtts + 1);
-    std::string::size_type annoDesc = line.find ("] ",  attsAnno + 1);
+    auto tagAtts  = line.find ("] [", 0);
+    auto attsAnno = line.find ("] [", tagAtts + 1);
+    auto annoDesc = line.find ("] ",  attsAnno + 1);
     if (tagAtts  != std::string::npos &&
         attsAnno != std::string::npos &&
         annoDesc != std::string::npos)
@@ -1703,7 +1703,7 @@ float Task::urgency_c () const
       if (var->first.substr (0, 13) == "urgency.user.")
       {
         // urgency.user.project.<project>.coefficient
-        std::string::size_type end = std::string::npos;
+        auto end = std::string::npos;
         if (var->first.substr (13, 8) == "project." &&
             (end = var->first.find (".coefficient")) != std::string::npos)
         {
@@ -1726,7 +1726,7 @@ float Task::urgency_c () const
       else if (var->first.substr (0, 12) == "urgency.uda.")
       {
         // urgency.uda.<name>.coefficient
-        std::string::size_type end = var->first.find (".coefficient");
+        auto end = var->first.find (".coefficient");
         if (end != std::string::npos)
           if (has (var->first.substr (12, end - 12)))
             value += var->second;

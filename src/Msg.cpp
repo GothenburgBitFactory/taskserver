@@ -144,7 +144,7 @@ bool Msg::parse (const std::string& input)
   _header.clear ();
   _payload = "";
 
-  std::string::size_type separator = input.find ("\n\n");
+  auto separator = input.find ("\n\n");
   if (separator == std::string::npos)
     throw std::string ("ERROR: Malformed message");
 
@@ -154,7 +154,7 @@ bool Msg::parse (const std::string& input)
   std::vector <std::string>::iterator i;
   for (i = lines.begin (); i != lines.end (); ++i)
   {
-    std::string::size_type delimiter = i->find (':');
+    auto delimiter = i->find (':');
     if (delimiter == std::string::npos)
       throw std::string ("ERROR: Malformed message header '") + *i + "'";
 
