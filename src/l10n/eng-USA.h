@@ -137,6 +137,8 @@
 #define STRING_CONFIG_SOURCE         "Configuration read from {1}"
 #define STRING_CONFIG_READ_ONLY      "Configuration file is read-only, no changes possible."
 
+#define STRING_FILE_PERMS            "Incorrect permissions for '{1}'."
+
 #define STRING_INIT_DATA_REQUIRED    "ERROR: The '--data' option is required."
 #define STRING_INIT_PATH_MISSING     "ERROR: The '--data' path does not exist."
 #define STRING_INIT_PATH_NOT_DIR     "ERROR: The '--data' path is not a directory."

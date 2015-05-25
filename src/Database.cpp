@@ -29,9 +29,7 @@
 #include <sstream>
 #include <algorithm>
 #include <utf8.h>
-#include <Path.h>
-#include <Directory.h>
-#include <File.h>
+#include <FS.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>

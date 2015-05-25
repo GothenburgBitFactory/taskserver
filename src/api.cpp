@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <TLSClient.h>
-#include <Directory.h>
+#include <FS.h>
 #include <Date.h>
 #include <Color.h>
 #include <Log.h>

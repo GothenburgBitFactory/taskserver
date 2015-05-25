@@ -14,10 +14,9 @@ add_executable (taskd_executable taskd.cpp
                                  diag.cpp
                                  Database.cpp   Database.h
                                  Date.cpp       Date.h
-                                 Directory.cpp  Directory.h
                                  Duration.cpp   Duration.h
                                  l10n/eng-USA.h
-                                 File.cpp       File.h
+                                 FS.cpp         FS.h
                                  help.cpp
                                  i18n.h
                                  init.cpp
@@ -25,7 +24,6 @@ add_executable (taskd_executable taskd.cpp
                                  Log.cpp        Log.h
                                  Msg.cpp        Msg.h
                                  Nibbler.cpp    Nibbler.h
-                                 Path.cpp       Path.h
                                  RX.cpp         RX.h
                                  Server.cpp     Server.h
                                  status.cpp
