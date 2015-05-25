@@ -32,7 +32,7 @@
 #include <ConfigFile.h>
 #include <Msg.h>
 #include <Log.h>
-#include <Directory.h>
+#include <FS.h>
 #include <Database.h>
 
 void command_init     (Database&, const std::vector <std::string>&);

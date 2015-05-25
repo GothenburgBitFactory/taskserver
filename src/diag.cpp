@@ -35,8 +35,7 @@
 #include <ConfigFile.h>
 #include <Color.h>
 #include <Msg.h>
-#include <File.h>
-#include <Directory.h>
+#include <FS.h>
 #include <JSON.h>
 #include <text.h>
 #include <taskd.h>

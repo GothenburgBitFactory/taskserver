@@ -114,6 +114,13 @@ if (GNUTLS_FOUND)
   set (TASKD_LIBRARIES    ${TASKD_LIBRARIES}    ${GNUTLS_LIBRARIES})
 endif (GNUTLS_FOUND)
 
+check_function_exists (timegm          HAVE_TIMEGM)
+check_function_exists (get_current_dir_name HAVE_GET_CURRENT_DIR_NAME)
+
+check_struct_has_member ("struct tm"   tm_gmtoff    time.h                   HAVE_TM_GMTOFF)
+check_struct_has_member ("struct stat" st_birthtime "sys/types.h;sys/stat.h" HAVE_ST_BIRTHTIME)
+
+
 message ("-- Looking for libuuid")
 if (DARWIN OR FREEBSD)
   # Apple and FreeBSD include the uuid functions in their libc, rather than libuuid
@@ -139,12 +146,6 @@ else (HAVE_UUID_UNPARSE_LOWER)
   message ("-- Found libuuid, using internal uuid_unparse_lower")
 endif (HAVE_UUID_UNPARSE_LOWER)
 
-check_function_exists (timegm          HAVE_TIMEGM)
-check_function_exists (get_current_dir_name HAVE_GET_CURRENT_DIR_NAME)
-
-check_struct_has_member ("struct tm"   tm_gmtoff    time.h                   HAVE_TM_GMTOFF)
-check_struct_has_member ("struct stat" st_birthtime "sys/types.h;sys/stat.h" HAVE_ST_BIRTHTIME)
-
 # Set the package language.
 if (LANGUAGE)
   set (PACKAGE_LANGUAGE ${LANGUAGE})
@@ -161,9 +162,9 @@ configure_file (
 
 add_subdirectory (src)
 add_subdirectory (doc)
-if (EXISTS test)
+if (EXISTS ${CMAKE_SOURCE_DIR}/test)
   add_subdirectory (test EXCLUDE_FROM_ALL)
-endif (EXISTS test)
+endif (EXISTS ${CMAKE_SOURCE_DIR}/test)
 
 set (doc_FILES NEWS ChangeLog INSTALL AUTHORS COPYING)
 foreach (doc_FILE ${doc_FILES})
