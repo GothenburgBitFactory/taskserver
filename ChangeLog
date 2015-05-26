@@ -1,5 +1,7 @@
 1.2.0 () -
 
+- TD-96 server_setup.bash won't run on Mac OS X and BSD (thanks to Dafo with
+        the golden hair).
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
   which means a confguration setting of server=:::<someport>. Related to TD-51
   (thanks to Johannes Wienke).

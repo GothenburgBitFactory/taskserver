@@ -99,13 +99,28 @@ makedir()
   fi
 }
 
+setpkipath()
+{
+    if [ "${OSTYPE:0:6}" = "darwin" ]; then
+        local _script_name=$(basename $2)
+        local _script_path=$(pwd)/$2
+        local _pki_path=${_script_path:0:${#_script_path}-${#_script_name}}$3
+        eval "$1=$_pki_path"
+    elif [[ "${OSTYPE}" =~ \w*bsd.* ]]; then
+        eval "$1=$(realpath $(dirname $2))/$3"
+    else
+        eval "$1=$(readlink -f $(dirname $2))/$3"
+    fi
+
+}
+
 ################################################################################
 # Taskserver defaults.
 DEFAULT_SETUP="$0"
-DEFAULT_PKI=$(readlink -f $(dirname $DEFAULT_SETUP)/../pki)
 DEFAULT_TASKDDATA=/var/taskd
 DEFAULT_HOST=localhost
 DEFAULT_PORT=53589
+setpkipath DEFAULT_PKI $DEFAULT_SETUP ../pki
 
 # Explain what is going to happen.
 log
@@ -126,7 +141,7 @@ log_ok $DEFAULT_SETUP
 # Look for pki scripts, relative to $0, which assumes this script is in the
 # $REPO/scripts/ directory.
 log_line "Checking for pki script directory"
-if [ -d $DEFAULT_PKI ]; then
+if [ -n "$DEFAULT_PKI" -a -d $DEFAULT_PKI ]; then
   log_ok "Found $DEFAULT_PKI"
 else
   log_error "error"
