@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import atexit
 import unittest
+import json
 from .utils import (run_cmd_wait, run_cmd_wait_nofail, which,
                     task_binary_location)
 from .exceptions import CommandError
@@ -146,6 +147,35 @@ class Task(object):
         with open(self.taskrc, "r") as f:
             return f.readlines()
 
+    def export(self, export_filter=None):
+        """Run "task export", return JSON array of exported tasks."""
+        if export_filter is None:
+            export_filter = ""
+
+        code, out, err = self.runSuccess("rc.json.array=1 {0} export"
+                                         "".format(export_filter))
+
+        return json.loads(out)
+
+    @staticmethod
+    def _split_string_args_if_string(args):
+        """Helper function to parse and split into arguments a single string
+        argument. The string is literally the same as if written in the shell.
+        """
+        # Enable nicer-looking calls by allowing plain strings
+        try:
+            # Python 2.x
+            if isinstance(args, basestring):
+                import shlex
+                args = shlex.split(args)
+        except NameError:
+            # Python 3.x
+            if isinstance(args, str):
+                import shlex
+                args = shlex.split(args)
+
+        return args
+
     def runSuccess(self, args=(), input=None, merge_streams=False,
                    timeout=5):
         """Invoke task with given arguments and fail if exit code != 0
@@ -167,6 +197,8 @@ class Task(object):
         """
         # Create a copy of the command
         command = self._command[:]
+
+        args = self._split_string_args_if_string(args)
         command.extend(args)
 
         output = run_cmd_wait_nofail(command, input,
@@ -199,6 +231,8 @@ class Task(object):
         """
         # Create a copy of the command
         command = self._command[:]
+
+        args = self._split_string_args_if_string(args)
         command.extend(args)
 
         output = run_cmd_wait_nofail(command, input,
