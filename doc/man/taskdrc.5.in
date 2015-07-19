@@ -88,7 +88,6 @@ Fully qualified path to the server key.
 .B trust
 Trust level of the server, which determines how the client certificates are
 verified.  If the value is 'allow all' then no verification is performed.
-Defaults to 'strict'.
 
 Note that sending the HUP signal to the Taskserver causes a configuration
 file reload before the next request is handled.
