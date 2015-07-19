@@ -27,7 +27,7 @@ The commands are:
 .B taskd init [--data <root>] [options]
 Performs a one-time initialization of the Taskserver instance.  Creates the
 bare data structure.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd help <command> [options]
@@ -37,7 +37,7 @@ Provides option and syntax help for each command.
 .B taskd config [options] [--data <root>] [--force] [<name> [<value>]]
 Allows modification of the taskd configuration.  Can add, remove, modify or list
 all configuration settings.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd server [--daemon] [options]
@@ -54,7 +54,7 @@ file reload before the next request is handled.
 .TP
 .B taskd add [--data <root>] user <org> <user>
 Adds organizations, groups and users.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd remove [--data <root>] org <org>
@@ -63,7 +63,7 @@ Either '--data <root>' must be specified, or TASKDDATA must be set.
 .TP
 .B taskd remove [--data <root>] user <org> <user>
 Removes organizations, groups and users.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd suspend [--data <root>] org <org>
@@ -72,7 +72,7 @@ Either '--data <root>' must be specified, or TASKDDATA must be set.
 .TP
 .B taskd suspend [--data <root>] user <org> <user>
 Suspends organizations, groups and users.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd resume [--data <root>] org <org>
@@ -81,7 +81,7 @@ Either '--data <root>' must be specified, or TASKDDATA must be set.
 .TP
 .B taskd resume [--data <root>] user <org> <user>
 Resumes organizations, groups and users.
-Either '--data <root>' must be specified, or TASKDDATA must be set.
+Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd diagnostics
@@ -129,7 +129,7 @@ this file.
 Note that any configuration variable may be overridden on the command line using
 this syntax:
 
-  $ taskd server --NAME=VALUE
+  $ taskd server \-\-NAME=VALUE
 
 In all commands but one, this will _temporarily_ override the value, but with
 the 'init' command, which creates a config file, overrides are made permanent.
@@ -141,7 +141,7 @@ command line.
 
 .TP
 .B TASKDDATA=<root>
-Most command require either '--data <root>' or this environment variable.  If
+Most command require either '\-\-data <root>' or this environment variable.  If
 both are provided, the command line overrides the environment.
 
 .SH "CREDITS & COPYRIGHTS"

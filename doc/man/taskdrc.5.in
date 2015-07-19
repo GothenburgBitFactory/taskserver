@@ -99,7 +99,7 @@ command line.
 
 .TP
 .B TASKDDATA=<root>
-Most command require either '--data <root>' or this environment variable.  If
+Most command require either '\-\-data <root>' or this environment variable.  If
 both are provided, the command line overrides the environment.
 
 .SH "CREDITS & COPYRIGHTS"
