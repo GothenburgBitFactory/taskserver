@@ -201,15 +201,22 @@ void command_diag (Database& config, const std::vector <std::string>& args)
     else
     {
       std::cout << "        root: "
-                << root_dir._data << (root_dir.readable ()
-                    ? " (readable)"
-                    : " (not readable)")
+                << root_dir._data
+                << (root_dir.readable ()
+                     ? ", readable"
+                     : ", not readable")
+                << (root_dir.writable ()
+                     ? ", writable"
+                     : ", not writable")
                 << "\n";
 
       File config_file (root_dir._data + "/config");
       std::cout << "      config: "
-                << config_file._data << (config_file.readable () ? " (readable)" : " (missing)")
-                << "\n";
+                << config_file._data
+                << (config_file.readable () ? ", readable" : ", missing")
+                << (config_file.writable () ? ", writable" : ", not writable")
+                << config_file.size ()
+                << " bytes\n";
 
       if (config_file.readable ())
       {
@@ -224,17 +231,21 @@ void command_diag (Database& config, const std::vector <std::string>& args)
         File client_key (config._config->get ("client.key"));
 
         std::cout << "          CA: "
-                  << ca_cert._data << (ca_cert.readable () ? " (readable)" : "")
-                  << "\n";
+                  << ca_cert._data << (ca_cert.readable () ? ", readable, " : ", ")
+                  << ca_cert.size ()
+                  << " bytes\n";
         std::cout << " Certificate: "
-                  << server_cert._data << (server_cert.readable () ? " (readable)" : " (missing)")
-                  << "\n";
+                  << server_cert._data << (server_cert.readable () ? ", readable, " : ", missing, ")
+                  << server_cert.size ()
+                  << " bytes\n";
         std::cout << "         Key: "
-                  << server_key._data << (server_key.readable () ? " (readable)" : " (missing)")
-                  << "\n";
+                  << server_key._data << (server_key.readable () ? ", readable, " : ", missing, ")
+                  << server_key.size ()
+                  << " bytes\n";
         std::cout << "         CRL: "
-                  << server_crl._data << (server_crl.readable () ? " (readable)" : "")
-                  << "\n";
+                  << server_crl._data << (server_crl.readable () ? ", readable, " : "")
+                  << server_crl.size ()
+                  << " bytes\n";
 
         File log (config._config->get ("log"));
         std::cout << "         Log: "
