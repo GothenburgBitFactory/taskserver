@@ -1,4 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
+if(POLICY CMP0037)
+  cmake_policy(SET CMP0037 OLD)
+endif()
 include_directories (${CMAKE_SOURCE_DIR}
                      ${CMAKE_SOURCE_DIR}/src
                      ${CMAKE_SOURCE_DIR}/test
@@ -28,7 +31,7 @@ configure_file (run_all.in run_all)
 
 add_custom_target (test ./run_all --verbose
                         DEPENDS ${test_SRCS} taskd_executable
-                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test)
 
 add_custom_target (build_tests DEPENDS ${test_SRCS}
                                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
