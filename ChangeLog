@@ -10,6 +10,8 @@
   which means a confguration setting of server=:::<someport>. Related to TD-51
   (thanks to Johannes Wienke).
 - Added "diag" command details regarding file sizes.
+- Improved error messages for users who skip the 'task sync init' requirement
+  (thanks to Komasa).
 
 ------- current release ---------------------------
 

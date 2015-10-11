@@ -557,7 +557,7 @@ unsigned int Daemon::find_branch_point (
   }
 
   if (!found)
-    throw std::string ("Client sync key not found.");
+    throw std::string ("Could not find the last sync transaction. Did you skip the 'task sync init' requirement?");
 
   _log->format ("[%d] Branch point: %s --> %u", _txn_count, key.c_str (), branch);
   return branch;
@@ -639,7 +639,7 @@ unsigned int Daemon::find_common_ancestor (
     }
   }
 
-  throw std::string ("ERROR: Could not find common ancestor for ") + uuid;
+  throw std::string ("ERROR: Could not find common ancestor for ") + uuid + ". Did you skip the 'task sync init' requirement?";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
