@@ -13,8 +13,10 @@ Fully qualified path to the CA certificate.  Optional.
 
 .TP
 .B ciphers
-List of GnuTLS ciphers to use.  Default is "NORMAL".  See your GnuTLS
-documentation for full details.
+List of GnuTLS ciphers to use.  Default is "%SERVER_PRECEDENCE:NORMAL" as well
+as turning off known-to-be-broken configurations known-broken (namely SSLv3,
+TLSv1.0, 3DES-CBC, RC4, and MD5).  See your GnuTLS documentation for full
+details.
 
 .TP
 .B dh_bits

@@ -48,7 +48,7 @@
 #include <gnutls/x509.h>
 #include <text.h>
 
-#define DH_BITS 1024
+#define DH_BITS 2048
 #define MAX_BUF 16384
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,13 @@ void TLSServer::init (
   gnutls_dh_params_generate2 (_params, _dh_bits);
 
   if (_ciphers == "")
-    _ciphers = "NORMAL";
+    _ciphers =
+      "%SERVER_PRECEDENCE"          // use the server's precedences for algorithms
+      ":NORMAL"                     // the normal suite
+      ":-VERS-SSL3.0:-VERS-TLS1.0"  // SSLv3 and TLSv1.0 are vulnerable to POODLE
+      ":-3DES-CBC"                  // 3DES is broken with CBC
+      ":-ARCFOUR-128:-ARCFOUR-40"   // RC4 is broken
+      ":-MD5";                      // MD5 is not good enough anymore
   gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL);
   gnutls_certificate_set_dh_params (_credentials, _params);
 
