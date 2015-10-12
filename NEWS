@@ -2,10 +2,18 @@
 New Features in Taskserver 1.2.0
 
   - When the server specified is ::, can use dual-stack IPv4/IPv6.
+  - New default 2048 bits for Diffie-Hellman key exchange.
+  - Server-side cipher selection is now preferred, preventing the client from
+    switching to less-secure communication.
+  - Removed broken SSLv3 and TLSv1.0 ciphers (POODLE) from default.
+  - Removed broken 3DES cipher in CBC mode from default.
+  - Removed broken RC4 cipher from default.
+  - Removed broken MD5 cipher from default.
 
 New configuration options in Taskserver 1.2.0
 
-  -
+  - New 'dh_bits' setting allows an override to the 2048 bit default
+    for the Diffie-Hellman key exchange.
 
 Removed features in 1.2.0
 
