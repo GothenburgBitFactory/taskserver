@@ -71,11 +71,14 @@ TLSServer::TLSServer ()
 , _cert ("")
 , _key ("")
 , _ciphers ("")
+, _dh_bits (0)
 , _socket (0)
 , _queue (5)
 , _debug (false)
 , _trust (TLSServer::strict)
 {
+  // Set up the default.
+  dh_bits (0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +139,22 @@ void TLSServer::ciphers (const std::string& cipher_list)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void TLSServer::dh_bits (unsigned int dh_bits)
+{
+  if (!dh_bits)
+#if GNUTLS_VERSION_NUMBER >= 0x020b00
+#if GNUTLS_VERSION_NUMBER >= 0x03000d
+    dh_bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
+#else
+    dh_bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
+#endif
+#else
+    dh_bits = DH_BITS;
+#endif
+  _dh_bits = dh_bits;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void TLSServer::init (
   const std::string& ca,
   const std::string& crl,
@@ -168,17 +187,8 @@ void TLSServer::init (
       (ret = gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
     throw format ("Bad CERT file. {1}", gnutls_strerror (ret));
 
-#if GNUTLS_VERSION_NUMBER >= 0x020b00
-#if GNUTLS_VERSION_NUMBER >= 0x03000d
-  unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
-#else
-  unsigned int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
-#endif
-#else
-  unsigned int bits = DH_BITS;
-#endif
   gnutls_dh_params_init (&_params);
-  gnutls_dh_params_generate2 (_params, bits);
+  gnutls_dh_params_generate2 (_params, _dh_bits);
 
   if (_ciphers == "")
     _ciphers = "NORMAL";

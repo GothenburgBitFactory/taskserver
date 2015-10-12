@@ -45,6 +45,7 @@ public:
   enum trust_level trust () const;
   void trust (const enum trust_level);
   void ciphers (const std::string&);
+  void dh_bits (unsigned int dh_bits);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&, const std::string&, const std::string&);
   void listen ();
@@ -58,6 +59,7 @@ private:
   std::string                      _cert;
   std::string                      _key;
   std::string                      _ciphers;
+  unsigned int                     _dh_bits;
   gnutls_certificate_credentials_t _credentials;
   gnutls_dh_params_t               _params;
   gnutls_priority_t                _priorities;
