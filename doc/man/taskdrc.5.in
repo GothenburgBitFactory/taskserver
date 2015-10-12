@@ -17,6 +17,11 @@ List of GnuTLS ciphers to use.  Default is "NORMAL".  See your GnuTLS
 documentation for full details.
 
 .TP
+.B dh_bits
+Size of the Diffie-Hellman parameters. Default is GnuTLS-specified. See your
+GnuTLS documentation for full details.
+
+.TP
 .B confirmation=on
 Determines whether certain commands are confirmed.  Defaults to on.
 

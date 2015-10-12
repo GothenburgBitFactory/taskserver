@@ -240,6 +240,16 @@ void Server::beginServer ()
       server.trust (TLSServer::strict);
     else if (_log)
       _log->format ("Invalid 'trust' setting value of '%s'", trust.c_str ());
+
+    int dh_bits = _config->getInteger ("dh_bits");
+    if (dh_bits < 0)
+    {
+      if (_log) _log->format ("Invalid dh_bits value, using defaults: %d", dh_bits);
+      dh_bits = 0;
+    }
+
+    server.dh_bits (dh_bits);
+    if (_log) _log->format ("Using dh_bits: %d", dh_bits);
   }
 
   server.init (_ca_file,        // CA
