@@ -12,13 +12,13 @@
 - Added "diag" command details regarding file sizes.
 - Improved error messages for users who skip the 'task sync init' requirement
   (thanks to Komasa).
-- New 2048-bit default size for hte Diff-Hellman key exchange, with a new
+- New 2048-bit default size for the Diff-Hellman key exchange, with a new
   'dh_bits' configuration setting to override this (thanks to Ben Boeckel).
 - New default cipher set that imposes server-side cipher selection, preventing
   the client from switching to less-secure communication (thanks to Ben
   Boeckel).
-- Removed broken SSLv3 and TLSv1.0 (POODLE), 3DES in CBC mode, RC4, MD5, RC4,
-  and MD5 ciphers from default (thanks to Ben Boeckel).
+- Removed broken SSLv3 and TLSv1.0 (POODLE), 3DES in CBC mode, RC4, and MD5,
+  ciphers from default (thanks to Ben Boeckel).
 
 ------- current release ---------------------------
 
