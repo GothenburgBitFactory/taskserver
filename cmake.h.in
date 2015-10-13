@@ -34,14 +34,13 @@
 /* Compiling platform */
 #cmakedefine LINUX
 #cmakedefine DARWIN
-#cmakedefine CYGWIN
+#cmakedefine KFREEBSD
 #cmakedefine FREEBSD
 #cmakedefine OPENBSD
 #cmakedefine NETBSD
-#cmakedefine HAIKU
 #cmakedefine SOLARIS
-#cmakedefine KFREEBSD
 #cmakedefine GNUHURD
+#cmakedefine CYGWIN
 #cmakedefine UNKNOWN
 
 /* Found tm.tm_gmtoff struct member */
