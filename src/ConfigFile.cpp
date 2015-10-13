@@ -166,13 +166,13 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the configuration value given the specified key.
-const std::string Config::get (const std::string& key)
+std::string Config::get (const std::string& key)
 {
   return (*this)[key];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Config::getInteger (const std::string& key)
+int Config::getInteger (const std::string& key)
 {
   if ((*this).find (key) != (*this).end ())
     return strtoimax ((*this)[key].c_str (), NULL, 10);
@@ -181,7 +181,7 @@ const int Config::getInteger (const std::string& key)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const double Config::getReal (const std::string& key)
+double Config::getReal (const std::string& key)
 {
   if ((*this).find (key) != (*this).end ())
     return strtod ((*this)[key].c_str (), NULL);
@@ -190,7 +190,7 @@ const double Config::getReal (const std::string& key)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const bool Config::getBoolean (const std::string& key)
+bool Config::getBoolean (const std::string& key)
 {
   if ((*this).find (key) != (*this).end ())
   {
