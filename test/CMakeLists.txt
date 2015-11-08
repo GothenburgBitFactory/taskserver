@@ -10,7 +10,7 @@ include_directories (${CMAKE_SOURCE_DIR}
 set (test_SRCS color.t config.t fs.t iso8601d.t iso8601p.t lexer.t msg.t
                nibbler.t rx.t text.t util.t utf8.t json.t json_test)
 
-message ("-- Configuring run_all")
+message ("-- Configuring tests")
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 
 set (TESTBLOB "./*.t")
@@ -26,8 +26,6 @@ if (CYGWIN)
 endif (CYGWIN)
 
 endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-
-configure_file (run_all.in run_all)
 
 add_custom_target (test ./run_all --verbose
                         DEPENDS ${test_SRCS} taskd_executable
