@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,8 @@ public:
   RX ();
   RX (const std::string&, bool caseSensitive = true);
   RX (const RX&);
-  RX& operator= (const RX&);
-  bool operator== (const RX&) const;
   ~RX ();
+  RX& operator= (const RX&);
 
   bool match (const std::string&);
   bool match (std::vector<std::string>&, const std::string&);
