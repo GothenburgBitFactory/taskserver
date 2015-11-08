@@ -835,7 +835,7 @@ void Daemon::get_totals (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_server (Database& db, const std::vector <std::string>& args)
+void command_server (Database& db)
 {
   _overrides = *db._config;
   bool daemon = db._config->getBoolean ("daemon");

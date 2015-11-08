@@ -78,7 +78,7 @@ int status_statistics (Config& config)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_status (Database& db, const std::vector <std::string>& args)
+void command_status ()
 {
   //return status_statistics (config);
 }
