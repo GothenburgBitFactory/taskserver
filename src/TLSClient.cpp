@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 
 #ifdef HAVE_LIBGNUTLS
 
+#include <TLSClient.h>
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
@@ -44,7 +45,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <TLSClient.h>
 #include <gnutls/x509.h>
 #include <text.h>
 
@@ -202,7 +202,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   gnutls_session_set_ptr (_session, (void*) this);
 
   // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints = {0};
+  struct addrinfo hints {};
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_PASSIVE; // use my IP
@@ -447,7 +447,7 @@ void TLSClient::recv (std::string& data)
   int received = 0;
 
   // Get the encoded length.
-  unsigned char header[4] = {0};
+  unsigned char header[4] {};
   do
   {
     received = gnutls_record_recv (_session, header, 4);
