@@ -5,9 +5,14 @@ import sys
 import socket
 import signal
 import functools
+import atexit
+import tempfile
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
-from Queue import Queue, Empty
+try:
+    from Queue import Queue, Empty
+except ImportError:
+    from queue import Queue, Empty
 from time import sleep
 try:
     import simplejson as json
@@ -141,6 +146,9 @@ def _queue_output(arguments, pidq, outputq):
 
     # Send input and wait for finish
     out, err = proc.communicate(input)
+
+    if sys.version_info > (3,):
+        out, err = out.decode('utf-8'), err.decode('utf-8')
 
     # Give the output back to the caller
     outputq.put((out, err, proc.returncode))
@@ -443,5 +451,33 @@ def parse_datafile(file):
                 data.append(line)
     return data
 
+
+def mkstemp(data):
+    """
+    Create a temporary file that is removed at process exit
+    """
+    def rmtemp(name):
+        try:
+            os.remove(name)
+        except OSError:
+            pass
+
+    f = tempfile.NamedTemporaryFile(delete=False)
+    f.write(data)
+    f.close()
+
+    # Ensure removal at end of python session
+    atexit.register(rmtemp, f.name)
+
+    return f.name
+
+
+def mkstemp_exec(data):
+    """Create a temporary executable file that is removed at process exit
+    """
+    name = mkstemp(data)
+    os.chmod(name, 0o755)
+
+    return name
 
 # vim: ai sts=4 et sw=4

@@ -33,8 +33,27 @@ from datetime import datetime
 # Ensure python finds the local simpletap module
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from basetest import Task, TestCase, Taskd, ServerTestCase
+from basetest import Task, TestCase
+from basetest import Taskd, ServerTestCase
 
+
+# Test methods available:
+#     self.assertEqual(a, b)
+#     self.assertNotEqual(a, b)
+#     self.assertTrue(x)
+#     self.assertFalse(x)
+#     self.assertIs(a, b)
+#     self.assertIsNot(a, b)
+#     self.assertIsNone(x)
+#     self.assertIsNotNone(x)
+#     self.assertIn(a, b)
+#     self.assertNotIn(a, b)
+#     self.assertIsInstance(a, b)
+#     self.assertNotIsInstance(a, b)
+#     self.assertRaises(e)
+#     self.assertRegexpMatches(t, r)
+#     self.assertNotRegexpMatches(t, r)
+#     self.tap("")
 
 class TestBugNumber(TestCase):
     @classmethod
@@ -52,28 +71,33 @@ class TestBugNumber(TestCase):
 
     def test_version(self):
         """Copyright is current"""
-        command = ("version",)
-
-        code, out, err = self.t(command)
+        code, out, err = self.t("version")
 
         expected = "Copyright \(C\) \d{4} - %d" % (datetime.now().year,)
         self.assertRegexpMatches(out.decode("utf8"), expected)
 
         # TAP diagnostics on the bas
-        self.diag("Yay TAP diagnostics")
+        self.tap("Yay TAP diagnostics")
 
     def test_faketime(self):
-        """Running tests using libfaketime"""
+        """Running tests using libfaketime
+
+           WARNING:
+             faketime version 0.9.6 and later correctly propagates non-zero
+             exit codes.  Please don't combine faketime tests and
+             self.t.runError().
+
+             https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=750721
+        """
         self.t.faketime("-2y")
 
-        command = ("add", "Testing")
+        command = ("add Testing")
         self.t(command)
 
         # Remove FAKETIME settings
         self.t.faketime()
 
-        command = ("list",)
-        code, out, err = self.t(command)
+        code, out, err = self.t("list")
 
         # Task should be 2 years old
         expected = "2.0y"
@@ -126,15 +150,15 @@ sys.exit(0)
 
         self.t.hooks.add(hookname, content)
 
-        self.t(("add", "Hello hooks"))
-        self.t(("1", "mod", "/Hello/Greetings/"))
+        self.t("add Hello hooks")
+        self.t("1 mod /Hello/Greetings/")
         code, out, err = self.t()
         self.assertIn("The hook did its magic", out)
 
         self.t.hooks[hookname].disable()
         self.assertFalse(self.t.hooks[hookname].is_active())
 
-        self.t(("1", "mod", "/magic/thing/"))
+        self.t("1 mod /magic/thing/")
         code, out, err = self.t()
         self.assertIn("The hook did its thing", out)
 
@@ -146,8 +170,8 @@ sys.exit(0)
         hookname = "on-modify-for-template.py"
         self.t.hooks.add_default(hookname, log=True)
 
-        self.t(("add", "Hello hooks"))
-        self.t(("1", "mod", "/Hello/Greetings/"))
+        self.t("add Hello hooks")
+        self.t("1 mod /Hello/Greetings/")
         code, out, err = self.t()
         self.assertIn("This is an example modify hook", out)
 
@@ -181,8 +205,8 @@ sys.exit(0)
         hookname = "on-modify-for-template-badexit.py"
         self.t.hooks.add_default(hookname, log=True)
 
-        self.t(("add", "Hello hooks"))
-        self.t.runError(("1", "mod", "/Hello/Greetings/"))
+        self.t("add Hello hooks")
+        self.t.runError("1 mod /Hello/Greetings/")
         code, out, err = self.t()
         self.assertNotIn("This is an example modify hook", out)
 
@@ -217,12 +241,12 @@ class ServerTestBugNumber(ServerTestCase):
 
     def test_server_sync(self):
         """Testing if client and server can speak to each other"""
-        self.t(("add", "Something to sync"))
-        self.t(("sync",))
+        self.t("add Something to sync")
+        self.t("sync")
 
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
     unittest.main(testRunner=TAPTestRunner())
 
-# vim: ai sts=4 et sw=4
+# vim: ai sts=4 et sw=4 ft=python
