@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,6 @@
 
 #include <string>
 
-#define FEATURE_COLOR 1
-
 ////////////////////////////////////////////////////////////////////////////////
 #define _COLOR_INVERSE   0x00400000  // Inverse attribute.
 #define _COLOR_256       0x00200000  // 256-color mode.
@@ -52,7 +50,6 @@ public:
   Color (unsigned int);                         // 256 | INVERSE | UNDERLINE | BOLD | BRIGHT | (BG << 8) | FG
   Color (const std::string&);                   // "red on bright black"
   Color (color_id);                             // fg.
-  Color (color_id, color_id);                   // fg, bg.
   Color (color_id, color_id, bool, bool, bool); // fg, bg, underline, bold, bright
   ~Color ();
   Color& operator= (const Color&);
@@ -64,6 +61,7 @@ public:
 
   std::string colorize (const std::string&);
   static std::string colorize (const std::string&, const std::string&);
+  void _colorize (std::string&, const std::string&);
   static std::string strip (const std::string&);
 
   bool nontrivial () const;

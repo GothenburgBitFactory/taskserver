@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,47 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <Color.h>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <string>
 #include <vector>
 #include <algorithm>
 #include <Color.h>
 #include <text.h>
+
+// uint to string lookup table for Color::_colorize()
+// _colorize() gets called _a lot_, having this lookup table is a cheap
+// performance optimization.
+const char *colorstring[] = {
+    "0",   "1",   "2",   "3",   "4",   "5",   "6",   "7",   "8",   "9",
+   "10",  "11",  "12",  "13",  "14",  "15",  "16",  "17",  "18",  "19",
+   "20",  "21",  "22",  "23",  "24",  "25",  "26",  "27",  "28",  "29",
+   "30",  "31",  "32",  "33",  "34",  "35",  "36",  "37",  "38",  "39",
+   "40",  "41",  "42",  "43",  "44",  "45",  "46",  "47",  "48",  "49",
+   "50",  "51",  "52",  "53",  "54",  "55",  "56",  "57",  "58",  "59",
+   "60",  "61",  "62",  "63",  "64",  "65",  "66",  "67",  "68",  "69",
+   "70",  "71",  "72",  "73",  "74",  "75",  "76",  "77",  "78",  "79",
+   "80",  "81",  "82",  "83",  "84",  "85",  "86",  "87",  "88",  "89",
+   "90",  "91",  "92",  "93",  "94",  "95",  "96",  "97",  "98",  "99",
+  "100", "101", "102", "103", "104", "105", "106", "107", "108", "109",
+  "110", "111", "112", "113", "114", "115", "116", "117", "118", "119",
+  "120", "121", "122", "123", "124", "125", "126", "127", "128", "129",
+  "130", "131", "132", "133", "134", "135", "136", "137", "138", "139",
+  "140", "141", "142", "143", "144", "145", "146", "147", "148", "149",
+  "150", "151", "152", "153", "154", "155", "156", "157", "158", "159",
+  "160", "161", "162", "163", "164", "165", "166", "167", "168", "169",
+  "170", "171", "172", "173", "174", "175", "176", "177", "178", "179",
+  "180", "181", "182", "183", "184", "185", "186", "187", "188", "189",
+  "190", "191", "192", "193", "194", "195", "196", "197", "198", "199",
+  "200", "201", "202", "203", "204", "205", "206", "207", "208", "209",
+  "210", "211", "212", "213", "214", "215", "216", "217", "218", "219",
+  "220", "221", "222", "223", "224", "225", "226", "227", "228", "229",
+  "230", "231", "232", "233", "234", "235", "236", "237", "238", "239",
+  "240", "241", "242", "243", "244", "245", "246", "247", "248", "249",
+  "250", "251", "252", "253", "254", "255"
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 static struct
@@ -72,14 +106,12 @@ Color::Color (const Color& other)
 Color::Color (unsigned int c)
 : _value (0)
 {
-#ifdef FEATURE_COLOR
   if (!(c & _COLOR_HASFG)) _value &= ~_COLOR_FG;
   if (!(c & _COLOR_HASBG)) _value &= ~_COLOR_BG;
 
   _value = c & (_COLOR_256 | _COLOR_HASBG | _COLOR_HASFG |_COLOR_UNDERLINE |
                 _COLOR_INVERSE | _COLOR_BOLD | _COLOR_BRIGHT | _COLOR_BG |
                 _COLOR_FG);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,16 +129,9 @@ Color::Color (unsigned int c)
 Color::Color (const std::string& spec)
 : _value (0)
 {
-#ifdef FEATURE_COLOR
-  // By converting underscores to spaces, we inherently support the old "on_red"
-  // style of specifying background colors.  We consider underscores to be
-  // deprecated.
-  std::string modifiable_spec = spec;
-  std::replace (modifiable_spec.begin (), modifiable_spec.end (), '_', ' ');
-
   // Split spec into words.
   std::vector <std::string> words;
-  split (words, modifiable_spec, ' ');
+  split (words, spec, ' ');
 
   // Construct the color as two separate colors, then blend them later.  This
   // make it possible to declare a color such as "color1 on black", and have
@@ -117,10 +142,9 @@ Color::Color (const std::string& spec)
   bool bg = false;
   int index;
   std::string word;
-  std::vector <std::string>::iterator it;
-  for (it = words.begin (); it != words.end (); ++it)
+  for (auto& it : words)
   {
-    word = lowerCase (trim (*it));
+    word = lowerCase (trim (it));
 
          if (word == "bold")      fg_value |= _COLOR_BOLD;
     else if (word == "bright")    bg_value |= _COLOR_BRIGHT;
@@ -147,12 +171,12 @@ Color::Color (const std::string& spec)
     }
 
     // greyN/grayN, where 0 <= N <= 23.
-    else if (word.substr (0, 4) == "grey" ||
-             word.substr (0, 4) == "gray")
+    else if (! word.compare (0, 4, "grey", 4) ||
+             ! word.compare (0, 4, "gray", 4))
     {
       index = atoi (word.substr (4).c_str ());
       if (index < 0 || index > 23)
-        throw format ("ERROR: The color '{1}' is not recognized.", *it);
+        throw format ("ERROR: The color '{1}' is not recognized.", it);
 
       if (bg)
       {
@@ -169,12 +193,12 @@ Color::Color (const std::string& spec)
     }
 
     // rgbRGB, where 0 <= R,G,B <= 5.
-    else if (word.substr (0, 3) == "rgb")
+    else if (! word.compare (0, 3, "rgb", 3))
     {
       index = atoi (word.substr (3).c_str ());
       if (word.length () != 6 ||
           index < 0 || index > 555)
-        throw format ("ERROR: The color '{1}' is not recognized.", *it);
+        throw format ("ERROR: The color '{1}' is not recognized.", it);
 
       int r = atoi (word.substr (3, 1).c_str ());
       int g = atoi (word.substr (4, 1).c_str ());
@@ -182,7 +206,7 @@ Color::Color (const std::string& spec)
       if (r < 0 || r > 5 ||
           g < 0 || g > 5 ||
           b < 0 || b > 5)
-        throw format ("ERROR: The color '{1}' is not recognized.", *it);
+        throw format ("ERROR: The color '{1}' is not recognized.", it);
 
       index = 16 + r*36 + g*6 + b;
 
@@ -201,11 +225,11 @@ Color::Color (const std::string& spec)
     }
 
     // colorN, where 0 <= N <= 255.
-    else if (word.substr (0, 5) == "color")
+    else if (! word.compare (0, 5, "color", 5))
     {
       index = atoi (word.substr (5).c_str ());
       if (index < 0 || index > 255)
-        throw format ("ERROR: The color '{1}' is not recognized.", *it);
+        throw format ("ERROR: The color '{1}' is not recognized.", it);
 
       upgrade ();
 
@@ -223,52 +247,29 @@ Color::Color (const std::string& spec)
       }
     }
     else if (word != "")
-      throw format ("ERROR: The color '{1}' is not recognized.", *it);
+      throw format ("ERROR: The color '{1}' is not recognized.", it);
   }
 
   // Now combine the fg and bg into a single color.
   _value = fg_value;
   blend (Color (bg_value));
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 Color::Color (color_id fg)
 : _value (0)
 {
-#ifdef FEATURE_COLOR
   if (fg != Color::nocolor)
   {
     _value |= _COLOR_HASFG;
     _value |= fg;
   }
-#endif
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Color::Color (color_id fg, color_id bg)
-: _value (0)
-{
-#ifdef FEATURE_COLOR
-  if (bg != Color::nocolor)
-  {
-    _value |= _COLOR_HASBG;
-    _value |= (bg << 8);
-  }
-
-  if (fg != Color::nocolor)
-  {
-    _value |= _COLOR_HASFG;
-    _value |= fg;
-  }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 Color::Color (color_id fg, color_id bg, bool underline, bool bold, bool bright)
 : _value (0)
 {
-#ifdef FEATURE_COLOR
   _value |= ((underline ? 1 : 0) << 18)
          |  ((bold      ? 1 : 0) << 17)
          |  ((bright    ? 1 : 0) << 16);
@@ -284,7 +285,6 @@ Color::Color (color_id fg, color_id bg, bool underline, bool bold, bool bright)
     _value |= _COLOR_HASFG;
     _value |= fg;
   }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +305,6 @@ Color& Color::operator= (const Color& other)
 Color::operator std::string () const
 {
   std::string description;
-#ifdef FEATURE_COLOR
   if (_value & _COLOR_BOLD) description += "bold";
 
   if (_value & _COLOR_UNDERLINE)
@@ -326,7 +325,6 @@ Color::operator std::string () const
 
     description += " " + bg ();
   }
-#endif
 
   return description;
 }
@@ -342,7 +340,6 @@ Color::operator int () const
 // other take precedence.
 void Color::blend (const Color& other)
 {
-#ifdef FEATURE_COLOR
   if (!other.nontrivial ())
     return;
 
@@ -394,13 +391,11 @@ void Color::blend (const Color& other)
       _value |= (c._value & _COLOR_BG);        // Apply other color.
     }
   }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Color::upgrade ()
 {
-#ifdef FEATURE_COLOR
   if (!(_value & _COLOR_256))
   {
     if (_value & _COLOR_HASFG)
@@ -423,7 +418,14 @@ void Color::upgrade ()
 
     _value |= _COLOR_256;
   }
-#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Color::colorize (const std::string& input)
+{
+  std::string result;
+  _colorize (result, input);
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -438,99 +440,88 @@ void Color::upgrade ()
 //
 //   256 fg               \033[38;5;Nm
 //   256 bg               \033[48;5;Nm
-std::string Color::colorize (const std::string& input)
+void Color::_colorize (std::string &result, const std::string& input)
 {
-#ifdef FEATURE_COLOR
   if (!nontrivial ())
-    return input;
+  {
+    result += input;
+    return;
+  }
 
   int count = 0;
-  std::stringstream result;
 
   // 256 color
   if (_value & _COLOR_256)
   {
-    bool needTerminator = false;
-
     if (_value & _COLOR_UNDERLINE)
-    {
-      result << "\033[4m";
-      needTerminator = true;
-    }
+      result += "\033[4m";
 
     if (_value & _COLOR_INVERSE)
-    {
-      result << "\033[7m";
-      needTerminator = true;
-    }
+      result += "\033[7m";
 
     if (_value & _COLOR_HASFG)
     {
-      result << "\033[38;5;" << (_value & _COLOR_FG) << "m";
-      needTerminator = true;
+      result += "\033[38;5;";
+      result += colorstring[(_value & _COLOR_FG)];
+      result += "m";
     }
 
     if (_value & _COLOR_HASBG)
     {
-      result << "\033[48;5;" << ((_value & _COLOR_BG) >> 8) << "m";
-      needTerminator = true;
+      result += "\033[48;5;";
+      result += colorstring[((_value & _COLOR_BG) >> 8)];
+      result += "m";
     }
 
-    result << input;
-    if (needTerminator)
-      result << "\033[0m";
-
-    return result.str ();
+    result += input;
+    result += "\033[0m";
   }
 
   // 16 color
   else
   {
-    result << "\033[";
+    result += "\033[";
 
     if (_value & _COLOR_BOLD)
     {
-      if (count++) result << ";";
-      result << "1";
+      if (count++) result += ";";
+      result += "1";
     }
 
     if (_value & _COLOR_UNDERLINE)
     {
-      if (count++) result << ";";
-      result << "4";
+      if (count++) result += ";";
+      result += "4";
     }
 
     if (_value & _COLOR_INVERSE)
     {
-      if (count++) result << ";";
-      result << "7";
+      if (count++) result += ";";
+      result += "7";
     }
 
     if (_value & _COLOR_HASFG)
     {
-      if (count++) result << ";";
-      result << (29 + (_value & _COLOR_FG));
+      if (count++) result += ";";
+      result += colorstring[(29 + (_value & _COLOR_FG))];
     }
 
     if (_value & _COLOR_HASBG)
     {
-      if (count++) result << ";";
-      result << ((_value & _COLOR_BRIGHT ? 99 : 39) + ((_value & _COLOR_BG) >> 8));
+      if (count++) result += ";";
+      result += colorstring[((_value & _COLOR_BRIGHT ? 99 : 39) + ((_value & _COLOR_BG) >> 8))];
     }
 
-    result << "m" << input << "\033[0m";
-    return result.str ();
+    result += "m";
+    result += input;
+    result += "\033[0m";
   }
-#endif
-
-  return input;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove color codes from a string.
 std::string Color::strip (const std::string& input)
 {
-#ifdef FEATURE_COLOR
   int length = input.length ();
   bool inside = false;
   std::string output;
@@ -551,20 +542,13 @@ std::string Color::strip (const std::string& input)
   }
 
   return output;
-#else
-  return input;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string Color::colorize (const std::string& input, const std::string& spec)
 {
-#ifdef FEATURE_COLOR
   Color c (spec);
   return c.colorize (input);
-#else
-  return input;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -586,7 +570,6 @@ int Color::find (const std::string& input)
 ////////////////////////////////////////////////////////////////////////////////
 std::string Color::fg () const
 {
-#ifdef FEATURE_COLOR
   int index = _value & _COLOR_FG;
 
   if (_value & _COLOR_256)
@@ -604,7 +587,6 @@ std::string Color::fg () const
       if (allColors[i].index == index)
         return allColors[i].english_name;
   }
-#endif
 
   return "";
 }
@@ -612,7 +594,6 @@ std::string Color::fg () const
 ////////////////////////////////////////////////////////////////////////////////
 std::string Color::bg () const
 {
-#ifdef FEATURE_COLOR
   int index = (_value & _COLOR_BG) >> 8;
 
   if (_value & _COLOR_256)
@@ -630,7 +611,6 @@ std::string Color::bg () const
       if (allColors[i].index == index)
         return allColors[i].english_name;
   }
-#endif
 
   return "";
 }
