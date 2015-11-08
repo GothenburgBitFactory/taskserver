@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,8 @@ public:
   void stop ();
   unsigned long total () const;
   void subtract (unsigned long);
+
+  static unsigned long now ();
 
 private:
   std::string    _description;
