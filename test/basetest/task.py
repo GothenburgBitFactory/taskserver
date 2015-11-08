@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import os
-import tempfile
-import shutil
 import atexit
-import unittest
 import json
-from .utils import (run_cmd_wait, run_cmd_wait_nofail, which,
-                    task_binary_location)
+import os
+import shlex
+import shutil
+import tempfile
+import unittest
 from .exceptions import CommandError
 from .hooks import Hooks
+from .utils import run_cmd_wait, run_cmd_wait_nofail, which, task_binary_location
+from .compat import STRING_TYPE
 
 
 class Task(object):
@@ -48,10 +49,8 @@ class Task(object):
 
         self.reset_env()
 
-        # Cannot call self.config until confirmation is disabled
         with open(self.taskrc, 'w') as rc:
             rc.write("data.location={0}\n"
-                     "confirmation=no\n"
                      "hooks=off\n"
                      "".format(self.datadir))
 
@@ -136,7 +135,13 @@ class Task(object):
         """
         # Add -- to avoid misinterpretation of - in things like UUIDs
         cmd = (self.taskw, "config", "--", var, value)
-        return run_cmd_wait(cmd, env=self.env)
+        return run_cmd_wait(cmd, env=self.env, input="y\n")
+
+    def del_config(self, var):
+        """Remove `var` from taskd config
+        """
+        cmd = (self.taskw, "config", var)
+        return run_cmd_wait(cmd, env=self.env, input="y\n")
 
     @property
     def taskrc_content(self):
@@ -157,26 +162,44 @@ class Task(object):
 
         return json.loads(out)
 
+    def export_one(self, export_filter=None):
+        """
+        Return a dictionary representing the exported task. Will
+        fail if mutliple tasks match the filter.
+        """
+
+        result = self.export(export_filter=export_filter)
+
+        if len(result) != 1:
+            descriptions = [task.get('description') or '[description-missing]'
+                            for task in result]
+
+            raise ValueError(
+                "One task should match the '{0}' filter, '{1}' "
+                "matches:\n    {2}".format(
+                    export_filter or '',
+                    len(result),
+                    '\n    '.join(descriptions)
+                ))
+
+        return result[0]
+
+    @property
+    def latest(self):
+        return self.export_one("+LATEST")
+
     @staticmethod
     def _split_string_args_if_string(args):
         """Helper function to parse and split into arguments a single string
         argument. The string is literally the same as if written in the shell.
         """
         # Enable nicer-looking calls by allowing plain strings
-        try:
-            # Python 2.x
-            if isinstance(args, basestring):
-                import shlex
-                args = shlex.split(args)
-        except NameError:
-            # Python 3.x
-            if isinstance(args, str):
-                import shlex
-                args = shlex.split(args)
+        if isinstance(args, STRING_TYPE):
+            args = shlex.split(args)
 
         return args
 
-    def runSuccess(self, args=(), input=None, merge_streams=False,
+    def runSuccess(self, args="", input=None, merge_streams=False,
                    timeout=5):
         """Invoke task with given arguments and fail if exit code != 0
 
@@ -185,7 +208,7 @@ class Task(object):
 
         If you wish to pass instructions to task such as confirmations or other
         input via stdin, you can do so by providing a input string.
-        Such as input="y\ny".
+        Such as input="y\ny\n".
 
         If merge_streams=True stdout and stderr will be merged into stdout.
 
@@ -219,7 +242,7 @@ class Task(object):
 
         If you wish to pass instructions to task such as confirmations or other
         input via stdin, you can do so by providing a input string.
-        Such as input="y\ny".
+        Such as input="y\ny\n".
 
         If merge_streams=True stdout and stderr will be merged into stdout.
 
@@ -281,7 +304,7 @@ class Task(object):
         which should be the output of any previous process that failed.
         """
         try:
-            output = self.runSuccess(("diag",))
+            output = self.runSuccess("diag")
         except CommandError as e:
             # If task diag failed add the error to stderr
             output = (e.code, None, str(e))
