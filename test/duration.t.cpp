@@ -44,7 +44,7 @@ int convertDuration (const std::string& input)
   return 0;
 }
 
-int main (int argc, char** argv)
+int main (int, char**)
 {
   UnitTest t (644);
 
