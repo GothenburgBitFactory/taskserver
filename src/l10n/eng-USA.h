@@ -103,6 +103,7 @@
 
 #define STRING_TASK_NO_FF1           "Taskwarrior no longer supports file format 1, originally used between 27 November 2006 and 31 December 2007."
 #define STRING_TASK_NO_FF2           "Taskwarrior no longer supports file format 2, originally used between 1 January 2008 and 12 April 2009."
+#define STRING_CMD_IMPORT_UUID_BAD   "Not a valid UUID '{1}'."
 #define STRING_TASK_NO_ENTRY         "Annotation is missing an entry date: {1}"
 #define STRING_TASK_NO_DESC          "Annotation is missing a description: {1}"
 
@@ -157,5 +158,36 @@
 #define STRING_ERROR_UNKNOWN         "Unknown error"
 #define STRING_SERVER_DOWN           "ERROR: Taskserver not responding."
 
+// Date
+#define STRING_DATE_INVALID_FORMAT   "'{1}' is not a valid date in the '{2}' format."
+#define STRING_DATE_BAD_WEEKSTART    "The 'weekstart' configuration variable may only contain 'Sunday' or 'Monday'."
+
+#define STRING_DATE_JANUARY          "january"
+#define STRING_DATE_FEBRUARY         "february"
+#define STRING_DATE_MARCH            "march"
+#define STRING_DATE_APRIL            "april"
+#define STRING_DATE_MAY              "may"
+#define STRING_DATE_JUNE             "june"
+#define STRING_DATE_JULY             "july"
+#define STRING_DATE_AUGUST           "august"
+#define STRING_DATE_SEPTEMBER        "september"
+#define STRING_DATE_OCTOBER          "october"
+#define STRING_DATE_NOVEMBER         "november"
+#define STRING_DATE_DECEMBER         "december"
+
+#define STRING_DATE_SUNDAY           "sunday"
+#define STRING_DATE_MONDAY           "monday"
+#define STRING_DATE_TUESDAY          "tuesday"
+#define STRING_DATE_WEDNESDAY        "wednesday"
+#define STRING_DATE_THURSDAY         "thursday"
+#define STRING_DATE_FRIDAY           "friday"
+#define STRING_DATE_SATURDAY         "saturday"
+
+// Errors
+#define STRING_ERROR_BAD_STATUS      "The status '{1}' is not valid."
+
+// Task
+#define STRING_TASK_NO_FF3           "Taskwarrior no longer supports file format 3, originally used between 23 March 2009 and 16 May 2009."
+#define STRING_TASK_DEPEND_ITSELF    "A task cannot be dependent on itself."
 #endif
 

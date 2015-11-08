@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,10 @@
 #ifndef INCLUDED_NIBBLER
 #define INCLUDED_NIBBLER
 
-#define NIBBLER_FEATURE_DATE
-//#undef  NIBBLER_FEATURE_DATE
-
-#define NIBBLER_FEATURE_REGEX
-//#undef  NIBBLER_FEATURE_REGEX
-
 #include <string>
 #include <vector>
 #include <time.h>
+#include <memory>
 
 class Nibbler
 {
@@ -48,22 +43,13 @@ public:
 
   bool getUntil (char, std::string&);
   bool getUntil (const std::string&, std::string&);
-#ifdef NIBBLER_FEATURE_REGEX
-  bool getUntilRx (const std::string&, std::string&);
-#endif
   bool getUntilOneOf (const std::string&, std::string&);
   bool getUntilWS (std::string&);
-  bool getUntilEOL (std::string&);
   bool getUntilEOS (std::string&);
-
-/*
-  bool getAllOneOf (const std::string&, std::string&);
-*/
 
   bool getN (const int, std::string&);
   bool getQuoted (char, std::string&, bool quote = false);
   bool getDigit (int&);
-  bool getDigit6 (int&);
   bool getDigit4 (int&);
   bool getDigit3 (int&);
   bool getDigit2 (int&);
@@ -71,34 +57,14 @@ public:
   bool getUnsignedInt (int&);
   bool getNumber (std::string&);
   bool getNumber (double&);
-  bool getUnsignedNumber (double&);
   bool getLiteral (const std::string&);
-#ifdef NIBBLER_FEATURE_REGEX
-  bool getRx (const std::string&, std::string&);
-#endif
-  bool getUUID (std::string&);
   bool getPartialUUID (std::string&);
-  bool getDateISO (time_t&);
-  bool parseDigits(std::string::size_type&, int&, unsigned int, bool strict = true);
-#ifdef NIBBLER_FEATURE_DATE
-  bool getDate (const std::string&, time_t&);
-#endif
   bool getOneOf (const std::vector <std::string>&, std::string&);
-  bool getName (std::string&);
-  bool getWord (std::string&);
 
   bool skipN (const int quantity = 1);
   bool skip (char);
-  bool skipAll (char);
   bool skipAllOneOf (const std::string&);
   bool skipWS ();
-#ifdef NIBBLER_FEATURE_REGEX
-  bool skipRx (const std::string&);
-#endif
-
-  bool backN (const int quantity = 1);
-
-  void getRemainder (std::string&);
 
   char next ();
   std::string next (const int quantity);
@@ -110,11 +76,10 @@ public:
 
   bool depleted ();
 
-  static bool isPunctuation (char);
   std::string dump ();
 
 private:
-  std::string _input;
+  std::shared_ptr<std::string> _input;
   std::string::size_type _length;
   std::string::size_type _cursor;
   std::string::size_type _saved;

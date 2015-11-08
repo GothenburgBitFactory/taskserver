@@ -29,7 +29,6 @@
 #include <sstream>
 #include <stdlib.h>
 #include <inttypes.h>
-#include <Date.h>
 #include <ConfigFile.h>
 #include <text.h>
 #include <taskd.h>

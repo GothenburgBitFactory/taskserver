@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,27 +27,16 @@
 #include <cmake.h>
 #include <stdlib.h>
 #include <Nibbler.h>
-#ifdef NIBBLER_FEATURE_DATE
-#include <Date.h>
-#endif
 #include <test.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-#ifdef NIBBLER_FEATURE_DATE
-#ifdef NIBBLER_FEATURE_REGEX
-  UnitTest t (410);
-#else
-  UnitTest t (380);
-#endif
-#else
-#ifdef NIBBLER_FEATURE_REGEX
-  UnitTest t (346);
-#else
-  UnitTest t (322);
-#endif
-#endif
+  UnitTest t (240);
+
+  // Ensure environment has no influence.
+  unsetenv ("TASKDATA");
+  unsetenv ("TASKRC");
 
   try
   {
@@ -55,11 +44,6 @@ int main (int, char**)
     std::string s;
     int i;
     double d;
-    time_t ti;
-
-#ifdef NIBBLER_FEATURE_DATE
-    Date dt;
-#endif
     std::vector <std::string> options;
 
     // Make sure the nibbler behaves itself with trivial input.
@@ -70,19 +54,12 @@ int main (int, char**)
     t.notok (n.getUntilOneOf ("ab", s),  "trivial: getUntilOneOf");
     t.notok (n.skipN (123),              "trivial: skipN");
     t.notok (n.skip ('x'),               "trivial: skip");
-    t.notok (n.skipAll ('x'),            "trivial: skipAll");
     t.notok (n.skipAllOneOf ("abc"),     "trivial: skipAllOneOf");
-    t.notok (n.backN (1),                "trivial: backN");
     t.notok (n.getQuoted ('"', s),       "trivial: getQuoted");
     t.notok (n.getDigit (i),             "trivial: getDigit");
     t.notok (n.getInt (i),               "trivial: getInt"); // 10
     t.notok (n.getUnsignedInt (i),       "trivial: getUnsignedInt");
-    t.notok (n.getUntilEOL (s),          "trivial: getUntilEOL");
     t.notok (n.getUntilEOS (s),          "trivial: getUntilEOS");
-    t.notok (n.getDateISO (ti),          "trivial: getDateISO");
-#ifdef NIBBLER_FEATURE_DATE
-    t.notok (n.getDate ("YYYYMMDD", ti), "trivial: getDate");
-#endif
     t.notok (n.getOneOf (options, s),    "trivial: getOneOf");
     t.ok    (n.depleted (),              "trivial: depleted");
 
@@ -97,23 +74,6 @@ int main (int, char**)
     t.ok    (n.getUntil (' ', s),        "     'two' :       getUntil (' ')    -> 'two'");
     t.notok (n.getUntil (' ', s),        "        '' :       getUntil (' ')    -> false");
     t.ok    (n.depleted (),              "        '' :       depleted ()       -> true");
-
-#ifdef NIBBLER_FEATURE_REGEX
-    // bool getUntilRx (const std::string&, std::string&);
-    t.diag ("Nibbler::getUntilRx");
-    n = Nibbler ("one two");
-    t.ok    (n.getUntilRx ("th", s),     " 'one two' :     getUntilRx ('th')   -> true");
-    t.is    (s, "one two",               " 'one two' :     getUntilRx ('th')   -> 'one two'");
-
-    n = Nibbler ("one two");
-    t.ok    (n.getUntilRx ("e", s),      " 'one two' :     getUntilRx ('e')    -> true");
-    t.is    (s, "on",                    " 'one two' :     getUntilRx ('e')    -> 'on'"); // 30
-    t.ok    (n.getUntilRx ("tw", s),     "   'e two' :     getUntilRx ('tw')   -> true");
-    t.is    (s, "e ",                    "   'e two' :     getUntilRx ('tw')   -> 'e '");
-    t.ok    (n.getUntilRx ("$", s),      "     'two' :     getUntilRx ('$')    -> true");
-    t.is    (s, "two",                   "     'two' :     getUntilRx ('$')    -> 'two'");
-    t.ok    (n.depleted (),              "        '' :       depleted ()       -> true");
-#endif
 
     // bool getUntilOneOf (const std::string&, std::string&);
     t.diag ("Nibbler::getUntilOneOf");
@@ -163,15 +123,6 @@ int main (int, char**)
     t.ok    (n.skip ('a'),            "       'a' :           skip ('a')    -> true");
     t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
 
-    // bool skipAll (char);
-    t.diag ("Nibbler::skipAll");
-    n = Nibbler ("aaaabb");
-    t.ok    (n.skipAll ('a'),         "  'aaaabb' :        skipAll ('a')    -> true");
-    t.notok (n.skipAll ('a'),         "      'bb' :        skipAll ('a')    -> false");
-    t.ok    (n.skipAll ('b'),         "      'bb' :        skipAll ('b')    -> true");
-    t.notok (n.skipAll ('b'),         "        '' :        skipAll ('b')    -> false");
-    t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
-
     // bool skipAllOneOf (const std::string&);
     t.diag ("Nibbler::skipAllOneOf");
     n = Nibbler ("abababcc");
@@ -188,26 +139,6 @@ int main (int, char**)
     t.ok    (n.getUntilEOS (s),       "     'foo' :    getUntilEOS ()       -> true");
     t.is    (s, "foo",                "     'foo' :    getUntilEOS ()       -> 'foo'");
     t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
-
-#ifdef NIBBLER_FEATURE_REGEX
-    // bool skipRx (const std::string&);
-    t.diag ("Nibbler::skipRx");
-    n = Nibbler ("one two");
-    t.ok    (n.skipRx ("o."),         " 'one two' :         skipRx ('o.')   -> true");
-    t.notok (n.skipRx ("A+"),         "   'e two' :         skipRx ('A+')   -> false");
-    t.ok    (n.skipRx ("e+"),         "   'e two' :         skipRx ('e+')   -> true");
-    t.ok    (n.skipRx ("...."),       "    ' two' :         skipRx ('....') -> true");
-    t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
-#endif
-
-    // bool backN (const int quantity = 1);
-    t.diag ("Nibbler::backN");
-    n = Nibbler ("/a/b/");
-    t.ok (n.getQuoted ('/', s),       "   '/a/b/' :         getQuoted ('/') -> true");
-    t.is (s, "a",                     "      'b/' :         getQuoted ('/') -> 'a'");
-    t.ok (n.backN (),                 "      'b/' :         backN ()        -> true");
-    t.ok (n.getQuoted ('/', s),       "     '/b/' :         getQuoted ('/') -> true");
-    t.is (s, "b",                     "     '/b/' :         getQuoted ('/') -> 'b'");
 
     // bool getQuoted (char, std::string&);
     t.diag ("Nibbler::getQuoted");
@@ -264,12 +195,6 @@ int main (int, char**)
     t.ok    (n.getDigit (i),          "      '2x' :         getDigit ()     -> true");
     t.is    (i, 2,                    "      '2x' :         getDigit ()     -> 2");
     t.notok (n.getDigit (i),          "       'x' :         getDigit ()     -> false");
-
-    // bool getDigit6 (int&);
-    t.diag ("Nibbler::getDigit6");
-    n = Nibbler ("654321");
-    t.ok    (n.getDigit6 (i),         "    654321 :         getDigit6 ()    -> true");
-    t.is    (i, 654321,               "    654321 :         getDigit6 ()    -> 654321");
 
     // bool getDigit4 (int&);
     t.diag ("Nibbler::getDigit4");
@@ -330,37 +255,6 @@ int main (int, char**)
     t.notok (n.getLiteral ("foo"),    "     'bar' :     getLiteral ('foo')  -> false");
     t.ok    (n.getLiteral ("bar"),    "     'bar' :     getLiteral ('bar')  -> true");
     t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
-
-#ifdef NIBBLER_FEATURE_REGEX
-    // bool getRx (const std::string&, std::string&);
-    t.diag ("Nibbler::getRx");
-    n = Nibbler ("one two three");
-    t.ok    (n.getRx ("^(o..)", s),   "'one two three' :   getRx ('^(o..)')  -> true");
-    t.is    (s, "one",                "'one two three' :   getRx ('^(o..)')  -> 'one'");
-    t.ok    (n.skip (' '),            "   ' two three' :         skip (' ')  -> true");
-    t.ok    (n.getRx ("t..", s),      "    'two three' :   getRx ('t..')     -> true");
-    t.is    (s, "two",                "    'two three' :   getRx ('t..')     -> 'two'");
-    t.notok (n.getRx ("th...", s),    "       ' three' :   getRx ('th...')   -> false");
-    t.ok    (n.skip (' '),            "       ' three' :         skip (' ')  -> true");
-    t.ok    (n.getRx ("th...", s),    "        'three' :   getRx ('th...')   -> true");
-    t.is    (s, "three",              "        'three' :   getRx ('th...')   -> 'three'");
-    t.ok    (n.depleted (),           "             '' :       depleted ()   -> true");
-#endif
-
-    // bool getUUID (std::string&);
-    t.diag ("Nibbler::getUUID");
-    n = Nibbler ("a0b1c2d3-e4f5-A6B7-C8D9-E0F1a2b3c4d5");
-    t.ok (n.getUUID (s),                             "uuid 1 found");
-    t.is (s, "a0b1c2d3-e4f5-A6B7-C8D9-E0F1a2b3c4d5", "uuid 1 -> correct");
-    t.ok (n.depleted (),                             "depleted");
-
-    n = Nibbler ("00000000-0000-0000-0000-000000000000,a0b1c2d3-e4f5-A6B7-C8D9-E0F1a2b3c4d5");
-    t.ok (n.getUUID (s),                             "uuid 1 found");
-    t.is (s, "00000000-0000-0000-0000-000000000000", "uuid 1 -> correct");
-    t.ok (n.skip (','),                              "comma -> skipped");
-    t.ok (n.getUUID (s),                             "uuid 2 -> found");
-    t.is (s, "a0b1c2d3-e4f5-A6B7-C8D9-E0F1a2b3c4d5", "uuid 2 -> correct");
-    t.ok (n.depleted (),                             "depleted");
 
     // bool getPartialUUID (std::string&);
     t.diag ("Nibbler::getPartialUUID");
@@ -509,122 +403,6 @@ int main (int, char**)
     t.is (s, "a0b1c2d3",                             "partial uuid [8] -> correct");
     t.ok (n.depleted (),                             "not depleted");
 
-    // bool getDateISO (time_t&);
-    t.diag ("Nibbler::getDateISO");
-    n = Nibbler ("19980119T070000Z");
-    t.ok    (n.getDateISO (ti),       "'19980119T070000Z': getDateISO ()  -> true");
-    t.is    (ti, 885193200,           "'19980119T070000Z': getDateISO ()  -> 885193200");
-    t.ok    (n.depleted (),           "depleted");
-
-    n = Nibbler ("20090213T233130Z");
-    t.ok    (n.getDateISO (ti),       "'20090213T233130Z': getDateISO ()  -> true");
-    t.is    (ti, 1234567890,          "'20090213T233130Z': getDateISO ()  -> 1234567890");
-    t.ok    (n.depleted (),           "depleted");
-
-#ifdef NIBBLER_FEATURE_DATE
-    // bool getDate (time_t&, const std::string&);
-    t.diag ("Nibbler::getDate");
-    n = Nibbler ("1/1/2008");
-    t.ok (n.getDate ("m/d/Y", ti), "m/d/Y ok");
-    dt = Date (ti);
-    t.is (dt.month (),   1, "ctor (std::string) -> m");
-    t.is (dt.day (),     1, "ctor (std::string) -> d");
-    t.is (dt.year (), 2008, "ctor (std::string) -> y");
-
-    n = Nibbler ("20080101");
-    t.ok (n.getDate ("YMD", ti), "YMD ok");
-    dt = Date (ti);
-    t.is (dt.month (),   1, "ctor (std::string) -> m");
-    t.is (dt.day (),     1, "ctor (std::string) -> d");
-    t.is (dt.year (), 2008, "ctor (std::string) -> y");
-
-    n = Nibbler ("12/31/2007");
-    t.ok (n.getDate ("m/d/Y", ti), "m/d/Y ok");
-    dt = Date (ti);
-    t.is (dt.month (),  12, "ctor (std::string) -> m");
-    t.is (dt.day (),    31, "ctor (std::string) -> d");
-    t.is (dt.year (), 2007, "ctor (std::string) -> y");
-
-    n = Nibbler ("20071231");
-    t.ok (n.getDate ("YMD", ti), "YMD ok");
-    dt = Date (ti);
-    t.is (dt.month (),  12, "ctor (std::string) -> m");
-    t.is (dt.day (),    31, "ctor (std::string) -> d");
-    t.is (dt.year (), 2007, "ctor (std::string) -> y");
-
-    n = Nibbler ("Tue 01 Jan 2008 (01)");
-    t.ok (n.getDate ("a D b Y (V)", ti), "a D b Y (V)");
-    dt = Date (ti);
-    t.is (dt.month (),   1, "ctor (std::string) -> m");
-    t.is (dt.day (),     1, "ctor (std::string) -> d");
-    t.is (dt.year (), 2008, "ctor (std::string) -> y");
-
-    n = Nibbler ("Tuesday, January 1, 2008");
-    t.ok (n.getDate ("A, B d, Y", ti), "A, B d, Y ok");
-    dt = Date (ti);
-    t.is (dt.month (),   1, "ctor (std::string) -> m");
-    t.is (dt.day (),     1, "ctor (std::string) -> d");
-    t.is (dt.year (), 2008, "ctor (std::string) -> y");
-
-    n = Nibbler ("w01 Tue 2008-01-01");
-    t.ok (n.getDate ("wV a Y-M-D", ti), "wV a Y-M-D ok");
-    dt = Date (ti);
-    t.is (dt.month (),   1, "ctor (std::string) -> m");
-    t.is (dt.day (),     1, "ctor (std::string) -> d");
-    t.is (dt.year (), 2008, "ctor (std::string) -> y");
-
-    n = Nibbler ("6/7/2010 1:23:45");
-    t.ok (n.getDate ("m/d/Y h:N:S", ti), "m/d/Y h:N:S ok");
-    dt = Date (ti);
-    t.is (dt.month (),     6, "ctor (std::string) -> m");
-    t.is (dt.day (),       7, "ctor (std::string) -> d");
-    t.is (dt.year (),   2010, "ctor (std::string) -> Y");
-    t.is (dt.hour (),      1, "ctor (std::string) -> h");
-    t.is (dt.minute (),   23, "ctor (std::string) -> N");
-    t.is (dt.second (),   45, "ctor (std::string) -> S");
-
-    n = Nibbler ("6/7/2010 01:23:45");
-    t.ok (n.getDate ("m/d/Y H:N:S", ti), "m/d/Y H:N:S ok");
-    dt = Date (ti);
-    t.is (dt.month (),     6, "ctor (std::string) -> m");
-    t.is (dt.day (),       7, "ctor (std::string) -> d");
-    t.is (dt.year (),   2010, "ctor (std::string) -> Y");
-    t.is (dt.hour (),      1, "ctor (std::string) -> h");
-    t.is (dt.minute (),   23, "ctor (std::string) -> N");
-    t.is (dt.second (),   45, "ctor (std::string) -> S");
-
-    n = Nibbler ("6/7/2010 12:34:56");
-    t.ok (n.getDate ("m/d/Y H:N:S", ti), "m/d/Y H:N:S ok");
-    dt = Date (ti);
-    t.is (dt.month (),     6, "ctor (std::string) -> m");
-    t.is (dt.day (),       7, "ctor (std::string) -> d");
-    t.is (dt.year (),   2010, "ctor (std::string) -> Y");
-    t.is (dt.hour (),     12, "ctor (std::string) -> h");
-    t.is (dt.minute (),   34, "ctor (std::string) -> N");
-    t.is (dt.second (),   56, "ctor (std::string) -> S");
-
-    n = Nibbler ("2010");
-    t.ok (n.getDate ("Y", ti), "Y ok");
-    dt = Date (ti);
-    t.is (dt.month (),     1, "ctor (std::string) -> m");
-    t.is (dt.day (),       1, "ctor (std::string) -> d");
-    t.is (dt.year (),   2010, "ctor (std::string) -> Y");
-    t.is (dt.hour (),      0, "ctor (std::string) -> h");
-    t.is (dt.minute (),    0, "ctor (std::string) -> N");
-    t.is (dt.second (),    0, "ctor (std::string) -> S");
-
-    n = Nibbler ("17:18:19");
-    t.ok (n.getDate ("H:N:S", ti), "H:N:S ok");
-    dt = Date (ti);
-    Date now = Date ();
-    t.is (dt.month (), now.month(), "ctor (std::string) -> m");
-    t.is (dt.day (),     now.day(), "ctor (std::string) -> d");
-    t.is (dt.year (),   now.year(), "ctor (std::string) -> Y");
-    t.is (dt.hour (),           17, "ctor (std::string) -> h");
-    t.is (dt.minute (),         18, "ctor (std::string) -> N");
-    t.is (dt.second (),         19, "ctor (std::string) -> S");
-#endif
-
     // bool getOneOf (const std::vector <std::string>&, std::string&);
     t.diag ("Nibbler::getOneOf");
     options = {"one", "two", "three"};
@@ -637,72 +415,6 @@ int main (int, char**)
     t.is    (s, "three",                      "      'threefour':   getOneOf () -> three");
     t.notok (n.getOneOf (options, s),         "           'four':   getOneOf () -> false");
 
-    // bool getName (std::string&);
-    t.diag ("Nibbler::getName");
-    n = Nibbler ("a1 one one.two 9 foo_bar");
-    t.ok    (n.getName (s),       "'a1 one one.two 9 foo_bar' getName -> ok");
-    t.is    (s, "a1",             "  ' one one.two 9 foo_bar' getName -> 'a1'");
-    t.ok    (n.skipWS (),         "   'one one.two 9 foo_bar' skipWS  -> ok");
-
-    t.ok    (n.getName (s),       "   'one one.two 9 foo_bar' getName -> ok");
-    t.is    (s, "one",            "      ' one.two 9 foo_bar' getName -> 'one'");
-    t.ok    (n.skipWS (),         "       'one.two 9 foo_bar' skipWS  -> ok");
-
-    t.ok    (n.getName (s),       "       'one.two 9 foo_bar' getName -> ok");
-    t.is    (s, "one",            "          '.two 9 foo_bar' getName -> 'one'");
-    t.ok    (n.skip ('.'),        "           'two 9 foo_bar' skip .  -> ok");
-
-    t.ok    (n.getName (s),       "           'two 9 foo_bar' getName -> ok");
-    t.is    (s, "two",            "              ' 9 foo_bar' getName -> 'two'");
-    t.ok    (n.skipWS (),         "               '9 foo_bar' skipWS  -> ok");
-
-    t.notok (n.getName (s),       "               '9 foo_bar' getName -> not ok");
-    t.ok    (n.skip ('9'),        "                ' foo_bar' skip 9  -> ok");
-    t.ok    (n.skipWS (),         "                 'foo_bar' skipWS  -> ok");
-
-    t.ok    (n.getName (s),       "                 'foo_bar' getName -> ok");
-    t.is    (s, "foo_bar",        "                        '' getName -> 'foo_bar'");
-    t.ok    (n.depleted (),       "depleted");
-
-    n = Nibbler ("entrée");
-    t.ok (n.getName (s), "'entrée' -> ok");
-    t.is (s, "entrée",   "'entrée' -> 'entrée'");
-
-    // bool getWord (std::string&);
-    t.diag ("Nibbler::getWord");
-    n = Nibbler ("one two th3ee");
-    t.ok (n.getWord (s),       "'one'              getWord -> ok");
-    t.is (s, "one",            "'one'              getWord -> 'one'");
-    t.ok (n.skipWS (),         "skipWS");
-    t.ok (n.getWord (s),       "'two'              getWord -> ok");
-    t.is (s, "two",            "'two'              getWord -> 'two'");
-    t.ok (n.skipWS (),         "skipWS");
-    t.ok (n.getWord (s),       "'th'               getWord -> ok");
-    t.is (s, "th",             "'th'               getWord -> 'th'");
-    t.ok (n.skip ('3'),        "skip(3)");
-    t.ok (n.getWord (s),       "'ee'               getWord -> ok");
-    t.is (s, "ee",             "'ee'               getWord -> 'ee'");
-    t.ok (n.depleted (),       "depleted");
-
-    t.diag ("Nibbler::getWord");
-    n = Nibbler ("one TWO,three,f ");
-    t.ok (n.getWord (s),              "'one TWO,three,f '   getWord  -> ok");
-    t.is (s, "one",                   "   ' TWO,three,f '   getWord  -> one");
-    t.ok (n.skipWS (),                "    'TWO,three,f '   skipWS   -> ok");
-
-    t.ok (n.getWord (s),              "    'TWO,three,f '   getWord  -> ok");
-    t.is (s, "TWO",                   "       ',three,f '   getWord  -> TWO");
-    t.ok (n.skip (','),               "        'three,f '   skip ,   -> ok");
-
-    t.ok (n.getWord (s),              "        'three,f '   getWord  -> ok");
-    t.is (s, "three",                 "             ',f '   getWord  -> three");
-    t.ok (n.skip (','),               "              'f '   skip ,   -> ok");
-
-    t.ok (n.getWord (s),              "              'f '   getWord  -> ok");
-    t.is (s, "f",                     "               ' '   getWord  -> f");
-    t.ok (n.skipWS (),                "                ''   skip ,   -> ok");
-    t.ok (n.depleted (),              "                ''   depleted -> true");
-
     // bool getN (int, std::string&);
     t.diag ("Nibbler::getN");
     n = Nibbler ("111223");
@@ -713,16 +425,6 @@ int main (int, char**)
     t.ok (n.getN (1, s),              "       '3' : getN (1)         -> true");
     t.is (s, "3",                     "       '3' : getN (1)         -> '1'");
     t.ok    (n.depleted (),           "        '' : depleted ()      -> true");
-
-    // bool getUntilEOL (std::string&);
-    t.diag ("Nibbler::getUntilEOL");
-    n = Nibbler ("one\ntwo");
-    t.ok    (n.getUntilEOL (s),       "'one\\ntwo' :   getUntilEOL ()       -> true");
-    t.is    (s, "one",                "'one\\ntwo' :   getUntilEOL ()       -> 'one'");
-    t.ok    (n.skip ('\n'),           "   '\\ntwo' :          skip ('\\n')   -> true");
-    t.ok    (n.getUntilEOL (s),       "     'two' :    getUntilEOL ()       -> true");
-    t.is    (s, "two",                "     'two' :    getUntilEOL ()       -> 'two'");
-    t.ok    (n.depleted (),           "        '' :       depleted ()       -> true");
 
     // bool getUntilEOS (std::string&);
     t.diag ("Nibbler::getUntilEOS");

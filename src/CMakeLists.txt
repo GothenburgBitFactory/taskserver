@@ -13,14 +13,14 @@ add_executable (taskd_executable taskd.cpp
                                  daemon.cpp
                                  diag.cpp
                                  Database.cpp   Database.h
-                                 Date.cpp       Date.h
-                                 Duration.cpp   Duration.h
                                  l10n/eng-USA.h
                                  FS.cpp         FS.h
                                  help.cpp
                                  i18n.h
                                  init.cpp
+                                 ISO8601.cpp    ISO8601.h
                                  JSON.cpp       JSON.h
+                                 Lexer.cpp      Lexer.h
                                  Log.cpp        Log.h
                                  Msg.cpp        Msg.h
                                  Nibbler.cpp    Nibbler.h

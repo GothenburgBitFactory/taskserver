@@ -28,7 +28,7 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
-#include <Date.h>
+#include <ISO8601.h>
 #include <Color.h>
 #include <Timer.h>
 #include <text.h>
@@ -44,7 +44,7 @@ int status_statistics (Config& config)
   // Request statistics, but do not spool request, in the event of failure.
   Msg request;
   request.set ("type", "statistics");
-  request.set ("time", Date ().toISO ());
+  request.set ("time", ISO8601d ().toISO ());
 
   Msg response;
   if (taskd_sendMessage (config, "server", request, response))
