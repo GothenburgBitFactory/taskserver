@@ -37,8 +37,7 @@
 #include <Timer.h>
 #include <Database.h>
 #include <Log.h>
-#include <Date.h>
-#include <Duration.h>
+#include <ISO8601.h>
 #include <Color.h>
 #include <Task.h>
 #ifdef HAVE_COMMIT
@@ -87,7 +86,7 @@ public:
 
 private:
   Config& _config;
-  Date _start;
+  ISO8601d _start;
   long _txn_count;
   long _error_count;
   double _busy;
@@ -100,7 +99,7 @@ private:
 Daemon::Daemon (Config& settings)
 : _db (&settings)
 , _config (settings)
-, _start (Date ())
+, _start (ISO8601d ())
 , _txn_count (0)
 , _error_count (0)
 , _busy (0.0)
@@ -251,7 +250,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   get_totals (total_orgs, total_users, total_bytes);
 
   // Stats about the server.
-  time_t uptime = Date () - _start;
+  time_t uptime = ISO8601d () - _start;
   double idle = 0.0;
   if (uptime != 0)
     idle = 1.0 - (_busy / (double) uptime);
@@ -350,7 +349,6 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     Task task (*client_task);
     std::string uuid = task.get ("uuid");
     task.validate ();
-    task.upgradeLegacyValues ();
 
     // If task is in subset
     if (contains (server_subset, uuid))
@@ -763,13 +761,12 @@ void Daemon::patch (
 {
   // Determine the different attribute names between from and to.
   std::vector <std::string> from_atts;
-  Task::const_iterator att;
-  for (att = from.begin (); att != from.end (); ++att)
-    from_atts.push_back (att->first);
+  for (auto& att: from.data)
+    from_atts.push_back (att.first);
 
   std::vector <std::string> to_atts;
-  for (att = to.begin (); att != to.end (); ++att)
-    to_atts.push_back (att->first);
+  for (auto& att: to.data)
+    to_atts.push_back (att.first);
 
   std::vector <std::string> from_only;
   std::vector <std::string> to_only;

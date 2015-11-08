@@ -7,8 +7,8 @@ include_directories (${CMAKE_SOURCE_DIR}
                      ${CMAKE_SOURCE_DIR}/test
                      ${TASKD_INCLUDE_DIRS})
 
-set (test_SRCS color.t config.t date.t duration.t fs.t msg.t nibbler.t rx.t
-               text.t util.t utf8.t json.t json_test)
+set (test_SRCS color.t config.t fs.t iso8601d.t iso8601p.t lexer.t msg.t
+               nibbler.t rx.t text.t util.t utf8.t json.t json_test)
 
 message ("-- Configuring run_all")
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -40,10 +40,10 @@ foreach (src_FILE ${test_SRCS})
   add_executable (${src_FILE} "${src_FILE}.cpp"
                               ../src/Color.cpp
                               ../src/ConfigFile.cpp
-                              ../src/Date.cpp
-                              ../src/Duration.cpp
                               ../src/FS.cpp
                               ../src/JSON.cpp
+                              ../src/ISO8601.cpp
+                              ../src/Lexer.cpp
                               ../src/Msg.cpp
                               ../src/Nibbler.cpp
                               ../src/RX.cpp

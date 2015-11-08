@@ -28,7 +28,7 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
-#include <Date.h>
+#include <ISO8601.h>
 #include <FS.h>
 #include <text.h>
 #include <util.h>
@@ -57,7 +57,7 @@ void command_client (Database& db, const std::vector <std::string>& args)
 
     Msg request;
     request.parse (contents);
-    request.set ("time", Date ().toISO ());
+    request.set ("time", ISO8601d ().toISO ());
 
     Msg response;
     if (! taskd_sendMessage (*db._config, "server", request, response))

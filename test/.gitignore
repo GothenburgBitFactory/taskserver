@@ -2,10 +2,12 @@ all.log
 color.t
 config.t
 date.t
-duration.t
 fs.t
+iso8601d.t
+iso8601p.t
 json.t
 json_test
+lexer.t
 msg.t
 nibbler.t
 rx.t
