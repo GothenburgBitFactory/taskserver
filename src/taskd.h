@@ -35,18 +35,18 @@
 #include <FS.h>
 #include <Database.h>
 
-void command_init     (Database&, const std::vector <std::string>&);
+void command_init     (Database&                                  );
 void command_config   (Database&, const std::vector <std::string>&);
-void command_status   (Database&, const std::vector <std::string>&);
+void command_status   (                                           );
 void command_help     (           const std::vector <std::string>&);
-void command_diag     (Database&, const std::vector <std::string>&);
-void command_server   (Database&, const std::vector <std::string>&);
+void command_diag     (Database&                                  );
+void command_server   (Database&                                  );
 void command_add      (Database&, const std::vector <std::string>&);
 void command_remove   (Database&, const std::vector <std::string>&);
 void command_suspend  (Database&, const std::vector <std::string>&);
 void command_resume   (Database&, const std::vector <std::string>&);
 void command_client   (Database&, const std::vector <std::string>&);
-void command_validate (Database&, const std::vector <std::string>&);
+void command_validate (           const std::vector <std::string>&);
 
 // api.cpp
 bool taskd_applyOverride (Config&, const std::string&);

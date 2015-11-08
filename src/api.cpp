@@ -132,7 +132,7 @@ void taskd_requireHeader (
 // Tests left >= right, where left and right are version number strings.
 // Assumes all versions are Major.Minor.Patch[other], such as '1.0.0' or
 // '1.0.0beta1'
-bool taskd_at_least (const std::string& left, const std::string& right)
+bool taskd_at_least (const std::string&, const std::string&)
 {
   // TODO Implement this.
 

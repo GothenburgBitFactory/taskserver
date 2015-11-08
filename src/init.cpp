@@ -32,7 +32,7 @@
 #include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_init (Database& db, const std::vector <std::string>& args)
+void command_init (Database& db)
 {
   // Verify that root exists.
   std::string root = db._config->get ("root");

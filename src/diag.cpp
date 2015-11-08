@@ -49,7 +49,7 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_diag (Database& config, const std::vector <std::string>& args)
+void command_diag (Database& config)
 {
   // No argument processing.
 
@@ -276,7 +276,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_validate (Database& config, const std::vector <std::string>& args)
+void command_validate (const std::vector <std::string>& args)
 {
   try
   {
