@@ -109,23 +109,22 @@ int autoComplete (
   unsigned int length = partial.length ();
   if (length)
   {
-    std::vector <std::string>::const_iterator item;
-    for (item = list.begin (); item != list.end (); ++item)
+    for (auto& item : list)
     {
       // An exact match is a special case.  Assume there is only one exact match
       // and return immediately.
-      if (partial == *item)
+      if (partial == item)
       {
         matches.clear ();
-        matches.push_back (*item);
+        matches.push_back (item);
         return 1;
       }
 
       // Maintain a list of partial matches.
       else if (length >= (unsigned) minimum &&
-               length <= item->length ()    &&
-               partial == item->substr (0, length))
-        matches.push_back (*item);
+               length <= item.length ()    &&
+               partial == item.substr (0, length))
+        matches.push_back (item);
     }
   }
 
@@ -170,7 +169,7 @@ const std::string uuid ()
 {
   uuid_t id;
   uuid_generate (id);
-  char buffer[100] = {0};
+  char buffer[100] {};
   uuid_unparse_lower (id, buffer);
 
   // Bug found by Steven de Brouwer.
@@ -250,7 +249,6 @@ const std::string escape (const std::string& value, char c)
   return modified;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef HAVE_TIMEGM
 time_t timegm (struct tm *tm)
@@ -271,3 +269,4 @@ time_t timegm (struct tm *tm)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+
