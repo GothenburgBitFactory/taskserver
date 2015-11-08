@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 
 int main (int, char**)
 {
-  UnitTest ut (23);
+  UnitTest ut (26);
 
   std::string text = "This is a test.";
 
@@ -110,6 +110,22 @@ int main (int, char**)
   RX r12 ("\\bthe\\b");
   ut.ok (r12.match (text), text + " =~ /\\bthe\\b/");
 #endif
+
+#if defined(DARWIN)
+  text = "D0";
+  RX r13 ("D\\d");
+  ut.ok (r13.match (text), text + " =~ /D\\d/");
+#else
+  ut.skip (" =~ /D\\d/");
+#endif
+
+  text = "D0";
+  RX r14 ("D[[:digit:]]");
+  ut.ok (r14.match (text), text + " =~ /D[[:digit:]]/");
+
+  text = "D0";
+  RX r15 ("D[0-9]");
+  ut.ok (r15.match (text), text + " =~ /D[0-9]/");
 
   return 0;
 }
