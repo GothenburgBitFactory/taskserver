@@ -96,7 +96,7 @@ Date::Date (const time_t t)
 Date::Date (const int m, const int d, const int y)
 {
   // Error if not valid.
-  struct tm t = {0};
+  struct tm t {};
   t.tm_isdst = -1;   // Requests that mktime determine summer time effect.
   t.tm_mday  = d;
   t.tm_mon   = m - 1;
@@ -110,7 +110,7 @@ Date::Date (const int m,  const int d,  const int y,
             const int hr, const int mi, const int se)
 {
   // Error if not valid.
-  struct tm t = {0};
+  struct tm t {};
   t.tm_isdst = -1;   // Requests that mktime determine summer time effect.
   t.tm_mday  = d;
   t.tm_mon   = m - 1;
@@ -567,7 +567,7 @@ time_t Date::easter (int year)
   int m = (a + 11 * h + 22 * L) / 451;
   int month = (h + L - 7 * m + 114) / 31;
   int day = ((h + L - 7 * m + 114) % 31) + 1;
-  struct tm t = {0};
+  struct tm t {};
   t.tm_isdst = -1;   // Requests that mktime determine summer time effect.
   t.tm_mday  = day;
   t.tm_mon   = month - 1;

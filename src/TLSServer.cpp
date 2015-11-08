@@ -217,7 +217,7 @@ void TLSServer::bind (
   const std::string& family)
 {
   // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints = {0};
+  struct addrinfo hints {};
   hints.ai_family   = (family == "IPv6" ? AF_INET6 :
                        family == "IPv4" ? AF_INET  :
                                           AF_UNSPEC);
@@ -367,7 +367,7 @@ void TLSTransaction::init (TLSServer& server)
   gnutls_session_enable_compatibility_mode (_session);
 */
 
-  struct sockaddr_in sa_cli = {0};
+  struct sockaddr_in sa_cli {};
   socklen_t client_len = sizeof sa_cli;
   do
   {
@@ -598,7 +598,7 @@ void TLSTransaction::recv (std::string& data)
   int received = 0;
 
   // Get the encoded length.
-  unsigned char header[4] = {0};
+  unsigned char header[4] {};
   do
   {
     received = gnutls_record_recv (_session, header, 4);
