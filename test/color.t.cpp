@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 
 #include <cmake.h>
 #include <iostream>
-#include <stdio.h>
+#include <stdlib.h>
 #include <Color.h>
 #include <test.h>
 
