@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <Timer.h>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <Timer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Timer starts when the object is constructed.
@@ -106,6 +106,14 @@ void Timer::subtract (unsigned long value)
     _total = 0;
   else
     _total -= value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned long Timer::now ()
+{
+  struct timeval now;
+  gettimeofday (&now, NULL);
+  return now.tv_sec * 1000000 + now.tv_usec;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
