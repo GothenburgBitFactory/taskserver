@@ -16,5 +16,4 @@ utf8.t
 util.t
 width.t
 obsolete
-run_all
 *.pyc
