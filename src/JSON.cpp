@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <JSON.h>
 #include <text.h>
 #include <utf8.h>
-#include <JSON.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 json::value* json::value::parse (Nibbler& nibbler)
@@ -50,7 +50,7 @@ json::jtype json::value::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::value::dump ()
+std::string json::value::dump () const
 {
   return "<value>";
 }
@@ -82,7 +82,7 @@ json::jtype json::string::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::string::dump ()
+std::string json::string::dump () const
 {
   return std::string ("\"") + _data + "\"";
 }
@@ -108,7 +108,7 @@ json::jtype json::number::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::number::dump ()
+std::string json::number::dump () const
 {
   return format (_dvalue);
 }
@@ -151,7 +151,7 @@ json::jtype json::literal::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::literal::dump ()
+std::string json::literal::dump () const
 {
        if (_lvalue == nullvalue)  return "null";
   else if (_lvalue == falsevalue) return "false";
@@ -161,9 +161,8 @@ std::string json::literal::dump ()
 ////////////////////////////////////////////////////////////////////////////////
 json::array::~array ()
 {
-  std::vector <json::value*>::iterator i;
-  for (i = _data.begin (); i != _data.end (); ++i)
-    delete *i;
+  for (auto& i : _data)
+    delete i;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,15 +220,12 @@ json::jtype json::array::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::array::dump ()
+std::string json::array::dump () const
 {
   std::string output;
   output += "[";
 
-  std::vector <json::value*>::iterator i;
-  for (i  = _data.begin ();
-       i != _data.end ();
-       ++i)
+  for (auto i = _data.begin (); i != _data.end (); ++i)
   {
     if (i != _data.begin ())
       output += ",";
@@ -244,9 +240,8 @@ std::string json::array::dump ()
 ////////////////////////////////////////////////////////////////////////////////
 json::object::~object ()
 {
-  std::map <std::string, json::value*>::iterator i;
-  for (i = _data.begin (); i != _data.end (); ++i)
-    delete i->second;
+  for (auto& i : _data)
+    delete i.second;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -335,13 +330,12 @@ json::jtype json::object::type ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string json::object::dump ()
+std::string json::object::dump () const
 {
   std::string output;
   output += "{";
 
-  std::map <std::string, json::value*>::iterator i;
-  for (i = _data.begin (); i != _data.end (); ++i)
+  for (auto i = _data.begin (); i != _data.end (); ++i)
   {
     if (i != _data.begin ())
       output += ",";
@@ -382,10 +376,11 @@ json::value* json::parse (const std::string& input)
 std::string json::encode (const std::string& input)
 {
   std::string output;
+  output.reserve ((input.size () * 6) / 5);  // 20% increase.
 
-  for (std::string::size_type i = 0; i < input.length (); ++i)
+  for (auto& i : input)
   {
-    switch (input[i])
+    switch (i)
     {
     // Simple translations.
     case '"':  output += "\\\"";   break;
@@ -398,7 +393,7 @@ std::string json::encode (const std::string& input)
     case '\t': output += "\\t";    break;
 
     // Default NOP.
-    default:   output += input[i]; break;
+    default:   output += i; break;
     }
   }
 
@@ -406,16 +401,19 @@ std::string json::encode (const std::string& input)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO Using a state machine would speed this up.
 std::string json::decode (const std::string& input)
 {
   std::string output;
-  for (unsigned int i = 0; i < input.length (); ++i)
+  output.reserve (input.size ());  // Same size.
+
+  size_t pos = 0;
+
+  while (pos < input.length ())
   {
-    if (input[i] == '\\')
+    if (input[pos] == '\\')
     {
-      ++i;
-      switch (input[i])
+      ++pos;
+      switch (input[pos])
       {
       // Simple translations.
       case '"':  output += '"';  break;
@@ -429,19 +427,24 @@ std::string json::decode (const std::string& input)
 
       // Compose a UTF8 unicode character.
       case 'u':
-        output += utf8_character (utf8_codepoint (input.substr (++i)));
-        i += 3;
+          output += utf8_character (utf8_codepoint (input.substr (++pos)));
+          pos += 3;
         break;
 
       // If it is an unrecognized sequence, do nothing.
       default:
         output += '\\';
-        output += input[i];
+          output += input[pos];
         break;
       }
+      ++pos;
     }
     else
-      output += input[i];
+    {
+      size_t next_backslash = input.find ('\\', pos);
+      output.append (input, pos, next_backslash - pos);
+      pos = next_backslash;
+    }
   }
 
   return output;
