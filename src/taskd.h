@@ -27,6 +27,7 @@
 #ifndef INCLUDED_TASKD
 #define INCLUDED_TASKD
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <ConfigFile.h>
@@ -86,39 +87,14 @@ template <class T> void listDiff (
   const T& left, const T& right, T& leftOnly, T& rightOnly)
 {
   leftOnly.clear ();
+  for (auto& l : left)
+    if (std::find (right.begin (), right.end (), l) == right.end ())
+      leftOnly.push_back (l);
+
   rightOnly.clear ();
-
-  for (unsigned int l = 0; l < left.size (); ++l)
-  {
-    bool found = false;
-    for (unsigned int r = 0; r < right.size (); ++r)
-    {
-      if (left[l] == right[r])
-      {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found)
-      leftOnly.push_back (left[l]);
-  }
-
-  for (unsigned int r = 0; r < right.size (); ++r)
-  {
-    bool found = false;
-    for (unsigned int l = 0; l < left.size (); ++l)
-    {
-      if (left[l] == right[r])
-      {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found)
-      rightOnly.push_back (right[r]);
-  }
+  for (auto& r : right)
+    if (std::find (left.begin (), left.end (), r) == left.end ())
+      rightOnly.push_back (r);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,17 +102,13 @@ template <class T> void listIntersect (const T& left, const T& right, T& join)
 {
   join.clear ();
 
-  for (unsigned int l = 0; l < left.size (); ++l)
-  {
-    for (unsigned int r = 0; r < right.size (); ++r)
-    {
-      if (left[l] == right[r])
+  for (auto& l : left)
+    for (auto& r : right)
+      if (l == r)
       {
-        join.push_back (left[l]);
+        join.push_back (l);
         break;
       }
-    }
-  }
 }
 
 #endif
