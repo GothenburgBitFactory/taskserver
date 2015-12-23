@@ -4,6 +4,8 @@
         the golden hair).
 - TD-99 Manual page of taskd has hyphen instead minus sign "-" (thanks to
         Sebastien Badia).
+- TD-100 Log taskd messages to stdout if launched by systemd (thanks to
+         Sebastien Badia).
 - TD-101 taskdrc man page says "trust" defaults to "strict", but server
          complains if none set (thanks to Jack).
 - TD-106 The recurrence value '2m' is not valid (thanks to Roman Golovin).
