@@ -4,7 +4,7 @@ After=network.target
 Documentation=http://taskwarrior.org/docs/
 
 [Service]
-ExecStart=/usr/bin/taskd server --data /var/lib/taskd
+ExecStart=/usr/bin/taskd server --data /var/lib/taskd --log=-
 Restart=on-abort
 Type=simple
 User=taskd
