@@ -9,6 +9,7 @@
 - TD-101 taskdrc man page says "trust" defaults to "strict", but server
          complains if none set (thanks to Jack).
 - TD-106 The recurrence value '2m' is not valid (thanks to Roman Golovin).
+- TD-110 Question: About src/tls/* (thanks to Sebastien Badia).
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
   which means a confguration setting of server=:::<someport>. Related to TD-51
   (thanks to Johannes Wienke).

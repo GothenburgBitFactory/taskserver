@@ -177,5 +177,5 @@ set (CPACK_SOURCE_PACKAGE_FILE_NAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 set (CPACK_SOURCE_IGNORE_FILES  "CMakeCache" "CMakeFiles" "CPackConfig" "CPackSourceConfig"
                                 "_CPack_Packages" "cmake_install" "install_manifest"
                                 "Makefile$" "test" "package-config"
-                                "src/taskd$" "/\\\\.gitignore" "/\\\\.git/" "swp$")
+                                "src/taskd$" "src/tls" "/\\\\.gitignore" "/\\\\.git/" "swp$")
 include (CPack)
