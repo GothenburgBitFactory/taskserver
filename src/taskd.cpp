@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2016, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ int main (int argc, const char** argv)
 #endif
 
           << "\n"
-          << "Copyright (C) 2010 - 2015 Göteborg Bit Factory."
+          << "Copyright (C) 2010 - 2016 Göteborg Bit Factory."
           << "\n"
           << "\n"
           << "Taskd may be copied only under the terms of the MIT license, "
