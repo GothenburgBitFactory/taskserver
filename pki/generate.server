@@ -29,6 +29,7 @@ chmod 600 server.key.pem
 cat <<EOF >server.info
 organization = $ORGANIZATION
 cn = $CN
+expiration_days = $EXPIRATION_DAYS
 tls_www_server
 encryption_key
 signing_key
