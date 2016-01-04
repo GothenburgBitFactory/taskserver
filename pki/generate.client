@@ -26,6 +26,7 @@ chmod 600 ${NAME}.key.pem
 cat <<EOF >client.info
 organization = $ORGANIZATION
 cn = $CN
+expiration_days = $EXPIRATION_DAYS
 tls_www_client
 encryption_key
 signing_key

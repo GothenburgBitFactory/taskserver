@@ -25,6 +25,7 @@ cn = $CN
 country = $COUNTRY
 state = $STATE
 locality = $LOCALITY
+expiration_days = $EXPIRATION_DAYS
 ca
 cert_signing_key
 EOF
