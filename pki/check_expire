@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 for cert in *.cert.pem; do
 	echo $cert
