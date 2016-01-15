@@ -11,7 +11,8 @@ fi
 . ./vars
 
 NAME=client
-if [ $# -gt 0 ] ; then
+if [ $# -gt 0 ]
+then
   NAME=$1
 fi
 
