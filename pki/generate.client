@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Take the correct binary to create the certificates
-CERTTOOL=$(which gnutls-certtool || which certtool)
+CERTTOOL=$(which gnutls-certtool 2>/dev/null || which certtool 2>/dev/null)
 if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
