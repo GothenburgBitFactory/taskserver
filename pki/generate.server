@@ -33,7 +33,7 @@ signing_key
 EOF
 fi
 
-if ! [ -f server.cert.pem ]
+if ! [ -f server.cert.pem ] || [ server.template -nt server.cert.pem ]
 then
   $CERTTOOL \
     --generate-certificate \
