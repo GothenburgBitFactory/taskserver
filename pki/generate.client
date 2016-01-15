@@ -43,5 +43,3 @@ $CERTTOOL \
 
 chmod 600 ${NAME}.cert.pem
 rm client.info
-exit 0
-
