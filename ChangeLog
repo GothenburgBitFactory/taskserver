@@ -23,6 +23,7 @@
   Boeckel).
 - Removed broken SSLv3 and TLSv1.0 (POODLE), 3DES in CBC mode, RC4, and MD5,
   ciphers from default (thanks to Ben Boeckel).
+- Improved OpenBSD support (thanks to Kent R. Spillner).
 
 ------- current release ---------------------------
 
