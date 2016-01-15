@@ -24,7 +24,7 @@ $CERTTOOL \
 
 # Sign a client cert with the key.
 chmod 600 ${NAME}.key.pem
-cat <<EOF >client.template
+cat <<EOF >${NAME}.template
 organization = $ORGANIZATION
 cn = $CN
 expiration_days = $EXPIRATION_DAYS
@@ -38,8 +38,8 @@ $CERTTOOL \
   --load-privkey ${NAME}.key.pem \
   --load-ca-certificate ca.cert.pem \
   --load-ca-privkey ca.key.pem \
-  --template client.template \
+  --template ${NAME}.template \
   --outfile ${NAME}.cert.pem
 
 chmod 600 ${NAME}.cert.pem
-rm client.template
+rm ${NAME}.template
