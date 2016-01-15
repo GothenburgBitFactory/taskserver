@@ -37,5 +37,3 @@ $CERTTOOL \
 
 chmod 600 server.cert.pem
 rm server.info
-exit 0
-

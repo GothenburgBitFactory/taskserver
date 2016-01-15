@@ -37,4 +37,3 @@ $CERTTOOL \
 
 chmod 600 ca.cert.pem
 rm ca.info
-exit 0

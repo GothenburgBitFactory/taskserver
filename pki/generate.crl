@@ -24,7 +24,6 @@ $CERTTOOL \
 
 chmod 600 server.crl.pem
 rm crl.info
-exit 0
 
 # To create a CRL that contains some revoked certificates, place the
 # certificates in a file and use --load-certificate as follows:
@@ -36,4 +35,3 @@ exit 0
 
 # To verify a CRL:
 #   $CERTTOOL --verify-crl --load-ca-certificate ca.cert.pem --infile server.crl.pem
-
