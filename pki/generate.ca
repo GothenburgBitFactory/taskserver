@@ -35,7 +35,7 @@ ca
 EOF
 fi
 
-if ! [ -f ca.cert.pem ]
+if ! [ -f ca.cert.pem ] || [ ca.template -nt ca.cert.pem ]
 then
   $CERTTOOL \
     --generate-self-signed \

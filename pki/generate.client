@@ -40,7 +40,7 @@ signing_key
 EOF
 fi
 
-if ! [ -f ${NAME}.cert.pem ]
+if ! [ -f ${NAME}.cert.pem ] || [ ${NAME}.template -nt ${NAME}.cert.pem ]
 then
   $CERTTOOL \
     --generate-certificate \
