@@ -22,8 +22,9 @@ $CERTTOOL \
   --bits $BITS \
   --outfile ${NAME}.key.pem
 
-# Sign a client cert with the key.
 chmod 600 ${NAME}.key.pem
+
+# Sign a client cert with the key.
 cat <<EOF >${NAME}.template
 organization = $ORGANIZATION
 cn = $CN
