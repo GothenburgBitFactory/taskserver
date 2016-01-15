@@ -29,7 +29,7 @@
 
 #include <string>
 #include <vector>
-#ifdef FREEBSD
+#if defined(FREEBSD) || defined(OPENBSD)
 #include <uuid.h>
 #else
 #include <uuid/uuid.h>
