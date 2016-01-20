@@ -10,16 +10,21 @@ fi
 
 . ./vars
 
-# Create a CA key.
-$CERTTOOL \
-  --generate-privkey \
-  --bits $BITS \
-  --outfile ca.key.pem
+if ! [ -f ca.key.pem ]
+then
+  # Create a CA key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile ca.key.pem
+fi
 
 chmod 600 ca.key.pem
 
-# Sign a CA cert.
-cat <<EOF >ca.template
+if ! [ -f ca.template ]
+then
+  # Sign a CA cert.
+  cat <<EOF >ca.template
 organization = $ORGANIZATION
 cn = $CN CA
 country = $COUNTRY
@@ -28,12 +33,15 @@ locality = $LOCALITY
 expiration_days = $EXPIRATION_DAYS
 ca
 EOF
+fi
 
-$CERTTOOL \
-  --generate-self-signed \
-  --load-privkey ca.key.pem \
-  --template ca.template \
-  --outfile ca.cert.pem
+if ! [ -f ca.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-self-signed \
+    --load-privkey ca.key.pem \
+    --template ca.template \
+    --outfile ca.cert.pem
+fi
 
 chmod 600 ca.cert.pem
-rm ca.template
