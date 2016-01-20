@@ -18,7 +18,7 @@ $CERTTOOL \
 
 chmod 600 server.key.pem
 
-cat <<EOF >server.info
+cat <<EOF >server.template
 organization = $ORGANIZATION
 cn = $CN
 expiration_days = $EXPIRATION_DAYS
@@ -32,8 +32,8 @@ $CERTTOOL \
   --load-privkey server.key.pem \
   --load-ca-certificate ca.cert.pem \
   --load-ca-privkey ca.key.pem \
-  --template server.info \
+  --template server.template \
   --outfile server.cert.pem
 
 chmod 600 server.cert.pem
-rm server.info
+rm server.template
