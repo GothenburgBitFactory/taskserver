@@ -21,13 +21,12 @@ chmod 600 ca.key.pem
 # Sign a CA cert.
 cat <<EOF >ca.info
 organization = $ORGANIZATION
-cn = $CN
+cn = $CN CA
 country = $COUNTRY
 state = $STATE
 locality = $LOCALITY
 expiration_days = $EXPIRATION_DAYS
 ca
-cert_signing_key
 EOF
 
 $CERTTOOL \
