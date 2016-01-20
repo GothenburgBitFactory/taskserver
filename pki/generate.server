@@ -10,15 +10,20 @@ fi
 
 . ./vars
 
-# Create a server key.
-$CERTTOOL \
-  --generate-privkey \
-  --bits $BITS \
-  --outfile server.key.pem
+if ! [ -f server.key.pem ]
+then
+  # Create a server key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile server.key.pem
+fi
 
 chmod 600 server.key.pem
 
-cat <<EOF >server.template
+if ! [ -f server.template ]
+then
+  cat <<EOF >server.template
 organization = $ORGANIZATION
 cn = $CN
 expiration_days = $EXPIRATION_DAYS
@@ -26,14 +31,17 @@ tls_www_server
 encryption_key
 signing_key
 EOF
+fi
 
-$CERTTOOL \
-  --generate-certificate \
-  --load-privkey server.key.pem \
-  --load-ca-certificate ca.cert.pem \
-  --load-ca-privkey ca.key.pem \
-  --template server.template \
-  --outfile server.cert.pem
+if ! [ -f server.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-certificate \
+    --load-privkey server.key.pem \
+    --load-ca-certificate ca.cert.pem \
+    --load-ca-privkey ca.key.pem \
+    --template server.template \
+    --outfile server.cert.pem
+fi
 
 chmod 600 server.cert.pem
-rm server.template

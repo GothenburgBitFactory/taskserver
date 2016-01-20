@@ -16,16 +16,21 @@ then
   NAME=$1
 fi
 
-# Create a client key.
-$CERTTOOL \
-  --generate-privkey \
-  --bits $BITS \
-  --outfile ${NAME}.key.pem
+if ! [ -f ${NAME}.key.pem ]
+then
+  # Create a client key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile ${NAME}.key.pem
+fi
 
 chmod 600 ${NAME}.key.pem
 
-# Sign a client cert with the key.
-cat <<EOF >${NAME}.template
+if ! [ -f ${NAME}.template ]
+then
+  # Sign a client cert with the key.
+  cat <<EOF >${NAME}.template
 organization = $ORGANIZATION
 cn = $CN
 expiration_days = $EXPIRATION_DAYS
@@ -33,14 +38,17 @@ tls_www_client
 encryption_key
 signing_key
 EOF
+fi
 
-$CERTTOOL \
-  --generate-certificate \
-  --load-privkey ${NAME}.key.pem \
-  --load-ca-certificate ca.cert.pem \
-  --load-ca-privkey ca.key.pem \
-  --template ${NAME}.template \
-  --outfile ${NAME}.cert.pem
+if ! [ -f ${NAME}.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-certificate \
+    --load-privkey ${NAME}.key.pem \
+    --load-ca-certificate ca.cert.pem \
+    --load-ca-privkey ca.key.pem \
+    --template ${NAME}.template \
+    --outfile ${NAME}.cert.pem
+fi
 
 chmod 600 ${NAME}.cert.pem
-rm ${NAME}.template
