@@ -11,7 +11,7 @@ fi
 . ./vars
 
 # CRL - Certificate Revocation List
-cat <<EOF >crl.info
+cat <<EOF >crl.template
 expiration_days = $EXPIRATION_DAYS
 EOF
 
@@ -19,11 +19,11 @@ $CERTTOOL \
   --generate-crl \
   --load-ca-privkey ca.key.pem \
   --load-ca-certificate ca.cert.pem \
-  --template crl.info \
+  --template crl.template \
   --outfile server.crl.pem
 
 chmod 600 server.crl.pem
-rm crl.info
+rm crl.template
 
 # To create a CRL that contains some revoked certificates, place the
 # certificates in a file and use --load-certificate as follows:

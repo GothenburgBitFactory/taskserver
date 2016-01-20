@@ -19,7 +19,7 @@ $CERTTOOL \
 chmod 600 ca.key.pem
 
 # Sign a CA cert.
-cat <<EOF >ca.info
+cat <<EOF >ca.template
 organization = $ORGANIZATION
 cn = $CN CA
 country = $COUNTRY
@@ -32,8 +32,8 @@ EOF
 $CERTTOOL \
   --generate-self-signed \
   --load-privkey ca.key.pem \
-  --template ca.info \
+  --template ca.template \
   --outfile ca.cert.pem
 
 chmod 600 ca.cert.pem
-rm ca.info
+rm ca.template
