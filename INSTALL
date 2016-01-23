@@ -13,6 +13,7 @@ from source. More information on cmake can be obtained at http://cmake.org
 
 You will also need:
   - make
+  - bash
 
 You will need a C++ compiler that supports full C++11, which includes:
   - gcc 4.7   (released 2012-03-23)
