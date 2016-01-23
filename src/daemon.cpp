@@ -303,10 +303,12 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::string org      = in.get ("org");
   std::string user     = in.get ("user");
   std::string password = in.get ("key");
+  std::string subtype  = in.get ("subtype");
 
   if (_log)
-    _log->format ("[%d] 'sync' from '%s/%s' using '%s' at %s:%d",
+    _log->format ("[%d] 'sync%s' from '%s/%s' using '%s' at %s:%d",
                   _txn_count,
+                  (subtype == "init" ? "+init" : ""),
                   org.c_str (),
                   user.c_str (),
                   in.get ("client").c_str (),
@@ -317,10 +319,10 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   if (_db.redirect (org, out))
     return;
 
-  // Separate payload into client_data and client_key.
+  // Separate payload into client_data and sync_key.
   std::vector <std::string> client_data;               // Incoming client data.
-  std::string client_key;                              // Incoming client key.
-  parse_payload (in.getPayload (), client_data, client_key);
+  std::string sync_key;                                // Incoming client key.
+  parse_payload (in.getPayload (), client_data, sync_key);
 
   // Load all user data.
   std::vector <std::string> server_data;               // Data loaded on server.
@@ -330,7 +332,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::vector <std::string> new_client_data;           // New tasks for client.
 
   // Find branch point and extract subset.
-  unsigned int branch_point = find_branch_point (server_data, client_key);
+  unsigned int branch_point = find_branch_point (server_data, sync_key);
   std::vector <Task> server_subset;
   extract_subset (server_data, branch_point, server_subset);
 
@@ -399,12 +401,12 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 
   // New server data means a new sync key must be generated.  No new server data
   // means the most recent sync key is reused.
-  std::string new_client_key = "";
+  std::string new_sync_key = "";
   if (new_server_data.size ())
   {
-    new_client_key = uuid ();
-    new_server_data.push_back (new_client_key);
-    _log->format ("[%d] New sync key '%s'", _txn_count, new_client_key.c_str ());
+    new_sync_key = uuid ();
+    new_server_data.push_back (new_sync_key);
+    _log->format ("[%d] New sync key '%s'", _txn_count, new_sync_key.c_str ());
 
     // Append new_server_data to file.
     append_server_data (org, password, new_server_data);
@@ -415,11 +417,11 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     for (i = server_data.rbegin (); i != server_data.rend (); ++i)
       if ((*i)[0] != '{')
       {
-        new_client_key = *i;
+        new_sync_key = *i;
         break;
       }
 
-    _log->format ("[%d] Sync key '%s' still valid", _txn_count, new_client_key.c_str ());
+    _log->format ("[%d] Sync key '%s' still valid", _txn_count, new_sync_key.c_str ());
   }
 
   // If there is outgoing data, generate payload + key.
@@ -429,13 +431,13 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     payload = generate_payload (server_subset,
                                 new_client_data,
-                                new_client_key);
+                                new_sync_key);
   }
 
   // No outgoing data, just sent the latest key.
   else
   {
-    payload = new_client_key + "\n";
+    payload = new_sync_key + "\n";
   }
 
   out.setPayload (payload);
@@ -460,7 +462,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 void Daemon::parse_payload (
   const std::string& payload,
   std::vector <std::string>& data,
-  std::string& key) const
+  std::string& sync_key) const
 {
   // Break payload into lines.
   std::vector <std::string> lines;
@@ -476,13 +478,13 @@ void Daemon::parse_payload (
       if ((*i)[0] == '{')
         data.push_back (*i);
       else
-        key = *i;
+        sync_key = *i;
     }
   }
 
   _log->format ("[%d] Client key '%s' + %u txns",
                 _txn_count,
-                key.c_str (),
+                sync_key.c_str (),
                 data.size ());
 }
 
@@ -529,23 +531,23 @@ void Daemon::append_server_data (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Note: A missing client_key implies first-time sync, which means the earliest
+// Note: A missing sync_key implies first-time sync, which means the earliest
 //       possible branch point is used.
 unsigned int Daemon::find_branch_point (
   const std::vector <std::string>& data,
-  const std::string& key) const
+  const std::string& sync_key) const
 {
   unsigned int branch = 0;
 
   // A missing key is either a first-time sync, or a request to get all data.
-  if (key == "")
+  if (sync_key == "")
     return branch;
 
   bool found = false;
   std::vector <std::string>::const_iterator i;
   for (i = data.begin (); i != data.end (); ++i)
   {
-    if (*i == key)
+    if (*i == sync_key)
     {
       found = true;
       break;
@@ -557,7 +559,7 @@ unsigned int Daemon::find_branch_point (
   if (!found)
     throw std::string ("Could not find the last sync transaction. Did you skip the 'task sync init' requirement?");
 
-  _log->format ("[%d] Branch point: %s --> %u", _txn_count, key.c_str (), branch);
+  _log->format ("[%d] Branch point: %s --> %u", _txn_count, sync_key.c_str (), branch);
   return branch;
 }
 
