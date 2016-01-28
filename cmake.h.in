@@ -39,6 +39,7 @@
 #cmakedefine OPENBSD
 #cmakedefine NETBSD
 #cmakedefine SOLARIS
+#cmakedefine CENTOS
 #cmakedefine GNUHURD
 #cmakedefine CYGWIN
 #cmakedefine UNKNOWN
