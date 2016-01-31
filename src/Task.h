@@ -93,7 +93,6 @@ public:
   std::vector <std::string> all ();
   const std::string identifier (bool shortened = false) const;
   const std::string get (const std::string&) const;
-  const std::string& get_ref (const std::string&) const;
   int get_int (const std::string&) const;
   unsigned long get_ulong (const std::string&) const;
   float get_float (const std::string&) const;

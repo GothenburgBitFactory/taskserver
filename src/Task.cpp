@@ -228,16 +228,6 @@ const std::string Task::get (const std::string& name) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& Task::get_ref (const std::string& name) const
-{
-  auto i = data.find (name);
-  if (i != data.end ())
-    return i->second;
-
-  return dummy;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 int Task::get_int (const std::string& name) const
 {
   auto i = data.find (name);
@@ -1860,7 +1850,7 @@ float Task::urgency_scheduled () const
 ////////////////////////////////////////////////////////////////////////////////
 float Task::urgency_waiting () const
 {
-  if (get_ref ("status") == "waiting")
+  if (get ("status") == "waiting")
     return 1.0;
 
   return 0.0;
