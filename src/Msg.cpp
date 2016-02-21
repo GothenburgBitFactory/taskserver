@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2016, Göteborg Bit Factory.
+// Copyright 2006 - 2016, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,53 +29,6 @@
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-Msg::Msg ()
-: _payload ("")
-{
-  // All messages are marked with the version number, so that the messages may
-  // be properly evaluated in context.
-  _header["client"] = PACKAGE_STRING;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Msg::Msg (const Msg& other)
-: _header (other._header)
-, _payload (other._payload)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Msg& Msg::operator= (const Msg& other)
-{
-  if (this != &other)
-  {
-    _header  = other._header;
-    _payload = other._payload;
-  }
-
-  return *this;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Msg::operator== (const Msg& other) const
-{
-  return _header  == other._header &&
-         _payload == other._payload;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Msg::~Msg ()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Msg::clear ()
-{
-  _header.clear ();
-  _payload = "";
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void Msg::set (const std::string& name, const int value)
 {
   _header[name] = format (value);
@@ -88,9 +41,13 @@ void Msg::set (const std::string& name, const std::string& value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Msg::set (const std::string& name, const double value)
+std::string Msg::get (const std::string& name) const
 {
-  _header[name] = format (value);
+  auto i = _header.find (name);
+  if (i != _header.end ())
+    return i->second;
+
+  return "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,38 +57,27 @@ void Msg::setPayload (const std::string& payload)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Msg::get (const std::string& name) const
-{
-  std::map <std::string, std::string>::const_iterator i;
-  i = _header.find (name);
-  if (i != _header.end ())
-    return i->second;
-
-  return "";
-}
-
-////////////////////////////////////////////////////////////////////////////////
 std::string Msg::getPayload () const
 {
   return _payload;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Msg::all (std::vector <std::string>& names) const
+std::vector <std::string> Msg::all () const
 {
-  std::map <std::string, std::string>::const_iterator i;
-  for (i = _header.begin (); i != _header.end (); ++i)
-    names.push_back (i->first);
+  std::vector <std::string> names;
+  for (auto& i : _header)
+    names.push_back (i.first);
+
+  return names;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string Msg::serialize () const
 {
   std::string output;
-
-  std::map <std::string, std::string>::const_iterator i;
-  for (i = _header.begin (); i != _header.end (); ++i)
-    output += i->first + ": " + i->second + "\n";
+  for (auto& i : _header)
+    output += i.first + ": " + i.second + "\n";
 
   output += "\n" + _payload + "\n";
 
@@ -151,14 +97,13 @@ bool Msg::parse (const std::string& input)
   // Parse header.
   std::vector <std::string> lines;
   split (lines, input.substr (0, separator), '\n');
-  std::vector <std::string>::iterator i;
-  for (i = lines.begin (); i != lines.end (); ++i)
+  for (auto& i : lines)
   {
-    auto delimiter = i->find (':');
+    auto delimiter = i.find (':');
     if (delimiter == std::string::npos)
-      throw std::string ("ERROR: Malformed message header '") + *i + "'";
+      throw std::string ("ERROR: Malformed message header '") + i + "'";
 
-    _header[trim (i->substr (0, delimiter))] = trim (i->substr (delimiter + 1));
+    _header[trim (i.substr (0, delimiter))] = trim (i.substr (delimiter + 1));
   }
 
   // Parse payload.

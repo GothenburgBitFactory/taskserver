@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2016, Göteborg Bit Factory.
+// Copyright 2006 - 2016, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,28 +34,20 @@
 class Msg
 {
 public:
-  Msg ();
-  Msg (const Msg&);
-  Msg& operator= (const Msg&);
-  bool operator== (const Msg&) const;
-  ~Msg ();
-
-  void clear ();
-
   void set (const std::string&, const int);
   void set (const std::string&, const std::string&);
-  void set (const std::string&, const double);
-  void setPayload (const std::string&);
   std::string get (const std::string&) const;
+
+  void setPayload (const std::string&);
   std::string getPayload () const;
 
-  void all (std::vector <std::string>&) const;
+  std::vector <std::string> all () const;
   std::string serialize () const;
   bool parse (const std::string&);
 
 private:
-  std::map <std::string, std::string> _header;
-  std::string _payload;
+  std::map <std::string, std::string> _header {};
+  std::string _payload                        {""};
 };
 
 #endif
