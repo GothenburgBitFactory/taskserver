@@ -496,7 +496,7 @@ void TLSClient::recv (std::string& data)
     if (received < 0 && gnutls_error_is_fatal (received) == 0)
     {
       if (_debug)
-      std::cout << "c: WARNING " << gnutls_strerror (received) << "\n";
+        std::cout << "c: WARNING " << gnutls_strerror (received) << "\n";
     }
     else if (received < 0)
       throw std::string (gnutls_strerror (received));
