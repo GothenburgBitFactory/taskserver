@@ -25,25 +25,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
+#include <FS.h>
 #include <fstream>
 #include <glob.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <pwd.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
-#include <errno.h>
 #include <text.h>
 #include <util.h>
 #include <i18n.h>
-#include <FS.h>
 
 #if defined SOLARIS || defined NETBSD || defined FREEBSD
 #include <limits.h>
+#endif
+
+#if defined __APPLE__
+#include <sys/syslimits.h>
 #endif
 
 // Fixes build with musl libc.
@@ -54,13 +57,6 @@
 #ifndef GLOB_BRACE
 #define GLOB_BRACE 0
 #endif
-
-////////////////////////////////////////////////////////////////////////////////
-std::ostream& operator<< (std::ostream& out, const Path& path)
-{
-  out << path._data;
-  return out;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 Path::Path ()
@@ -82,11 +78,6 @@ Path::Path (const std::string& in)
 {
   _original = in;
   _data = expand (in);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Path::~Path ()
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,10 +208,10 @@ bool Path::executable () const
 ////////////////////////////////////////////////////////////////////////////////
 bool Path::rename (const std::string& new_name)
 {
-  std::string expanded = expand (new_name);
+  auto expanded = expand (new_name);
   if (_data != expanded)
   {
-    if (::rename (_data.c_str (), expanded.c_str ()) == 0)
+    if (std::rename (_data.c_str (), expanded.c_str ()) == 0)
     {
       _data = expanded;
       return true;
@@ -246,7 +237,7 @@ std::string Path::expand (const std::string& in)
   if (tilde != std::string::npos)
   {
     const char *home = getenv("HOME");
-    if (home == NULL)
+    if (home == nullptr)
     {
       struct passwd* pw = getpwuid (getuid ());
       home = pw->pw_dir;
@@ -277,7 +268,7 @@ std::string Path::expand (const std::string& in)
   else if (in.length () > 2 &&
            in.substr (0, 2) == "./")
   {
-    copy = Directory::cwd () + "/" + in.substr (2);
+    copy = Directory::cwd () + in.substr (1);
   }
   else if (in.length () > 1 &&
            in[0] != '.' &&
@@ -296,9 +287,9 @@ std::vector <std::string> Path::glob (const std::string& pattern)
 
   glob_t g;
 #ifdef SOLARIS
-  if (!::glob (pattern.c_str (), GLOB_ERR, NULL, &g))
+  if (!::glob (pattern.c_str (), GLOB_ERR, nullptr, &g))
 #else
-  if (!::glob (pattern.c_str (), GLOB_ERR | GLOB_BRACE | GLOB_TILDE, NULL, &g))
+  if (!::glob (pattern.c_str (), GLOB_ERR | GLOB_BRACE | GLOB_TILDE, nullptr, &g))
 #endif
     for (int i = 0; i < (int) g.gl_pathc; ++i)
       results.push_back (g.gl_pathv[i]);
@@ -310,7 +301,7 @@ std::vector <std::string> Path::glob (const std::string& pattern)
 ////////////////////////////////////////////////////////////////////////////////
 File::File ()
 : Path::Path ()
-, _fh (NULL)
+, _fh (nullptr)
 , _h (-1)
 , _locked (false)
 {
@@ -319,7 +310,7 @@ File::File ()
 ////////////////////////////////////////////////////////////////////////////////
 File::File (const Path& other)
 : Path::Path (other)
-, _fh (NULL)
+, _fh (nullptr)
 , _h (-1)
 , _locked (false)
 {
@@ -328,7 +319,7 @@ File::File (const Path& other)
 ////////////////////////////////////////////////////////////////////////////////
 File::File (const File& other)
 : Path::Path (other)
-, _fh (NULL)
+, _fh (nullptr)
 , _h (-1)
 , _locked (false)
 {
@@ -337,7 +328,7 @@ File::File (const File& other)
 ////////////////////////////////////////////////////////////////////////////////
 File::File (const std::string& in)
 : Path::Path (in)
-, _fh (NULL)
+, _fh (nullptr)
 , _h (-1)
 , _locked (false)
 {
@@ -380,6 +371,17 @@ bool File::remove () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+std::string File::removeBOM (const std::string& input)
+{
+  if (input[0] && input[0] == '\xEF' &&
+      input[1] && input[1] == '\xBB' &&
+      input[2] && input[2] == '\xBF')
+    return input.substr (3);
+
+  return input;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool File::open ()
 {
   if (_data != "")
@@ -407,12 +409,6 @@ bool File::open ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool File::openAndLock ()
-{
-  return open () && lock ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void File::close ()
 {
   if (_fh)
@@ -421,7 +417,7 @@ void File::close ()
       unlock ();
 
     fclose (_fh);
-    _fh = NULL;
+    _fh = nullptr;
     _h = -1;
     _locked = false;
   }
@@ -467,10 +463,20 @@ void File::read (std::string& contents)
   std::ifstream in (_data.c_str ());
   if (in.good ())
   {
+    bool first = true;
     std::string line;
     line.reserve (512 * 1024);
     while (getline (in, line))
+    {
+      // Detect forbidden BOM on first line.
+      if (first)
+      {
+        line = File::removeBOM (line);
+        first = false;
+      }
+
       contents += line + "\n";
+    }
 
     in.close ();
   }
@@ -485,37 +491,22 @@ void File::read (std::vector <std::string>& contents)
   std::ifstream in (_data.c_str ());
   if (in.good ())
   {
+    bool first = true;
     std::string line;
     line.reserve (512 * 1024);
     while (getline (in, line))
+    {
+      // Detect forbidden BOM on first line.
+      if (first)
+      {
+        line = File::removeBOM (line);
+        first = false;
+      }
+
       contents.push_back (line);
+    }
 
     in.close ();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Opens if necessary.
-void File::write (const std::string& line)
-{
-  if (!_fh)
-    open ();
-
-  if (_fh)
-    fputs (line.c_str (), _fh);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Opens if necessary.
-void File::write (const std::vector <std::string>& lines)
-{
-  if (!_fh)
-    open ();
-
-  if (_fh)
-  {
-    for (auto& line : lines)
-      fputs (line.c_str (), _fh);
   }
 }
 
@@ -544,8 +535,18 @@ void File::append (const std::vector <std::string>& lines)
   {
     fseek (_fh, 0, SEEK_END);
     for (auto& line : lines)
-      fputs ((line + "\n").c_str (), _fh);
+      fputs (line.c_str (), _fh);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void File::write_raw (const std::string& line)
+{
+  if (!_fh)
+    open ();
+
+  if (_fh)
+    fputs (line.c_str (), _fh);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -555,7 +556,7 @@ void File::truncate ()
     open ();
 
   if (_fh)
-    ftruncate (_h, 0);
+    (void) ftruncate (_h, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -643,25 +644,6 @@ bool File::create (const std::string& name, int mode /* = 0640 */)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string File::read (const std::string& name)
-{
-  std::string contents = "";
-
-  std::ifstream in (name.c_str ());
-  if (in.good ())
-  {
-    std::string line;
-    line.reserve (1024);
-    while (getline (in, line))
-      contents += line + "\n";
-
-    in.close ();
-  }
-
-  return contents;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 bool File::read (const std::string& name, std::string& contents)
 {
   contents = "";
@@ -669,10 +651,20 @@ bool File::read (const std::string& name, std::string& contents)
   std::ifstream in (name.c_str ());
   if (in.good ())
   {
+    bool first = true;
     std::string line;
     line.reserve (1024);
     while (getline (in, line))
+    {
+      // Detect forbidden BOM on first line.
+      if (first)
+      {
+        line = File::removeBOM (line);
+        first = false;
+      }
+
       contents += line + "\n";
+    }
 
     in.close ();
     return true;
@@ -689,10 +681,20 @@ bool File::read (const std::string& name, std::vector <std::string>& contents)
   std::ifstream in (name.c_str ());
   if (in.good ())
   {
+    bool first = true;
     std::string line;
     line.reserve (1024);
     while (getline (in, line))
+    {
+      // Detect forbidden BOM on first line.
+      if (first)
+      {
+        line = File::removeBOM (line);
+        first = false;
+      }
+
       contents.push_back (line);
+    }
 
     in.close ();
     return true;
@@ -742,49 +744,36 @@ bool File::write (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool File::append (const std::string& name, const std::string& contents)
-{
-  std::ofstream out (expand (name).c_str (),
-                     std::ios_base::out | std::ios_base::app);
-  if (out.good ())
-  {
-    out << contents;
-    out.close ();
-    return true;
-  }
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool File::append (
-  const std::string& name,
-  const std::vector <std::string>& lines,
-  bool addNewlines /* = true */)
-{
-  std::ofstream out (expand (name).c_str (),
-                     std::ios_base::out | std::ios_base::app);
-  if (out.good ())
-  {
-    for (auto& line : lines)
-    {
-      out << line;
-
-      if (addNewlines)
-        out << "\n";
-    }
-
-    out.close ();
-    return true;
-  }
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 bool File::remove (const std::string& name)
 {
   return unlink (expand (name).c_str ()) == 0 ? true : false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool File::copy (const std::string& from, const std::string& to)
+{
+  // 'from' must exist.
+  if (! access (from.c_str (), F_OK))
+  {
+    std::ifstream src (from, std::ios::binary);
+    std::ofstream dst (to,   std::ios::binary);
+
+    dst << src.rdbuf ();
+    return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool File::move (const std::string& from, const std::string& to)
+{
+  auto expanded = expand (to);
+  if (from != expanded)
+    if (std::rename (from.c_str (), to.c_str ()) == 0)
+      return true;
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -817,17 +806,10 @@ Directory::Directory (const std::string& in)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Directory::~Directory ()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
 Directory& Directory::operator= (const Directory& other)
 {
   if (this != &other)
-  {
     File::operator= (other);
-  }
 
   return *this;
 }
@@ -848,10 +830,10 @@ bool Directory::remove () const
 bool Directory::remove_directory (const std::string& dir) const
 {
   DIR* dp = opendir (dir.c_str ());
-  if (dp != NULL)
+  if (dp != nullptr)
   {
     struct dirent* de;
-    while ((de = readdir (dp)) != NULL)
+    while ((de = readdir (dp)) != nullptr)
     {
       if (!strcmp (de->d_name, ".") ||
           !strcmp (de->d_name, ".."))
@@ -906,7 +888,7 @@ std::string Directory::cwd ()
 {
 #ifdef HAVE_GET_CURRENT_DIR_NAME
   char *buf = get_current_dir_name ();
-  if (buf == NULL)
+  if (buf == nullptr)
     throw std::bad_alloc ();
   std::string result (buf);
   free (buf);
@@ -952,10 +934,10 @@ void Directory::list (
   bool recursive)
 {
   DIR* dp = opendir (base.c_str ());
-  if (dp != NULL)
+  if (dp != nullptr)
   {
     struct dirent* de;
-    while ((de = readdir (dp)) != NULL)
+    while ((de = readdir (dp)) != nullptr)
     {
       if (!strcmp (de->d_name, ".") ||
           !strcmp (de->d_name, ".."))

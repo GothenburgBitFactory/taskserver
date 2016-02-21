@@ -36,9 +36,8 @@ class Path
 {
 public:
   Path ();
-  Path (const Path&);
+  explicit Path (const Path&);
   Path (const std::string&);
-  virtual ~Path ();
 
   Path& operator= (const Path&);
   bool operator== (const Path&);
@@ -70,8 +69,8 @@ class File : public Path
 {
 public:
   File ();
-  File (const Path&);
-  File (const File&);
+  explicit File (const Path&);
+  explicit File (const File&);
   File (const std::string&);
   virtual ~File ();
 
@@ -81,7 +80,6 @@ public:
   virtual bool remove () const;
 
   bool open ();
-  bool openAndLock ();
   void close ();
 
   bool lock ();
@@ -90,11 +88,9 @@ public:
   void read (std::string&);
   void read (std::vector <std::string>&);
 
-  void write (const std::string&);
-  void write (const std::vector <std::string>&);
-
   void append (const std::string&);
   void append (const std::vector <std::string>&);
+  void write_raw (const std::string&);
 
   void truncate ();
 
@@ -105,14 +101,14 @@ public:
   virtual time_t btime () const;
 
   static bool create (const std::string&, int mode = 0640);
-  static std::string read (const std::string&);
   static bool read (const std::string&, std::string&);
   static bool read (const std::string&, std::vector <std::string>&);
   static bool write (const std::string&, const std::string&);
   static bool write (const std::string&, const std::vector <std::string>&, bool addNewlines = true);
-  static bool append (const std::string&, const std::string&);
-  static bool append (const std::string&, const std::vector <std::string>&, bool addNewlines = true);
   static bool remove (const std::string&);
+  static bool copy (const std::string&, const std::string&);
+  static bool move (const std::string&, const std::string&);
+  static std::string removeBOM (const std::string&);
 
 private:
   FILE* _fh;
@@ -124,11 +120,10 @@ class Directory : public File
 {
 public:
   Directory ();
-  Directory (const Directory&);
-  Directory (const File&);
-  Directory (const Path&);
+  explicit Directory (const Directory&);
+  explicit Directory (const File&);
+  explicit Directory (const Path&);
   Directory (const std::string&);
-  virtual ~Directory ();
 
   Directory& operator= (const Directory&);
 
@@ -147,8 +142,4 @@ private:
   bool remove_directory (const std::string&) const;
 };
 
-std::ostream& operator<< (std::ostream&, const Path&);
-
 #endif
-////////////////////////////////////////////////////////////////////////////////
-
