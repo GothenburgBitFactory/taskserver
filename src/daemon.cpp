@@ -381,7 +381,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       std::string combined_JSON = combined.composeJSON ();
 
       // Append combined task to client and server data, if not already there.
-      new_server_data.push_back (combined_JSON);
+      new_server_data.push_back (combined_JSON + "\n");
       new_client_data.push_back (combined_JSON);
       ++merge_count;
     }
@@ -389,7 +389,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     {
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
-      new_server_data.push_back (*client_task);
+      new_server_data.push_back (*client_task + "\n");
       ++store_count;
     }
   }
@@ -405,7 +405,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   if (new_server_data.size ())
   {
     new_sync_key = uuid ();
-    new_server_data.push_back (new_sync_key);
+    new_server_data.push_back (new_sync_key + "\n");
     _log->format ("[%d] New sync key '%s'", _txn_count, new_sync_key.c_str ());
 
     // Append new_server_data to file.
