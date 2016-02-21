@@ -32,7 +32,7 @@
 
 int main (int, char**)
 {
-  UnitTest t (108);
+  UnitTest t (116);
 
   // Ensure environment has no influence.
   unsetenv ("TASKDATA");
@@ -52,6 +52,9 @@ int main (int, char**)
 
   Path p3 ("/tmp");
   t.ok (p3._data == "/tmp", "/tmp -> /tmp");
+
+  // operator==
+  t.notok (p2 == p3, "p2 != p3");
 
   // Path& operator= (const Path&);
   Path p3_copy (p3);
@@ -77,6 +80,9 @@ int main (int, char**)
   // bool is_directory () const;
   t.ok (p2.is_directory (), "~ is_directory");
   t.ok (p3.is_directory (), "/tmp is_directory");
+
+  // bool is_link () const;
+  t.notok (p2.is_link (), "~ !is_link");
 
   // bool readable () const;
   t.ok (p2.readable (), "~ readable");
@@ -113,6 +119,9 @@ int main (int, char**)
   t.ok    (p2.is_absolute (), "~ is_absolute (after expansion)");
   t.ok    (p3.is_absolute (), "/tmp is_absolute");
   t.ok    (p4.is_absolute (), "/a/b/c/file.ext is_absolute");
+
+  Path p5 ("~/file.ext");
+  t.notok (p5.name () == "~/file.ext", "~/file.ext --> ! ~/file.ext");
 
   Directory tmp ("tmp");
   tmp.create ();
@@ -272,8 +281,25 @@ int main (int, char**)
   d10.remove ();
   t.notok (d10.exists (),           "Directory::remove temp/dir.perm file no longer exists");
 
+  // Directory::cd
+  Directory d11 ("/tmp");
+  t.ok (d11.cd (),                  "Directory::cd /tmp good");
+
   tmp.remove ();
   t.notok (tmp.exists (),           "tmp dir removed.");
+
+  // File::removeBOM
+  std::string line = "Should not be modified.";
+  t.is (File::removeBOM (line), line,  "File::removeBOM 'Should not be modified' --> 'Should not be modified'");
+
+  line = "no";
+  t.is (File::removeBOM (line), line,  "File::removeBOM 'no' --> 'no'");
+
+  line = "";
+  t.is (File::removeBOM (line), line,  "File::removeBOM '' --> ''");
+
+  line = {'\xEF', '\xBB', '\xBF', 'F', 'o', 'o'};
+  t.is (File::removeBOM (line), "Foo",  "File::removeBOM '<BOM>Foo' --> 'Foo'");
 
   return 0;
 }
