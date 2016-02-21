@@ -49,8 +49,7 @@ int status_statistics (Config& config)
   Msg response;
   if (taskd_sendMessage (config, "server", request, response))
   {
-    std::vector <std::string> names;
-    response.all (names);
+    auto names = response.all ();
 
     std::map <std::string, std::string> data;
     data["Uptime"]                = formatTime (strtol (response.get ("uptime").c_str (), NULL, 10));
