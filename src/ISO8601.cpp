@@ -232,7 +232,16 @@ bool ISO8601d::parse (
 {
   auto i = start;
   Nibbler n (input.substr (i));
-  if (parse_formatted (n, format))
+
+  // Parse epoch first, as it's the most common scenario.
+  if (parse_epoch (n))
+  {
+    // ::validate and ::resolve are not needed in this case.
+    start = n.cursor ();
+    return true;
+  }
+
+  else if (parse_formatted (n, format))
   {
     // Check the values and determine time_t.
     if (validate ())
@@ -249,9 +258,7 @@ bool ISO8601d::parse (
   else if (parse_date_time     (n)   || // Strictest first.
            parse_date_time_ext (n)   ||
            (ISO8601d::isoEnabled &&
-            (parse_date_time     (n) ||
-             parse_date_time_ext (n) ||
-             parse_date_ext      (n) ||
+            (parse_date_ext      (n) ||
              parse_time_utc_ext  (n) ||
              parse_time_off_ext  (n) ||
              parse_time_ext      (n)))) // Time last, as it is the most permissive.
@@ -265,8 +272,7 @@ bool ISO8601d::parse (
     }
   }
 
-  else if (parse_epoch (n) ||
-           parse_named (n))
+  else if (parse_named (n))
   {
     // ::validate and ::resolve are not needed in this case.
     start = n.cursor ();
@@ -1574,12 +1580,6 @@ bool ISO8601d::sameYear (const ISO8601d& rhs) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ISO8601d ISO8601d::operator+ (time_t delta)
-{
-  return ISO8601d (_date + delta);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 ISO8601d ISO8601d::operator+ (const int delta)
 {
   return ISO8601d (_date + delta);
@@ -1943,14 +1943,24 @@ const std::string ISO8601p::format () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Range      Representation
+// ---------  ---------------------
+// >= 365d    {n.n}y
+// >= 90d     {n}mo
+// >= 14d     {n}w
+// >= 1d      {n}d
+// >= 1h      {n}h
+// >= 1min    {n}min
+//            {n}s
+//
 const std::string ISO8601p::formatVague () const
 {
   float days = (float) _period / 86400.0;
 
   std::stringstream formatted;
        if (_period >= 86400 * 365) formatted << std::fixed << std::setprecision (1) << (days / 365) << "y";
-  else if (_period >= 86400 * 84)  formatted << static_cast <int> (days / 30)       << "mo";
-  else if (_period >= 86400 * 13)  formatted << static_cast <int> (days / 7)        << "w";
+  else if (_period >= 86400 * 90)  formatted << static_cast <int> (days / 30)       << "mo";
+  else if (_period >= 86400 * 14)  formatted << static_cast <int> (days / 7)        << "w";
   else if (_period >= 86400)       formatted << static_cast <int> (days)            << "d";
   else if (_period >= 3600)        formatted << static_cast <int> (_period / 3600)  << "h";
   else if (_period >= 60)          formatted << static_cast <int> (_period / 60)    << "min";
