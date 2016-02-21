@@ -89,18 +89,6 @@ std::map <std::string, std::vector <std::string>> Task::customOrder;
 static const std::string dummy ("");
 
 ////////////////////////////////////////////////////////////////////////////////
-Task::Task ()
-: data ()
-, id (0)
-, urgency_value (0.0)
-, recalc_urgency (true)
-, is_blocked (false)
-, is_blocking (false)
-, annotation_count (0)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // The uuid and id attributes must be exempt from comparison.
 //
 // This performs two tests which are sufficient and necessary for Task
@@ -117,7 +105,7 @@ bool Task::operator== (const Task& other)
   if (data.size () != other.data.size ())
     return false;
 
-  for (auto& i : data)
+  for (const auto& i : data)
     if (i.first != "uuid" &&
         i.second != other.get (i.first))
       return false;
@@ -128,11 +116,11 @@ bool Task::operator== (const Task& other)
 ////////////////////////////////////////////////////////////////////////////////
 Task::Task (const std::string& input)
 {
-  id = 0;
-  urgency_value = 0.0;
-  recalc_urgency = true;
-  is_blocked = false;
-  is_blocking = false;
+  id               = 0;
+  urgency_value    = 0.0;
+  recalc_urgency   = true;
+  is_blocked       = false;
+  is_blocking      = false;
   annotation_count = 0;
 
   parse (input);
@@ -228,6 +216,16 @@ const std::string Task::get (const std::string& name) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+const std::string& Task::get_ref (const std::string& name) const
+{
+  auto i = data.find (name);
+  if (i != data.end ())
+    return i->second;
+
+  return dummy;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 int Task::get_int (const std::string& name) const
 {
   auto i = data.find (name);
@@ -293,6 +291,9 @@ void Task::remove (const std::string& name)
 ////////////////////////////////////////////////////////////////////////////////
 Task::status Task::getStatus () const
 {
+  if (! has ("status"))
+    return Task::pending;
+
   return textToStatus (get ("status"));
 }
 
@@ -491,10 +492,9 @@ bool Task::is_dueyear () const
 bool Task::is_udaPresent () const
 {
   for (auto& col : context.columns)
-    if (col.first.compare (0, 11, "annotation_", 11) != 0)
-      if (col.second->is_uda () &&
-          has (col.first))
-        return true;
+    if (col.second->is_uda () &&
+        has (col.first))
+      return true;
 
   return false;
 }
@@ -621,29 +621,29 @@ void Task::parseJSON (const std::string& line)
 ////////////////////////////////////////////////////////////////////////////////
 void Task::parseJSON (const json::object* root_obj)
 {
-    // For each object element...
+  // For each object element...
   for (auto& i : root_obj->_data)
   {
     // If the attribute is a recognized column.
     std::string type = Task::attributes[i.first];
     if (type != "")
     {
-        // Any specified id is ignored.
+      // Any specified id is ignored.
       if (i.first == "id")
         ;
 
-        // Urgency, if present, is ignored.
+      // Urgency, if present, is ignored.
       else if (i.first == "urgency")
         ;
 
-        // TW-1274 Standardization.
+      // TW-1274 Standardization.
       else if (i.first == "modification")
       {
         ISO8601d d (unquoteText (i.second->dump ()));
         set ("modified", d.toEpochString ());
       }
 
-        // Dates are converted from ISO to epoch.
+      // Dates are converted from ISO to epoch.
       else if (type == "date")
       {
         std::string text = unquoteText (i.second->dump ());
@@ -651,7 +651,7 @@ void Task::parseJSON (const json::object* root_obj)
         set (i.first, text == "" ? "" : d.toEpochString ());
       }
 
-        // Tags are an array of JSON strings.
+      // Tags are an array of JSON strings.
       else if (i.first == "tags" && i.second->type() == json::j_array)
       {
         json::array* tags = (json::array*)i.second;
@@ -661,24 +661,40 @@ void Task::parseJSON (const json::object* root_obj)
           addTag (tag->_data);
         }
       }
-      // This is a temporary measure to allow Mirakel sync, and will be removed
-      // in a future release.
+      // This is a temporary measure to accomodate a malformed JSON message from
+      // Mirakel sync.
+      //
+      // 2016-02-21 Mirakel dropped sync support in late 2015. This can be
+      //            removed in a later release.
       else if (i.first == "tags" && i.second->type() == json::j_string)
       {
         json::string* tag = (json::string*)i.second;
         addTag (tag->_data);
       }
 
-      // Dependencies can be exported as a single comma-separated string, or as
-      // an array of strings.
+      // Dependencies can be exported as an array of strings.
+      // 2016-02-21: This will be the only option in future releases.
+      //             See other 2016-02-21 comments for details.
       else if (i.first == "depends" && i.second->type() == json::j_array)
       {
-        json::array* tags = (json::array*)i.second;
-        for (auto& t : tags->_data)
+        json::array* deps = (json::array*)i.second;
+        for (auto& t : deps->_data)
         {
-          json::string* tag = (json::string*)t;
-          addDependency (tag->_data);
+          json::string* dep = (json::string*)t;
+          addDependency (dep->_data);
         }
+      }
+
+      // Dependencies can be exported as a single comma-separated string.
+      // 2016-02-21: Deprecated - see other 2016-02-21 comments for details.
+      else if (i.first == "depends" && i.second->type() == json::j_string)
+      {
+        json::string* deps = (json::string*)i.second;
+        std::vector <std::string> uuids;
+        split (uuids, deps->_data, ',');
+
+        for (const auto& uuid : uuids)
+          addDependency (uuid);
       }
 
       // Strings are decoded.
@@ -701,7 +717,7 @@ void Task::parseJSON (const json::object* root_obj)
 
         json::array* atts = (json::array*)i.second;
         for (auto& annotations : atts->_data)
-         {
+        {
           json::object* annotation = (json::object*)annotations;
           json::string* when = (json::string*)annotation->_data["entry"];
           json::string* what = (json::string*)annotation->_data["description"];
@@ -713,7 +729,7 @@ void Task::parseJSON (const json::object* root_obj)
             throw format (STRING_TASK_NO_DESC, root_obj->dump ());
 
           std::string name = "annotation_" + ISO8601d (when->_data).toEpochString ();
-            annos.insert (std::make_pair (name, json::decode (what->_data)));
+          annos.insert (std::make_pair (name, json::decode (what->_data)));
         }
 
         setAnnotations (annos);
@@ -783,10 +799,12 @@ std::string Task::composeF4 () const
   bool first = true;
   for (auto it : data)
   {
+    // Orphans have no type, treat as string.
     std::string type = Task::attributes[it.first];
     if (type == "")
       type = "string";
 
+    // If there is a value.
     if (it.second != "")
     {
       ff4 += (first ? "" : " ");
@@ -845,7 +863,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
           << "\":\""
           // Date was deleted, do not export parsed empty string
           << (i.second == "" ? "" : d.toISO ())
-            << "\"";
+          << "\"";
 
       ++attributes_written;
     }
@@ -858,7 +876,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
 */
     else if (type == "numeric")
     {
-        out << "\""
+      out << "\""
           << i.first
           << "\":"
           << i.second;
@@ -890,6 +908,21 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     // Dependencies are an array by default.
     else if (i.first == "depends"
 #ifdef PRODUCT_TASKWARRIOR
+    // 2016-02-20: Taskwarrior 2.5.0 introduced the 'json.depends.array' setting
+    //             which defaulted to 'on', and emitted this JSON for
+    //             dependencies:
+    //
+    //             With json.depends.array=on    "depends":["<uuid>","<uuid>"]
+    //             With json.depends.array=off   "depends":"<uuid>,<uuid>"
+    //
+    //             Taskwarrior 2.5.1 defaults this to 'off', because Taskserver
+    //             1.0.0 and 1.1.0 both expect that. Taskserver 1.2.0 will
+    //             accept both forms, but emit the 'off' variant.
+    //
+    //             When Taskwarrior 2.5.0 is no longer the dominant version,
+    //             and Taskserver 1.2.0 is released, the default for
+    //             'json.depends.array' can revert to 'on'.
+
              && context.config.getBoolean ("json.depends.array")
 #endif
             )
@@ -1458,30 +1491,30 @@ void Task::validate (bool applyDefault /* = true */)
 
   if (applyDefault && (! has ("parent") || get ("parent") == ""))
   {
-  // Override with default.project, if not specified.
+    // Override with default.project, if not specified.
     if (Task::defaultProject != "" &&
         ! has ("project"))
-  {
+    {
       if (context.columns["project"]->validate (Task::defaultProject))
-      set ("project", Task::defaultProject);
-  }
+        set ("project", Task::defaultProject);
+    }
 
-  // Override with default.due, if not specified.
+    // Override with default.due, if not specified.
     if (Task::defaultDue != "" &&
         ! has ("due"))
     {
       if (context.columns["due"]->validate (Task::defaultDue))
-  {
+      {
         ISO8601p dur (Task::defaultDue);
         if ((time_t) dur != 0)
           set ("due", (ISO8601d () + dur).toEpoch ());
         else
           set ("due", ISO8601d (Task::defaultDue).toEpoch ());
       }
-  }
+    }
 
-  // If a UDA has a default value in the configuration,
-  // override with uda.(uda).default, if not specified.
+    // If a UDA has a default value in the configuration,
+    // override with uda.(uda).default, if not specified.
     // Gather a list of all UDAs with a .default value
     std::vector <std::string> udas;
     for (auto& var : context.config)
@@ -1655,8 +1688,8 @@ int Task::determineVersion (const std::string& line)
   //   X [tags] [attributes] description\n
   //
   // Scan for the first character being either the bracket or X.
-  else if (line.find ("X [") == 0 ||
-           (line[0] == '[' &&
+  else if (line.find ("X [") == 0                      ||
+           (line[0] == '['                             &&
             line.substr (line.length () - 1, 1) != "]" &&
             line.length () > 3))
     return 1;
@@ -1767,8 +1800,8 @@ float Task::urgency_c () const
           }
         }
       }
-      }
     }
+  }
 
   if (is_blocking && context.config.getBoolean ("urgency.inherit"))
   {
@@ -1850,7 +1883,7 @@ float Task::urgency_scheduled () const
 ////////////////////////////////////////////////////////////////////////////////
 float Task::urgency_waiting () const
 {
-  if (get ("status") == "waiting")
+  if (get_ref ("status") == "waiting")
     return 1.0;
 
   return 0.0;
@@ -1923,7 +1956,7 @@ float Task::urgency_age () const
 
   ISO8601d now;
   ISO8601d entry (get_date ("entry"));
-  int   age  = (now - entry) / 86400;  // in days
+  int age = (now - entry) / 86400;  // in days
 
   if (Task::urgencyAgeMax == 0 || age > Task::urgencyAgeMax)
     return 1.0;
@@ -1952,8 +1985,11 @@ void Task::modify (modType type, bool text_required /* = false */)
   context.debug ("Task::modify");
   std::string label = "  [1;37;43mMODIFICATION[0m ";
 
+  // Need this for later comparison.
+  auto originalStatus = getStatus ();
+
   std::string text = "";
-  int modCount = 0;
+  bool mods = false;
   for (auto& a : context.cli2._args)
   {
     if (a.hasTag ("MODIFICATION"))
@@ -1970,9 +2006,15 @@ void Task::modify (modType type, bool text_required /* = false */)
         {
           // ::composeF4 will skip if the value is blank, but the presence of
           // the attribute will prevent ::validate from applying defaults.
-          set (name, "");
+          if ((has (name) && get (name) != "") ||
+              (name == "due"     && context.config.has ("default.due")) ||
+              (name == "project" && context.config.has ("default.project")))
+          {
+            mods = true;
+            set (name, "");
+          }
+
           context.debug (label + name + " <-- ''");
-          ++modCount;
         }
         else
         {
@@ -1984,200 +2026,17 @@ void Task::modify (modType type, bool text_required /* = false */)
               ! column->modifiable ())
             throw format (STRING_INVALID_MOD, name, value);
 
-          // DOM resolution. If it evals, store that, otherwise raw.
-          Variant evaluatedValue;
-          if (name != "project" || Lexer::isDOM (value))
+          // Delegate modification to the column object or their base classes.
+          if (name == "depends"             ||
+              name == "tags"                ||
+              name == "recur"               ||
+              column->type () == "date"     ||
+              column->type () == "duration" ||
+              column->type () == "numeric"  ||
+              column->type () == "string")
           {
-            // Try to evaluate 'value'.  It might work.
-            try
-            {
-              Eval e;
-              e.addSource (domSource);
-              e.addSource (namedDates);
-              contextTask = *this;
-              e.evaluateInfixExpression (value, evaluatedValue);
-            }
-
-            // Ah, fuck it.
-            catch (...)
-            {
-              evaluatedValue = Variant (value);
-            }
-          }
-          else
-          {
-            evaluatedValue = Variant (value);
-          }
-
-          // Dependencies are specified as IDs.
-          if (name == "depends")
-          {
-            // Parse IDs
-            std::vector <std::string> deps;
-            split (deps, value, ',');
-
-            // Apply or remove dendencies in turn.
-            for (auto& dep : deps)
-            {
-              if (dep[0] == '-')
-              {
-                if (dep.length () == 37)
-                  removeDependency (context.tdb2.pending.id (dep.substr (1)));
-                else
-                  removeDependency (strtol (dep.substr (1).c_str (), NULL, 10));
-              }
-              else
-              {
-                if (dep.length () == 36)
-                  addDependency (context.tdb2.pending.id (dep));
-                else
-                  addDependency (strtol (dep.c_str (), NULL, 10));
-              }
-            }
-
-            ++modCount;
-          }
-
-          // For those using the "tags:..." attribute directly.
-          else if (name == "tags")
-          {
-            // TW-1701
-            set ("tags", "");
-
-            std::vector <std::string> tags;
-            split (tags, value, ',');
-
-            for (auto& tag : tags)
-            {
-              // If it's a DOM ref, eval it first.
-              Lexer lexer (tag);
-              std::string domRef;
-              Lexer::Type type;
-              if (lexer.token (domRef, type) &&
-                  type == Lexer::Type::dom)
-              {
-                Eval e;
-                e.addSource (domSource);
-                e.addSource (namedDates);
-                contextTask = *this;
-
-                Variant v;
-                e.evaluateInfixExpression (value, v);
-                addTag ((std::string) v);
-                context.debug (label + "tags <-- '" + (std::string) v + "' <-- '" + tag + "'");
-              }
-              else
-              {
-                addTag (tag);
-                context.debug (label + "tags <-- '" + tag + "'");
-              }
-
-              feedback_special_tags (*this, tag);
-            }
-
-            ++modCount;
-          }
-
-          // Dates are special, maybe.
-          else if (column->type () == "date")
-          {
-            // If v is duration, add 'now' to it, else store as date.
-            if (evaluatedValue.type () == Variant::type_duration)
-            {
-              context.debug (label + name + " <-- '" + format ("{1}", format (evaluatedValue.get_duration ())) + "' <-- '" + (std::string) evaluatedValue + "' <-- '" + value + "'");
-              Variant now;
-              if (namedDates ("now", now))
-                evaluatedValue += now;
-            }
-            else
-            {
-              evaluatedValue.cast (Variant::type_date);
-              context.debug (label + name + " <-- '" + format ("{1}", evaluatedValue.get_date ()) + "' <-- '" + (std::string) evaluatedValue + "' <-- '" + value + "'");
-            }
-
-            // If a date doesn't parse (2/29/2014) then it evaluates to zero.
-            if (value != "" &&
-                evaluatedValue.get_date () == 0)
-              throw format (STRING_DATE_INVALID_FORMAT, value, Variant::dateFormat);
-
-            set (name, evaluatedValue.get_date ());
-            ++modCount;
-          }
-
-          // Special case: type duration.
-          // Note: "recur" is marked as type "string" to force storage in raw form.
-          else if (name == "recur")
-          {
-            // The duration is stored in raw form, but it must still be valid,
-            // and therefore is parsed first.
-
-            if (evaluatedValue.type () == Variant::type_duration)
-            {
-              // Store the raw value, for 'recur'.
-              context.debug (label + name + " <-- '" + value + "'");
-              set (name, value);
-              ++modCount;
-            }
-            else
-              throw format (STRING_TASK_INVALID_DUR, value);
-          }
-
-          else if (column->type () == "duration")
-          {
-            // The duration is stored in raw form, but it must still be valid,
-            // and therefore is parsed first.
-
-            if (evaluatedValue.type () == Variant::type_duration)
-            {
-              // Store the raw value, for 'recur'.
-              context.debug (label + name + " <-- " + (std::string) evaluatedValue + " <-- '" + value + "'");
-              set (name, evaluatedValue);
-              ++modCount;
-            }
-            else
-              throw format (STRING_TASK_INVALID_DUR, value);
-          }
-
-          // Need handling for numeric types, used by UDAs.
-          else if (column->type () == "numeric")
-          {
-            context.debug (label + name + " <-- '" + evaluatedValue.get_string () + "' <-- '" + value + "'");
-
-            // If the result is not readily convertible to a numeric value,
-            // then this is an error.
-            if (evaluatedValue.type () == Variant::type_string)
-              throw format (STRING_UDA_NUMERIC, evaluatedValue.get_string ());
-
-            set (name, evaluatedValue);
-            ++modCount;
-          }
-
-          // String type columns are not eval'd.  Well, not much.
-          else if (column->type () == "string")
-          {
-            std::string strValue = (std::string) evaluatedValue;
-            if (column->validate (strValue))
-            {
-/*
-              if (column->can_modify ())
-              {
-                std::string col_value = column->modify (strValue);
-                context.debug (label + name + " <-- '" + col_value + "' <-- '" + strValue + "' <-- '" + value + "'");
-                (*this).set (name, col_value);
-              }
-              else
-              {
-*/
-                context.debug (label + name + " <-- '" + strValue + "' <-- '" + value + "'");
-                (*this).set (name, strValue);
-/*
-              }
-*/
-
-              ++modCount;
-            }
-            else
-              throw format (STRING_INVALID_MOD, name, value);
+            column->modify (*this, value);
+            mods = true;
           }
 
           else
@@ -2192,7 +2051,7 @@ void Task::modify (modType type, bool text_required /* = false */)
         substitute (a.attribute ("from"),
                     a.attribute ("to"),
                     a.attribute ("flags"));
-        ++modCount;
+        mods = true;
       }
 
       // Tags need special handling because they are essentially a vector stored
@@ -2215,7 +2074,7 @@ void Task::modify (modType type, bool text_required /* = false */)
           removeTag (tag);
         }
 
-        ++modCount;
+        mods = true;
       }
 
       // Unknown args are accumulated as though they were WORDs.
@@ -2257,8 +2116,17 @@ void Task::modify (modType type, bool text_required /* = false */)
       break;
     }
   }
-  else if (modCount == 0 && text_required)
+  else if (! mods && text_required)
     throw std::string (STRING_CMD_MODIFY_NEED_TEXT);
+
+  // Modifying completed/deleted tasks generates a message, if the modification
+  // does not change status.
+  if ((getStatus () == Task::completed || getStatus () == Task::deleted) &&
+      getStatus () == originalStatus)
+  {
+    auto uuid = get ("uuid").substr (0, 8);
+    context.footnote (format (STRING_CMD_MODIFY_INACTIVE, uuid, get ("status"), uuid));
+  }
 }
 #endif
 
