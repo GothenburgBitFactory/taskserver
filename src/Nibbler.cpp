@@ -180,15 +180,11 @@ bool Nibbler::getN (const int quantity, std::string& result)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Nibbler::getQuoted (
-  char c,
-  std::string& result,
-  bool quote /* = false */)
+// Gets quote content:      "foobar" -> foobar      (for c = '"')
+// Handles escaped quotes:  "foo\"bar" -> foo\"bar  (for c = '"')
+// Returns false if first character is not c, or if there is no closing c
+bool Nibbler::getQuoted (char c, std::string& result)
 {
-  bool inquote = false;
-  bool inescape = false;
-  char previous = 0;
-  char current = 0;
   result = "";
 
   if (_cursor >= _length ||
@@ -197,45 +193,52 @@ bool Nibbler::getQuoted (
     return false;
   }
 
-  for (auto i = _cursor; i < _length; ++i)
+  std::string::size_type start = _cursor + 1;  // Skip first quote char
+  std::string::size_type i = start;
+
+  while (i < _length)
   {
-    current = (*_input)[i];
+    i = (*_input).find (c, i);
 
-    if (current == '\\' && !inescape)
+    if (i == std::string::npos)
+      return false;  // Unclosed quote
+
+    if (i == start)
     {
-      inescape = true;
-      previous = current;
-      continue;
+      // Empty quote
+      _cursor += 2;  // Skip both quote chars
+      return true;
     }
 
-    if (current == c && !inescape)
+    if ((*_input)[i-1] == '\\')
     {
-      if (quote)
-        result += current;
+      // Check for escaped backslashes.  Backtracking like this is not very
+      // efficient, but is only done in extreme corner cases.
 
-      if (!inquote)
+      auto j = i-2;  // Start one character further left
+      bool is_escaped_quote = true;
+      while (j >= start && (*_input)[j] == '\\')
       {
-        inquote = true;
-      }
-      else
-      {
-        _cursor = i + 1;
-        return true;
-      }
-    }
-    else
-    {
-      if (previous)
-      {
-        result += previous;
-        previous = 0;
+        // Toggle flag for each further backslash encountered.
+        is_escaped_quote = is_escaped_quote ? false : true;
+        --j;
       }
 
-      result += current;
-      inescape = false;
+      if (is_escaped_quote)
+      {
+        // Keep searching
+        ++i;
+        continue;
+      }
     }
+
+    // None of the above applied, we must have found the closing quote char.
+    result.assign ((*_input), start, i - start);
+    _cursor = i + 1;  // Skip closing quote char
+    return true;
   }
 
+  // This should never be reached.  We could throw here instead.
   return false;
 }
 
