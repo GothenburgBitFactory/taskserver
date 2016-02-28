@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <errno.h>
 #include <string.h>
 #include <text.h>
 #include <util.h>
@@ -391,7 +392,7 @@ bool File::open ()
       bool already_exists = exists ();
       if (already_exists)
         if (!readable () || !writable ())
-          throw std::string (format (STRING_FILE_PERMS, _data));
+          throw format (STRING_FILE_PERMS, _data);
 
       _fh = fopen (_data.c_str (), (already_exists ? "r+" : "w+"));
       if (_fh)
@@ -556,7 +557,8 @@ void File::truncate ()
     open ();
 
   if (_fh)
-    (void) ftruncate (_h, 0);
+    if (ftruncate (_h, 0))
+      throw format ("ftruncate error {1}: {2}", errno, strerror (errno));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
