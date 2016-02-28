@@ -1,34 +1,44 @@
 1.2.0 () -
 
-- TD-64 sync conflict deleted all annotations of the task
-        (thanks to Markus Beppler, Konstantin Vorobyev).
-- TD-96 server_setup.bash won't run on Mac OS X and BSD (thanks to Dafo with
-        the golden hair).
-- TD-99 Manual page of taskd has hyphen instead minus sign "-" (thanks to
-        Sebastien Badia).
-- TD-100 Log taskd messages to stdout if launched by systemd (thanks to
-         Sebastien Badia).
-- TD-101 taskdrc man page says "trust" defaults to "strict", but server
-         complains if none set (thanks to Jack).
-- TD-104 Unrecognized taskwarrior file format
-         (thanks to Jeremy John Reeder, Reg).
-- TD-106 The recurrence value '2m' is not valid (thanks to Roman Golovin).
-- TD-107 Bash dependency not documented (thanks to Michael Eichorn).
-- TD-110 Question: About src/tls/* (thanks to Sebastien Badia).
+- TD-64   sync conflict deleted all annotations of the task
+          (thanks to Markus Beppler, Konstantin Vorobyev).
+- TD-96   server_setup.bash won't run on Mac OS X and BSD
+          (thanks to Dafo with the golden hair).
+- TD-99   Manual page of taskd has hyphen instead minus sign "-"
+          (thanks to Sebastien Badia).
+- TD-100  Log taskd messages to stdout if launched by systemd
+          (thanks to Sebastien Badia).
+- TD-101  taskdrc man page says "trust" defaults to "strict", but server
+          complains if none set
+          (thanks to Jack).
+- TD-104  Unrecognized taskwarrior file format
+          (thanks to Jeremy John Reeder, Reg).
+- TD-106  The recurrence value '2m' is not valid
+          (thanks to Roman Golovin).
+- TD-107  Bash dependency not documented
+          (thanks to Michael Eichorn).
+- TD-110  Question: About src/tls/*
+          (thanks to Sebastien Badia).
+- TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
+          xubuntu15.10
+          (thanks to Sunil Joshi).
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
   which means a confguration setting of server=:::<someport>. Related to TD-51
-  (thanks to Johannes Wienke).
+          (thanks to Johannes Wienke).
 - Added "diag" command details regarding file sizes.
 - Improved error messages for users who skip the 'task sync init' requirement
-  (thanks to Komasa).
+          (thanks to Komasa).
 - New 2048-bit default size for the Diff-Hellman key exchange, with a new
-  'dh_bits' configuration setting to override this (thanks to Ben Boeckel).
+  'dh_bits' configuration setting to override this
+          (thanks to Ben Boeckel).
 - New default cipher set that imposes server-side cipher selection, preventing
-  the client from switching to less-secure communication (thanks to Ben
-  Boeckel).
+  the client from switching to less-secure communication
+          (thanks to Ben Boeckel).
 - Removed broken SSLv3 and TLSv1.0 (POODLE), 3DES in CBC mode, RC4, and MD5,
-  ciphers from default (thanks to Ben Boeckel).
-- Improved OpenBSD support (thanks to Kent R. Spillner).
+  ciphers from default
+          (thanks to Ben Boeckel).
+- Improved OpenBSD support
+          (thanks to Kent R. Spillner).
 
 ------- current release ---------------------------
 
