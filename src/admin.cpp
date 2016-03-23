@@ -81,7 +81,7 @@ void command_add (Database& db, const std::vector <std::string>& args)
       throw std::string ("Usage: taskd add [options] group <org> <group>");
 
     if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[1] + "' does not exist.";
+      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
 
     for (unsigned int i = 3; i < args.size (); ++i)
     {
@@ -106,7 +106,7 @@ void command_add (Database& db, const std::vector <std::string>& args)
       throw std::string ("Usage: taskd add [options] user <org> <user>");
 
     if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[1] + "' does not exist.";
+      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
 
     for (unsigned int i = 3; i < args.size (); ++i)
     {

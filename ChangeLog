@@ -11,6 +11,8 @@
 - TD-101  taskdrc man page says "trust" defaults to "strict", but server
           complains if none set
           (thanks to Jack).
+- TD-103  Incorrect Error Message when Org does not exist
+          (thanks to Jack, Jelle van der Waa).
 - TD-104  Unrecognized taskwarrior file format
           (thanks to Jeremy John Reeder, Reg).
 - TD-106  The recurrence value '2m' is not valid
