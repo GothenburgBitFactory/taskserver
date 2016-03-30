@@ -26,6 +26,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -115,7 +117,8 @@ void UnitTest::ok (bool expression, const std::string& name)
   if (expression)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -124,7 +127,8 @@ void UnitTest::ok (bool expression, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -140,7 +144,8 @@ void UnitTest::notok (bool expression, const std::string& name)
   if (!expression)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -149,7 +154,8 @@ void UnitTest::notok (bool expression, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -164,7 +170,8 @@ void UnitTest::is (bool actual, bool expected, const std::string& name)
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -173,7 +180,8 @@ void UnitTest::is (bool actual, bool expected, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -192,7 +200,8 @@ void UnitTest::is (size_t actual, size_t expected, const std::string& name)
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -201,7 +210,8 @@ void UnitTest::is (size_t actual, size_t expected, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -220,7 +230,8 @@ void UnitTest::is (int actual, int expected, const std::string& name)
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -229,7 +240,8 @@ void UnitTest::is (int actual, int expected, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -248,7 +260,8 @@ void UnitTest::is (double actual, double expected, const std::string& name)
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -257,7 +270,8 @@ void UnitTest::is (double actual, double expected, const std::string& name)
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -276,7 +290,8 @@ void UnitTest::is (double actual, double expected, double tolerance, const std::
   if (fabs (actual - expected) <= tolerance)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -285,7 +300,8 @@ void UnitTest::is (double actual, double expected, double tolerance, const std::
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -304,7 +320,8 @@ void UnitTest::is (unsigned char actual, unsigned char expected, const std::stri
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -313,7 +330,8 @@ void UnitTest::is (unsigned char actual, unsigned char expected, const std::stri
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -335,7 +353,8 @@ void UnitTest::is (
   if (actual == expected)
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -344,7 +363,8 @@ void UnitTest::is (
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -367,7 +387,8 @@ void UnitTest::is (
   if (! strcmp (actual, expected))
   {
     ++_passed;
-    std::cout << "ok "
+    std::cout << green ("ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -376,7 +397,8 @@ void UnitTest::is (
   else
   {
     ++_failed;
-    std::cout << "not ok "
+    std::cout << red ("not ok")
+              << " "
               << _counter
               << " - "
               << name
@@ -394,7 +416,9 @@ void UnitTest::diag (const std::string& text)
 {
   auto start = text.find_first_not_of (" \t\n\r\f");
   auto end   = text.find_last_not_of  (" \t\n\r\f");
-  std::cout << "# " << text.substr (start, end - start + 1) << "\n";
+  if (start != std::string::npos &&
+      end   != std::string::npos)
+    std::cout << "# " << text.substr (start, end - start + 1) << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -402,7 +426,8 @@ void UnitTest::pass (const std::string& text)
 {
   ++_counter;
   ++_passed;
-  std::cout << "ok "
+  std::cout << green ("ok")
+            << " "
             << _counter
             << " - "
             << text
@@ -414,7 +439,8 @@ void UnitTest::fail (const std::string& text)
 {
   ++_counter;
   ++_failed;
-  std::cout << "not ok "
+  std::cout << red ("not ok")
+            << " "
             << _counter
             << " - "
             << text
@@ -426,11 +452,39 @@ void UnitTest::skip (const std::string& text)
 {
   ++_counter;
   ++_skipped;
-  std::cout << "skip "
+  std::cout << yellow ("skip")
+            << " "
             << _counter
             << " - "
             << text
             << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+std::string UnitTest::red (const std::string& input)
+{
+  if (isatty (fileno (stdout)))
+    return std::string ("\033[31m" + input + "\033[0m");
+
+  return input;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+std::string UnitTest::green (const std::string& input)
+{
+  if (isatty (fileno (stdout)))
+    return std::string ("\033[32m" + input + "\033[0m");
+
+  return input;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+std::string UnitTest::yellow (const std::string& input)
+{
+  if (isatty (fileno (stdout)))
+    return std::string ("\033[33m" + input + "\033[0m");
+
+  return input;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
