@@ -15,6 +15,9 @@
 - TD-101  taskdrc man page says "trust" defaults to "strict", but server
           complains if none set
           (thanks to Jack).
+- TD-102  After creating a user aparently successful taskd says: User does not
+          exists
+          (thanks to Olaf H B).
 - TD-103  Incorrect Error Message when Org does not exist
           (thanks to Jack, Jelle van der Waa).
 - TD-104  Unrecognized taskwarrior file format
