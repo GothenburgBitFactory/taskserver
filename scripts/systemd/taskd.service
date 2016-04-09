@@ -11,4 +11,4 @@ User=taskd
 Group=taskd
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=network.target
