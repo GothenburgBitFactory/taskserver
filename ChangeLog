@@ -25,6 +25,9 @@
           (thanks to Sebastien Badia).
 - TD-115  Throw error when config file is missing or not readable
           (thanks to Jelle van der Waa).
+- TD-117  Wrong systemd target, taskd can fail if multi-user.target is up
+          earlier than the network
+          (thanks to Sebastian Sonne).
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
           xubuntu15.10
           (thanks to Sunil Joshi).
