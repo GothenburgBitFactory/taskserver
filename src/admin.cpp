@@ -206,8 +206,8 @@ void command_remove (Database& db, const std::vector <std::string>& args)
 
     for (unsigned int i = 3; i < args.size (); ++i)
     {
-      if (! taskd_is_user (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
+      if (! taskd_is_user_key (root_dir, args[2], args[i]))
+        throw std::string ("ERROR: User '") + args[i] + "' does not exist.";
 
       if (db.remove_user (args[2], args[i]))
       {
@@ -302,8 +302,8 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
 
     for (unsigned int i = 3; i < args.size (); ++i)
     {
-      if (! taskd_is_user (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
+      if (! taskd_is_user_key (root_dir, args[2], args[i]))
+        throw std::string ("ERROR: User '") + args[i] + "' does not exist.";
 
       if (db.suspend (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
       {
@@ -398,8 +398,8 @@ void command_resume (Database& db, const std::vector <std::string>& args)
 
     for (unsigned int i = 3; i < args.size (); ++i)
     {
-      if (! taskd_is_user (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: User '") + args[i] + "' does not  exists.";
+      if (! taskd_is_user_key (root_dir, args[2], args[i]))
+        throw std::string ("ERROR: User '") + args[i] + "' does not exist.";
 
       if (db.resume (root_dir._data + "/orgs/" + args[2] + "/users/" + args[i]))
       {

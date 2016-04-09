@@ -27,7 +27,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 # Create the data dir.
 my $data = 'add_org.data';
@@ -45,6 +45,10 @@ unlike ($output, qr/^ERROR/,         "'taskd add --data $data org ORG' - no erro
 ok (-d $data.'/orgs/ORG',            "'$data/orgs/ORG' dir exists");
 ok (-d $data.'/orgs/ORG/groups',     "'$data/orgs/ORG/groups' dir exists");
 ok (-d $data.'/orgs/ORG/users',      "'$data/orgs/ORG/users' dir exists");
+
+# Try to re-add organization.
+$output = qx{../src/taskd add --data $data org ORG 2>&1};
+like ($output, qr/^ERROR: Organization 'ORG' already exists\.$/, "'ORG' already exists");
 
 # Organization with a space in the name.
 $output = qx{../src/taskd add --data $data org 'one two' 2>&1};

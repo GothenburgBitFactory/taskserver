@@ -277,13 +277,40 @@ bool taskd_is_group (
 bool taskd_is_user (
   const Directory& root,
   const std::string& org,
-  const std::string& password)
+  const std::string& user)
 {
   Directory d (root);
   d += "orgs";
   d += org;
   d += "users";
-  d += password;
+
+  std::vector <std::string> users = d.list();
+  std::vector <std::string>::iterator u;
+
+  for (u = users.begin (); u != users.end (); ++u)
+  {
+    Path cfg (*u);
+    cfg += "config";
+
+    Config conf (cfg._data);
+    if (conf.get ("user") == user)
+      return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_is_user_key (
+  const Directory& root,
+  const std::string& org,
+  const std::string& key)
+{
+  Directory d (root);
+  d += "orgs";
+  d += org;
+  d += "users";
+  d += key;
   return d.exists ();
 }
 
