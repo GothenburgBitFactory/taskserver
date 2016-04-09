@@ -1,5 +1,7 @@
 1.2.0 () -
 
+- TD-40   Remove user command says user does not exist
+          (thanks to Robin Green).
 - TD-49   Log when file management fails
           (thanks to Ben Boeckel).
 - TD-64   sync conflict deleted all annotations of the task
