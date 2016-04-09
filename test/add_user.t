@@ -27,7 +27,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 # Create the data dir.
 my $data = 'add_user.data';
@@ -52,6 +52,10 @@ unlike ($output, qr/^ERROR/,         "'taskd add --data $data user ORG USER' - n
 like ($output, qr/New user key: \S{36}/, "New user key generated");
 my ($key) = $output =~ /New user key: (\S{36})/;
 ok (-d $data.'/orgs/ORG/users/'.$key, "'$data/orgs/ORG/users/KEY' dir exists");
+
+# Try to re-add user.
+$output = qx{../src/taskd add --data $data user ORG USER 2>&1};
+like ($output, qr/^ERROR: User 'USER' already exists\.$/, "'USER' already exists");
 
 # Cleanup.
 qx{rm -rf $data};
