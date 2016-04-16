@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 1: New user, no tasks, with an unused server account.
 

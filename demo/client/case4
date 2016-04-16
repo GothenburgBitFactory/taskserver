@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 4: Client modifies a task, syncs, and receives a new task from the
 # server, placed there by a different client.
