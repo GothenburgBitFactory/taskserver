@@ -33,6 +33,8 @@
 - TD-117  Wrong systemd target, taskd can fail if multi-user.target is up
           earlier than the network
           (thanks to Sebastian Sonne).
+- TD-118  Shebang issue
+          (thanks to Slava, Daniel Shahaf).
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
           xubuntu15.10
           (thanks to Sunil Joshi).

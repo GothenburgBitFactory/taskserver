@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 2: Continuing, nothing changes, and another sync is performed.
 # Nothing is expected to happen.

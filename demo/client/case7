@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 7: Recurring task added, then child tasks created in separate places,
 #             followed by a sync.

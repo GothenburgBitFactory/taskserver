@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 5: Client modifies a task, syncs and finds that another client has
 # modified the same task twice.
