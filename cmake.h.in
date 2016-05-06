@@ -50,6 +50,7 @@
 #cmakedefine HAVE_ST_BIRTHTIME
 
 /* Functions */
+#cmakedefine HAVE_GET_CURRENT_DIR_NAME
 #cmakedefine HAVE_TIMEGM
 #cmakedefine HAVE_UUID_UNPARSE_LOWER
 
