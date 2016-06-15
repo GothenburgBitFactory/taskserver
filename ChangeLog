@@ -35,6 +35,8 @@
           (thanks to Sebastian Sonne).
 - TD-118  Shebang issue
           (thanks to Slava, Daniel Shahaf).
+- TD-120  Missing cmakedefine for HAVE_GET_CURRENT_DIR_NAME
+          (Thanks to Jörg Krause, Ben Boeckel).
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
           xubuntu15.10
           (thanks to Sunil Joshi).
