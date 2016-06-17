@@ -35,6 +35,7 @@ add_library (taskd admin.cpp
                    util.cpp       util.h
                    wcwidth6.cpp)
 
+find_package(Threads REQUIRED)
 add_executable (taskd_executable taskd.cpp)
 target_link_libraries (taskd_executable taskd ${TASKD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
