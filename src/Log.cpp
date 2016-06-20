@@ -151,10 +151,10 @@ void Log::format (const char* message, ...)
 ////////////////////////////////////////////////////////////////////////////////
 void Log::timestamp ()
 {
-  // Get time info, UTC.
+  // Get time info, in the user's specified timezone.
   time_t current;
   time (&current);
-  struct tm* t = gmtime (&current);
+  struct tm* t = localtime (&current);
 
   // Generate timestamp.
   sprintf (_now, "%04d-%02d-%02d %02d:%02d:%02d",
