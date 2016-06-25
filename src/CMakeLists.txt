@@ -18,7 +18,6 @@ add_library (taskd admin.cpp
                    i18n.h
                    init.cpp
                    Log.cpp        Log.h
-                   Nibbler.cpp    Nibbler.h
                    Server.cpp     Server.h
                    status.cpp
                    Task.cpp       Task.h
@@ -33,6 +32,7 @@ add_library (libshared libshared/src/Datetime.cpp      libshared/src/Datetime.h
                        libshared/src/JSON.cpp          libshared/src/JSON.h
                        libshared/src/Lexer.cpp         libshared/src/Lexer.h
                        libshared/src/Msg.cpp           libshared/src/Msg.h
+                       libshared/src/Pig.cpp           libshared/src/Pig.h
                        libshared/src/RX.cpp            libshared/src/RX.h
                        libshared/src/Timer.cpp         libshared/src/Timer.h
                        libshared/src/utf8.cpp          libshared/src/utf8.h

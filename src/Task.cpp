@@ -39,7 +39,7 @@
 #include <Lexer.h>
 #ifdef PRODUCT_TASKWARRIOR
 #include <Context.h>
-#include <Nibbler.h>
+#include <Pig.h>
 #endif
 #include <Datetime.h>
 #include <Duration.h>
@@ -560,20 +560,20 @@ void Task::parse (const std::string& input)
 
     if (input[0] == '[')
     {
-      Nibbler n (input);
+      Pig n (input);
       std::string line;
       if (n.skip     ('[')       &&
           n.getUntil (']', line) &&
           n.skip     (']')       &&
-          (n.skip ('\n') || n.depleted ()))
+          (n.skip ('\n') || n.eos ()))
       {
         if (line.length () == 0)
           throw std::string (STRING_RECORD_EMPTY);
 
-        Nibbler nl (line);
+        Pig nl (line);
         std::string name;
         std::string value;
-        while (!nl.depleted ())
+        while (!nl.eos ())
         {
           if (nl.getUntil (':', name) &&
               nl.skip (':')           &&
@@ -593,7 +593,7 @@ void Task::parse (const std::string& input)
         }
 
         std::string remainder;
-        nl.getUntilEOS (remainder);
+        nl.getRemainder (remainder);
         if (remainder.length ())
           throw std::string (STRING_RECORD_JUNK_AT_EOL);
       }
