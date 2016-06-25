@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 include_directories (${CMAKE_SOURCE_DIR}
                      ${CMAKE_SOURCE_DIR}/src
+                     ${CMAKE_SOURCE_DIR}/src/libshared/src
                      ${TASKD_INCLUDE_DIRS})
 
 add_library (taskd admin.cpp
@@ -23,7 +24,6 @@ add_library (taskd admin.cpp
                    Log.cpp        Log.h
                    Msg.cpp        Msg.h
                    Nibbler.cpp    Nibbler.h
-                   RX.cpp         RX.h
                    Server.cpp     Server.h
                    status.cpp
                    Task.cpp       Task.h
@@ -35,9 +35,14 @@ add_library (taskd admin.cpp
                    util.cpp       util.h
                    wcwidth6.cpp)
 
+add_library (libshared libshared/src/RX.cpp            libshared/src/RX.h)
+
 find_package(Threads REQUIRED)
 add_executable (taskd_executable taskd.cpp)
-target_link_libraries (taskd_executable taskd ${TASKD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+target_link_libraries (taskd_executable taskd libshared ${TASKD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
 set_property (TARGET taskd_executable PROPERTY OUTPUT_NAME "taskd")
+
 install (TARGETS taskd_executable DESTINATION ${TASKD_BINDIR})
 
