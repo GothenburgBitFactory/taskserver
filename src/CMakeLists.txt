@@ -19,7 +19,6 @@ add_library (taskd admin.cpp
                    init.cpp
                    ISO8601.cpp    ISO8601.h
                    Log.cpp        Log.h
-                   Msg.cpp        Msg.h
                    Nibbler.cpp    Nibbler.h
                    Server.cpp     Server.h
                    status.cpp
@@ -34,6 +33,7 @@ add_library (taskd admin.cpp
 add_library (libshared libshared/src/FS.cpp            libshared/src/FS.h
                        libshared/src/JSON.cpp          libshared/src/JSON.h
                        libshared/src/Lexer.cpp         libshared/src/Lexer.h
+                       libshared/src/Msg.cpp           libshared/src/Msg.h
                        libshared/src/RX.cpp            libshared/src/RX.h
                        libshared/src/Timer.cpp         libshared/src/Timer.h)
 
