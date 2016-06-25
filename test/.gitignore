@@ -3,7 +3,6 @@ color.t
 config.t
 iso8601d.t
 iso8601p.t
-msg.t
 nibbler.t
 text.t
 utf8.t
