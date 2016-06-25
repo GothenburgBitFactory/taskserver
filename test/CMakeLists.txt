@@ -11,7 +11,7 @@ include_directories (${CMAKE_SOURCE_DIR}
                      ${CMAKE_SOURCE_DIR}/test
                      ${TASKD_INCLUDE_DIRS})
 
-set (test_SRCS color.t config.t iso8601d.t iso8601p.t msg.t nibbler.t text.t util.t utf8.t)
+set (test_SRCS color.t config.t iso8601d.t iso8601p.t nibbler.t text.t util.t utf8.t)
 
 add_custom_target (test ./run_all --verbose
                         DEPENDS ${test_SRCS} taskd_executable
