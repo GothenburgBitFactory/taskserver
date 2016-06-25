@@ -3,7 +3,6 @@ color.t
 config.t
 nibbler.t
 text.t
-utf8.t
 util.t
 width.t
 obsolete
