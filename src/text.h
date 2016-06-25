@@ -31,9 +31,6 @@
 #include <string>
 
 // text.cpp, Non-UTF-8 aware.
-std::string trimLeft (const std::string& in, const std::string& t = " ");
-std::string trimRight (const std::string& in, const std::string& t = " ");
-std::string trim (const std::string& in, const std::string& t = " ");
 std::string unquoteText (const std::string&);
 void split (std::vector<std::string>&, const std::string&, const char);
 void split (std::vector<std::string>&, const std::string&, const std::string&);
@@ -41,26 +38,14 @@ void split_minimal (std::vector<std::string>&, const std::string&, const char);
 void join (std::string&, const std::string&, const std::vector<std::string>&);
 void join (std::string&, const std::string&, const std::vector<int>&);
 std::string commify (const std::string&);
-std::string lowerCase (const std::string&);
-std::string upperCase (const std::string&);
 std::string ucFirst (const std::string&);
 const std::string str_replace (std::string&, const std::string&, const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
 bool digitsOnly (const std::string&);
-bool compare (const std::string&, const std::string&, bool sensitive = true);
-bool closeEnough (const std::string&, const std::string&, unsigned int minLength = 0);
 std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
 std::string::size_type find (const std::string&, const std::string&, std::string::size_type, bool sensitive = true);
 int damerau_levenshtein (const char*, const char*);
-
-std::string leftJustify (const int, const int);
-std::string leftJustify (const std::string&, const int);
-std::string rightJustifyZero (const int, const int);
-std::string rightJustify (const int, const int);
-std::string rightJustify (const std::string&, const int);
-
-int mk_wcwidth (wchar_t);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////

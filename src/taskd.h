@@ -70,34 +70,6 @@ std::string taskd_error (const int);
 void taskd_staticInitialize ();
 
 // list template
-///////////////////////////////////////////////////////////////////////////////
-template <class T> bool listDiff (const T& left, const T& right)
-{
-  if (left.size () != right.size ())
-    return true;
-
-  for (unsigned int i = 0; i < left.size (); ++i)
-    if (left[i] != right[i])
-      return true;
-
-  return false;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <class T> void listDiff (
-  const T& left, const T& right, T& leftOnly, T& rightOnly)
-{
-  leftOnly.clear ();
-  for (auto& l : left)
-    if (std::find (right.begin (), right.end (), l) == right.end ())
-      leftOnly.push_back (l);
-
-  rightOnly.clear ();
-  for (auto& r : right)
-    if (std::find (left.begin (), left.end (), r) == left.end ())
-      rightOnly.push_back (r);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 template <class T> void listIntersect (const T& left, const T& right, T& join)
 {

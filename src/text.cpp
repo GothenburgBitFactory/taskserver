@@ -34,8 +34,6 @@
 #include <utf8.h>
 #include <text.h>
 
-static void replace_positional (std::string&, const std::string&, const std::string&);
-
 ////////////////////////////////////////////////////////////////////////////////
 void split (
   std::vector<std::string>& results,
@@ -133,27 +131,6 @@ void join (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string trimLeft (const std::string& in, const std::string& t /*= " "*/)
-{
-  std::string out = in;
-  return out.erase (0, in.find_first_not_of (t));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string trimRight (const std::string& in, const std::string& t /*= " "*/)
-{
-  std::string out = in;
-  return out.erase (out.find_last_not_of (t) + 1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string trim (const std::string& in, const std::string& t /*= " "*/)
-{
-  std::string out = in;
-  return trimLeft (trimRight (out, t), t);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Remove enclosing balanced quotes.  Assumes trimmed text.
 std::string unquoteText (const std::string& input)
 {
@@ -245,23 +222,6 @@ std::string commify (const std::string& data)
   return done;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-std::string lowerCase (const std::string& input)
-{
-  std::string output = input;
-  std::transform (output.begin (), output.end (), output.begin (), tolower);
-  return output;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string upperCase (const std::string& input)
-{
-  std::string output = input;
-  std::transform (output.begin (), output.end (), output.begin (), toupper);
-  return output;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 std::string ucFirst (const std::string& input)
 {
@@ -342,36 +302,6 @@ bool digitsOnly (const std::string& input)
       return false;
 
   return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool compare (
-  const std::string& left,
-  const std::string& right,
-  bool sensitive /*= true*/)
-{
-  // Use strcasecmp if required.
-  if (!sensitive)
-    return strcasecmp (left.c_str (), right.c_str ()) == 0 ? true : false;
-
-  // Otherwise, just use std::string::operator==.
-  return left == right;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool closeEnough (
-  const std::string& reference,
-  const std::string& attempt,
-  unsigned int minLength /* = 0 */)
-{
-  if (compare (reference, attempt, false))
-    return true;
-
-  if (attempt.length () < reference.length () &&
-      attempt.length () >= minLength)
-    return compare (reference.substr (0, attempt.length ()), attempt, false);
-
-  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,57 +444,6 @@ int damerau_levenshtein (const char* left, const char* right)
   }
 
   return line1[len_right];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static void replace_positional (
-  std::string& fmt,
-  const std::string& from,
-  const std::string& to)
-{
-  std::string::size_type pos = 0;
-  while ((pos = fmt.find (from, pos)) != std::string::npos)
-  {
-    fmt.replace (pos, from.length (), to);
-    pos += to.length ();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string leftJustify (const int input, const int width)
-{
-  std::stringstream s;
-  s << input;
-  std::string output = s.str ();
-  return output + std::string (width - output.length (), ' ');
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string leftJustify (const std::string& input, const int width)
-{
-  return input + std::string (width - utf8_text_width (input), ' ');
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string rightJustifyZero (const int input, const int width)
-{
-  std::stringstream s;
-  s << std::setw (width) << std::setfill ('0') << input;
-  return s.str ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string rightJustify (const int input, const int width)
-{
-  std::stringstream s;
-  s << std::setw (width) << std::setfill (' ') << input;
-  return s.str ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string rightJustify (const std::string& input, const int width)
-{
-  return std::string (width - utf8_text_width (input), ' ') + input;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
