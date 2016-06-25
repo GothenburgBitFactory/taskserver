@@ -20,7 +20,6 @@ add_library (taskd admin.cpp
                    init.cpp
                    ISO8601.cpp    ISO8601.h
                    JSON.cpp       JSON.h
-                   Lexer.cpp      Lexer.h
                    Log.cpp        Log.h
                    Msg.cpp        Msg.h
                    Nibbler.cpp    Nibbler.h
@@ -35,7 +34,8 @@ add_library (taskd admin.cpp
                    util.cpp       util.h
                    wcwidth6.cpp)
 
-add_library (libshared libshared/src/RX.cpp            libshared/src/RX.h)
+add_library (libshared libshared/src/Lexer.cpp         libshared/src/Lexer.h
+                       libshared/src/RX.cpp            libshared/src/RX.h)
 
 find_package(Threads REQUIRED)
 add_executable (taskd_executable taskd.cpp)
