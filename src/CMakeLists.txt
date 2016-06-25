@@ -7,7 +7,6 @@ include_directories (${CMAKE_SOURCE_DIR}
 add_library (taskd admin.cpp
                    api.cpp
                    client.cpp
-                   Color.cpp      Color.h
                    ConfigFile.cpp ConfigFile.h
                    config.cpp
                    daemon.cpp
@@ -26,7 +25,8 @@ add_library (taskd admin.cpp
                    TLSServer.cpp  TLSServer.h
                    util.cpp       util.h)
 
-add_library (libshared libshared/src/Datetime.cpp      libshared/src/Datetime.h
+add_library (libshared libshared/src/Color.cpp         libshared/src/Color.h
+                       libshared/src/Datetime.cpp      libshared/src/Datetime.h
                        libshared/src/Duration.cpp      libshared/src/Duration.h
                        libshared/src/FS.cpp            libshared/src/FS.h
                        libshared/src/JSON.cpp          libshared/src/JSON.h
