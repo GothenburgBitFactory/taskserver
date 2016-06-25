@@ -19,7 +19,6 @@ add_library (taskd admin.cpp
                    i18n.h
                    init.cpp
                    ISO8601.cpp    ISO8601.h
-                   JSON.cpp       JSON.h
                    Log.cpp        Log.h
                    Msg.cpp        Msg.h
                    Nibbler.cpp    Nibbler.h
@@ -33,7 +32,8 @@ add_library (taskd admin.cpp
                    util.cpp       util.h
                    wcwidth6.cpp)
 
-add_library (libshared libshared/src/Lexer.cpp         libshared/src/Lexer.h
+add_library (libshared libshared/src/JSON.cpp          libshared/src/JSON.h
+                       libshared/src/Lexer.cpp         libshared/src/Lexer.h
                        libshared/src/RX.cpp            libshared/src/RX.h
                        libshared/src/Timer.cpp         libshared/src/Timer.h)
 
