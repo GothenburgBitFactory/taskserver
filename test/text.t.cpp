@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (177);
+  UnitTest t (108);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -137,33 +137,6 @@ int main (int, char**)
   t.is (joined.length (), (size_t) 5, "join 0 1 2 -> length 5");
   t.is (joined,           "0-1-2",    "join 0 1 2 -> '0-1-2'");
 
-  // std::string trimLeft (const std::string& in, const std::string& t /*= " "*/)
-  t.is (trimLeft (""),                     "",            "trimLeft '' -> ''");
-  t.is (trimLeft ("   "),                  "",            "trimLeft '   ' -> ''");
-  t.is (trimLeft ("",              " \t"), "",            "trimLeft '' -> ''");
-  t.is (trimLeft ("xxx"),                  "xxx",         "trimLeft 'xxx' -> 'xxx'");
-  t.is (trimLeft ("xxx",           " \t"), "xxx",         "trimLeft 'xxx' -> 'xxx'");
-  t.is (trimLeft ("  \t xxx \t  "),        "\t xxx \t  ", "trimLeft '  \\t xxx \\t  ' -> '\\t xxx \\t  '");
-  t.is (trimLeft ("  \t xxx \t  ", " \t"), "xxx \t  ",    "trimLeft '  \\t xxx \\t  ' -> 'xxx \\t  '");
-
-  // std::string trimRight (const std::string& in, const std::string& t /*= " "*/)
-  t.is (trimRight (""),                     "",            "trimRight '' -> ''");
-  t.is (trimRight ("   "),                  "",            "trimRight '   ' -> ''");
-  t.is (trimRight ("",              " \t"), "",            "trimRight '' -> ''");
-  t.is (trimRight ("xxx"),                  "xxx",         "trimRight 'xxx' -> 'xxx'");
-  t.is (trimRight ("xxx",           " \t"), "xxx",         "trimRight 'xxx' -> 'xxx'");
-  t.is (trimRight ("  \t xxx \t  "),        "  \t xxx \t", "trimRight '  \\t xxx \\t  ' -> '  \\t xxx \\t'");
-  t.is (trimRight ("  \t xxx \t  ", " \t"), "  \t xxx",    "trimRight '  \\t xxx \\t  ' -> '  \\t xxx'");
-
-  // std::string trim (const std::string& in, const std::string& t /*= " "*/)
-  t.is (trim (""),                     "",          "trim '' -> ''");
-  t.is (trim ("   "),                  "",          "trim '   ' -> ''");
-  t.is (trim ("",              " \t"), "",          "trim '' -> ''");
-  t.is (trim ("xxx"),                  "xxx",       "trim 'xxx' -> 'xxx'");
-  t.is (trim ("xxx",           " \t"), "xxx",       "trim 'xxx' -> 'xxx'");
-  t.is (trim ("  \t xxx \t  "),        "\t xxx \t", "trim '  \\t xxx \\t  ' -> '\\t xxx \\t'");
-  t.is (trim ("  \t xxx \t  ", " \t"), "xxx",       "trim '  \\t xxx \\t  ' -> 'xxx'");
-
   // std::string unquoteText (const std::string& text)
   t.is (unquoteText (""),         "",     "unquoteText '' -> ''");
   t.is (unquoteText ("x"),        "x",    "unquoteText 'x' -> 'x'");
@@ -200,14 +173,6 @@ int main (int, char**)
   t.is (commify ("1234post"),    "1,234post",    "commify '1234post' -> '1,234post'");
   t.is (commify ("pre1234post"), "pre1,234post", "commify 'pre1234post' -> 'pre1,234post'");
 
-  // std::string lowerCase (const std::string& input)
-  t.is (lowerCase (""),            "",            "lowerCase '' -> ''");
-  t.is (lowerCase ("pre01_:POST"), "pre01_:post", "lowerCase 'pre01_:POST' -> 'pre01_:post'");
-
-  // std::string upperCase (const std::string& input)
-  t.is (upperCase (""),            "",            "upperCase '' -> ''");
-  t.is (upperCase ("pre01_:POST"), "PRE01_:POST", "upperCase 'pre01_:POST' -> 'PRE01_:POST'");
-
   // bool digitsOnly (const std::string&);
   t.ok    (digitsOnly (""),                       "digitsOnly '' -> true");
   t.ok    (digitsOnly ("0"),                      "digitsOnly '0' -> true");
@@ -217,32 +182,6 @@ int main (int, char**)
   std::string text = "Hello, world.";
   //      0123456789012
   //      s   e  s   e
-
-  // bool compare (const std::string&, const std::string&, bool caseless = false);
-  // Make sure degenerate cases are handled.
-  t.ok    (compare ("", ""),    "'' == ''");
-  t.notok (compare ("foo", ""), "foo != ''");
-  t.notok (compare ("", "foo"), "'' != foo");
-
-  // Make sure the default is case-sensitive.
-  t.ok    (compare ("foo", "foo"), "foo == foo");
-  t.notok (compare ("foo", "FOO"), "foo != foo");
-
-  // Test case-sensitive.
-  t.notok (compare ("foo", "xx", true),  "foo != xx");
-
-  t.ok    (compare ("foo", "foo", true), "foo == foo");
-  t.notok (compare ("foo", "FOO", true), "foo != FOO");
-  t.notok (compare ("FOO", "foo", true), "FOO != foo");
-  t.ok    (compare ("FOO", "FOO", true), "FOO == FOO");
-
-  // Test case-insensitive.
-  t.notok (compare ("foo", "xx", false),   "foo != foo (caseless)");
-
-  t.ok    (compare ("foo", "foo", false),  "foo == foo (caseless)");
-  t.ok    (compare ("foo", "FOO", false),  "foo == FOO (caseless)");
-  t.ok    (compare ("FOO", "foo", false),  "FOO == foo (caseless)");
-  t.ok    (compare ("FOO", "FOO", false),  "FOO == FOO (caseless)");
 
   // std::string::size_type find (const std::string&, const std::string&, bool caseless = false);
   // Make sure degenerate cases are handled.
@@ -276,53 +215,6 @@ int main (int, char**)
   t.is ((int) find ("one two three", "e", 11, true), (int) 11, "offset obeyed");
 
   // TODO bool closeEnough (const std::string&, const std::string&);
-
-  // std::string format (char);
-  t.is (format ('A'), "A", "format ('A') -> A");
-
-  // std::string format (int);
-  t.is (format (0),  "0",  "format (0) -> 0");
-  t.is (format (-1), "-1", "format (-1) -> -1");
-
-  // std::string formatHex (int);
-  t.is (formatHex (0),   "0",  "formatHex (0) -> 0");
-  t.is (formatHex (10),  "a",  "formatHex (10) -> a");
-  t.is (formatHex (123), "7b", "formatHex (123) -> 7b");
-
-  // std::string format (float, int, int);
-  t.is (format (1.23456789, 8, 1),      "       1",     "format (1.23456789,    8,   1) -> _______1");
-  t.is (format (1.23456789, 8, 2),      "     1.2",     "format (1.23456789,    8,   2) -> _____1.2");
-  t.is (format (1.23456789, 8, 3),      "    1.23",     "format (1.23456789,    8,   3) -> ____1.23");
-  t.is (format (1.23456789, 8, 4),      "   1.235",     "format (1.23456789,    8,   4) -> ___1.235");
-  t.is (format (1.23456789, 8, 5),      "  1.2346",     "format (1.23456789,    8,   5) -> __1.2346");
-  t.is (format (1.23456789, 8, 6),      " 1.23457",     "format (1.23456789,    8,   6) ->  1.23457");
-  t.is (format (1.23456789, 8, 7),      "1.234568",     "format (1.23456789,    8,   7) -> 1.234568");
-  t.is (format (1.23456789, 8, 8),      "1.2345679",    "format (1.23456789,    8,   8) -> 1.2345679");
-  t.is (format (2444238.56789, 12, 11), "2444238.5679", "format (2444238.56789, 12, 11) -> 2444238.5679");
-
-  // std::string format (double, int, int);
-
-  // std::string leftJustify (const std::string&, const int);
-  t.is (leftJustify (123, 3), "123",   "leftJustify 123,3 -> '123'");
-  t.is (leftJustify (123, 4), "123 ",  "leftJustify 123,4 -> '123 '");
-  t.is (leftJustify (123, 5), "123  ", "leftJustify 123,5 -> '123  '");
-
-  // std::string leftJustify (const std::string&, const int);
-  t.is (leftJustify ("foo", 3), "foo",   "leftJustify foo,3 -> 'foo'");
-  t.is (leftJustify ("foo", 4), "foo ",  "leftJustify foo,4 -> 'foo '");
-  t.is (leftJustify ("foo", 5), "foo  ", "leftJustify foo,5 -> 'foo  '");
-  t.is (leftJustify ("föo", 5), "föo  ", "leftJustify föo,5 -> 'föo  '");
-
-  // std::string rightJustify (const std::string&, const int);
-  t.is (rightJustify (123, 3), "123",   "rightJustify 123,3 -> '123'");
-  t.is (rightJustify (123, 4), " 123",  "rightJustify 123,4 -> ' 123'");
-  t.is (rightJustify (123, 5), "  123", "rightJustify 123,5 -> '  123'");
-
-  // std::string rightJustify (const std::string&, const int);
-  t.is (rightJustify ("foo", 3), "foo",   "rightJustify foo,3 -> 'foo'");
-  t.is (rightJustify ("foo", 4), " foo",  "rightJustify foo,4 -> ' foo'");
-  t.is (rightJustify ("foo", 5), "  foo", "rightJustify foo,5 -> '  foo'");
-  t.is (rightJustify ("föo", 5), "  föo", "rightJustify föo,5 -> '  föo'");
 
   // int utf8_length (const std::string&);
   t.is ((int) utf8_length ("Çirçös"),            6, "utf8_length (Çirçös) == 6");
