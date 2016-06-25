@@ -35,6 +35,8 @@
           (thanks to Sebastian Sonne).
 - TD-118  Shebang issue
           (thanks to Slava, Daniel Shahaf).
+- TD-119  Build fails on Debian (no C++11 support)
+          (thanks to Samathy Barratt).
 - TD-120  Missing cmakedefine for HAVE_GET_CURRENT_DIR_NAME
           (Thanks to Jörg Krause, Ben Boeckel).
 - TD-121  Log time in user's specified timezone
