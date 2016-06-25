@@ -1,7 +1,6 @@
 all.log
 color.t
 config.t
-fs.t
 iso8601d.t
 iso8601p.t
 msg.t
