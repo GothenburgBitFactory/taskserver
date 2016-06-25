@@ -9,7 +9,6 @@ json_test
 lexer.t
 msg.t
 nibbler.t
-rx.t
 text.t
 utf8.t
 util.t
