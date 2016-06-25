@@ -14,7 +14,6 @@ add_library (taskd admin.cpp
                    diag.cpp
                    Database.cpp   Database.h
                    l10n/eng-USA.h
-                   FS.cpp         FS.h
                    help.cpp
                    i18n.h
                    init.cpp
@@ -32,7 +31,8 @@ add_library (taskd admin.cpp
                    util.cpp       util.h
                    wcwidth6.cpp)
 
-add_library (libshared libshared/src/JSON.cpp          libshared/src/JSON.h
+add_library (libshared libshared/src/FS.cpp            libshared/src/FS.h
+                       libshared/src/JSON.cpp          libshared/src/JSON.h
                        libshared/src/Lexer.cpp         libshared/src/Lexer.h
                        libshared/src/RX.cpp            libshared/src/RX.h
                        libshared/src/Timer.cpp         libshared/src/Timer.h)
