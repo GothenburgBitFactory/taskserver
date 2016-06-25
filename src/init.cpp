@@ -92,7 +92,7 @@ void command_init (Database& db)
   {
     db._config->save ();
     if (db._config->getBoolean ("verbose"))
-      std::cout << format (STRING_INIT_CREATED, db._config->_original_file)
+      std::cout << format (STRING_INIT_CREATED, db._config->_original_file._data)
                 << "\n";
   }
 }

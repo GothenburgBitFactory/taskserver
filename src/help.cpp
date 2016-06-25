@@ -29,6 +29,7 @@
 #include <cstring>
 #include <text.h>
 #include <taskd.h>
+#include <shared.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 void command_help (const std::vector <std::string>& args)

@@ -37,31 +37,7 @@
 #include <stdint.h>
 #include <text.h>
 #include <util.h>
-
-////////////////////////////////////////////////////////////////////////////////
-// Uses std::getline, because std::cin eats leading whitespace, and that means
-// that if a newline is entered, std::cin eats it and never returns from the
-// "std::cin >> answer;" line, but it does display the newline.  This way, with
-// std::getline, the newline can be detected, and the prompt re-written.
-bool confirm (const std::string& question)
-{
-  std::vector <std::string> options {"yes", "no"};
-  std::string answer;
-  std::vector <std::string> matches;
-
-  do
-  {
-    std::cout << question << " (yes/no) ";
-
-    std::getline (std::cin, answer);
-    answer = std::cin.eof() ? "no" : lowerCase (trim (answer));
-
-    autoComplete (answer, options, matches, 1); // Hard-coded 1.
-  }
-  while (matches.size () != 1);
-
-  return matches[0] == "yes" ? true : false;
-}
+#include <shared.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert a quantity in bytes to a more readable format.
@@ -94,41 +70,6 @@ std::string formatTime (time_t seconds)
   else                             strcpy (formatted, "-");
 
   return std::string (formatted);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-int autoComplete (
-  const std::string& partial,
-  const std::vector<std::string>& list,
-  std::vector<std::string>& matches,
-  int minimum/* = 1*/)
-{
-  matches.clear ();
-
-  // Handle trivial case. 
-  unsigned int length = partial.length ();
-  if (length)
-  {
-    for (auto& item : list)
-    {
-      // An exact match is a special case.  Assume there is only one exact match
-      // and return immediately.
-      if (partial == item)
-      {
-        matches.clear ();
-        matches.push_back (item);
-        return 1;
-      }
-
-      // Maintain a list of partial matches.
-      else if (length >= (unsigned) minimum &&
-               length <= item.length ()    &&
-               partial == item.substr (0, length))
-        matches.push_back (item);
-    }
-  }
-
-  return matches.size ();
 }
 
 // Handle the generation of UUIDs on FreeBSD in a separate implementation

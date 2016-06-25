@@ -33,6 +33,7 @@
 #include <text.h>
 #include <util.h>
 #include <taskd.h>
+#include <shared.h>
 #include <Database.h>
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <ConfigFile.h>
+#include <shared.h>
 #include <format.h>
 #include <text.h>
 #include <taskd.h>

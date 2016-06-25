@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <Server.h>
 #include <Timer.h>
+#include <shared.h>
 #include <Datetime.h>
 #include <Database.h>
 #include <format.h>
