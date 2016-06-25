@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <ISO8601.h>
 #include <Color.h>
-#include <Timer.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>

@@ -158,7 +158,7 @@ void Daemon::handler (const std::string& input, std::string& output)
         input.length () >= request_limit)
       throw 504;
 
-    HighResTimer timer;
+    Timer timer;
     timer.start ();
 
     // Request-specific processing here.
