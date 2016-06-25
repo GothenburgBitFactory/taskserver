@@ -1,8 +1,6 @@
 all.log
-color.t
 config.t
 text.t
 util.t
 width.t
-obsolete
 *.pyc
