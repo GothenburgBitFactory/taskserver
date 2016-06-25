@@ -25,9 +25,7 @@ add_library (taskd admin.cpp
                    text.cpp       text.h
                    TLSClient.cpp  TLSClient.h
                    TLSServer.cpp  TLSServer.h
-                   utf8.cpp       utf8.h
-                   util.cpp       util.h
-                   wcwidth6.cpp)
+                   util.cpp       util.h)
 
 add_library (libshared libshared/src/Datetime.cpp      libshared/src/Datetime.h
                        libshared/src/Duration.cpp      libshared/src/Duration.h
@@ -36,7 +34,9 @@ add_library (libshared libshared/src/Datetime.cpp      libshared/src/Datetime.h
                        libshared/src/Lexer.cpp         libshared/src/Lexer.h
                        libshared/src/Msg.cpp           libshared/src/Msg.h
                        libshared/src/RX.cpp            libshared/src/RX.h
-                       libshared/src/Timer.cpp         libshared/src/Timer.h)
+                       libshared/src/Timer.cpp         libshared/src/Timer.h
+                       libshared/src/utf8.cpp          libshared/src/utf8.h
+                       libshared/src/wcwidth6.cpp)
 
 find_package(Threads REQUIRED)
 add_executable (taskd_executable taskd.cpp)
