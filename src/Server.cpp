@@ -279,7 +279,7 @@ void Server::beginServer ()
         tx.getClient (_client_address, _client_port);
 
       // Metrics.
-      HighResTimer timer;
+      Timer timer;
       timer.start ();
 
       std::string input;
