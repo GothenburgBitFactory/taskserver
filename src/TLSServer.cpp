@@ -47,6 +47,7 @@
 #include <netdb.h>
 #include <gnutls/x509.h>
 #include <text.h>
+#include <format.h>
 
 #define DH_BITS 2048
 #define MAX_BUF 16384

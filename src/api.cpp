@@ -37,6 +37,7 @@
 #include <Log.h>
 #include <Task.h>
 #include <RX.h>
+#include <format.h>
 #include <text.h>
 #include <util.h>
 #include <taskd.h>

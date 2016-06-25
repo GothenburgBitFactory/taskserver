@@ -30,6 +30,7 @@
 #include <taskd.h>
 #include <text.h>
 #include <i18n.h>
+#include <format.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 void command_init (Database& db)

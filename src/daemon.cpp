@@ -37,6 +37,7 @@
 #include <Timer.h>
 #include <Datetime.h>
 #include <Database.h>
+#include <format.h>
 #include <Log.h>
 #include <Color.h>
 #include <Task.h>
