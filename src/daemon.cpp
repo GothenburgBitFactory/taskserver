@@ -35,9 +35,9 @@
 #include <errno.h>
 #include <Server.h>
 #include <Timer.h>
+#include <Datetime.h>
 #include <Database.h>
 #include <Log.h>
-#include <ISO8601.h>
 #include <Color.h>
 #include <Task.h>
 #ifdef HAVE_COMMIT
@@ -86,7 +86,7 @@ public:
 
 private:
   Config& _config;
-  ISO8601d _start;
+  Datetime _start;
   long _txn_count;
   long _error_count;
   double _busy;
@@ -99,7 +99,7 @@ private:
 Daemon::Daemon (Config& settings)
 : _db (&settings)
 , _config (settings)
-, _start (ISO8601d ())
+, _start (Datetime ())
 , _txn_count (0)
 , _error_count (0)
 , _busy (0.0)
@@ -250,7 +250,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   get_totals (total_orgs, total_users, total_bytes);
 
   // Stats about the server.
-  time_t uptime = ISO8601d () - _start;
+  time_t uptime = Datetime () - _start;
   double idle = 0.0;
   if (uptime != 0)
     idle = 1.0 - (_busy / (double) uptime);
