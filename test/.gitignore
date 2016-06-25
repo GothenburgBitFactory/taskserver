@@ -1,7 +1,6 @@
 all.log
 color.t
 config.t
-nibbler.t
 text.t
 util.t
 width.t
