@@ -62,6 +62,7 @@
 - Taskd source now builds into a static library, which makes the test builds
   signifacntly faster.
           (thanks to aszlig).
+- Integrated libshared.
 
 ------- current release ---------------------------
 

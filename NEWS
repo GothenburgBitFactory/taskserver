@@ -9,6 +9,7 @@ New Features in Taskserver 1.2.0
   - Removed broken 3DES cipher in CBC mode from default.
   - Removed broken RC4 cipher from default.
   - Removed broken MD5 cipher from default.
+  - Integrates libshared.
 
 New configuration options in Taskserver 1.2.0
 
