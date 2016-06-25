@@ -53,22 +53,6 @@ bool closeEnough (const std::string&, const std::string&, unsigned int minLength
 std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
 std::string::size_type find (const std::string&, const std::string&, std::string::size_type, bool sensitive = true);
 int damerau_levenshtein (const char*, const char*);
-const std::string format (char);
-const std::string format (int);
-const std::string formatHex (int);
-const std::string format (float, int, int);
-const std::string format (double, int, int);
-const std::string format (double);
-const std::string format (const std::string&, const std::string&);
-const std::string format (const std::string&, int);
-const std::string format (const std::string&, const std::string&, const std::string&);
-const std::string format (const std::string&, const std::string&, int);
-const std::string format (const std::string&, const std::string&, double);
-const std::string format (const std::string&, int, const std::string&);
-const std::string format (const std::string&, int, int);
-const std::string format (const std::string&, int, int, int);
-const std::string format (const std::string&, int, double);
-const std::string format (const std::string&, const std::string&, const std::string&, const std::string&);
 
 std::string leftJustify (const int, const int);
 std::string leftJustify (const std::string&, const int);
