@@ -34,7 +34,6 @@
 std::string unquoteText (const std::string&);
 void split (std::vector<std::string>&, const std::string&, const char);
 void split (std::vector<std::string>&, const std::string&, const std::string&);
-void split_minimal (std::vector<std::string>&, const std::string&, const char);
 std::string commify (const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
