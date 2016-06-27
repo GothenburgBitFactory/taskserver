@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (108);
+  UnitTest t (104);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -172,12 +172,6 @@ int main (int, char**)
   t.is (commify ("pre1234"),     "pre1,234",     "commify 'pre1234' -> 'pre1,234'");
   t.is (commify ("1234post"),    "1,234post",    "commify '1234post' -> '1,234post'");
   t.is (commify ("pre1234post"), "pre1,234post", "commify 'pre1234post' -> 'pre1,234post'");
-
-  // bool digitsOnly (const std::string&);
-  t.ok    (digitsOnly (""),                       "digitsOnly '' -> true");
-  t.ok    (digitsOnly ("0"),                      "digitsOnly '0' -> true");
-  t.ok    (digitsOnly ("123"),                    "digitsOnly '123' -> true");
-  t.notok (digitsOnly ("12fa"),                   "digitsOnly '12fa' -> false");
 
   std::string text = "Hello, world.";
   //      0123456789012
