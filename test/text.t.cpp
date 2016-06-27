@@ -33,67 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (66);
-
-  // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
-  std::vector <std::string> items;
-  std::string unsplit = "";
-  split (items, unsplit, '-');
-  t.is (items.size (), (size_t) 0, "split '' '-' -> 0 items");
-
-  unsplit = "a";
-  split (items, unsplit, '-');
-  t.is (items.size (), (size_t) 1, "split 'a' '-' -> 1 item");
-  t.is (items[0], "a",             "split 'a' '-' -> 'a'");
-
-  split (items, unsplit, '-');
-  t.is (items.size (), (size_t) 1, "split 'a' '-' -> 1 item");
-  t.is (items[0], "a",             "split 'a' '-' -> 'a'");
-
-  unsplit = "-";
-  split (items, unsplit, '-');
-  t.is (items.size (), (size_t) 2, "split '-' '-' -> '' ''");
-  t.is (items[0], "",              "split '-' '-' -> [0] ''");
-  t.is (items[1], "",              "split '-' '-' -> [1] ''");
-
-  unsplit = "-a-bc-def";
-  split (items, unsplit, '-');
-  t.is (items.size (), (size_t) 4, "split '-a-bc-def' '-' -> '' 'a' 'bc' 'def'");
-  t.is (items[0], "",              "split '-a-bc-def' '-' -> [0] ''");
-  t.is (items[1], "a",             "split '-a-bc-def' '-' -> [1] 'a'");
-  t.is (items[2], "bc",            "split '-a-bc-def' '-' -> [2] 'bc'");
-  t.is (items[3], "def",           "split '-a-bc-def' '-' -> [3] 'def'");
-
-  // void split (std::vector<std::string>& results, const std::string& input, const std::string& delimiter)
-  unsplit = "";
-  split (items, unsplit, "--");
-  t.is (items.size (), (size_t) 0, "split '' '--' -> 0 items");
-
-  unsplit = "a";
-  split (items, unsplit, "--");
-  t.is (items.size (), (size_t) 1, "split 'a' '--' -> 1 item");
-  t.is (items[0], "a",             "split 'a' '-' -> 'a'");
-
-  unsplit = "--";
-  split (items, unsplit, "--");
-  t.is (items.size (), (size_t) 2, "split '-' '--' -> '' ''");
-  t.is (items[0], "",              "split '-' '-' -> [0] ''");
-  t.is (items[1], "",              "split '-' '-' -> [1] ''");
-
-  unsplit = "--a--bc--def";
-  split (items, unsplit, "--");
-  t.is (items.size (), (size_t) 4, "split '-a-bc-def' '--' -> '' 'a' 'bc' 'def'");
-  t.is (items[0], "",              "split '-a-bc-def' '--' -> [0] ''");
-  t.is (items[1], "a",             "split '-a-bc-def' '--' -> [1] 'a'");
-  t.is (items[2], "bc",            "split '-a-bc-def' '--' -> [2] 'bc'");
-  t.is (items[3], "def",           "split '-a-bc-def' '--' -> [3] 'def'");
-
-  unsplit = "one\ntwo\nthree";
-  split (items, unsplit, "\n");
-  t.is (items.size (), (size_t) 3, "split 'one\\ntwo\\nthree' -> 'one', 'two', 'three'");
-  t.is (items[0], "one",           "split 'one\\ntwo\\nthree' -> [0] 'one'");
-  t.is (items[1], "two",           "split 'one\\ntwo\\nthree' -> [1] 'two'");
-  t.is (items[2], "three",         "split 'one\\ntwo\\nthree' -> [2] 'three'");
+  UnitTest t (38);
 
   // std::string unquoteText (const std::string& text)
   t.is (unquoteText (""),         "",     "unquoteText '' -> ''");
