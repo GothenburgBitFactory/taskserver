@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <Log.h>
+#include <shared.h>
 #include <text.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,8 +75,7 @@ void Log::write (const std::string& line, bool multiline /* = false */)
   // lines and recursively calling Log::write
   if (multiline)
   {
-    std::vector <std::string> lines;
-    split (lines, line, "\n");
+    auto lines = split (line, '\n');
     std::vector <std::string>::iterator line;
     for (line = lines.begin (); line != lines.end (); ++line)
       write (line->c_str ());
