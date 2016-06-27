@@ -295,16 +295,6 @@ std::string printable (char input)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool digitsOnly (const std::string& input)
-{
-  for (size_t i = 0; i < input.length (); ++i)
-    if (!isdigit (input[i]))
-      return false;
-
-  return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 std::string::size_type find (
   const std::string& text,
   const std::string& pattern,
