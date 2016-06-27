@@ -467,8 +467,7 @@ void Daemon::parse_payload (
   std::string& sync_key) const
 {
   // Break payload into lines.
-  std::vector <std::string> lines;
-  split (lines, payload, '\n');
+  auto lines = split (payload, '\n');
 
   // Separate into data and key.
   // TODO Some syntax checking would be nice.
