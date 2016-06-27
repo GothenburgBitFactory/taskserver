@@ -26,6 +26,7 @@
 
 #include <cmake.h>
 #include <text.h>
+#include <string.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove enclosing balanced quotes.  Assumes trimmed text.
