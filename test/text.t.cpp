@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (69);
+  UnitTest t (66);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -130,11 +130,6 @@ int main (int, char**)
   t.is (commify ("pre1234"),     "pre1,234",     "commify 'pre1234' -> 'pre1,234'");
   t.is (commify ("1234post"),    "1,234post",    "commify '1234post' -> '1,234post'");
   t.is (commify ("pre1234post"), "pre1,234post", "commify 'pre1234post' -> 'pre1,234post'");
-
-  // int utf8_length (const std::string&);
-  t.is ((int) utf8_length ("Çirçös"),            6, "utf8_length (Çirçös) == 6");
-  t.is ((int) utf8_length ("ツネナラム"),        5, "utf8_length (ツネナラム) == 5");
-  t.is ((int) utf8_length ("Zwölf Boxkämpfer"), 16, "utf8_length (Zwölf Boxkämpfer) == 16");
 
   // int damerau_levenshtein (const char*, const char*);
   t.is    (damerau_levenshtein ("foo", "foo"),  0, "foo --> foo = 0");
