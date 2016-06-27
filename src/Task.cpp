@@ -47,6 +47,7 @@
 #include <RX.h>
 #endif
 #include <text.h>
+#include <shared.h>
 #include <format.h>
 #include <util.h>
 

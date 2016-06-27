@@ -39,7 +39,6 @@ void join (std::string&, const std::string&, const std::vector<std::string>&);
 void join (std::string&, const std::string&, const std::vector<int>&);
 std::string commify (const std::string&);
 std::string ucFirst (const std::string&);
-const std::string str_replace (std::string&, const std::string&, const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
 std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
