@@ -42,7 +42,6 @@ std::string ucFirst (const std::string&);
 const std::string str_replace (std::string&, const std::string&, const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
-bool digitsOnly (const std::string&);
 std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
 std::string::size_type find (const std::string&, const std::string&, std::string::size_type, bool sensitive = true);
 int damerau_levenshtein (const char*, const char*);
