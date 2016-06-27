@@ -52,9 +52,6 @@ int main (int, char**)
 
   // TODO const std::string uuid ();
 
-  // TODO const std::string encode (const std::string& value);
-  // TODO const std::string decode (const std::string& value);
-
   return 0;
 }
 
