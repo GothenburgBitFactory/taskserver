@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (87);
+  UnitTest t (69);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -130,43 +130,6 @@ int main (int, char**)
   t.is (commify ("pre1234"),     "pre1,234",     "commify 'pre1234' -> 'pre1,234'");
   t.is (commify ("1234post"),    "1,234post",    "commify '1234post' -> '1,234post'");
   t.is (commify ("pre1234post"), "pre1,234post", "commify 'pre1234post' -> 'pre1,234post'");
-
-  std::string text = "Hello, world.";
-  //      0123456789012
-  //      s   e  s   e
-
-  // std::string::size_type find (const std::string&, const std::string&, bool caseless = false);
-  // Make sure degenerate cases are handled.
-  t.is ((int) find ("foo", ""), (int) 0,                 "foo !contains ''");
-  t.is ((int) find ("", "foo"), (int) std::string::npos, "'' !contains foo");
-
-  // Make sure the default is case-sensitive.
-  t.is ((int) find ("foo", "fo"), 0,                       "foo contains fo");
-  t.is ((int) find ("foo", "FO"), (int) std::string::npos, "foo !contains fo");
-
-  // Test case-sensitive.
-  t.is ((int) find ("foo", "xx", true), (int) std::string::npos, "foo !contains xx");
-  t.is ((int) find ("foo", "oo", true), 1,                       "foo contains oo");
-
-  t.is ((int) find ("foo", "fo", true), 0,                       "foo contains fo");
-  t.is ((int) find ("foo", "FO", true), (int) std::string::npos, "foo !contains fo");
-  t.is ((int) find ("FOO", "fo", true), (int) std::string::npos, "foo !contains fo");
-  t.is ((int) find ("FOO", "FO", true), 0,                       "foo contains fo");
-
-  // Test case-insensitive.
-  t.is ((int) find ("foo", "xx", false),  (int) std::string::npos, "foo !contains xx (caseless)");
-  t.is ((int) find ("foo", "oo", false),  1,                       "foo contains oo (caseless)");
-
-  t.is ((int) find ("foo", "fo", false),  0, "foo contains fo (caseless)");
-  t.is ((int) find ("foo", "FO", false),  0, "foo contains FO (caseless)");
-  t.is ((int) find ("FOO", "fo", false),  0, "FOO contains fo (caseless)");
-  t.is ((int) find ("FOO", "FO", false),  0, "FOO contains FO (caseless)");
-
-  // Test start offset.
-  t.is ((int) find ("one two three", "e",  3, true), (int) 11, "offset obeyed");
-  t.is ((int) find ("one two three", "e", 11, true), (int) 11, "offset obeyed");
-
-  // TODO bool closeEnough (const std::string&, const std::string&);
 
   // int utf8_length (const std::string&);
   t.is ((int) utf8_length ("Çirçös"),            6, "utf8_length (Çirçös) == 6");
