@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (104);
+  UnitTest t (92);
 
   // void split (std::vector<std::string>& results, const std::string& input, const char delimiter)
   std::vector <std::string> items;
@@ -103,39 +103,6 @@ int main (int, char**)
   t.is (items[0], "one",           "split 'one\\ntwo\\nthree' -> [0] 'one'");
   t.is (items[1], "two",           "split 'one\\ntwo\\nthree' -> [1] 'two'");
   t.is (items[2], "three",         "split 'one\\ntwo\\nthree' -> [2] 'three'");
-
-  // void join (std::string& result, const std::string& separator, const std::vector<std::string>& items)
-  std::vector <std::string> unjoined;
-  std::string joined;
-
-  join (joined, "", unjoined);
-  t.is (joined.length (), (size_t) 0,  "join -> length 0");
-  t.is (joined,           "",          "join -> ''");
-
-  unjoined = {"", "a", "bc", "def"};
-  join (joined, "", unjoined);
-  t.is (joined.length (), (size_t) 6, "join '' 'a' 'bc' 'def' -> length 6");
-  t.is (joined,           "abcdef",   "join '' 'a' 'bc' 'def' -> 'abcdef'");
-
-  join (joined, "-", unjoined);
-  t.is (joined.length (), (size_t) 9,  "join '' - 'a' - 'bc' - 'def' -> length 9");
-  t.is (joined,           "-a-bc-def", "join '' - 'a' - 'bc' - 'def' -> '-a-bc-def'");
-
-  // void join (std::string& result, const std::string& separator, const std::vector<int>& items)
-  std::vector <int> unjoined2;
-
-  join (joined, "", unjoined2);
-  t.is (joined.length (), (size_t) 0, "join -> length 0");
-  t.is (joined,           "",         "join -> ''");
-
-  unjoined2 = {0, 1, 2};
-  join (joined, "", unjoined2);
-  t.is (joined.length (), (size_t) 3, "join 0 1 2 -> length 3");
-  t.is (joined,           "012",      "join 0 1 2 -> '012'");
-
-  join (joined, "-", unjoined2);
-  t.is (joined.length (), (size_t) 5, "join 0 1 2 -> length 5");
-  t.is (joined,           "0-1-2",    "join 0 1 2 -> '0-1-2'");
 
   // std::string unquoteText (const std::string& text)
   t.is (unquoteText (""),         "",     "unquoteText '' -> ''");
