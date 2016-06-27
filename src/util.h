@@ -43,10 +43,6 @@ void uuid_unparse_lower (uuid_t uu, char *out);
 #endif
 const std::string uuid ();
 
-const std::string encode (const std::string&);
-const std::string decode (const std::string&);
-const std::string escape (const std::string&, char);
-
 #ifndef HAVE_TIMEGM
   time_t timegm (struct tm *tm);
 #endif
