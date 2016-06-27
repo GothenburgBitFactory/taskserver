@@ -699,8 +699,7 @@ void Task::parseJSON (const json::object* root_obj)
       else if (i.first == "depends" && i.second->type() == json::j_string)
       {
         json::string* deps = (json::string*)i.second;
-        std::vector <std::string> uuids;
-        split (uuids, deps->_data, ',');
+        auto uuids = split (deps->_data, ',');
 
         for (const auto& uuid : uuids)
           addDependency (uuid);
@@ -896,8 +895,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     // Tags are converted to an array.
     else if (i.first == "tags")
     {
-      std::vector <std::string> tags;
-      split (tags, i.second, ',');
+      auto tags = split (i.second, ',');
 
       out << "\"tags\":[";
 
@@ -936,8 +934,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
 #endif
             )
     {
-      std::vector <std::string> deps;
-      split (deps, i.second, ',');
+      auto deps = split (i.second, ',');
 
       out << "\"depends\":[";
 
@@ -1135,8 +1132,7 @@ void Task::addDependency (const std::string& uuid)
 ////////////////////////////////////////////////////////////////////////////////
 void Task::removeDependency (const std::string& uuid)
 {
-  std::vector <std::string> deps;
-  split (deps, get ("depends"), ',');
+  auto deps = split (get ("depends"), ',');
 
   auto i = std::find (deps.begin (), deps.end (), uuid);
   if (i != deps.end ())
@@ -1163,8 +1159,7 @@ void Task::removeDependency (int id)
 ////////////////////////////////////////////////////////////////////////////////
 void Task::getDependencies (std::vector <int>& all) const
 {
-  std::vector <std::string> deps;
-  split (deps, get ("depends"), ',');
+  auto deps = split (get ("depends"), ',');
 
   all.clear ();
 
@@ -1175,17 +1170,14 @@ void Task::getDependencies (std::vector <int>& all) const
 ////////////////////////////////////////////////////////////////////////////////
 void Task::getDependencies (std::vector <std::string>& all) const
 {
-  all.clear ();
-  split (all, get ("depends"), ',');
+  all = split (get ("depends"), ',');
 }
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 int Task::getTagCount () const
 {
-  std::vector <std::string> tags;
-  split (tags, get ("tags"), ',');
-
+  auto tags = split (get ("tags"), ',');
   return (int) tags.size ();
 }
 
@@ -1243,8 +1235,7 @@ bool Task::hasTag (const std::string& tag) const
   }
 
   // Concrete tags.
-  std::vector <std::string> tags;
-  split (tags, get ("tags"), ',');
+  auto tags = split (get ("tags"), ',');
 
   if (std::find (tags.begin (), tags.end (), tag) != tags.end ())
     return true;
@@ -1255,8 +1246,7 @@ bool Task::hasTag (const std::string& tag) const
 ////////////////////////////////////////////////////////////////////////////////
 void Task::addTag (const std::string& tag)
 {
-  std::vector <std::string> tags;
-  split (tags, get ("tags"), ',');
+  auto tags = split (get ("tags"), ',');
 
   if (std::find (tags.begin (), tags.end (), tag) == tags.end ())
   {
@@ -1281,14 +1271,13 @@ void Task::addTags (const std::vector <std::string>& tags)
 ////////////////////////////////////////////////////////////////////////////////
 void Task::getTags (std::vector<std::string>& tags) const
 {
-  split (tags, get ("tags"), ',');
+  tags = split (get ("tags"), ',');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Task::removeTag (const std::string& tag)
 {
-  std::vector <std::string> tags;
-  split (tags, get ("tags"), ',');
+  auto tags = split (get ("tags"), ',');
 
   auto i = std::find (tags.begin (), tags.end (), tag);
   if (i != tags.end ())
