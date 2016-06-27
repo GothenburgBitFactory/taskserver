@@ -1142,9 +1142,7 @@ void Task::removeDependency (const std::string& uuid)
   if (i != deps.end ())
   {
     deps.erase (i);
-    std::string combined;
-    join (combined, ",", deps);
-    set ("depends", combined);
+    set ("depends", join (",", deps));
     recalc_urgency = true;
   }
   else
@@ -1263,9 +1261,7 @@ void Task::addTag (const std::string& tag)
   if (std::find (tags.begin (), tags.end (), tag) == tags.end ())
   {
     tags.push_back (tag);
-    std::string combined;
-    join (combined, ",", tags);
-    set ("tags", combined);
+    set ("tags", join (",", tags));
 
     recalc_urgency = true;
   }
@@ -1298,9 +1294,7 @@ void Task::removeTag (const std::string& tag)
   if (i != tags.end ())
   {
     tags.erase (i);
-    std::string combined;
-    join (combined, ",", tags);
-    set ("tags", combined);
+    set ("tags", join (",", tags));
   }
 
   recalc_urgency = true;
