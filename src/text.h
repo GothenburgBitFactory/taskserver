@@ -37,8 +37,6 @@ void split (std::vector<std::string>&, const std::string&, const std::string&);
 std::string commify (const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
-std::string::size_type find (const std::string&, const std::string&, bool sensitive = true);
-std::string::size_type find (const std::string&, const std::string&, std::string::size_type, bool sensitive = true);
 int damerau_levenshtein (const char*, const char*);
 
 #endif
