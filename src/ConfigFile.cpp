@@ -121,8 +121,7 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
     return;
 
   // Split the input into lines.
-  std::vector <std::string> lines;
-  split (lines, input, "\n");
+  auto lines = split (input, '\n');
 
   // Parse each line.
   std::vector <std::string>::iterator it;
