@@ -27,13 +27,10 @@
 #ifndef INCLUDED_TEXT
 #define INCLUDED_TEXT
 
-#include <vector>
 #include <string>
 
 // text.cpp, Non-UTF-8 aware.
 std::string unquoteText (const std::string&);
-void split (std::vector<std::string>&, const std::string&, const char);
-void split (std::vector<std::string>&, const std::string&, const std::string&);
 std::string commify (const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);

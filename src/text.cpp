@@ -25,54 +25,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <cmake.h>
-#include <sstream>
-#include <iomanip>
-#include <algorithm>
-#include <strings.h>
-#include <string.h>
-#include <math.h>
-#include <utf8.h>
 #include <text.h>
-
-////////////////////////////////////////////////////////////////////////////////
-void split (
-  std::vector<std::string>& results,
-  const std::string& input,
-  const char delimiter)
-{
-  results.clear ();
-  std::string::size_type start = 0;
-  std::string::size_type i;
-  while ((i = input.find (delimiter, start)) != std::string::npos)
-  {
-    results.push_back (input.substr (start, i - start));
-    start = i + 1;
-  }
-
-  if (input.length ())
-    results.push_back (input.substr (start));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void split (
-  std::vector<std::string>& results,
-  const std::string& input,
-  const std::string& delimiter)
-{
-  results.clear ();
-  std::string::size_type length = delimiter.length ();
-
-  std::string::size_type start = 0;
-  std::string::size_type i;
-  while ((i = input.find (delimiter, start)) != std::string::npos)
-  {
-    results.push_back (input.substr (start, i - start));
-    start = i + length;
-  }
-
-  if (input.length ())
-    results.push_back (input.substr (start));
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove enclosing balanced quotes.  Assumes trimmed text.
