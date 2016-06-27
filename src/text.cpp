@@ -223,17 +223,6 @@ std::string commify (const std::string& data)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ucFirst (const std::string& input)
-{
-  std::string output = input;
-
-  if (output.length () > 0)
-    output[0] = toupper (output[0]);
-
-  return output;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 std::string printable (const std::string& input)
 {
   // Sanitize 'message'.
