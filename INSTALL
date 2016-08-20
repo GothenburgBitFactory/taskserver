@@ -34,7 +34,7 @@ Briefly, these shell commands will unpack, build and install Taskserver:
 
   $ tar xzf taskd-X.Y.Z.tar.gz                  [1]
   $ cd taskd-X.Y.Z                              [2]
-  $ cmake .                                     [3]
+  $ cmake . -DCMAKE_BUILD_TYPE=Release          [3]
   $ make                                        [4]
   $ sudo make install                           [5]
   $ cd .. ; rm -r taskd-X.Y.Z                   [6]
