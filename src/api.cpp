@@ -261,20 +261,6 @@ bool taskd_is_org (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool taskd_is_group (
-  const Directory& root,
-  const std::string& org,
-  const std::string& group)
-{
-  Directory d (root);
-  d += "orgs";
-  d += org;
-  d += "groups";
-  d += group;
-  return d.exists ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 bool taskd_is_user (
   const Directory& root,
   const std::string& org,

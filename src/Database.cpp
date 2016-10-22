@@ -175,29 +175,11 @@ bool Database::add_org (const std::string& org)
   new_org += "orgs";
   new_org += org;
 
-  Directory groups (new_org);
-  groups += "groups";
-
   Directory users (new_org);
   users += "users";
 
   return new_org.create (0700) &&
-         groups.create (0700) &&
          users.create (0700);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Database::add_group (
-  const std::string& org,
-  const std::string& group)
-{
-  Directory new_group (_config->get ("root"));
-  new_group += "orgs";
-  new_group += org;
-  new_group += "groups";
-  new_group += group;
-
-  return new_group.create (0700);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,26 +222,8 @@ bool Database::remove_org (const std::string& org)
   org_dir += org;
 
   // TODO Remove users?
-  // TODO Remove groups?
-  // TODO Revoke user group membership.
 
   return org_dir.remove ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Database::remove_group (
-  const std::string& org,
-  const std::string& group)
-{
-  Directory group_dir (_config->get ("root"));
-  group_dir += "orgs";
-  group_dir += org;
-  group_dir += "groups";
-  group_dir += group;
-
-  // TODO Revoke user group membership.
-
-  return group_dir.remove ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -272,8 +236,6 @@ bool Database::remove_user (
   user_dir += org;
   user_dir += "users";
   user_dir += key;
-
-  // TODO Revoke group memberships.
 
   return user_dir.remove ();
 }
