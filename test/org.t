@@ -120,6 +120,60 @@ class TestRemoveOrg(ServerTestCase):
         code, out, err = self.td.runError('remove --data {0} org NOPE'.format(self.td.datadir))
         self.assertNotIn("ERROR: Organization 'NOPE' does not exist.", err)
 
+class TestSuspendOrg(ServerTestCase):
+    def setUp(self):
+        """Executed before each test in the class"""
+        self.td = Taskd()
+
+    def test_suspend_org(self):
+        """taskd suspend --data $TASKDDATA org ORG"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Created organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+
+        code, out, err = self.td('suspend --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Suspended organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
+
+    def test_suspend_org_missing(self):
+        """taskd suspend --data $TASKDDATA org NOPE"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        code, out, err = self.td.runError('suspend --data {0} org ORG'.format(self.td.datadir))
+        self.assertIn("ERROR: Organization 'ORG' does not exist.", out)
+
+    def test_suspend_org_suspended(self):
+        """taskd suspend --data $TASKDDATA org ORG; taskd suspend --data $TASKDDATA org ORG"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Created organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+
+        code, out, err = self.td('suspend --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Suspended organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
+
+        code, out, err = self.td.runError('suspend --data {0} org ORG'.format(self.td.datadir))
+        self.assertIn("Organization 'ORG' already suspended.", out)
+
+
+
+
+
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
