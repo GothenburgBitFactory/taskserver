@@ -47,10 +47,8 @@ public:
   bool redirect (const std::string&, Msg&);
 
   bool add_org (const std::string&);
-  bool add_group (const std::string&, const std::string&);
   bool add_user (const std::string&, const std::string&);
   bool remove_org (const std::string&);
-  bool remove_group (const std::string&, const std::string&);
   bool remove_user (const std::string&, const std::string&);
   bool suspend (const Directory&);
   bool resume (const Directory&);

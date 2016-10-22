@@ -34,7 +34,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd add org   <org>
-// taskd add group <org> <group>
 // taskd add user  <org> <user>
 void command_add (Database& db, const std::vector <std::string>& args)
 {
@@ -50,7 +49,7 @@ void command_add (Database& db, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (args.size () < 2)
-    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+    throw std::string ("ERROR: Subcommand not specified - expected 'org' or 'user'.");
 
   // Create an organization.
   //   org <org>
@@ -71,31 +70,6 @@ void command_add (Database& db, const std::vector <std::string>& args)
       }
       else
         throw std::string ("ERROR: Failed to create organization '") + args[i] + "'.";
-    }
-  }
-
-  // Create a group.
-  //   group <org> <group>
-  else if (closeEnough ("group", args[1], 3))
-  {
-    if (args.size () < 4)
-      throw std::string ("Usage: taskd add [options] group <org> <group>");
-
-    if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
-
-    for (unsigned int i = 3; i < args.size (); ++i)
-    {
-      if (taskd_is_group (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: Group '") + args[i] + "' already exists.";
-
-      if (db.add_group (args[2], args[i]))
-      {
-        if (verbose)
-          std::cout << "Created group '" << args[i] << "' for organization '" << args[2] << "'\n";
-      }
-      else
-        throw std::string ("ERROR: Failed to create group '") + args[i] + "'.";
     }
   }
 
@@ -130,7 +104,6 @@ void command_add (Database& db, const std::vector <std::string>& args)
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd remove org   <org>
-// taskd remove group <org> <group>
 // taskd remove user  <org> <user>
 void command_remove (Database& db, const std::vector <std::string>& args)
 {
@@ -146,7 +119,7 @@ void command_remove (Database& db, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (args.size () < 2)
-    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+    throw std::string ("ERROR: Subcommand not specified - expected 'org' or 'user'.");
 
   // Remove an organization.
   //   org <org>
@@ -167,31 +140,6 @@ void command_remove (Database& db, const std::vector <std::string>& args)
       }
       else
         throw std::string ("ERROR: Failed to remove organization '") + args[i] + "'.";
-    }
-  }
-
-  // Remove a group.
-  //   group <org> <group>
-  else if (closeEnough ("group", args[1], 3))
-  {
-    if (args.size () < 4)
-      throw std::string ("Usage: taskd remove [options] group <org> <group>");
-
-    if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
-
-    for (unsigned int i = 3; i < args.size (); ++i)
-    {
-      if (! taskd_is_group (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
-
-      if (db.remove_group (args[2], args[i]))
-      {
-        if (verbose)
-          std::cout << "Removed group '" << args[i] << "' from organization '" << args[2] << "'\n";
-      }
-      else
-        throw std::string ("ERROR: Failed to remove group '") + args[i] + "'.";
     }
   }
 
@@ -226,7 +174,6 @@ void command_remove (Database& db, const std::vector <std::string>& args)
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd suspend org   <org>
-// taskd suspend group <org> <group>
 // taskd suspend user  <org> <user>
 void command_suspend (Database& db, const std::vector <std::string>& args)
 {
@@ -242,7 +189,7 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (args.size () < 2)
-    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+    throw std::string ("ERROR: Subcommand not specified - expected 'org' or 'user'.");
 
   // Suspend an organization.
   //   org <org>
@@ -263,31 +210,6 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
       }
       else
         throw std::string ("ERROR: Failed to suspend organization '") + args[i] + "'.";
-    }
-  }
-
-  // Suspend a group.
-  //   group <org> <group>
-  else if (closeEnough ("group", args[1], 3))
-  {
-    if (args.size () < 4)
-      throw std::string ("Usage: taskd suspend [options] group <org> <group>");
-
-    if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
-
-    for (unsigned int i = 3; i < args.size (); ++i)
-    {
-      if (! taskd_is_group (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
-
-      if (db.suspend (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
-      {
-        if (verbose)
-          std::cout << "Suspended group '" << args[i] << "' in organization '" << args[2] << "'\n";
-      }
-      else
-        throw std::string ("ERROR: Failed to suspend group '") + args[i] + "'.";
     }
   }
 
@@ -322,7 +244,6 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd resume org   <org>
-// taskd resume group <org> <group>
 // taskd resume user  <org> <user>
 void command_resume (Database& db, const std::vector <std::string>& args)
 {
@@ -338,7 +259,7 @@ void command_resume (Database& db, const std::vector <std::string>& args)
     throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (args.size () < 1)
-    throw std::string ("ERROR: Subcommand not specified - expected 'org', 'group' or 'user'.");
+    throw std::string ("ERROR: Subcommand not specified - expected 'org' or 'user'.");
 
   // Resume an organization.
   //   org <org>
@@ -359,31 +280,6 @@ void command_resume (Database& db, const std::vector <std::string>& args)
       }
       else
         throw std::string ("ERROR: Failed to resume organization '") + args[i] + "'.";
-    }
-  }
-
-  // Resume a group.
-  //   group <org> <group>
-  else if (closeEnough ("group", args[1], 3))
-  {
-    if (args.size () < 4)
-      throw std::string ("Usage: taskd resume [options] group <org> <group>");
-
-    if (! taskd_is_org (root_dir, args[2]))
-      throw std::string ("ERROR: Organization '") + args[2] + "' does not exist.";
-
-    for (unsigned int i = 3; i < args.size (); ++i)
-    {
-      if (! taskd_is_group (root_dir, args[2], args[i]))
-        throw std::string ("ERROR: Group '") + args[i] + "' does not exist.";
-
-      if (db.resume (root_dir._data + "/orgs/" + args[2] + "/groups/" + args[i]))
-      {
-        if (verbose)
-          std::cout << "Resumed group '" << args[i] << "' in organization '" << args[2] << "'\n";
-      }
-      else
-        throw std::string ("ERROR: Failed to resume group '") + args[i] + "'.";
     }
   }
 
