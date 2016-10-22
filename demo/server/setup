@@ -26,9 +26,6 @@ echo "# taskd add --data $ROOT org Public"
 echo "# taskd add --data $ROOT org 'ABC Corp'"
 ../../src/taskd add --data $ROOT org 'ABC Corp'
 
-echo "# taskd add --data $ROOT group 'Public' 'Group Name'"
-../../src/taskd add --data $ROOT group 'Public' 'Group Name'
-
 echo "# taskd add --data $ROOT user 'Public' 'User Name'"
 ../../src/taskd add --data $ROOT user 'Public' 'User Name'
 

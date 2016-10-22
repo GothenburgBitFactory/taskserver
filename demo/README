@@ -56,8 +56,8 @@ Setup and Run the Server
 
 It is recommended that you run the server and the client in separate windows.
 In the server window, the setup script creates a server instance, with an
-organization ("ORG") that has a group ("Group Name"), and two users ("USER",
-"User Name").  There is also a suspended organization ("ABC Corp").
+organization ("ORG") and two users ("USER", "User Name").  There is also a
+suspended organization ("ABC Corp").
 
   $ cd demo/server
   $ ./setup
