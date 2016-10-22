@@ -92,6 +92,34 @@ class TestAddOrg(ServerTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'MY ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'MY ORG', 'users')))
 
+class TestRemoveOrg(ServerTestCase):
+    def setUp(self):
+        """Executed before each test in the class"""
+        self.td = Taskd()
+
+    def test_remove_org(self):
+        """taskd remove --data $TASKDDATA org ORG"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Created organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+
+        code, out, err = self.td('remove --data {0} org ORG'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+        self.assertIn("Removed organization 'ORG'", out)
+        self.assertTrue(os.path.exists(self.td.datadir))
+        self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
+        self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
+
+    def test_remove_org_missing(self):
+        """taskd remove --data $TASKDDATA org NOPE"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        code, out, err = self.td.runError('remove --data {0} org NOPE'.format(self.td.datadir))
+        self.assertNotIn("ERROR: Organization 'NOPE' does not exist.", err)
+
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
