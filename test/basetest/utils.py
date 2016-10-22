@@ -52,13 +52,6 @@ TASKD_USE_PATH = os.environ.get("TASKD_USE_PATH", False)
 UUID_REGEXP = ("[0-9A-Fa-f]{8}-" + ("[0-9A-Fa-f]{4}-" * 3) + "[0-9A-Fa-f]{12}")
 
 
-def task_binary_location(cmd="task"):
-    """If TASK_USE_PATH is set rely on PATH to look for task binaries.
-    Otherwise ../src/ is used by default.
-    """
-    return binary_location(cmd, TASK_USE_PATH)
-
-
 def taskd_binary_location(cmd="taskd"):
     """If TASKD_USE_PATH is set rely on PATH to look for taskd binaries.
     Otherwise ../src/ is used by default.

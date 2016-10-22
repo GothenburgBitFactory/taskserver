@@ -1,105 +1,53 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function
-import os
-import tempfile
-import shutil
-import signal
 import atexit
-from time import sleep
-from subprocess import Popen, PIPE
-from .utils import (find_unused_port, release_port, port_used, run_cmd_wait,
-                    which, parse_datafile, DEFAULT_CERT_PATH,
-                    taskd_binary_location)
+import json
+import os
+import shlex
+import shutil
+import tempfile
+import unittest
 from .exceptions import CommandError
-
-try:
-    from subprocess import DEVNULL
-except ImportError:
-    DEVNULL = open(os.devnull, 'w')
+from .hooks import Hooks
+from .utils import run_cmd_wait, run_cmd_wait_nofail, which, taskd_binary_location
+from .compat import STRING_TYPE
 
 
 class Taskd(object):
-    """Manage a taskd instance
+    """Manage a taskserver instance
 
-    A temporary folder is used as data store of taskd.
-    This class can be instanciated multiple times if multiple taskd servers are
-    needed.
+    A temporary folder is used as data store of taskserver
 
-    This class implements mechanisms to automatically select an available port
-    and prevent assigning the same port to different instances.
-
-    A server can be stopped and started multiple times, but should not be
-    started or stopped after being destroyed.
+    A taskd client should not be used after being destroyed.
     """
     DEFAULT_TASKD = taskd_binary_location()
-    TASKD_RUNNING = 0
-    TASKD_NEVER_STARTED = 1
-    TASKD_EXITED = 2
-    TASKD_NOT_LISTENING = 3
 
-    def __init__(self, taskd=DEFAULT_TASKD, certpath=None,
-                 address="localhost"):
-        """Initialize a Task server that runs in the background and stores data
-        in a temporary folder
+    def __init__(self, taskd=DEFAULT_TASKD):
+        """Initialize a Taskserver. The taskd client runs in a temporary folder.
 
-        :arg taskd: Taskd binary to launch the server (defaults: taskd in PATH)
-        :arg certpath: Folder where to find all certificates needed for taskd
-        :arg address: Address to bind to
         """
         self.taskd = taskd
-        self.usercount = 0
 
-        # Will hold the taskd subprocess if it's running
-        self.proc = None
+        # Used to specify what command to launch (and to inject faketime)
+        self._command = [self.taskd]
+
+        # Configuration of the isolated environment
+        self._original_pwd = os.getcwd()
         self.datadir = tempfile.mkdtemp(prefix="taskd_")
-        self.tasklog = os.path.join(self.datadir, "taskd.log")
-        self.taskpid = os.path.join(self.datadir, "taskd.pid")
+        os.environ["TASKDDATA"] = self.datadir
 
         # Ensure any instance is properly destroyed at session end
         atexit.register(lambda: self.destroy())
 
         self.reset_env()
 
-        if certpath is None:
-            certpath = DEFAULT_CERT_PATH
-        self.certpath = certpath
-
-        self.address = address
-        self.port = find_unused_port(self.address)
-
-        # Keep all certificate paths public for access by TaskClients
-        self.client_cert = os.path.join(self.certpath, "client.cert.pem")
-        self.client_key = os.path.join(self.certpath, "client.key.pem")
-        self.server_cert = os.path.join(self.certpath, "server.cert.pem")
-        self.server_key = os.path.join(self.certpath, "server.key.pem")
-        self.server_crl = os.path.join(self.certpath, "server.crl.pem")
-        self.ca_cert = os.path.join(self.certpath, "ca.cert.pem")
-
-        # Initialize taskd
-        cmd = (self.taskd, "init", "--data", self.datadir)
-        run_cmd_wait(cmd, env=self.env)
-
-        self.config("server", "{0}:{1}".format(self.address, self.port))
-        self.config("family", "IPv4")
-        self.config("log", self.tasklog)
-        self.config("pid.file", self.taskpid)
-        self.config("root", self.datadir)
-        self.config("client.allow", "^task [2-9]")
-
-        # Setup all necessary certificates
-        self.config("client.cert", self.client_cert)
-        self.config("client.key", self.client_key)
-        self.config("server.cert", self.server_cert)
-        self.config("server.key", self.server_key)
-        self.config("server.crl", self.server_crl)
-        self.config("ca.cert", self.ca_cert)
-
-        self.default_user = self.create_user()
-
     def __repr__(self):
         txt = super(Taskd, self).__repr__()
         return "{0} running from {1}>".format(txt[:-1], self.datadir)
+
+    def __call__(self, *args, **kwargs):
+        "aka t = Taskd() ; t() which is now an alias to t.runSuccess()"
+        return self.runSuccess(*args, **kwargs)
 
     def reset_env(self):
         """Set a new environment derived from the one used to launch the test
@@ -107,207 +55,106 @@ class Taskd(object):
         # Copy all env variables to avoid clashing subprocess environments
         self.env = os.environ.copy()
 
-        # Make sure TASKDDATA points to the temporary folder
-        self.env["TASKDATA"] = self.datadir
-
-    def create_user(self, user=None, org=None):
-        """Create a user in the server and return the user
-        credentials to use in a taskw client.
-        """
-        if user is None:
-            # Create a unique user ID
-            uid = self.usercount
-            user = "test_user_{0}".format(uid)
-
-            # Increment the user_id
-            self.usercount += 1
-
-        if org is None:
-            org = "default_org"
-
-        self._add_entity("org", org, ignore_exists=True)
-        userkey = self._add_entity("user", org, user)
-
-        return user, org, userkey
-
-    def _add_entity(self, keyword, org, value=None, ignore_exists=False):
-        """Add an organization or user to the current server
-
-        If a user creation is requested, the user unique ID is returned
-        """
-        cmd = (self.taskd, "add", "--data", self.datadir, keyword, org)
-
-        if value is not None:
-            cmd += (value,)
-
-        try:
-            code, out, err = run_cmd_wait(cmd, env=self.env)
-        except CommandError as e:
-            match = False
-            for line in e.out.splitlines():
-                if line.endswith("already exists.") and ignore_exists:
-                    match = True
-                    break
-
-            # If the error was not "Already exists" report it
-            if not match:
-                raise
-
-        if keyword == "user":
-            expected = "New user key: "
-            for line in out.splitlines():
-                if line.startswith(expected):
-                    return line.replace(expected, '')
+        # Make sure TASKDDATA is isolated
+        self.env["TASKDDATA"] = self.datadir
 
     def config(self, var, value):
         """Run setup `var` as `value` in taskd config
         """
-        cmd = (self.taskd, "config", "--force", "--data", self.datadir, var,
-               value)
-        run_cmd_wait(cmd, env=self.env)
+        # Add -- to avoid misinterpretation of - in things like UUIDs
+        cmd = (self.taskd, "config", "--force", var, value)
+        return run_cmd_wait(cmd, env=self.env)
 
-        # If server is running send a SIGHUP to force config reload
-        if self.proc is not None:
-            try:
-                self.proc.send_signal(signal.SIGHUP)
-            except:
-                pass
-
-    def status(self):
-        """Check the status of the server by checking if it's still running and
-        listening for connections
-        :returns: Taskd.TASKD_[NEVER_STARTED/EXITED/NOT_LISTENING/RUNNING]
+    def del_config(self, var):
+        """Remove `var` from taskd config
         """
-        if self.proc is None:
-            return self.TASKD_NEVER_STARTED
+        cmd = (self.taskd, "config", "--force", var)
+        return run_cmd_wait(cmd, env=self.env)
 
-        if self.returncode() is not None:
-            return self.TASKD_EXITED
-
-        if not port_used(addr=self.address, port=self.port):
-            return self.TASKD_NOT_LISTENING
-
-        return self.TASKD_RUNNING
-
-    def returncode(self):
-        """If taskd finished, return its exit code, otherwise return None.
-        :returns: taskd's exit code or None
+    @staticmethod
+    def _split_string_args_if_string(args):
+        """Helper function to parse and split into arguments a single string
+        argument. The string is literally the same as if written in the shell.
         """
-        return self.proc.poll()
+        # Enable nicer-looking calls by allowing plain strings
+        if isinstance(args, STRING_TYPE):
+            args = shlex.split(args)
 
-    def start(self, minutes=5, tries_per_minute=2):
-        """Start the taskd server if it's not running.
-        If it's already running OSError will be raised
+        return args
+
+    def runSuccess(self, args="", input=None, merge_streams=False,
+                   timeout=5):
+        """Invoke taskd with given arguments and fail if exit code != 0
+
+        Use runError if you want exit_code to be tested automatically and
+        *not* fail if program finishes abnormally.
+
+        If you wish to pass instructions to taskd such as confirmations or other
+        input via stdin, you can do so by providing a input string.
+        Such as input="y\ny\n".
+
+        If merge_streams=True stdout and stderr will be merged into stdout.
+
+        timeout = number of seconds the test will wait for every taskd call.
+        Defaults to 1 second if not specified. Unit is seconds.
+
+        Returns (exit_code, stdout, stderr) if merge_streams=False
+                (exit_code, output) if merge_streams=True
         """
-        if self.proc is None:
-            cmd = (self.taskd, "server", "--data", self.datadir)
-            self.proc = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=DEVNULL,
-                              env=self.env)
-        else:
-            self.show_log_contents()
+        # Create a copy of the command
+        command = self._command[:]
 
-            raise OSError("Taskd server is still running or crashed")
+        args = self._split_string_args_if_string(args)
+        command.extend(args)
 
-        # Wait for server to listen by checking connectivity in the port
-        # Default is to wait up to 5 minutes checking once every 500ms
-        for i in range(minutes * 60 * tries_per_minute):
-            status = self.status()
+        output = run_cmd_wait_nofail(command, input,
+                                     merge_streams=merge_streams,
+                                     env=self.env,
+                                     timeout=timeout)
 
-            if status == self.TASKD_RUNNING:
-                return
+        if output[0] != 0:
+            raise CommandError(command, *output)
 
-            elif status == self.TASKD_NEVER_STARTED:
-                self.show_log_contents()
+        return output
 
-                raise OSError("Task server was never started. "
-                              "This shouldn't happen!!")
+    def runError(self, args=(), input=None, merge_streams=False, timeout=5):
+        """Invoke taskd with given arguments and fail if exit code == 0
 
-            elif status == self.TASKD_EXITED:
-                # Collect output logs
-                out, err = self.proc.communicate()
+        Use runSuccess if you want exit_code to be tested automatically and
+        *fail* if program finishes abnormally.
 
-                self.show_log_contents()
+        If you wish to pass instructions to taskd such as confirmations or other
+        input via stdin, you can do so by providing a input string.
+        Such as input="y\ny\n".
 
-                raise OSError(
-                    "Task server launched with '{0}' crashed or exited "
-                    "prematurely. Exit code: {1}. "
-                    "Listening on port: {2}. "
-                    "Stdout: {3!r}, "
-                    "Stderr: {4!r}.".format(
-                        self.taskd,
-                        self.returncode(),
-                        self.port,
-                        out,
-                        err,
-                    ))
+        If merge_streams=True stdout and stderr will be merged into stdout.
 
-            elif status == self.TASKD_NOT_LISTENING:
-                sleep(1 / tries_per_minute)
+        timeout = number of seconds the test will wait for every taskd call.
+        Defaults to 1 second if not specified. Unit is seconds.
 
-            else:
-                self.show_log_contents()
-
-                raise OSError("Unknown running status for taskd '{0}'".format(
-                    status))
-
-        # Force stop so we can collect output
-        proc = self.stop()
-
-        # Collect output logs
-        out, err = proc.communicate()
-
-        self.show_log_contents()
-
-        raise OSError("Task server didn't start and listen on port {0} after "
-                      "{1} minutes. Stdout: {2!r}. Stderr: {3!r}.".format(
-                          self.port, minutes, out, err))
-
-    def stop(self):
-        """Stop the server by sending a SIGTERM and SIGKILL if fails to
-        terminate.
-        If it's already stopped OSError will be raised
-
-        Returns: a reference to the old process object
+        Returns (exit_code, stdout, stderr) if merge_streams=False
+                (exit_code, output) if merge_streams=True
         """
-        if self.proc is None:
-            raise OSError("Taskd server is not running")
+        # Create a copy of the command
+        command = self._command[:]
 
-        if self._check_pid():
-            self.proc.send_signal(signal.SIGTERM)
+        args = self._split_string_args_if_string(args)
+        command.extend(args)
 
-        if self._check_pid():
-            self.proc.kill()
+        output = run_cmd_wait_nofail(command, input,
+                                     merge_streams=merge_streams,
+                                     env=self.env,
+                                     timeout=timeout)
 
-        # Wait for process to end to avoid zombies
-        self.proc.wait()
+        # output[0] is the exit code
+        if output[0] == 0 or output[0] is None:
+            raise CommandError(command, *output)
 
-        # Keep a reference to the old process
-        proc = self.proc
-
-        # Unset the process to inform that no process is running
-        self.proc = None
-
-        return proc
-
-    def _check_pid(self):
-        "Check if self.proc is still running and a PID still exists"
-        # Wait ~1 sec for taskd to finish
-        signal = True
-        for i in range(10):
-            sleep(0.1)
-            if self.proc.poll() is not None:
-                signal = False
-                break
-
-        return signal
+        return output
 
     def destroy(self):
         """Cleanup the data folder and release server port for other instances
         """
-        # Ensure server is stopped first
-        if self.proc is not None:
-            self.stop()
-
         try:
             shutil.rmtree(self.datadir)
         except OSError as e:
@@ -317,12 +164,9 @@ class Taskd(object):
             else:
                 raise
 
-        release_port(self.port)
-
         # Prevent future reuse of this instance
-        self.start = self.__destroyed
-        self.config = self.__destroyed
-        self.stop = self.__destroyed
+        self.runSuccess = self.__destroyed
+        self.runError = self.__destroyed
 
         # self.destroy will get called when the python session closes.
         # If self.destroy was already called, turn the action into a noop
@@ -330,7 +174,7 @@ class Taskd(object):
 
     def __destroyed(self, *args, **kwargs):
         raise AttributeError("Taskd instance has been destroyed. "
-                             "Create a new instance if you need a new server.")
+                             "Create a new instance if you need a new client.")
 
     @classmethod
     def not_available(cls):
@@ -340,27 +184,66 @@ class Taskd(object):
         else:
             return True
 
-    def client_data(self, client):
-        """Return a python list with the content of tx.data matching the given
-        task client. tx.data will be parsed to string and JSON.
-        """
-        file = os.path.join(self.datadir,
-                            "orgs",
-                            client.credentials["org"],
-                            "users",
-                            client.credentials["userkey"],
-                            "tx.data")
+    def diag(self, merge_streams_with=None):
+        """Run taskd diagnostics.
 
-        return parse_datafile(file)
+        This function may fail in which case the exception text is returned as
+        stderr or appended to stderr if merge_streams_with is set.
 
-    def show_log_contents(self):
-        """Print to to STDOUT the contents of taskd.log
+        If set, merge_streams_with should have the format:
+        (exitcode, out, err)
+        which should be the output of any previous process that failed.
         """
-        if os.path.isfile(self.tasklog):
-            with open(self.tasklog) as fh:
-                print("#### Start taskd.log ####")
-                for line in fh:
-                    print(line, end='')
-                print("#### End taskd.log ####")
+        try:
+            output = self.runSuccess("diag")
+        except CommandError as e:
+            # If taskd diag failed add the error to stderr
+            output = (e.code, None, str(e))
+
+        if merge_streams_with is None:
+            return output
+        else:
+            # Merge any given stdout and stderr with that of "taskd diag"
+            code, out, err = merge_streams_with
+            dcode, dout, derr = output
+
+            # Merge stdout
+            newout = "\n##### Debugging information (taskd diag): #####\n{0}"
+            if dout is None:
+                newout = newout.format("Not available, check STDERR")
+            else:
+                newout = newout.format(dout)
+
+            if out is not None:
+                newout = out + newout
+
+            # And merge stderr
+            newerr = "\n##### Debugging information (taskd diag): #####\n{0}"
+            if derr is None:
+                newerr = newerr.format("Not available, check STDOUT")
+            else:
+                newerr = newerr.format(derr)
+
+            if err is not None:
+                newerr = err + derr
+
+            return code, newout, newerr
+
+    def faketime(self, faketime=None):
+        """Set a faketime using libfaketime that will affect the following
+        command calls.
+
+        If faketime is None, faketime settings will be disabled.
+        """
+        cmd = which("faketime")
+        if cmd is None:
+            raise unittest.SkipTest("libfaketime/faketime is not installed")
+
+        if self._command[0] == cmd:
+            self._command = self._command[3:]
+
+        if faketime is not None:
+            # Use advanced time format
+            self._command = [cmd, "-f", faketime] + self._command
 
 # vim: ai sts=4 et sw=4
