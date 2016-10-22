@@ -71,8 +71,6 @@ class TestAddOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
     def test_add_org_add_org(self):
@@ -88,8 +86,6 @@ class TestAddOrg(ServerTestCase):
         code, out, err = self.td("add --data {0} org 'MY ORG'".format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'MY ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'MY ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'MY ORG', 'users')))
 
 class TestRemoveOrg(ServerTestCase):
@@ -103,15 +99,11 @@ class TestRemoveOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td('remove --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Removed organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
     def test_remove_org_missing(self):
@@ -131,15 +123,11 @@ class TestSuspendOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td('suspend --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Suspended organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
@@ -155,15 +143,11 @@ class TestSuspendOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td('suspend --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Suspended organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
@@ -181,23 +165,17 @@ class TestResumeOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td('suspend --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Suspended organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
         code, out, err = self.td('resume --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Resumed organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
         self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
@@ -213,8 +191,6 @@ class TestResumeOrg(ServerTestCase):
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
         self.assertIn("Created organization 'ORG'", out)
-        self.assertTrue(os.path.exists(self.td.datadir))
-        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG')))
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td.runError('resume --data {0} org ORG'.format(self.td.datadir))
