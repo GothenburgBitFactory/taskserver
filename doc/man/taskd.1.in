@@ -50,37 +50,29 @@ file reload before the next request is handled.
 .TP
 .B taskd add [--data <root>] org <org>
 .TP
-.B taskd add [--data <root>] group <org> <group>
-.TP
 .B taskd add [--data <root>] user <org> <user>
-Adds organizations, groups and users.
+Adds organizations and users.
 Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd remove [--data <root>] org <org>
 .TP
-.B taskd remove [--data <root>] group <org> <group>
-.TP
 .B taskd remove [--data <root>] user <org> <user>
-Removes organizations, groups and users.
+Removes organizations and users.
 Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd suspend [--data <root>] org <org>
 .TP
-.B taskd suspend [--data <root>] group <org> <group>
-.TP
 .B taskd suspend [--data <root>] user <org> <user>
-Suspends organizations, groups and users.
+Suspends organizations and users.
 Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
 .B taskd resume [--data <root>] org <org>
 .TP
-.B taskd resume [--data <root>] group <org> <group>
-.TP
 .B taskd resume [--data <root>] user <org> <user>
-Resumes organizations, groups and users.
+Resumes organizations and users.
 Either '\-\-data <root>' must be specified, or TASKDDATA must be set.
 
 .TP
