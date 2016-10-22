@@ -65,6 +65,7 @@
   signifacntly faster.
           (thanks to aszlig).
 - Integrated libshared.
+- Removed references to the unimplemented 'group' features.
 
 ------- current release ---------------------------
 
