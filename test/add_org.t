@@ -27,7 +27,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 12;
 
 # Create the data dir.
 my $data = 'add_org.data';
@@ -43,7 +43,6 @@ ok (-d $data.'/orgs',                "'$data/orgs' dir exists");
 $output = qx{../src/taskd add --data $data org ORG 2>&1};
 unlike ($output, qr/^ERROR/,         "'taskd add --data $data org ORG' - no errors");
 ok (-d $data.'/orgs/ORG',            "'$data/orgs/ORG' dir exists");
-ok (-d $data.'/orgs/ORG/groups',     "'$data/orgs/ORG/groups' dir exists");
 ok (-d $data.'/orgs/ORG/users',      "'$data/orgs/ORG/users' dir exists");
 
 # Try to re-add organization.
@@ -54,7 +53,6 @@ like ($output, qr/^ERROR: Organization 'ORG' already exists\.$/, "'ORG' already 
 $output = qx{../src/taskd add --data $data org 'one two' 2>&1};
 unlike ($output, qr/^ERROR/,         "'taskd add --data $data org \'one two\'' - no errors");
 ok (-d $data.'/orgs/one two',        "'$data/orgs/one two' dir exists");
-ok (-d $data.'/orgs/one two/groups', "'$data/orgs/one two/groups' dir exists");
 ok (-d $data.'/orgs/one two/users',  "'$data/orgs/one two/users' dir exists");
 
 # Cleanup.
