@@ -1427,7 +1427,11 @@ void Task::substitute (
 //   2) To provide suitable warnings about odd states
 //   3) To generate errors when the inconsistencies are not fixable
 //
-void Task::validate (bool applyDefault /* = true */)
+void Task::validate (bool
+#ifdef PRODUCT_TASKWARRIOR
+  applyDefault
+#endif
+  )
 {
   Task::status status = Task::pending;
   if (get ("status") != "")
@@ -1574,7 +1578,16 @@ void Task::validate (bool applyDefault /* = true */)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::validate_before (const std::string& left, const std::string& right)
+void Task::validate_before (
+  const std::string&
+#ifdef PRODUCT_TASKWARRIOR
+  left
+#endif
+  , const std::string&
+#ifdef PRODUCT_TASKWARRIOR
+  right
+#endif
+  )
 {
 #ifdef PRODUCT_TASKWARRIOR
   if (has (left) &&
