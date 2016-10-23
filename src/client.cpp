@@ -38,12 +38,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // This is a debugging-only command that uploads a file to the server, and then
 // displays the result.
-void command_client (Database& db, const std::vector <std::string>& args)
+void command_api (Database& db, const std::vector <std::string>& args)
 {
-#ifdef FEATURE_CLIENT_INTERFACE
+#ifdef FEATURE_API_INTERFACE
   // Parse arguments.
   if (args.size () < 3)
-    throw std::string (STRING_CLIENT_USAGE);
+    throw std::string (STRING_API_USAGE);
 
   db._config->set ("server", args[1]);
 
@@ -67,7 +67,7 @@ void command_client (Database& db, const std::vector <std::string>& args)
               << response.serialize ();
   }
 #else
-  throw std::string (STRING_CLIENT_DISABLED);
+  throw std::string (STRING_API_DISABLED);
 #endif
 }
 
