@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <Log.h>
+#include <format.h>
 #include <shared.h>
 #include <text.h>
 
