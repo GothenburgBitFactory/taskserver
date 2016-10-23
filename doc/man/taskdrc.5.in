@@ -8,11 +8,11 @@ taskdrc \- Configuration details for the taskd(1) server
 Valid variable names and their default values are:
 
 .TP
-.B ca.cert
+.B ca.cert=/path/to/ca.cert.pem
 Fully qualified path to the CA certificate.  Optional.
 
 .TP
-.B ciphers
+.B ciphers=%SERVER_PRECEDENCE:NORMAL
 List of GnuTLS ciphers to use.  Default is "%SERVER_PRECEDENCE:NORMAL" as well
 as turning off known-to-be-broken configurations known-broken (namely SSLv3,
 TLSv1.0, 3DES-CBC, RC4, and MD5).  See your GnuTLS documentation for full
@@ -28,8 +28,9 @@ GnuTLS documentation for full details.
 Determines whether certain commands are confirmed.  Defaults to on.
 
 .TP
-.B client.cert
-Fully qualified path of the client cert.  This is used by the 'client' command.
+.B api.cert=/path/to/api.cert.pem
+Fully qualified path of the api cert.  This is used by the 'api' command.
+This is an optional value, you will not likely need this.
 
 .TP
 .B debug=off
@@ -70,9 +71,9 @@ the 'taskdctl' script to start/stop the daemon.
 Size of the connection backlog.  See 'man listen'.
 
 .TP
-.B request.limit=1048576
+.B request.limit=4194304
 Size limit of incoming requests, in bytes.  Use a value of zero '0' to indicate
-no size limit.
+no size limit. For large task lists, this 4MB value may be too small.
 
 .TP
 .B server=localhost:53589
@@ -80,21 +81,23 @@ The address (IPv4, IPv6 or DNS) of the Taskserver, followed by a colon and the
 port number.
 
 .TP
-.B server.cert
+.B server.cert=/path/to/server.cert.pem
 Fully qualified path to the server certificate.
 
 .TP
-.B server.crl
+.B server.crl=/path/to/server.crl.pem
 Fully qualified path to the server certificate revocation list.
 
 .TP
-.B server.key
+.B server.key=/path/to/server.key.pem
 Fully qualified path to the server key.
 
 .TP
-.B trust
+.B trust=strict
 Trust level of the server, which determines how the client certificates are
-verified.  If the value is 'allow all' then no verification is performed.
+verified.
+If the value is 'strict' then the certificate is validated.
+If the value is 'allow all' then no validation is performed.
 
 Note that sending the HUP signal to the Taskserver causes a configuration
 file reload before the next request is handled.
