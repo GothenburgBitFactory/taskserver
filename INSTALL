@@ -23,9 +23,6 @@ You will need the following libraries:
   - libuuid
   - gnutls
 
-It is HIGHLY RECOMMENDED that you build with a library that provides uuid_*
-functions, such as libuuid.
-
 
 Basic Installation
 ------------------
@@ -37,7 +34,6 @@ Briefly, these shell commands will unpack, build and install Taskserver:
   $ cmake . -DCMAKE_BUILD_TYPE=Release          [3]
   $ make                                        [4]
   $ sudo make install                           [5]
-  $ cd .. ; rm -r taskd-X.Y.Z                   [6]
 
 These commands are explained below:
 
@@ -52,8 +48,6 @@ These commands are explained below:
   4. Builds Taskserver.  This may take a minute.
 
   5. Installs the program, documentation and other data files.
-
-  6. Removes the temporary directory.
 
 
 Build and configurations options
