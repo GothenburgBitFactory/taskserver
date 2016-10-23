@@ -94,12 +94,12 @@ Or you can run them individually, and see what's happening:
 Test interface
 --------------
 
-There is currently a test client interface, used for further testing.  This may
-be removed before release.  In the meantime it serves as a means to send
-requests to the server.  The requests are fully-formed API messages, in files,
-sent using the 'client' command.
+There is currently a test API, used for further testing.  This may be removed.
+In the meantime it serves as a means to send requests to the server.  The
+requests are fully-formed API messages, in files, sent using the 'api'
+command.
 
-  taskd client localhost:53589 stats.0
-  taskd client localhost:53589 sync.1
+  taskd api localhost:53589 stats.0
+  taskd api localhost:53589 sync.1
 
 ---
