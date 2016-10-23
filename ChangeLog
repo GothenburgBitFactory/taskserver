@@ -66,6 +66,8 @@
           (thanks to aszlig).
 - Integrated libshared.
 - Removed references to the unimplemented 'group' features.
+- Renamed 'client.key', 'client.cert' to 'api.key', 'api.cert' to reduce some
+  of the confusion around the intended purpose.
 
 ------- current release ---------------------------
 

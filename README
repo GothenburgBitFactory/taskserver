@@ -7,8 +7,7 @@ different client applications, primarily Taskwarrior.
 Taskserver is compatible with Taskwarrior version 2.4.x and later, but works
 best with the latest Taskwarrior.
 
-Taskserver is complex.  It is not for anyone who is unfamiliar with the
-operation of daemons.
+Taskserver setup is complex.  Be very careful when following instructions.
 
 
 Easiest Setup
