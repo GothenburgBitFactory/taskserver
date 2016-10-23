@@ -97,30 +97,11 @@ void command_help (const std::vector <std::string>& args)
                 << "file reload before the next request is handled.\n"
                 << "\n";
     }
-    else if (closeEnough ("status", args[1], 3))
+#ifdef FEATURE_API_INTERFACE
+    else if (closeEnough ("api", args[1], 3))
     {
       std::cout << "\n"
-                << "Taskserver 'status' is not implemented.\n"
-                << "\n";
-/*
-      std::cout << "\n"
-                << "taskd status [options]\n"
-                << "\n"
-                << "Shows server status.\n"
-                << "\n"
-                << "Options:\n"
-                << "  --quiet        Turns off verbose output\n"
-                << "  --debug        Generates debugging diagnostics\n"
-                << "  --data <root>  Data directory, otherwise $TASKDDATA\n"
-                << "  --NAME=VALUE   Temporary configuration override\n"
-                << "\n";
-*/
-    }
-#ifdef FEATURE_CLIENT_INTERFACE
-    else if (closeEnough ("client", args[1], 3))
-    {
-      std::cout << "\n"
-                << "taskd client [options] <host:port> <file> [<file> ...]\n"
+                << "taskd api [options] <host:port> <file> [<file> ...]\n"
                 << "\n"
                 << "Sends <file> to Taskserver on <host:port> and displays "
                 << "the response.\n"
@@ -136,9 +117,11 @@ void command_help (const std::vector <std::string>& args)
     {
       std::cout << "\n"
                 << "taskd add [options] org <org>\n"
-                << "taskd add [options] user <org> <user>\n"
+                << "taskd add [options] user <org> <user-name>\n"
                 << "\n"
                 << "Creates a new organization or user.\n"
+                << "When creating a new user, shows the resultant UUID that the client software\n"
+                << "useѕ to uniquely identify a user, because <user-name> need not be unique.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
@@ -151,9 +134,10 @@ void command_help (const std::vector <std::string>& args)
     {
       std::cout << "\n"
                 << "taskd remove [options] org <org>\n"
-                << "taskd remove [options] user <org> <password>\n"
+                << "taskd remove [options] user <org> <uuid>\n"
                 << "\n"
                 << "Deletes an organization or user.  Permanently.\n"
+                << "Note that users are identified by uuid, not name.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
@@ -166,9 +150,10 @@ void command_help (const std::vector <std::string>& args)
     {
       std::cout << "\n"
                 << "taskd suspend [options] org <org>\n"
-                << "taskd suspend [options] user <org> <password>\n"
+                << "taskd suspend [options] user <org> <uuid>\n"
                 << "\n"
                 << "Suspends an organization or user.\n"
+                << "Note that users are identified by uuid, not name.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
@@ -181,9 +166,10 @@ void command_help (const std::vector <std::string>& args)
     {
       std::cout << "\n"
                 << "taskd resume [options] org <org>\n"
-                << "taskd resume [options] user <org> <password>\n"
+                << "taskd resume [options] user <org> <uuid>\n"
                 << "\n"
                 << "Resumes, or un-suspends an organization or user.\n"
+                << "Note that users are identified by uuid, not name.\n"
                 << "\n"
                 << "Options:\n"
                 << "  --quiet        Turns off verbose output\n"
@@ -221,22 +207,22 @@ void command_help (const std::vector <std::string>& args)
               << "       taskd help [<command>]\n"
               << "\n"              << "\n"
               << "Commands run only on server:\n"
-              << "       taskd add     [options] org  <org>\n"
-              << "       taskd remove  [options] org  <org>\n"
-              << "       taskd suspend [options] org  <org>\n"
-              << "       taskd resume  [options] org  <org>\n"
+              << "       taskd add     [options] org <org>\n"
+              << "       taskd remove  [options] org <org>\n"
+              << "       taskd suspend [options] org <org>\n"
+              << "       taskd resume  [options] org <org>\n"
               << "\n"
-              << "       taskd add     [options] user <org> <user>\n"
-              << "       taskd remove  [options] user <org> <key>\n"
-              << "       taskd suspend [options] user <org> <key>\n"
-              << "       taskd resume  [options] user <org> <key>\n"
+              << "       taskd add     [options] user <org> <user-name>\n"
+              << "       taskd remove  [options] user <org> <uuid>\n"
+              << "       taskd suspend [options] user <org> <uuid>\n"
+              << "       taskd resume  [options] user <org> <uuid>\n"
               << "\n"
               << "       taskd config  [options] [--force] [<name> [<value>]]\n"
               << "       taskd init    [options]\n"
               << "       taskd server  [options] [--daemon]\n"
               << "\n"
               << "Commands run remotely:\n"
-              << "       taskd client  [options] <host:port> <file> [<file> ...]\n"
+              << "       taskd api     [options] <host:port> <file> [<file> ...]\n"
               << "\n"
               << "Common Options:\n"
               << "  --quiet        Turns off verbose output\n"
