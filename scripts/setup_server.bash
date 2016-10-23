@@ -377,12 +377,12 @@ else
 fi
 
 log_line "Generating API key/cert pair"
-OUTPUT=$($DEFAULT_PKI/generate.client client 2>&1)
+OUTPUT=$($DEFAULT_PKI/generate.client api 2>&1)
 if [ $? -eq 0 ]; then
   log_ok "Ok"
 
-  log_line "Installing client.cert.pem"
-  cp $DEFAULT_PKI/client.cert.pem $TASKDDATA/cert/client.cert.pem
+  log_line "Installing api.cert.pem"
+  cp $DEFAULT_PKI/api.cert.pem $TASKDDATA/cert/api.cert.pem
   if [ $? -eq 0 ]; then
     log_ok "Ok"
   else
@@ -390,8 +390,8 @@ if [ $? -eq 0 ]; then
     exit 1
   fi
 
-  log_line "Installing client.key.pem"
-  cp $DEFAULT_PKI/client.key.pem $TASKDDATA/cert/client.key.pem
+  log_line "Installing api.key.pem"
+  cp $DEFAULT_PKI/api.key.pem $TASKDDATA/cert/api.key.pem
   if [ $? -eq 0 ]; then
     log_ok "Ok"
   else
@@ -399,8 +399,8 @@ if [ $? -eq 0 ]; then
     exit 1
   fi
 
-  configure "Configuring client.cert" client.cert $TASKDDATA/cert/client.cert.pem
-  configure "Configuring client.key"  client.key  $TASKDDATA/cert/client.key.pem
+  configure "Configuring api.cert" api.cert $TASKDDATA/cert/api.cert.pem
+  configure "Configuring api.key"  api.key  $TASKDDATA/cert/api.key.pem
 else
   log_error "Failed"
   log
