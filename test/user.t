@@ -97,6 +97,37 @@ class TestAddUser(ServerTestCase):
         self.assertIn('Created user \'FIRST LAST\' for organization \'ORG\'', out)
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
 
+class TestRemoveUser(ServerTestCase):
+    def setUp(self):
+        """Executed before each test in the class"""
+        self.td = Taskd()
+
+    def test_remove_user(self):
+        """taskd remove --data $TASKDDATA user ORG KEY"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} user ORG USER'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+
+        reKey = re.compile ('New user key: ([a-z0-9-]{36})')
+        match = reKey.match (out)
+        self.assertTrue(match)
+        key = match.group(1)
+
+        self.assertIn('Created user \'USER\' for organization \'ORG\'', out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+
+        code, out, err = self.td('remove --data {0} user ORG {1}'.format(self.td.datadir, key))
+        self.assertIn('Removed user \'{0}\' from organization \'ORG\''.format(key), out)
+        self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+
+    def test_remove_user_missing(self):
+        """taskd remove --data $TASKDDATA user ORG NOPE"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td.runError('remove --data {0} user ORG NOPE'.format(self.td.datadir))
+        self.assertIn('User \'NOPE\' does not exist.', out)
+
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
