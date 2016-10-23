@@ -46,7 +46,7 @@ void command_add      (Database&, const std::vector <std::string>&);
 void command_remove   (Database&, const std::vector <std::string>&);
 void command_suspend  (Database&, const std::vector <std::string>&);
 void command_resume   (Database&, const std::vector <std::string>&);
-void command_client   (Database&, const std::vector <std::string>&);
+void command_api      (Database&, const std::vector <std::string>&);
 void command_validate (           const std::vector <std::string>&);
 
 // api.cpp

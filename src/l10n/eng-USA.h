@@ -150,8 +150,8 @@
 #define STRING_INIT_COULD_NOT_CREATE "ERROR: Could not create '{1}'."
 #define STRING_INIT_CREATED          "Created {1}"
 
-#define STRING_CLIENT_USAGE          "ERROR: Usage:  taskd client [options] <host:post> <file> [<file> ...]"
-#define STRING_CLIENT_DISABLED       "ERROR: Client interface feature not enabled."
+#define STRING_API_USAGE             "ERROR: Usage:  taskd api [options] <host:post> <file> [<file> ...]"
+#define STRING_API_DISABLED          "ERROR: API feature not enabled."
 
 #define STRING_TASKD_BAD_COMMAND     "ERROR: Did not recognize command '{1}'."
 

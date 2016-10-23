@@ -160,7 +160,7 @@ int main (int argc, const char** argv)
         else if (closeEnough ("remove",      args[0], 3)) command_remove   (db, positionals);
         else if (closeEnough ("suspend",     args[0], 3)) command_suspend  (db, positionals);
         else if (closeEnough ("resume",      args[0], 3)) command_resume   (db, positionals);
-        else if (closeEnough ("client",      args[0], 3)) command_client   (db, positionals);
+        else if (closeEnough ("api",         args[0], 3)) command_api      (db, positionals);
         else if (closeEnough ("validate",    args[0], 3)) command_validate (    positionals);
         else
           throw format (STRING_TASKD_BAD_COMMAND, args[0]);
