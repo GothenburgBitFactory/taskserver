@@ -18,7 +18,6 @@ add_library (taskd admin.cpp
                    init.cpp
                    Log.cpp        Log.h
                    Server.cpp     Server.h
-                   status.cpp
                    Task.cpp       Task.h
                    text.cpp       text.h
                    TLSClient.cpp  TLSClient.h

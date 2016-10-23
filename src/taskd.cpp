@@ -153,7 +153,6 @@ int main (int argc, const char** argv)
         // The highest-level commands are hard-coded:
              if (closeEnough ("init",        args[0], 3)) command_init     (db             );
         else if (closeEnough ("config",      args[0], 3)) command_config   (db, positionals);
-        else if (closeEnough ("status",      args[0], 3)) command_status   (               );
         else if (closeEnough ("help",        args[0], 3)) command_help     (    positionals);
         else if (closeEnough ("diagnostics", args[0], 3)) command_diag     (db             );
         else if (closeEnough ("server",      args[0], 3)) command_server   (db             );
