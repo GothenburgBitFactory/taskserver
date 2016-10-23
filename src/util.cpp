@@ -40,25 +40,6 @@
 #include <format.h>
 #include <shared.h>
 
-////////////////////////////////////////////////////////////////////////////////
-// Convert a quantity in seconds to a more readable format.
-std::string formatTime (time_t seconds)
-{
-  char formatted[24];
-  float days = (float) seconds / 86400.0;
-
-       if (seconds >= 86400 * 365) sprintf (formatted, "%.1f y", (days / 365.0));
-  else if (seconds >= 86400 * 84)  sprintf (formatted, "%1d mo", (int) (days / 30));
-  else if (seconds >= 86400 * 13)  sprintf (formatted, "%d wk",  (int) (float) (days / 7.0));
-  else if (seconds >= 86400)       sprintf (formatted, "%d d",   (int) days);
-  else if (seconds >= 3600)        sprintf (formatted, "%d h",   (int) (seconds / 3600));
-  else if (seconds >= 60)          sprintf (formatted, "%d m",   (int) (seconds / 60));
-  else if (seconds >= 1)           sprintf (formatted, "%d s",   (int) seconds);
-  else                             strcpy (formatted, "-");
-
-  return std::string (formatted);
-}
-
 // Handle the generation of UUIDs on FreeBSD in a separate implementation
 // of the uuid () function, since the API is quite different from Linux's.
 // Also, uuid_unparse_lower is not needed on FreeBSD, because the string
