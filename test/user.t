@@ -183,6 +183,60 @@ class TestSuspendUser(ServerTestCase):
         code, out, err = self.td('suspend --data {0} user ORG {1}'.format(self.td.datadir, key))
         self.assertIn("User '{0}' int organization 'ORG' already suspended.", out)
 
+class TestResumeUser(ServerTestCase):
+    def setUp(self):
+        """Executed before each test in the class"""
+        self.td = Taskd()
+
+    def test_resume_user(self):
+        """taskd resume --data $TASKDDATA user ORG KEY"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} user ORG USER'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+
+        reKey = re.compile ('New user key: ([a-z0-9-]{36})')
+        match = reKey.match (out)
+        self.assertTrue(match)
+        key = match.group(1)
+
+        self.assertIn('Created user \'USER\' for organization \'ORG\'', out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+
+        code, out, err = self.td('suspend --data {0} user ORG {1}'.format(self.td.datadir, key))
+        self.assertIn('Suspended user \'{0}\' in organization \'ORG\''.format(key), out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key, 'suspended')))
+
+        code, out, err = self.td('resume --data {0} user ORG {1}'.format(self.td.datadir, key))
+        self.assertIn('Resumed user \'{0}\' in organization \'ORG\''.format(key), out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+        self.assertFalse(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key, 'suspended')))
+
+    def test_resume_missing(self):
+        """taskd resume --data $TASKDDATA user ORG NOPE"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td.runError('resume --data {0} user ORG NOPE'.format(self.td.datadir))
+        self.assertIn("ERROR: User 'NOPE' does not exist.", out)
+
+    def test_resume_unsuspended(self):
+        """taskd resume --data $TASKDDATA user ORG KEY"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} user ORG USER'.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+
+        reKey = re.compile ('New user key: ([a-z0-9-]{36})')
+        match = reKey.match (out)
+        self.assertTrue(match)
+        key = match.group(1)
+
+        self.assertIn('Created user \'USER\' for organization \'ORG\'', out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+
+        code, out, err = self.td.runError('resume --data {0} user ORG {1}'.format(self.td.datadir, key))
+        self.assertIn('ERROR: Failed to resume user \'{0}\'.'.format(key), out)
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
