@@ -1,65 +1,85 @@
-#! /usr/bin/env perl
-################################################################################
-##
-## Copyright 2010 - 2016, Göteborg Bit Factory.
-##
-## Permission is hereby granted, free of charge, to any person obtaining a copy
-## of this software and associated documentation files (the "Software"), to deal
-## in the Software without restriction, including without limitation the rights
-## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-## copies of the Software, and to permit persons to whom the Software is
-## furnished to do so, subject to the following conditions:
-##
-## The above copyright notice and this permission notice shall be included
-## in all copies or substantial portions of the Software.
-##
-## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-## OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-## THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-## SOFTWARE.
-##
-## http://www.opensource.org/licenses/mit-license.php
-##
-################################################################################
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+###############################################################################
+#
+# Copyright 2006 - 2016, Paul Beckingham, Federico Hernandez.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# http://www.opensource.org/licenses/mit-license.php
+#
+###############################################################################
 
-use strict;
-use warnings;
-use Test::More tests => 13;
+import sys
+import os
+import unittest
+# Ensure python finds the local simpletap module
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Create an instance.
-my $data = 'config.data';
-qx{mkdir $data};
+from basetest import Taskd, ServerTestCase
 
-my $output = qx{../src/taskd init --data $data 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd init --data $data' - no errors");
-ok (-d $data,                "$data exists and is a directory");
 
-$output = qx{../src/taskd config --data $data --force name value 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd config --data $data --force name value' - no errors");
-like   ($output, qr/config modified/, 'name/value modified');
+# Test methods available:
+#     self.assertEqual(a, b)
+#     self.assertNotEqual(a, b)
+#     self.assertTrue(x)
+#     self.assertFalse(x)
+#     self.assertIs(a, b)
+#     self.assertIsNot(a, b)
+#     self.assertIsNone(x)
+#     self.assertIsNotNone(x)
+#     self.assertIn(a, b)
+#     self.assertNotIn(a, b)
+#     self.assertIsInstance(a, b)
+#     self.assertNotIsInstance(a, b)
+#     self.assertRaises(e)
+#     self.assertRegexpMatches(t, r)
+#     self.assertNotRegexpMatches(t, r)
+#     self.tap("")
 
-$output = qx{../src/taskd config --data $data 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd config --data $data' - no errors");
-like   ($output, qr/name\s+value/, 'name/value removed');
+class TestConfig(ServerTestCase):
+    def setUp(self):
+        """Executed before each test in the class"""
+        self.td = Taskd()
+        self.td('init --data {0}'.format(self.td.datadir))
 
-$output = qx{../src/taskd config --data $data --force name '' 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd config --data $data --force name \'\'' - no errors");
-like   ($output, qr/config modified/, 'name/value modified');
+    def test_config(self):
+        """taskd config --data $TASKDDATA"""
+        code, out, err = self.td('config --data {0}'.format(self.td.datadir))
+        self.assertIn("request.limit", out)
 
-$output = qx{../src/taskd config --data $data --force name 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd config --data $data --force name' - no errors");
-like   ($output, qr/config modified/, 'name/value modified');
+    def test_config_name_value(self):
+        """taskd config --data $TASKDDATA --force name value"""
+        code, out, err = self.td('config --data {0} --force name value'.format(self.td.datadir))
+        self.assertIn("Config file {0}/config modified.".format(self.td.datadir), out)
 
-$output = qx{../src/taskd config --data $data 2>&1};
-unlike ($output, qr/^ERROR/, "'taskd config --data $data' - no errors");
-unlike ($output, qr/name\s+value/, 'name/value removed');
+    def test_config_name_blank(self):
+        """taskd config --data $TASKDDATA --force name ''"""
+        code, out, err = self.td('config --data {0} --force name \'\''.format(self.td.datadir))
+        self.assertIn("Config file {0}/config modified.".format(self.td.datadir), out)
 
-# Cleanup.
-qx{rm -rf $data};
-ok (! -d $data, "Removed $data");
+    def test_config_name(self):
+        """taskd config --data $TASKDDATA --force name"""
+        self.td('config --data {0} --force name value'.format(self.td.datadir))
+        code, out, err = self.td('config --data {0} --force name'.format(self.td.datadir))
+        self.assertIn("Config file {0}/config modified.".format(self.td.datadir), out)
 
-exit 0;
-
+if __name__ == "__main__":
+    from simpletap import TAPTestRunner
+    unittest.main(testRunner=TAPTestRunner())
