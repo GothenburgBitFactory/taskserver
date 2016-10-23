@@ -1,6 +1,5 @@
 all.log
 config.t
 text.t
-util.t
 width.t
 *.pyc
