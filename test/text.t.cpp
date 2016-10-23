@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
 {
-  UnitTest t (23);
+  UnitTest t (16);
 
   // std::string unquoteText (const std::string& text)
   t.is (unquoteText (""),         "",     "unquoteText '' -> ''");
@@ -50,15 +50,6 @@ int main (int, char**)
   t.is (unquoteText ("\"''\""),   "''",   "unquoteText '\"''\"' -> ''''");
   t.is (unquoteText ("'x'"),      "x",    "unquoteText ''x'' -> 'x'");
   t.is (unquoteText ("\"x\""),    "x",    "unquoteText '\"x\"' -> 'x'");
-
-  // int damerau_levenshtein (const char*, const char*);
-  t.is    (damerau_levenshtein ("foo", "foo"),  0, "foo --> foo = 0");
-  t.is    (damerau_levenshtein ("foo", "food"), 1, "foo --> food = 1");
-  t.is    (damerau_levenshtein ("ffoo", "foo"), 1, "ffoo --> foo = 1");
-  t.is    (damerau_levenshtein ("foo", "fox"),  1, "foo --> fox = 1");
-  t.is    (damerau_levenshtein ("foo", "ofo"),  1, "foo --> ofo = 1");
-  t.is    (damerau_levenshtein ("one", "two"),  3, "one --> two = 3");
-  t.is    (damerau_levenshtein ("wonderfulmacintosh", "winchestermachine"), 12, "wonderfulmacintosh --> winchestermachine = 12");
 
   return 0;
 }

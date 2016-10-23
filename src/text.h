@@ -33,7 +33,6 @@
 std::string unquoteText (const std::string&);
 std::string printable (const std::string&);
 std::string printable (char);
-int damerau_levenshtein (const char*, const char*);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////
