@@ -224,12 +224,10 @@ void command_diag (Database& config)
         // Load the config file.
         config._config->load (config_file._data);
 
-        File ca_cert (config._config->get ("ca.cert"));
+        File ca_cert     (config._config->get ("ca.cert"));
         File server_cert (config._config->get ("server.cert"));
-        File server_key (config._config->get ("server.key"));
-        File server_crl (config._config->get ("server.crl"));
-        File client_cert (config._config->get ("client.cert"));
-        File client_key (config._config->get ("client.key"));
+        File server_key  (config._config->get ("server.key"));
+        File server_crl  (config._config->get ("server.crl"));
 
         std::cout << "          CA: "
                   << ca_cert._data << (ca_cert.readable () ? ", readable, " : ", ")
