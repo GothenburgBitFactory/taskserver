@@ -31,8 +31,6 @@
 
 // text.cpp, Non-UTF-8 aware.
 std::string unquoteText (const std::string&);
-std::string printable (const std::string&);
-std::string printable (char);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////
