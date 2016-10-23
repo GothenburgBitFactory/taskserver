@@ -74,6 +74,29 @@ class TestAddUser(ServerTestCase):
         self.assertIn('Created user \'USER\' for organization \'ORG\'', out)
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
 
+    def test_add_user_add_user(self):
+        """taskd add --data $TASKDDATA user ORG USER; taskd add --data $TASKDDATA user ORG USER"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        self.td('add --data {0} user ORG USER'.format(self.td.datadir))
+        code, out, err = self.td.runError('add --data {0} user ORG USER'.format(self.td.datadir))
+        self.assertIn("ERROR: User 'USER' already exists.", out)
+
+    def test_add_user_spaces(self):
+        """taskd add --data $TASKDDATA user ORG 'FIRST LAST'"""
+        self.td('init --data {0}'.format(self.td.datadir))
+        self.td('add --data {0} org ORG'.format(self.td.datadir))
+        code, out, err = self.td('add --data {0} user ORG \'FIRST LAST\''.format(self.td.datadir))
+        self.assertNotIn("ERROR", err)
+
+        reKey = re.compile ('New user key: ([a-z0-9-]{36})')
+        match = reKey.match (out)
+        self.assertTrue(match)
+        key = match.group(1)
+
+        self.assertIn('Created user \'FIRST LAST\' for organization \'ORG\'', out)
+        self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users', key)))
+
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
