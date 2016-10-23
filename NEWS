@@ -10,11 +10,14 @@ New Features in Taskserver 1.2.0
   - Removed broken RC4 cipher from default.
   - Removed broken MD5 cipher from default.
   - Integrates libshared.
+  - Made the documentation consistently distinguish between user name and UUID.
 
 New configuration options in Taskserver 1.2.0
 
   - New 'dh_bits' setting allows an override to the 2048 bit default
     for the Diffie-Hellman key exchange.
+  - Renamed 'client.cert' and 'client.key' to 'api.cert' and 'api.key', because
+    the word 'client' implied it was to be used for all clients.
 
 Removed features in 1.2.0
 
