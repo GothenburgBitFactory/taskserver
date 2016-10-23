@@ -35,7 +35,6 @@
 #include <uuid/uuid.h>
 #endif
 
-std::string formatBytes (size_t);
 std::string formatTime (time_t);
 
 #ifndef HAVE_UUID_UNPARSE_LOWER
