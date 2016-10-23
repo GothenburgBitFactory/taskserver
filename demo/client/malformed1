@@ -2,14 +2,14 @@
 
 # Use Case: Negative testing using malformed requests.
 
-client()
+api()
 {
   REQUEST=$1
 
-  ../../src/taskd client \
+  ../../src/taskd api \
     --ca.cert=tw1/ca.cert.pem \
-    --client.cert=tw1/client.cert.pem \
-    --client.key=tw1/client.key.pem \
+    --client.cert=tw1/api.cert.pem \
+    --client.key=tw1/api.key.pem \
     localhost:53589 \
     $REQUEST
 }
@@ -25,6 +25,6 @@ for req in bad.0 \
            bad.80 bad.81 bad.82 bad.83 
 do
   echo "--- $req ---------------------------------------------------------------"
-  client $req
+  api $req
 done
 
