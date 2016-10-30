@@ -521,12 +521,25 @@ void Daemon::append_server_data (
   user_dir += org;
   user_dir += "users";
   user_dir += password;
-  File user_data (user_dir._data + "/tx.data");
 
-  if (!user_data.exists ())
-    user_data.create (0600);
+  // Write to a tmp copy of the data, then renamed afterwards. This guarantees
+  // that there are no partial writes to the real data file, which may occur
+  // in situations where there is no disk space.
+  File user_data     (user_dir._data     + "/tx.data");
+  File user_tmp_data (user_dir._data + "/tx.tmp.data");
 
-  user_data.append (data);
+  // Create or copy, as necessary.
+  if (user_data.exists ())
+    File::copy (user_data._data, user_tmp_data._data);
+  else
+    user_tmp_data.create (0600);
+
+  // Store the data in the temporary file.
+  user_tmp_data.append (data);
+
+  // Move the temp file to the real file, after closing it.
+  user_tmp_data.close ();
+  File::move (user_tmp_data._data, user_data._data);
 
   _log->format ("[%d] Wrote %u", _txn_count, data.size ());
 }

@@ -4,6 +4,9 @@
           (thanks to Robin Green).
 - TD-49   Log when file management fails
           (thanks to Ben Boeckel).
+- TD-52   No errors in log in case of "No space left on device", but task data
+          corrupted
+          (thanks to Rainer Müller).
 - TD-64   sync conflict deleted all annotations of the task
           (thanks to Markus Beppler, Konstantin Vorobyev).
 - TD-96   server_setup.bash won't run on Mac OS X and BSD
