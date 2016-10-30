@@ -11,6 +11,7 @@ New Features in Taskserver 1.2.0
   - Removed broken MD5 cipher from default.
   - Integrates libshared.
   - Made the documentation consistently distinguish between user name and UUID.
+  - Improved handling for I/O errors.
 
 New configuration options in Taskserver 1.2.0
 
