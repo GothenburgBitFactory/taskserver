@@ -31,6 +31,8 @@
           (thanks to Michael Eichorn).
 - TD-110  Question: About src/tls/*
           (thanks to Sebastien Badia).
+- TD-112  warning: missing initializer for member
+          (thanks to Dirk Deimeke).
 - TD-115  Throw error when config file is missing or not readable
           (thanks to Jelle van der Waa).
 - TD-117  Wrong systemd target, taskd can fail if multi-user.target is up
