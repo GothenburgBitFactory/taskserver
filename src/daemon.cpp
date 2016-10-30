@@ -795,11 +795,13 @@ void Daemon::patch (
 
   // The intersecting attributes, if the values differ, are applied.
   for (i = common_atts.begin (); i != common_atts.end (); ++i)
+  {
     if (from.get (*i) != to.get (*i))
     {
       _log->format ("[%d] patch modify %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
       base.set (*i, to.get (*i));
     }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
