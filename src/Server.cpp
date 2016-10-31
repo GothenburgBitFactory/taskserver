@@ -293,16 +293,6 @@ void Server::beginServer ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO To provide these data, a request count, a start time, and a cumulative
-//      utilization time must be tracked.
-void Server::stats (int& requests, time_t& uptime, double& utilization)
-{
-  requests = _request_count;
-  uptime = 0;
-  utilization = 0.0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void Server::daemonize ()
 {
   if (_log) _log->write ("Daemonizing");

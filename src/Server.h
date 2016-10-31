@@ -57,8 +57,6 @@ public:
 
   void beginServer ();
 
-  void stats (int&, time_t&, double&);
-
   virtual void handler (const std::string&, std::string&) = 0;
 
 protected:
