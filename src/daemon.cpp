@@ -145,7 +145,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     if (_sigusr1)
     {
       if (_log)
-        _log->format ("[%d] SIGUSR1 triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
+        _log->write (format ("[{1}] SIGUSR1 triggered reload of {2}", _txn_count, _config._original_file._data));
 
       _config.load (_config._original_file._data);
       Config::iterator i;
@@ -175,7 +175,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     else
     {
       if (_log)
-        _log->format ("[%d] ERROR: Unrecognized message type '%s'", _txn_count, type.c_str ());
+        _log->write (format ("[{1}] ERROR: Unrecognized message type '{2}'", _txn_count, type));
 
       throw 500;
     }
@@ -202,7 +202,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] ERROR: %d %s", _txn_count, e, taskd_error (e).c_str ());
+      _log->write (format ("[{1}] ERROR: {2} {3}", _txn_count, e, taskd_error (e)));
   }
 
   // Handlers can throw a string, for a 500 code with specific text.
@@ -215,14 +215,14 @@ void Daemon::handler (const std::string& input, std::string& output)
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] %s", _txn_count, e.c_str ());
+      _log->write (format ("[{1}] {2}", _txn_count, e));
   }
 
   // Mystery errors.
   catch (...)
   {
     if (_log)
-      _log->format ("[%d] Unknown error", _txn_count);
+      _log->write (format ("[{1}] Unknown error", _txn_count));
   }
 
   _bytes_in  += input.length ();
@@ -240,10 +240,10 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   taskd_requireHeader (in, "protocol", "v1");
 
   if (_log)
-    _log->format ("[%d] 'statistics' from %s:%d",
-                  _txn_count,
-                  _client_address.c_str (),
-                  _client_port);
+    _log->write (format ("[{1}] 'statistics' from {2}:{3}",
+                         _txn_count,
+                         _client_address,
+                         _client_port));
 
   // Stats about the data.
   long total_orgs = 0;
@@ -308,14 +308,14 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::string subtype  = in.get ("subtype");
 
   if (_log)
-    _log->format ("[%d] 'sync%s' from '%s/%s' using '%s' at %s:%d",
-                  _txn_count,
-                  (subtype == "init" ? "+init" : ""),
-                  org.c_str (),
-                  user.c_str (),
-                  in.get ("client").c_str (),
-                  _client_address.c_str (),
-                  _client_port);
+    _log->write (format ("[{1}] 'sync{2}' from '{3}/{4}' using '{5}' at {6}:{7}",
+                         _txn_count,
+                         (subtype == "init" ? "+init" : ""),
+                         org,
+                         user,
+                         in.get ("client"),
+                         _client_address,
+                         _client_port));
 
   // Redirect if instructed.
   if (_db.redirect (org, out))
@@ -396,10 +396,10 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     }
   }
 
-  _log->format ("[%d] Stored %d tasks, merged %d tasks",
-                _txn_count,
-                store_count,
-                merge_count);
+  _log->write (format ("[{1}] Stored {2} tasks, merged {3} tasks",
+                       _txn_count,
+                       store_count,
+                       merge_count));
 
   // New server data means a new sync key must be generated.  No new server data
   // means the most recent sync key is reused.
@@ -408,7 +408,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     new_sync_key = uuid ();
     new_server_data.push_back (new_sync_key + "\n");
-    _log->format ("[%d] New sync key '%s'", _txn_count, new_sync_key.c_str ());
+    _log->write (format ("[{1}] New sync key '{2}'", _txn_count, new_sync_key));
 
     // Append new_server_data to file.
     append_server_data (org, password, new_server_data);
@@ -423,7 +423,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
         break;
       }
 
-    _log->format ("[%d] Sync key '%s' still valid", _txn_count, new_sync_key.c_str ());
+    _log->write (format ("[{1}] Sync key '{2}' still valid", _txn_count, new_sync_key));
   }
 
   // If there is outgoing data, generate payload + key.
@@ -454,7 +454,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   }
   else
   {
-    _log->format ("[%d] No change", _txn_count);
+    _log->write (format ("[{1}] No change", _txn_count));
     out.set ("code",   201);
     out.set ("status", taskd_error (201));
   }
@@ -483,10 +483,10 @@ void Daemon::parse_payload (
     }
   }
 
-  _log->format ("[%d] Client key '%s' + %u txns",
-                _txn_count,
-                sync_key.c_str (),
-                data.size ());
+  _log->write (format ("[{1}] Client key '{2}' + {3} txns",
+                       _txn_count,
+                       sync_key,
+                       data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -507,7 +507,7 @@ void Daemon::load_server_data (
   else
     user_data.create (0600);
 
-  _log->format ("[%d] Loaded %u records", _txn_count, data.size ());
+  _log->write (format ("[{1}] Loaded {2} records", _txn_count, data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -541,7 +541,7 @@ void Daemon::append_server_data (
   user_tmp_data.close ();
   File::move (user_tmp_data._data, user_data._data);
 
-  _log->format ("[%d] Wrote %u", _txn_count, data.size ());
+  _log->write (format ("[{1}] Wrote {2}", _txn_count, data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,7 +573,7 @@ unsigned int Daemon::find_branch_point (
   if (!found)
     throw std::string ("Could not find the last sync transaction. Did you skip the 'task sync init' requirement?");
 
-  _log->format ("[%d] Branch point: %s --> %u", _txn_count, sync_key.c_str (), branch);
+  _log->write (format ("[{1}] Branch point: {2} --> {3}", _txn_count, sync_key, branch));
   return branch;
 }
 
@@ -598,7 +598,7 @@ void Daemon::extract_subset (
     throw e + format (STRING_RECORD_LINE, i);
   }
 
-  _log->format ("[%d] Subset %u tasks", _txn_count, subset.size ());
+  _log->write (format ("[{1}] Subset {2} tasks", _txn_count, subset.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -720,7 +720,7 @@ void Daemon::merge_sort (
     time_t mod_r = last_modification (*iter_r);
     if (mod_l < mod_r)
     {
-      _log->format ("[%d] applying left %d < %d", _txn_count, mod_l, mod_r);
+      _log->write (format ("[{1}] applying left {2} < {3}", _txn_count, mod_l, mod_r));
       patch (combined, *prev_l, *iter_l);
       combined.set ("modified", (int) mod_l);
       prev_l = iter_l;
@@ -728,7 +728,7 @@ void Daemon::merge_sort (
     }
     else
     {
-      _log->format ("[%d] applying right %d >= %d", _txn_count, mod_l, mod_r);
+      _log->write (format ("[{1}] applying right {2} >= {3}", _txn_count, mod_l, mod_r));
       patch (combined, *prev_r, *iter_r);
       combined.set ("modified", (int) mod_r);
       prev_r = iter_r;
@@ -752,7 +752,7 @@ void Daemon::merge_sort (
     ++iter_r;
   }
 
-  _log->format ("[%d] Merge result %s", _txn_count, combined.composeJSON ().c_str ());
+  _log->write (format ("[{1}] Merge result {2}", _txn_count, combined.composeJSON ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -795,14 +795,14 @@ void Daemon::patch (
   std::vector <std::string>::iterator i;
   for (i = from_only.begin (); i != from_only.end (); ++i)
   {
-    _log->format ("[%d] patch remove %s", _txn_count, i->c_str ());
+    _log->write (format ("[{1}] patch remove {2}", _txn_count, *i));
     base.remove (*i);
   }
 
   // The to-only attributes must be added to base.
   for (i = to_only.begin (); i != to_only.end (); ++i)
   {
-    _log->format ("[%d] patch add %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
+    _log->write (format ("[{1}] patch add {2}={3}", _txn_count, *i, to.get (*i)));
     base.set (*i, to.get (*i));
   }
 
@@ -811,7 +811,7 @@ void Daemon::patch (
   {
     if (from.get (*i) != to.get (*i))
     {
-      _log->format ("[%d] patch modify %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
+      _log->write (format ("[{1}] patch modify {2}={3}", _txn_count, *i, to.get (*i)));
       base.set (*i, to.get (*i));
     }
   }
@@ -879,7 +879,7 @@ void command_server (Database& db)
 
   try
   {
-    log.setFile (db._config->get ("log"));
+    log.file (db._config->get ("log"));
     log.write (std::string ("==== ")
                + PACKAGE_STRING
                + " "
@@ -889,7 +889,7 @@ void command_server (Database& db)
                + " ===="
               );
 
-    log.format ("Serving from %s", root.c_str ());
+    log.write (format("Serving from {1}", root));
 
     if (db._config->getBoolean ("debug"))
       log.write ("Debug mode");
@@ -950,9 +950,9 @@ void command_server (Database& db)
   catch (...)
   {
     if (errno)
-      log.format ("errno=%d %s", errno, strerror (errno));
+      log.write (format ("errno={1} {2}", errno, strerror (errno)));
     else
-    log.write ("Unknown error");
+      log.write ("Unknown error");
   }
 }
 

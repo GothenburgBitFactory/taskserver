@@ -34,7 +34,6 @@
 #include <TLSClient.h>
 #include <FS.h>
 #include <Color.h>
-#include <Log.h>
 #include <Task.h>
 #include <RX.h>
 #include <format.h>
