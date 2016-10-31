@@ -42,12 +42,7 @@
 #include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static struct
-{
-  int code;
-  std::string error;
-} errors[] =
-{
+std::map <int, std::string> errors {
   // 2xx Success.
   { 200, "Ok" },
   { 201, "No change"},
@@ -74,8 +69,6 @@ static struct
   { 503, "Command parameter not implemented"},
   { 504, "Request too big"},
 };
-
-#define NUM_ERRORS (sizeof (errors) / sizeof (errors[0]))
 
 ////////////////////////////////////////////////////////////////////////////////
 bool taskd_applyOverride (Config& config, const std::string& arg)
@@ -303,9 +296,9 @@ bool taskd_is_user_key (
 ////////////////////////////////////////////////////////////////////////////////
 std::string taskd_error (const int code)
 {
-  for (unsigned int i = 0; i < NUM_ERRORS; ++i)
-    if (code == errors[i].code)
-      return errors[i].error;
+  auto e = errors.find (code);
+  if (e != errors.end ())
+    return e->second;
 
   return "[Missing error code]";
 }
