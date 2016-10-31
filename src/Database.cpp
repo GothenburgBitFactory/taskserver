@@ -34,12 +34,13 @@
 #include <util.h>
 #include <taskd.h>
 #include <shared.h>
+#include <format.h>
 #include <Database.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 Database::Database (Config* config)
 : _config (config)
-, _log (NULL)
+, _log (nullptr)
 {
 }
 
@@ -73,8 +74,7 @@ bool Database::authenticate (
   if (! org_dir.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' unknown",
-                    org.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' unknown", org));
 
     response.set ("code", 430);
     response.set ("status", taskd_error (430));
@@ -86,8 +86,7 @@ bool Database::authenticate (
   if (org_suspended.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' suspended",
-                    org.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' suspended", org));
 
     response.set ("code", 431);
     response.set ("status", taskd_error (431));
@@ -99,9 +98,7 @@ bool Database::authenticate (
   if (! user_dir.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' unknown",
-                    org.c_str (),
-                    user.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' unknown", org, user));
 
     response.set ("code", 430);
     response.set ("status", taskd_error (430));
@@ -113,9 +110,7 @@ bool Database::authenticate (
   if (user_suspended.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' suspended",
-                    org.c_str (),
-                    user.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' suspended", org, user));
 
     response.set ("code", 431);
     response.set ("status", taskd_error (431));
@@ -127,9 +122,7 @@ bool Database::authenticate (
   if (!user.empty () && user_rc.get ("user") != user)
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' bad key",
-                    org.c_str (),
-                    user.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' bad key", org, user));
 
     response.set ("code", 430);
     response.set ("status", taskd_error (430));
@@ -157,9 +150,7 @@ bool Database::redirect (const std::string& org, Msg& response)
     response.set ("info", trim (server, " \n"));
 
     if (_log)
-      _log->format ("INFO Redirecting org '%s' to '%s'",
-                    org.c_str (),
-                    response.get ("info").c_str ());
+      _log->write (format ("INFO Redirecting org '{1}' to '{2}'", org, response.get ("info")));
 
     return true;
   }

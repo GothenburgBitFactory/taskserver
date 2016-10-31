@@ -90,35 +90,35 @@ Server::~Server ()
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setPort (const std::string& port)
 {
-  if (_log) _log->format ("Using port %s", port.c_str ());
+  if (_log) _log->write (format ("Using port {1}", port));
   _port = port;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setHost (const std::string& host)
 {
-  if (_log) _log->format ("Using address %s", host.c_str ());
+  if (_log) _log->write (format ("Using address {1}", host));
   _host = host;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setFamily (const std::string& family)
 {
-  if (_log) _log->format ("Using family %s", family.c_str ());
+  if (_log) _log->write (format ("Using family {1}", family));
   _family = family;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setQueueSize (int size)
 {
-  if (_log) _log->format ("Queue size %d requests", size);
+  if (_log) _log->write (format ("Queue size {1} requests", size));
   _queue_size = size;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setPoolSize (int size)
 {
-  if (_log) _log->format ("Thread Pool size %d", size);
+  if (_log) _log->write (format ("Thread Pool size {1}", size));
   _pool_size = size;
 }
 
@@ -140,7 +140,7 @@ void Server::setPidFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setLimit (int max)
 {
-  if (_log) _log->format ("Request size limit %d bytes", max);
+  if (_log) _log->write (format ("Request size limit {1} bytes", max));
   assert (max >= 0);
   _limit = max;
 }
@@ -148,7 +148,7 @@ void Server::setLimit (int max)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCAFile (const std::string& file)
 {
-  if (_log) _log->format ("CA          %s", file.c_str ());
+  if (_log) _log->write (format ("CA          {1}", file));
   _ca_file = file;
   File cert (file);
   if (! cert.readable ())
@@ -158,7 +158,7 @@ void Server::setCAFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCertFile (const std::string& file)
 {
-  if (_log) _log->format ("Certificate %s", file.c_str ());
+  if (_log) _log->write (format ("Certificate {1}", file));
   _cert_file = file;
   File cert (file);
   if (! cert.readable ())
@@ -168,7 +168,7 @@ void Server::setCertFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setKeyFile (const std::string& file)
 {
-  if (_log) _log->format ("Private Key %s", file.c_str ());
+  if (_log) _log->write (format ("Private Key {1}", file));
   _key_file = file;
   File key (file);
   if (! key.readable ())
@@ -178,7 +178,7 @@ void Server::setKeyFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCRLFile (const std::string& file)
 {
-  if (_log) _log->format ("CRL         %s", file.c_str ());
+  if (_log) _log->write (format ("CRL         {1}", file));
   _crl_file = file;
   File crl (file);
   if (! crl.readable ())
@@ -188,7 +188,7 @@ void Server::setCRLFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setLogClients (bool value)
 {
-  if (_log) _log->format ("IP logging %s", (value ? "on" : "off"));
+  if (_log) _log->write (format ("IP logging {1}", (value ? "on" : "off")));
   _log_clients = value;
 }
 
@@ -231,7 +231,7 @@ void Server::beginServer ()
     if (ciphers != "")
     {
       server.ciphers (ciphers);
-      if (_log) _log->format ("Using ciphers: %s", ciphers.c_str ());
+      if (_log) _log->write (format ("Using ciphers: {1}", ciphers));
     }
 
     std::string trust = _config->get ("trust");
@@ -240,17 +240,17 @@ void Server::beginServer ()
     else if (trust == "strict")
       server.trust (TLSServer::strict);
     else if (_log)
-      _log->format ("Invalid 'trust' setting value of '%s'", trust.c_str ());
+      _log->write (format ("Invalid 'trust' setting value of '{1}'", trust));
 
     int dh_bits = _config->getInteger ("dh_bits");
     if (dh_bits < 0)
     {
-      if (_log) _log->format ("Invalid dh_bits value, using defaults: %d", dh_bits);
+      if (_log) _log->write (format ("Invalid dh_bits value, using defaults: {1}", dh_bits));
       dh_bits = 0;
     }
 
     server.dh_bits (dh_bits);
-    if (_log) _log->format ("Using dh_bits: %d", dh_bits);
+    if (_log) _log->write (format ("Using dh_bits: {1}", dh_bits));
   }
 
   server.init (_ca_file,        // CA
@@ -298,7 +298,7 @@ void Server::beginServer ()
       if (_log)
       {
         timer.stop ();
-        _log->format ("[%d] Serviced in %.6fs", _request_count, timer.total ());
+        _log->write (format ("[{1}] Serviced in {2}", _request_count, timer.total ()));
       }
     }
 

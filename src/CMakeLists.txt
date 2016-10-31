@@ -16,7 +16,6 @@ add_library (taskd admin.cpp
                    help.cpp
                    i18n.h
                    init.cpp
-                   Log.cpp        Log.h
                    Server.cpp     Server.h
                    Task.cpp       Task.h
                    text.cpp       text.h
@@ -30,6 +29,7 @@ add_library (libshared libshared/src/Color.cpp         libshared/src/Color.h
                        libshared/src/FS.cpp            libshared/src/FS.h
                        libshared/src/JSON.cpp          libshared/src/JSON.h
                        libshared/src/Lexer.cpp         libshared/src/Lexer.h
+                       libshared/src/Log.cpp           libshared/src/Log.h
                        libshared/src/Msg.cpp           libshared/src/Msg.h
                        libshared/src/Pig.cpp           libshared/src/Pig.h
                        libshared/src/RX.cpp            libshared/src/RX.h
