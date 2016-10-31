@@ -63,22 +63,6 @@ static void signal_handler (int s)
 
 ////////////////////////////////////////////////////////////////////////////////
 Server::Server ()
-  : _log (NULL)
-  , _log_clients (false)
-  , _client_address ("")
-  , _client_port (0)
-  , _host ("::")
-  , _port ("12345")
-  , _pool_size (4)
-  , _queue_size (10)
-  , _daemon (false)
-  , _pid_file ("")
-  , _request_count (0)
-  , _limit (0)        // Unlimited
-  , _ca_file ("")
-  , _cert_file ("")
-  , _key_file ("")
-  , _crl_file ("")
 {
 }
 
