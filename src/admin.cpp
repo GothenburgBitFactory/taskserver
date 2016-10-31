@@ -37,10 +37,10 @@
 // taskd add user  <org> <user>
 void command_add (Database& db, const std::vector <std::string>& args)
 {
-  bool verbose = db._config->getBoolean ("verbose");
+  auto verbose = db._config->getBoolean ("verbose");
 
   // Verify that root exists.
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");
 
