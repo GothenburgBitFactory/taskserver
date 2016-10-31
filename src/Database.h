@@ -56,10 +56,10 @@ public:
   std::string key_generate ();
 
 public:
-  Config* _config;
+  Config* _config {nullptr};
 
 private:
-  Log* _log;
+  Log* _log {nullptr};
 };
 
 #endif

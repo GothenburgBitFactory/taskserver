@@ -40,7 +40,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 Database::Database (Config* config)
 : _config (config)
-, _log (nullptr)
 {
 }
 
@@ -65,9 +64,9 @@ bool Database::authenticate (
   const Msg& request,
   Msg& response)
 {
-  std::string org  = request.get ("org");
-  std::string user = request.get ("user");
-  std::string key  = request.get ("key");
+  auto org  = request.get ("org");
+  auto user = request.get ("user");
+  auto key  = request.get ("key");
 
   // Verify existence of <root>/orgs/<org>
   Directory org_dir (_config->get ("root") + "/orgs/" + org);
@@ -179,7 +178,7 @@ bool Database::add_user (
   const std::string& user)
 {
   // Generate new KEY
-  std::string key = key_generate ();
+  auto key = key_generate ();
 
   Directory new_user (_config->get ("root"));
   new_user += "orgs";
