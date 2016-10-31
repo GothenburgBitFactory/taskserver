@@ -65,26 +65,27 @@ protected:
   void daemonize ();
   void writePidFile ();
   void removePidFile ();
-  Log* _log;
-  Config* _config;
-  bool _log_clients;
-  std::string _client_address;
-  int _client_port;
+
+  Log* _log                    {nullptr};
+  Config* _config              {nullptr};
+  bool _log_clients            {false};
+  std::string _client_address  {""};
+  int _client_port             {0};
 
 private:
-  std::string _host;
-  std::string _port;
-  std::string _family;
-  int _pool_size;
-  int _queue_size;
-  bool _daemon;
-  std::string _pid_file;
-  int _request_count;
-  int _limit;
-  std::string _ca_file;
-  std::string _cert_file;
-  std::string _key_file;
-  std::string _crl_file;
+  std::string _host            {"::"};
+  std::string _port            {"53589"};
+  std::string _family          {"IPv6"};
+  int _pool_size               {4};
+  int _queue_size              {10};
+  bool _daemon                 {false};
+  std::string _pid_file        {""};
+  int _request_count           {0};
+  int _limit                   {0};
+  std::string _ca_file         {""};
+  std::string _cert_file       {""};
+  std::string _key_file        {""};
+  std::string _crl_file        {""};
 };
 
 #endif
