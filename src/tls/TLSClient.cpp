@@ -175,7 +175,7 @@ void TLSClient::init (
   if (ret < 0)
   {
     if (_debug && ret == GNUTLS_E_INVALID_REQUEST)
-      std::cout << "c: ERROR Priority error at: " << err << "\n";
+      std::cout << "c: ERROR Priority error at: " << err << '\n';
 
     throw format ("Error initializing TLS. {1}", gnutls_strerror (ret));
   }
@@ -269,7 +269,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   {
 #if GNUTLS_VERSION_NUMBER >= 0x03010a
     char* desc = gnutls_session_get_desc (_session);
-    std::cout << "c: INFO Handshake was completed: " << desc << "\n";
+    std::cout << "c: INFO Handshake was completed: " << desc << '\n';
     gnutls_free (desc);
 #else
     std::cout << "c: INFO Handshake was completed.\n";
@@ -302,7 +302,7 @@ int TLSClient::verify_certificate () const
   if (ret < 0)
   {
     if (_debug)
-      std::cout << "c: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << "\n";
+      std::cout << "c: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << '\n';
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 #else
@@ -310,7 +310,7 @@ int TLSClient::verify_certificate () const
   if (ret < 0)
   {
     if (_debug)
-      std::cout << "c: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << "\n";
+      std::cout << "c: ERROR Certificate verification peers2 failed. " << gnutls_strerror (ret) << '\n';
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 
@@ -326,7 +326,7 @@ int TLSClient::verify_certificate () const
       if (cert_list_size == 0)
       {
         if (_debug)
-          std::cout << "c: ERROR Certificate get peers failed. " << gnutls_strerror (ret) << "\n";
+          std::cout << "c: ERROR Certificate get peers failed. " << gnutls_strerror (ret) << '\n';
         return GNUTLS_E_CERTIFICATE_ERROR;
       }
 
@@ -334,7 +334,7 @@ int TLSClient::verify_certificate () const
       if (ret < 0)
       {
         if (_debug)
-          std::cout << "c: ERROR x509 init failed. " << gnutls_strerror (ret) << "\n";
+          std::cout << "c: ERROR x509 init failed. " << gnutls_strerror (ret) << '\n';
         return GNUTLS_E_CERTIFICATE_ERROR;
       }
 
@@ -342,7 +342,7 @@ int TLSClient::verify_certificate () const
       if (ret < 0)
       {
         if (_debug)
-          std::cout << "c: ERROR x509 cert import. " << gnutls_strerror (ret) << "\n";
+          std::cout << "c: ERROR x509 cert import. " << gnutls_strerror (ret) << '\n';
         gnutls_x509_crt_deinit(cert);
         status = GNUTLS_E_CERTIFICATE_ERROR;
       }
@@ -350,7 +350,7 @@ int TLSClient::verify_certificate () const
       if (gnutls_x509_crt_check_hostname (cert, hostname) == 0)
       {
         if (_debug)
-          std::cout << "c: ERROR x509 cert check hostname. " << gnutls_strerror (ret) << "\n";
+          std::cout << "c: ERROR x509 cert check hostname. " << gnutls_strerror (ret) << '\n';
         gnutls_x509_crt_deinit(cert);
         return GNUTLS_E_CERTIFICATE_ERROR;
       }
@@ -367,7 +367,7 @@ int TLSClient::verify_certificate () const
   if (ret < 0)
   {
     if (_debug)
-      std::cout << "c: ERROR certificate verification status. " << gnutls_strerror (ret) << "\n";
+      std::cout << "c: ERROR certificate verification status. " << gnutls_strerror (ret) << '\n';
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
 
@@ -476,7 +476,7 @@ void TLSClient::recv (std::string& data)
     if (received < 0 && gnutls_error_is_fatal (received) == 0)
     {
       if (_debug)
-      std::cout << "c: WARNING " << gnutls_strerror (received) << "\n";
+      std::cout << "c: WARNING " << gnutls_strerror (received) << '\n';
     }
     else if (received < 0)
       throw std::string (gnutls_strerror (received));

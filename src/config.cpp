@@ -127,12 +127,12 @@ void command_config (Database& db, const std::vector <std::string>& args)
       File::write (config._original_file, contents);
       if (verbose)
         std::cout << format (STRING_CONFIG_MODIFIED, config._original_file._data)
-                  << "\n";
+                  << '\n';
     }
     else
     {
       if (verbose)
-        std::cout << STRING_CONFIG_NO_CHANGE << "\n";
+        std::cout << STRING_CONFIG_NO_CHANGE << '\n';
     }
   }
 
@@ -183,13 +183,13 @@ void command_config (Database& db, const std::vector <std::string>& args)
       File::write (config._original_file, contents);
       if (verbose)
         std::cout << format (STRING_CONFIG_MODIFIED, config._original_file._data)
-                  << "\n";
+                  << '\n';
     }
     else
     {
       if (verbose)
         std::cout << STRING_CONFIG_NO_CHANGE
-                  << "\n";
+                  << '\n';
     }
   }
 
@@ -198,7 +198,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
   else
   {
     if (verbose)
-      std::cout << "\n"
+      std::cout << '\n'
                 << format (STRING_CONFIG_SOURCE, config._original_file._data)
                 << "\n\n";
     taskd_renderMap (config, "Variable", "Value");

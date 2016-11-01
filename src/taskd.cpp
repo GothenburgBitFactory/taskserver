@@ -73,7 +73,7 @@ int main (int argc, const char** argv)
     else if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
     {
       Color bold ("bold");
-      std::cout << "\n"
+      std::cout << '\n'
                 << bold.colorize (PACKAGE_STRING)
 #ifdef HAVE_COMMIT
                 << " "
@@ -105,17 +105,17 @@ int main (int argc, const char** argv)
                 << "unknown"
 #endif
 
-          << "\n"
+          << '\n'
           << "Copyright (C) 2010 - 2016 Göteborg Bit Factory."
-          << "\n"
-          << "\n"
+          << '\n'
+          << '\n'
           << "Taskd may be copied only under the terms of the MIT license, "
           << "which may be found in the taskd source kit."
-          << "\n"
+          << '\n'
           << "Documentation for taskd can be found using 'man taskd' or at "
           << "http://taskwarrior.org"
-          << "\n"
-          << "\n";
+          << '\n'
+          << '\n';
     }
     else
     {
@@ -174,20 +174,20 @@ int main (int argc, const char** argv)
           command_help (no_args);
         }
         else
-          std::cout << error << "\n";
+          std::cout << error << '\n';
         status = -1;
       }
 
       catch (std::bad_alloc& error)
       {
-        std::cerr << "Error: Memory allocation failed: " << error.what () << "\n";
+        std::cerr << "Error: Memory allocation failed: " << error.what () << '\n';
         status = -3;
       }
 
       catch (...)
       {
         std::cerr << STRING_ERROR_UNKNOWN
-                  << "\n";
+                  << '\n';
         status = -2;
       }
     }

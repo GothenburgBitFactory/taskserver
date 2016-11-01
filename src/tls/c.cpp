@@ -25,7 +25,7 @@ int main (void)
 
   catch (std::string& e)
   {
-    std::cout << "ERROR " << e << "\n";
+    std::cout << "ERROR " << e << '\n';
   }
 
   catch (...)

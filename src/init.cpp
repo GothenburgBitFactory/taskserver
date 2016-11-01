@@ -70,9 +70,9 @@ void command_init (Database& db)
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
     std::cout << STRING_INIT_SERVER
-              << "\n"
+              << '\n'
               << "  taskd config server localhost:53589\n"
-              << "\n";
+              << '\n';
 
   // Create the data structure.
   Directory sub (root_dir);
@@ -93,7 +93,7 @@ void command_init (Database& db)
     db._config->save ();
     if (db._config->getBoolean ("verbose"))
       std::cout << format (STRING_INIT_CREATED, db._config->_original_file._data)
-                << "\n";
+                << '\n';
   }
 }
 
