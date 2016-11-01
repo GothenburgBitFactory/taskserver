@@ -88,26 +88,19 @@ public:
 
 private:
   Config& _config;
-  Datetime _start;
-  long _txn_count;
-  long _error_count;
-  double _busy;
-  double _max_time;
-  long _bytes_in;
-  long _bytes_out;
+  Datetime _start    {Datetime ()};
+  long _txn_count    {0};
+  long _error_count  {0};
+  double _busy       {0.0};
+  double _max_time   {0.0};
+  long _bytes_in     {0};
+  long _bytes_out    {0};
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 Daemon::Daemon (Config& settings)
 : _db (&settings)
 , _config (settings)
-, _start (Datetime ())
-, _txn_count (0)
-, _error_count (0)
-, _busy (0.0)
-, _max_time (0.0)
-, _bytes_in (0)
-, _bytes_out (0)
 {
 }
 
@@ -134,10 +127,10 @@ void Daemon::handler (const std::string& input, std::string& output)
     //           xx 00 xx 00  UTF-16LE
     //           xx xx xx xx  UTF-8
     if (input.length () >= 4 &&
-        (!input[0]           ||
-         !input[1]           ||
-         !input[2]           ||
-         !input[3]))
+        (! input[0]           ||
+         ! input[1]           ||
+         ! input[2]           ||
+         ! input[3]))
       throw 401;
 
     // A trapped SIGUSR1 results in a config reload.  Original command line
@@ -148,9 +141,9 @@ void Daemon::handler (const std::string& input, std::string& output)
         _log->write (format ("[{1}] SIGUSR1 triggered reload of {2}", _txn_count, _config._original_file._data));
 
       _config.load (_config._original_file._data);
-      Config::iterator i;
-      for (i = _overrides.begin (); i != _overrides.end (); ++i)
-        _config[i->first] = i->second;
+
+      for (auto& i : _overrides)
+        _config[i.first] = i.second;
 
       _sigusr1 = false;
     }
@@ -169,7 +162,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     Msg out;
 
     // Handle or reject all message types.
-    std::string type = in.get ("type");
+    auto type = in.get ("type");
          if (type == "statistics") handle_statistics (in, out);
     else if (type == "sync")       handle_sync       (in, out);
     else
@@ -184,7 +177,7 @@ void Daemon::handler (const std::string& input, std::string& output)
 
     // Record response time.
     timer.stop ();
-    double total = timer.total ();
+    auto total = timer.total ();
     _busy += total;
 
     // Record high-water mark.
@@ -302,10 +295,10 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   taskd_requireHeader (in, "protocol", "v1");
 
   // Note: org/user already validated during authentication.
-  std::string org      = in.get ("org");
-  std::string user     = in.get ("user");
-  std::string password = in.get ("key");
-  std::string subtype  = in.get ("subtype");
+  auto org      = in.get ("org");
+  auto user     = in.get ("user");
+  auto password = in.get ("key");
+  auto subtype  = in.get ("subtype");
 
   if (_log)
     _log->write (format ("[{1}] 'sync{2}' from '{3}/{4}' using '{5}' at {6}:{7}",
@@ -344,13 +337,10 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   int merge_count = 0;
 
   // For each incoming task...
-  std::vector <std::string>::iterator client_task;
-  for (client_task = client_data.begin ();
-       client_task != client_data.end ();
-       ++client_task)
+  for (auto& client_task : client_data)
   {
     // Validate task.
-    Task task (*client_task);
+    Task task (client_task);
     std::string uuid = task.get ("uuid");
     task.validate ();
 
@@ -391,7 +381,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     {
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
-      new_server_data.push_back (*client_task + "\n");
+      new_server_data.push_back (client_task + "\n");
       ++store_count;
     }
   }
@@ -471,15 +461,14 @@ void Daemon::parse_payload (
 
   // Separate into data and key.
   // TODO Some syntax checking would be nice.
-  std::vector <std::string>::iterator i;
-  for (i = lines.begin (); i != lines.end (); ++i)
+  for (auto& i : lines)
   {
-    if (*i != "")
+    if (i != "")
     {
-      if ((*i)[0] == '{')
-        data.push_back (*i);
+      if (i[0] == '{')
+        data.push_back (i);
       else
-        sync_key = *i;
+        sync_key = i;
     }
   }
 
@@ -558,10 +547,9 @@ unsigned int Daemon::find_branch_point (
     return branch;
 
   bool found = false;
-  std::vector <std::string>::const_iterator i;
-  for (i = data.begin (); i != data.end (); ++i)
+  for (auto& i : data)
   {
-    if (*i == sync_key)
+    if (i == sync_key)
     {
       found = true;
       break;
@@ -570,7 +558,7 @@ unsigned int Daemon::find_branch_point (
       ++branch;
   }
 
-  if (!found)
+  if (! found)
     throw std::string ("Could not find the last sync transaction. Did you skip the 'task sync init' requirement?");
 
   _log->write (format ("[{1}] Branch point: {2} --> {3}", _txn_count, sync_key, branch));
@@ -606,9 +594,8 @@ bool Daemon::contains (
   const std::vector <Task>& subset,
   const std::string& uuid) const
 {
-  std::vector <Task>::const_iterator i;
-  for (i = subset.begin (); i != subset.end (); ++i)
-    if (uuid == i->get ("uuid"))
+  for (auto& i : subset)
+    if (uuid == i.get ("uuid"))
       return true;
 
   return false;
@@ -622,13 +609,11 @@ std::string Daemon::generate_payload (
 {
   std::string payload;
 
-  std::vector <Task>::const_iterator t;
-  for (t = subset.begin (); t != subset.end (); ++t)
-    payload += t->composeJSON () + "\n";
+  for (auto& s : subset)
+    payload += s.composeJSON () + "\n";
 
-  std::vector <std::string>::const_iterator s;
-  for (s = additions.begin (); s != additions.end (); ++s)
-    payload += *s + "\n";
+  for (auto& a : additions)
+    payload += a + "\n";
 
   payload += key + "\n";
 
@@ -664,12 +649,11 @@ void Daemon::get_client_mods (
   const std::vector <std::string>& data,
   const std::string& uuid) const
 {
-  std::vector <std::string>::const_iterator line;
-  for (line = data.begin (); line != data.end (); ++line)
+  for (auto& line : data)
   {
-    if ((*line)[0] == '{')
+    if (line[0] == '{')
     {
-      Task t (*line);
+      Task t (line);
       if (t.get ("uuid") == uuid)
         mods.push_back (t);
     }
@@ -800,19 +784,19 @@ void Daemon::patch (
   }
 
   // The to-only attributes must be added to base.
-  for (i = to_only.begin (); i != to_only.end (); ++i)
+  for (auto& i : to_only)
   {
-    _log->write (format ("[{1}] patch add {2}={3}", _txn_count, *i, to.get (*i)));
-    base.set (*i, to.get (*i));
+    _log->write (format ("[{1}] patch add {2}={3}", _txn_count, i, to.get (i)));
+    base.set (i, to.get (i));
   }
 
   // The intersecting attributes, if the values differ, are applied.
-  for (i = common_atts.begin (); i != common_atts.end (); ++i)
+  for (auto& i : common_atts)
   {
-    if (from.get (*i) != to.get (*i))
+    if (from.get (i) != to.get (i))
     {
-      _log->write (format ("[{1}] patch modify {2}={3}", _txn_count, *i, to.get (*i)));
-      base.set (*i, to.get (*i));
+      _log->write (format ("[{1}] patch modify {2}={3}", _txn_count, i, to.get (i)));
+      base.set (i, to.get (i));
     }
   }
 }
@@ -828,21 +812,19 @@ void Daemon::get_totals (
 
   Directory orgs_dir (_config.get ("root"));
   orgs_dir += "orgs";
-  std::vector <std::string> orgs = orgs_dir.list ();
-  std::vector <std::string>::iterator org;
-  for (org = orgs.begin (); org != orgs.end (); ++org)
+
+  for (auto& org : orgs_dir.list ())
   {
     ++total_orgs;
 
-    Directory users_dir (*org);
+    Directory users_dir (org);
     users_dir += "users";
-    std::vector <std::string> users = users_dir.list ();
-    std::vector <std::string>::iterator user;
-    for (user = users.begin (); user != users.end (); ++user)
+
+    for (auto& user : users_dir.list ())
     {
       ++total_users;
 
-      File data (*user);
+      File data (user);
       data += "tx.data";
       total_bytes += (long) data.size ();
     }
@@ -853,10 +835,10 @@ void Daemon::get_totals (
 void command_server (Database& db)
 {
   _overrides = *db._config;
-  bool daemon = db._config->getBoolean ("daemon");
+  auto daemon = db._config->getBoolean ("daemon");
 
   // Verify that root exists.
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");
 
@@ -868,9 +850,8 @@ void command_server (Database& db)
   db._config->load (root_dir._data + "/config");
 
   // Apply overrides to db._config
-  Config::iterator i;
-  for (i = _overrides.begin (); i != _overrides.end (); ++i)
-    db._config->set (i->first, i->second);
+  for (auto& i : _overrides)
+    db._config->set (i.first, i.second);
 
   // Provide a set of attribute types.
   taskd_staticInitialize ();
@@ -896,14 +877,14 @@ void command_server (Database& db)
 
     // It is important that the ':' found should be the *last* one, in order
     // to accomodate IPv6 addresses.
-    std::string serverDetails = db._config->get ("server");
+    auto serverDetails = db._config->get ("server");
     auto colon = serverDetails.rfind (':');
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 
-    std::string host = serverDetails.substr (0, colon);
-    std::string port = serverDetails.substr (colon + 1);
-    std::string family = db._config->get ("family");
+    auto host = serverDetails.substr (0, colon);
+    auto port = serverDetails.substr (colon + 1);
+    auto family = db._config->get ("family");
 
     // Create a taskd server object.
     Daemon server        (*db._config);
