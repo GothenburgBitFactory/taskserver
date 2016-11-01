@@ -40,8 +40,8 @@
 // taskd config --data <root> [<name> [<value>]]
 void command_config (Database& db, const std::vector <std::string>& args)
 {
-  bool verbose      = db._config->getBoolean ("verbose");
-  bool confirmation = db._config->getBoolean ("confirmation");
+  auto verbose      = db._config->getBoolean ("verbose");
+  auto confirmation = db._config->getBoolean ("confirmation");
 
   std::string name;
   std::string value;
@@ -63,7 +63,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
     }
   }
 
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   Directory root_dir (root);
   if (!root_dir.exists ())
     throw std::string (STRING_CONFIG_NO_PATH);
@@ -80,33 +80,32 @@ void command_config (Database& db, const std::vector <std::string>& args)
     if (! config._original_file.writable ())
       throw std::string (STRING_CONFIG_READ_ONLY);
 
-    bool change = false;
+    auto change = false;
 
     // Read .taskd/config
     std::vector <std::string> contents;
     File::read (config._original_file, contents);
 
-    bool found = false;
-    std::vector <std::string>::iterator line;
-    for (line = contents.begin (); line != contents.end (); ++line)
+    auto found = false;
+    for (auto& line : contents)
     {
       // If there is a comment on the line, it must follow the pattern.
-      auto comment = line->find ("#");
-      auto pos     = line->find (name + "=");
+      auto comment = line.find ("#");
+      auto pos     = line.find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
            comment > pos) &&
-          trim (*line, " \t").find (name + "=") == 0)
+          trim (line, " \t").find (name + "=") == 0)
       {
         found = true;
         if (!confirmation ||
             confirm (format (STRING_CONFIG_OVERWRITE, name, config.get (name), value)))
         {
           if (comment != std::string::npos)
-            *line = name + "=" + value + " " + line->substr (comment);
+            line = name + "=" + value + " " + line.substr (comment);
           else
-            *line = name + "=" + value;
+            line = name + "=" + value;
 
           change = true;
         }
@@ -114,8 +113,8 @@ void command_config (Database& db, const std::vector <std::string>& args)
     }
 
     // Not found, so append instead.
-    if (!found &&
-        (!confirmation ||
+    if (! found &&
+        (! confirmation ||
          confirm (format (STRING_CONFIG_ADD, name, value))))
     {
       contents.push_back (name + "=" + value);
@@ -150,12 +149,11 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
     bool change = false;
     bool found = false;
-    std::vector <std::string>::iterator line;
-    for (line = contents.begin (); line != contents.end (); ++line)
+    for (auto& line : contents)
     {
       // If there is a comment on the line, it must follow the pattern.
-      auto comment = line->find ("#");
-      auto pos     = line->find (name + "=");
+      auto comment = line.find ("#");
+      auto pos     = line.find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
@@ -167,7 +165,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
         if (!confirmation ||
             confirm (format (STRING_CONFIG_REMOVE, name)))
         {
-          *line = "";
+          line = "";
           change = true;
         }
       }
@@ -184,8 +182,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
       File::write (config._original_file, contents);
       if (verbose)
-        std::cout << format (STRING_CONFIG_MODIFIED,
-                             config._original_file._data)
+        std::cout << format (STRING_CONFIG_MODIFIED, config._original_file._data)
                   << "\n";
     }
     else
