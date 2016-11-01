@@ -36,7 +36,7 @@
 void command_init (Database& db)
 {
   // Verify that root exists.
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   if (root == "")
     throw std::string (STRING_INIT_DATA_REQUIRED);
 
