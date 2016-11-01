@@ -56,9 +56,9 @@ void command_diag (Database& config)
 
   Color bold ("bold");
 
-  std::cout << "\n"
+  std::cout << '\n'
             << bold.colorize (PACKAGE_STRING)
-            << "\n";
+            << '\n';
 
   std::cout << "    Platform: "
             <<
@@ -85,7 +85,7 @@ void command_diag (Database& config)
 #else
                "unknown"
 #endif
-            << "\n";
+            << '\n';
 
   char hostname[128] = {0};
   gethostname (hostname, 128);
@@ -95,10 +95,10 @@ void command_diag (Database& config)
 
   // Compiler.
   std::cout << bold.colorize ("Compiler")
-            << "\n"
+            << '\n'
 #ifdef __VERSION__
             << "     Version: "
-            << __VERSION__ << "\n"
+            << __VERSION__ << '\n'
 #endif
             << "        Caps:"
 #ifdef __STDC__
@@ -127,7 +127,7 @@ void command_diag (Database& config)
             << " +l"      << 8 * sizeof (long)
             << " +vp"     << 8 * sizeof (void*)
             << " +time_t" << 8 * sizeof (time_t)
-            << "\n";
+            << '\n';
 
   // Compiler compliance level.
   std::string compliance = "non-compliant";
@@ -145,14 +145,14 @@ void command_diag (Database& config)
             << "\n\n";
 
   std::cout << bold.colorize ("Build Features")
-            << "\n"
+            << '\n'
 
   // Build date.
-            << "       Built: " << __DATE__ << " " << __TIME__ << "\n"
+            << "       Built: " << __DATE__ << " " << __TIME__ << '\n'
 #ifdef HAVE_COMMIT
-            << "      Commit: " << COMMIT << "\n"
+            << "      Commit: " << COMMIT << '\n'
 #endif
-            << "       CMake: " << CMAKE_VERSION << "\n";
+            << "       CMake: " << CMAKE_VERSION << '\n';
 
   std::cout << "     libuuid: "
 #ifdef HAVE_UUID_UNPARSE_LOWER
@@ -160,7 +160,7 @@ void command_diag (Database& config)
 #else
             << "libuuid, no uuid_unparse_lower"
 #endif
-            << "\n";
+            << '\n';
 
   std::cout << "   libgnutls: "
 #ifdef HAVE_LIBGNUTLS
@@ -172,7 +172,7 @@ void command_diag (Database& config)
 #else
             << "n/a"
 #endif
-            << "\n";
+            << '\n';
 
   std::cout << "  Build type: "
 #ifdef CMAKE_BUILD_TYPE
@@ -185,11 +185,11 @@ void command_diag (Database& config)
   // Configuration details, if possible.
   char* root_env = getenv ("TASKDDATA");
   std::cout << bold.colorize ("Configuration")
-            << "\n"
-            << "   TASKDDATA: " << (root_env ? root_env : "") << "\n";
+            << '\n'
+            << "   TASKDDATA: " << (root_env ? root_env : "") << '\n';
 
   // Verify that root exists.
-  std::string root = config._config->get ("root");
+  auto root = config._config->get ("root");
   if (root == "")
   {
     std::cout << "\nBy specifying the '--data' location, more diagnostics can be generated.\n";
@@ -209,7 +209,7 @@ void command_diag (Database& config)
                 << (root_dir.writable ()
                      ? ", writable"
                      : ", not writable")
-                << "\n";
+                << '\n';
 
       File config_file (root_dir._data + "/config");
       std::cout << "      config: "
@@ -249,22 +249,22 @@ void command_diag (Database& config)
         File log (config._config->get ("log"));
         std::cout << "         Log: "
                   << log._data << (log.exists () ? " (found)" : " (missing)")
-                  << "\n";
+                  << '\n';
 
         File pid (config._config->get ("pid.file"));
         std::cout << "    PID File: "
                   << pid._data << (pid.exists () ? " (found)" : " (missing)")
-                  << "\n";
+                  << '\n';
 
-        std::cout << "      Server: " << config._config->get ("server") << "\n";
+        std::cout << "      Server: " << config._config->get ("server") << '\n';
         std::cout << " Max Request: " << config._config->get ("request.limit") << " bytes\n";
-        std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";
+        std::cout << "     Ciphers: " << config._config->get ("ciphers") << '\n';
 
         // Show trust level.
         std::string trust_value = config._config->get ("trust");
         if (trust_value == "strict" ||
             trust_value == "allow all")
-          std::cout << "       Trust: " << trust_value << "\n";
+          std::cout << "       Trust: " << trust_value << '\n';
         else
           std::cout << "       Trust: Bad value - see 'man taskdrc'\n";
       }
@@ -281,7 +281,7 @@ void command_validate (const std::vector <std::string>& args)
   {
     if (args.size () < 2)
     {
-      std::cout << STRING_JSON_VALIDATE << "\n";
+      std::cout << STRING_JSON_VALIDATE << '\n';
       return;
     }
 
@@ -301,14 +301,14 @@ void command_validate (const std::vector <std::string>& args)
       std::cout << STRING_JSON_SYNTAX_OK
                 << "\n\n"
                 << root->dump ()
-                << "\n";
+                << '\n';
     }
 
     delete root;
   }
 
-  catch (const std::string& e) { std::cout << e << "\n";                    }
-  catch (...)                  { std::cout << STRING_ERROR_UNKNOWN << "\n"; }
+  catch (const std::string& e) { std::cout << e << '\n';                    }
+  catch (...)                  { std::cout << STRING_ERROR_UNKNOWN << '\n'; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
