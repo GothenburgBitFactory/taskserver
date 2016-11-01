@@ -83,8 +83,8 @@ bool taskd_applyOverride (Config& config, const std::string& arg)
     if (equal != std::string::npos &&
         equal > 2)
     {
-      std::string name  = arg.substr (2, equal - 2);
-      std::string value = arg.substr (equal + 1);
+      auto name  = arg.substr (2, equal - 2);
+      auto value = arg.substr (equal + 1);
 
       config.set (name, value);
       return true;
@@ -154,25 +154,25 @@ bool taskd_sendMessage (
   const Msg& out,
   Msg& in)
 {
-  std::string destination = config.get (to);
+  auto destination = config.get (to);
   auto colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
-  std::string server      = destination.substr (0, colon);
-  std::string port        = destination.substr (colon + 1);
+  auto server      = destination.substr (0, colon);
+  auto port        = destination.substr (colon + 1);
 
-  std::string ca          = config.get ("ca.cert");
-  std::string certificate = config.get ("client.cert");
-  std::string key         = config.get ("client.key");
-  std::string ciphers     = config.get ("ciphers");
+  auto ca          = config.get ("ca.cert");
+  auto certificate = config.get ("client.cert");
+  auto key         = config.get ("client.key");
+  auto ciphers     = config.get ("ciphers");
 
   try
   {
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
 
-    std::string trust_level = config.get ("trust");
+    auto trust_level = config.get ("trust");
     client.trust (trust_level == "allow all"       ? TLSClient::allow_all       :
                   trust_level == "ignore hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
@@ -207,17 +207,16 @@ void taskd_renderMap (
 {
   if (data.size ())
   {
-    unsigned int max1 = title1.length ();
-    unsigned int max2 = title2.length ();
+    auto max1 = title1.length ();
+    auto max2 = title2.length ();
 
-    std::map <std::string, std::string>::const_iterator i;
-    for (i = data.begin (); i != data.end (); ++i)
+    for (auto& i : data)
     {
-      if (i->first.length () > max1)  max1 = i->first.length ();
-      if (i->second.length () > max2) max2 = i->second.length ();
+      if (i.first.length ()  > max1) max1 = i.first.length ();
+      if (i.second.length () > max2) max2 = i.second.length ();
     }
 
-    std::cout << std::left 
+    std::cout << std::left
               << std::setfill (' ')
               << std::setw (max1) << title1
               << "  "
@@ -229,12 +228,12 @@ void taskd_renderMap (
               << std::setw (max2) << ""
               << "\n";
 
-    for (i = data.begin (); i != data.end (); ++i)
+    for (auto& i : data)
       std::cout << std::left
                 << std::setfill (' ')
-                << std::setw (max1) << i->first
+                << std::setw (max1) << i.first
                 << "  "
-                << std::setw (max2) << i->second
+                << std::setw (max2) << i.second
                 << "\n";
 
     std::cout << "\n";
@@ -263,12 +262,9 @@ bool taskd_is_user (
   d += org;
   d += "users";
 
-  std::vector <std::string> users = d.list();
-  std::vector <std::string>::iterator u;
-
-  for (u = users.begin (); u != users.end (); ++u)
+  for (auto& u : d.list ())
   {
-    Path cfg (*u);
+    Path cfg (u);
     cfg += "config";
 
     Config conf (cfg._data);
