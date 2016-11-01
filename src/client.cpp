@@ -53,7 +53,7 @@ void command_api (Database& db, const std::vector <std::string>& args)
     File file (args[i]);
     std::string contents;
     file.read (contents);
-    std::cout << ">>> " << args[i] << "\n";
+    std::cout << ">>> " << args[i] << '\n';
 
     Msg request;
     request.parse (contents);

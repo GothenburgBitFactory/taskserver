@@ -139,7 +139,7 @@ bool taskd_createDirectory (Directory& d, bool verbose)
     if (verbose)
       std::cout << Color ("green").colorize (
                      "- Created directory " + std::string (d))
-                << "\n";
+                << '\n';
 
     return true;
   }
@@ -221,12 +221,12 @@ void taskd_renderMap (
               << std::setw (max1) << title1
               << "  "
               << std::setw (max2) << title2
-              << "\n"
+              << '\n'
               << std::setfill ('-')
               << std::setw (max1) << ""
               << "  "
               << std::setw (max2) << ""
-              << "\n";
+              << '\n';
 
     for (auto& i : data)
       std::cout << std::left
@@ -234,9 +234,9 @@ void taskd_renderMap (
                 << std::setw (max1) << i.first
                 << "  "
                 << std::setw (max2) << i.second
-                << "\n";
+                << '\n';
 
-    std::cout << "\n";
+    std::cout << '\n';
   }
 }
 

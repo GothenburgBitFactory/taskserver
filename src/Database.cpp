@@ -197,7 +197,7 @@ bool Database::add_user (
     conf.save ();
 
     // User will need this key.
-    std::cout << "New user key: " << key << "\n";
+    std::cout << "New user key: " << key << '\n';
     return true;
   }
 
