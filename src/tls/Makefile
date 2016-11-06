@@ -1,4 +1,4 @@
-CFLAGS  = -I. -I/usr/local/include -Wall -pedantic -D HAVE_LIBGNUTLS=1
+CFLAGS  = -I. -I/usr/local/include -Wall -pedantic -D HAVE_LIBGNUTLS=1 --std=c++11 -stdlib=libc++
 LFLAGS  = -L/usr/local/lib
 LIBS    = -lgnutls
 
