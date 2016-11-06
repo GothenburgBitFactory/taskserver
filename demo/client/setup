@@ -27,6 +27,7 @@ echo "taskd.trust=strict"                     >> $TW1/rc
 #echo "taskd.trust=allow all"                  >> $TW1/rc
 echo "confirmation=off"                       >> $TW1/rc
 echo "verbose=sync"                           >> $TW1/rc
+#echo "debug.tls=4"                            >> $TW1/rc
 cp ../../pki/api.cert.pem $TW1
 cp ../../pki/api.key.pem $TW1
 cp ../../pki/ca.cert.pem $TW1
@@ -47,6 +48,7 @@ echo "taskd.trust=strict"                     >> $TW2/rc
 #echo "taskd.trust=allow all"                  >> $TW2/rc
 echo "confirmation=off"                       >> $TW2/rc
 echo "verbose=sync"                           >> $TW2/rc
+#echo "debug.tls=4"                            >> $TW2/rc
 cp ../../pki/api.cert.pem $TW2
 cp ../../pki/api.key.pem $TW2
 cp ../../pki/ca.cert.pem $TW2

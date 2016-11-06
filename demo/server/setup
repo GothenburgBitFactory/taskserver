@@ -77,6 +77,9 @@ echo "# taskd config --force --data $ROOT ip.log 1"
 echo "# taskd config --force --data $ROOT trust strict"
 ../../src/taskd config --force --data $ROOT trust strict
 
+#echo "# taskd config --force --data $ROOT debug.tls 4"
+#../../src/taskd config --force --data $ROOT debug.tls 4
+
 echo
 ${TREE} $ROOT
 
