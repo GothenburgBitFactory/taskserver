@@ -61,7 +61,6 @@ private:
   std::string                      _ciphers;
   unsigned int                     _dh_bits;
   gnutls_certificate_credentials_t _credentials;
-  gnutls_dh_params_t               _params;
   gnutls_priority_t                _priorities;
   int                              _socket;
   int                              _queue;

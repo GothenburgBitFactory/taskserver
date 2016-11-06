@@ -188,9 +188,6 @@ void TLSServer::init (
       (ret = gnutls_certificate_set_x509_key_file (_credentials, _cert.c_str (), _key.c_str (), GNUTLS_X509_FMT_PEM)) < 0)
     throw format ("Bad CERT file. {1}", gnutls_strerror (ret));
 
-  gnutls_dh_params_init (&_params);
-  gnutls_dh_params_generate2 (_params, _dh_bits);
-
   if (_ciphers == "")
     _ciphers =
       "%SERVER_PRECEDENCE"          // use the server's precedences for algorithms
@@ -200,7 +197,15 @@ void TLSServer::init (
       ":-ARCFOUR-128:-ARCFOUR-40"   // RC4 is broken
       ":-MD5";                      // MD5 is not good enough anymore
   gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL);
-  gnutls_certificate_set_dh_params (_credentials, _params);
+
+#if GNUTLS_VERSION_NUMBER >= 0x030506
+  gnutls_certificate_set_known_dh_params (_credentials, GNUTLS_SEC_PARAM_HIGH);
+#else
+  gnutls_dh_params_t params;
+  gnutls_dh_params_init (&params);
+  gnutls_dh_params_generate2 (params, _dh_bits);
+  gnutls_certificate_set_dh_params (_credentials, params);
+#endif
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
   // The automatic verification for the client certificate with
