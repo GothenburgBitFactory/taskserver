@@ -106,5 +106,5 @@ printf "Ice cream and candy floss.  Parents with dosh."  > bad.82
 printf ""  > bad.83
 
 echo "# Stats"
-printf "type: statistics\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n" > stats.0
+printf "type: statistics\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.6.0\nprotocol: v1\n\n\n" > stats.0
 
