@@ -163,8 +163,8 @@ bool taskd_sendMessage (
   auto port        = destination.substr (colon + 1);
 
   auto ca          = config.get ("ca.cert");
-  auto certificate = config.get ("client.cert");
-  auto key         = config.get ("client.key");
+  auto certificate = config.get ("api.cert");
+  auto key         = config.get ("api.key");
   auto ciphers     = config.get ("ciphers");
 
   try
