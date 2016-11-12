@@ -18,3 +18,7 @@ echo '--- list 2, sync --------------------------------------------------------'
 task rc:tw2/rc list   # Generate local instances
 task rc:tw2/rc sync   # Sync to creates duplicates
 
+# tw2/pending.data
+# - Contains two instances for imask 0
+# - Contains two instances for imask 1
+# - Contains floating point imask values for the second set of instances
