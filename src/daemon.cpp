@@ -826,7 +826,8 @@ void Daemon::get_totals (
 
       File data (user);
       data += "tx.data";
-      total_bytes += (long) data.size ();
+      if (data.exists ())
+        total_bytes += (long) data.size ();
     }
   }
 }
