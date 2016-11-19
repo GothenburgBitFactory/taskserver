@@ -35,7 +35,7 @@
 class Config : public std::map <std::string, std::string>
 {
 public:
-  Config ();
+  Config () = default;
   Config (const std::string&);
 
   Config (const Config&);
@@ -61,10 +61,10 @@ public:
   bool dirty ();
 
 public:
-  File _original_file;
+  File _original_file {};
 
 private:
-  bool _dirty;
+  bool _dirty         {false};
 };
 
 #endif
