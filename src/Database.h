@@ -59,7 +59,7 @@ public:
   Config* _config {nullptr};
 
 private:
-  Log* _log {nullptr};
+  Log* _log       {nullptr};
 };
 
 #endif
