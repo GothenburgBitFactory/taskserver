@@ -177,7 +177,7 @@ void Daemon::handler (const std::string& input, std::string& output)
 
     // Record response time.
     timer.stop ();
-    auto total = timer.total ();
+    auto total = timer.total_s ();
     _busy += total;
 
     // Record high-water mark.
