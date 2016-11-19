@@ -37,7 +37,6 @@ class Config : public std::map <std::string, std::string>
 public:
   Config () = default;
   Config (const std::string&);
-
   Config (const Config&);
   Config& operator= (const Config&);
 
