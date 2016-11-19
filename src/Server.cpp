@@ -282,7 +282,7 @@ void Server::beginServer ()
       if (_log)
       {
         timer.stop ();
-        _log->write (format ("[{1}] Serviced in {2}", _request_count, timer.total ()));
+        _log->write (format ("[{1}] Serviced in {2}", _request_count, timer.total_s ()));
       }
     }
 
