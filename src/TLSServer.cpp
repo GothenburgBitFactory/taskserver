@@ -67,16 +67,6 @@ static int verify_certificate_callback (gnutls_session_t session)
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
-: _ca ("")
-, _crl ("")
-, _cert ("")
-, _key ("")
-, _ciphers ("")
-, _dh_bits (0)
-, _socket (0)
-, _queue (5)
-, _debug (false)
-, _trust (TLSServer::strict)
 {
   // Set up the default.
   dh_bits (0);
@@ -323,17 +313,6 @@ void TLSServer::accept (TLSTransaction& tx)
     tx.debug ();
 
   tx.init (*this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TLSTransaction::TLSTransaction ()
-: _socket (0)
-, _limit (0)
-, _debug (false)
-, _address ("")
-, _port (0)
-, _trust (TLSServer::strict)
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
