@@ -33,8 +33,8 @@
 #include <shared.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd add org   <org>
-// taskd add user  <org> <user>
+// taskd add org  <org>
+// taskd add user <org> <user>
 void command_add (Database& db, const std::vector <std::string>& args)
 {
   auto verbose = db._config->getBoolean ("verbose");
@@ -103,8 +103,8 @@ void command_add (Database& db, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd remove org   <org>
-// taskd remove user  <org> <user>
+// taskd remove org  <org>
+// taskd remove user <org> <user>
 void command_remove (Database& db, const std::vector <std::string>& args)
 {
   bool verbose = db._config->getBoolean ("verbose");
@@ -173,8 +173,8 @@ void command_remove (Database& db, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd suspend org   <org>
-// taskd suspend user  <org> <user>
+// taskd suspend org  <org>
+// taskd suspend user <org> <user>
 void command_suspend (Database& db, const std::vector <std::string>& args)
 {
   bool verbose = db._config->getBoolean ("verbose");
@@ -243,8 +243,8 @@ void command_suspend (Database& db, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// taskd resume org   <org>
-// taskd resume user  <org> <user>
+// taskd resume org  <org>
+// taskd resume user <org> <user>
 void command_resume (Database& db, const std::vector <std::string>& args)
 {
   bool verbose = db._config->getBoolean ("verbose");
