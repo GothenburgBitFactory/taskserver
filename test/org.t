@@ -152,7 +152,7 @@ class TestSuspendOrg(ServerTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
         code, out, err = self.td.runError('suspend --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("Organization 'ORG' already suspended.", out)
+        self.assertIn("Already suspended.", out)
 
 class TestResumeOrg(ServerTestCase):
     def setUp(self):
@@ -186,7 +186,7 @@ class TestResumeOrg(ServerTestCase):
         self.assertIn("ERROR: Organization 'NOPE' does not exist.", out)
 
     def test_resume_unsuspended(self):
-        """taskd resume --data $TASKDDATA org ORG"""
+        """taskd resume --data $TASKDDATA org ORG; taskd resume --data $TASKDDATA org ORG"""
         self.td('init --data {0}'.format(self.td.datadir))
         code, out, err = self.td('add --data {0} org ORG'.format(self.td.datadir))
         self.assertNotIn("ERROR", err)
@@ -194,7 +194,7 @@ class TestResumeOrg(ServerTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td.runError('resume --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("ERROR: Failed to resume organization 'ORG'.", out)
+        self.assertIn("Not suspended.", out)
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
