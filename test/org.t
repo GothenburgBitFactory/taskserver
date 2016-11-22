@@ -78,7 +78,7 @@ class TestAddOrg(ServerTestCase):
         self.td('init --data {0}'.format(self.td.datadir))
         self.td('add --data {0} org ORG'.format(self.td.datadir))
         code, out, err = self.td.runError('add --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("ERROR: Organization 'ORG' already exists.", out)
+        self.assertIn("ERROR: Organization 'ORG' already exists.", err)
 
     def test_add_org_with_spaces(self):
         """taskd add --data $TASKDDATA org 'MY ORG'"""
@@ -110,7 +110,7 @@ class TestRemoveOrg(ServerTestCase):
         """taskd remove --data $TASKDDATA org NOPE"""
         self.td('init --data {0}'.format(self.td.datadir))
         code, out, err = self.td.runError('remove --data {0} org NOPE'.format(self.td.datadir))
-        self.assertNotIn("ERROR: Organization 'NOPE' does not exist.", err)
+        self.assertIn("ERROR: Organization 'NOPE' does not exist.", err)
 
 class TestSuspendOrg(ServerTestCase):
     def setUp(self):
@@ -135,7 +135,7 @@ class TestSuspendOrg(ServerTestCase):
         """taskd suspend --data $TASKDDATA org NOPE"""
         self.td('init --data {0}'.format(self.td.datadir))
         code, out, err = self.td.runError('suspend --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("ERROR: Organization 'ORG' does not exist.", out)
+        self.assertIn("ERROR: Organization 'ORG' does not exist.", err)
 
     def test_suspend_org_suspended(self):
         """taskd suspend --data $TASKDDATA org ORG; taskd suspend --data $TASKDDATA org ORG"""
@@ -152,7 +152,7 @@ class TestSuspendOrg(ServerTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'suspended')))
 
         code, out, err = self.td.runError('suspend --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("Already suspended.", out)
+        self.assertIn("Already suspended.", err)
 
 class TestResumeOrg(ServerTestCase):
     def setUp(self):
@@ -183,7 +183,7 @@ class TestResumeOrg(ServerTestCase):
         """taskd resume --data $TASKDDATA org NOPE"""
         self.td('init --data {0}'.format(self.td.datadir))
         code, out, err = self.td.runError('resume --data {0} org NOPE'.format(self.td.datadir))
-        self.assertIn("ERROR: Organization 'NOPE' does not exist.", out)
+        self.assertIn("ERROR: Organization 'NOPE' does not exist.", err)
 
     def test_resume_unsuspended(self):
         """taskd resume --data $TASKDDATA org ORG; taskd resume --data $TASKDDATA org ORG"""
@@ -194,7 +194,7 @@ class TestResumeOrg(ServerTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.td.datadir, 'orgs', 'ORG', 'users')))
 
         code, out, err = self.td.runError('resume --data {0} org ORG'.format(self.td.datadir))
-        self.assertIn("Not suspended.", out)
+        self.assertIn("Not suspended.", err)
 
 if __name__ == "__main__":
     from simpletap import TAPTestRunner
