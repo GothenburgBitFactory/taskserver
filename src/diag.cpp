@@ -38,7 +38,6 @@
 #include <FS.h>
 #include <JSON.h>
 #include <format.h>
-#include <text.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>

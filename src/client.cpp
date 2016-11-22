@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <FS.h>
 #include <Datetime.h>
-#include <text.h>
 #include <util.h>
 #include <taskd.h>
 #include <i18n.h>

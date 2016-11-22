@@ -45,7 +45,6 @@
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <text.h>
 #include <util.h>
 #include <taskd.h>
 #include <i18n.h>
