@@ -27,7 +27,6 @@
 #include <cmake.h>
 #include <iostream>
 #include <cstring>
-#include <text.h>
 #include <taskd.h>
 #include <shared.h>
 

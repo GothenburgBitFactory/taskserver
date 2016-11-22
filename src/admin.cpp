@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include <ConfigFile.h>
 #include <taskd.h>
-#include <text.h>
 #include <shared.h>
 
 ////////////////////////////////////////////////////////////////////////////////

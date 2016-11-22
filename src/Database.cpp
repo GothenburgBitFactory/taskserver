@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <utf8.h>
 #include <FS.h>
-#include <text.h>
 #include <util.h>
 #include <taskd.h>
 #include <shared.h>

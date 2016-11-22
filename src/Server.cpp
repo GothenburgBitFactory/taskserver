@@ -43,7 +43,6 @@
 #include <TLSServer.h>
 #include <Timer.h>
 #include <format.h>
-#include <text.h>
 
 // Indicates that certain signals were caught.
 bool _sighup  = false;

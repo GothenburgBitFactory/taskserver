@@ -40,7 +40,6 @@
 #include <shared.h>
 #include <format.h>
 #include <Database.h>
-#include <text.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>

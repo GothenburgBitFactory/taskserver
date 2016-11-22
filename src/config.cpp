@@ -32,7 +32,6 @@
 #include <format.h>
 #include <taskd.h>
 #include <shared.h>
-#include <text.h>
 #include <util.h>
 #include <i18n.h>
 
