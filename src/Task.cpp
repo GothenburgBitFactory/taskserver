@@ -648,14 +648,14 @@ void Task::parseJSON (const json::object* root_obj)
       // TW-1274 Standardization.
       else if (i.first == "modification")
       {
-        Datetime d (unquoteText (i.second->dump ()));
+        Datetime d (Lexer::dequote (i.second->dump ()));
         set ("modified", d.toEpochString ());
       }
 
       // Dates are converted from ISO to epoch.
       else if (type == "date")
       {
-        std::string text = unquoteText (i.second->dump ());
+        auto text = Lexer::dequote (i.second->dump ());
         Datetime d (text);
         set (i.first, text == "" ? "" : d.toEpochString ());
       }
@@ -707,11 +707,11 @@ void Task::parseJSON (const json::object* root_obj)
 
       // Strings are decoded.
       else if (type == "string")
-        set (i.first, json::decode (unquoteText (i.second->dump ())));
+        set (i.first, json::decode (Lexer::dequote (i.second->dump ())));
 
       // Other types are simply added.
       else
-        set (i.first, unquoteText (i.second->dump ()));
+        set (i.first, Lexer::dequote (i.second->dump ()));
     }
 
     // UDA orphans and annotations do not have columns.
@@ -755,7 +755,7 @@ void Task::parseJSON (const json::object* root_obj)
                 << "' --> preserved\n";
         context.debug (message.str ());
 #endif
-        set (i.first, json::decode (unquoteText (i.second->dump ())));
+        set (i.first, json::decode (Lexer::dequote (i.second->dump ())));
       }
     }
   }
@@ -2023,7 +2023,7 @@ void Task::modify (modType type, bool text_required /* = false */)
         }
         else
         {
-          Lexer::dequote (value);
+          value = Lexer::dequote (value);
 
           // Get the column info. Some columns are not modifiable.
           Column* column = context.columns[name];
@@ -2096,7 +2096,7 @@ void Task::modify (modType type, bool text_required /* = false */)
   //  any.
   if (text != "")
   {
-    Lexer::dequote (text);
+    text = Lexer::dequote (text);
 
     switch (type)
     {
