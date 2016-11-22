@@ -174,7 +174,7 @@ int main (int argc, const char** argv)
           command_help (no_args);
         }
         else
-          std::cout << error << '\n';
+          std::cerr << error << '\n';
         status = -1;
       }
 
