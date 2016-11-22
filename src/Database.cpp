@@ -234,6 +234,9 @@ bool Database::remove_user (
 bool Database::suspend (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
+  if (semaphore.exists ())
+    throw std::string ("Already suspended.");
+
   return semaphore.create (0600);
 }
 
@@ -241,6 +244,9 @@ bool Database::suspend (const Directory& node)
 bool Database::resume (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
+  if (! semaphore.exists ())
+    throw std::string ("Not suspended.");
+
   return semaphore.remove ();
 }
 
