@@ -182,7 +182,7 @@ const std::string Task::identifier (bool shortened /* = false */) const
 void Task::setAsNow (const std::string& att)
 {
   char now[16];
-  sprintf (now, "%u", (unsigned int) time (NULL));
+  snprintf (now, 16, "%u", (unsigned int) time (NULL));
   set (att, now);
 
   recalc_urgency = true;
@@ -784,7 +784,7 @@ void Task::parseLegacy (const std::string& line)
     std::stringstream message;
     message << "Invalid fileformat at line '"
             << line
-            << "'";
+            << '\'';
     context.debug (message.str ());
 #endif
     throw std::string (STRING_TASK_PARSE_UNREC_FF);
@@ -821,13 +821,13 @@ std::string Task::composeF4 () const
         ff4 += encode (json::encode (it.second));
       else
         ff4 += it.second;
-      ff4 += "\"";
+      ff4 += '"';
 
       first = false;
     }
   }
 
-  ff4 += "]";
+  ff4 += ']';
   return ff4;
 }
 
@@ -835,12 +835,12 @@ std::string Task::composeF4 () const
 std::string Task::composeJSON (bool decorate /*= false*/) const
 {
   std::stringstream out;
-  out << "{";
+  out << '{';
 
   // ID inclusion is optional, but not a good idea, because it remains correct
   // only until the next gc.
   if (decorate)
-    out << "\"id\":" << id << ",";
+    out << "\"id\":" << id << ',';
 
   // First the non-annotations.
   int attributes_written = 0;
@@ -855,7 +855,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
         continue;
 
     if (attributes_written)
-      out << ",";
+      out << ',';
 
     std::string type = Task::attributes[i.first];
     if (type == "")
@@ -865,12 +865,12 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     if (type == "date")
     {
       Datetime d (i.second);
-      out << "\""
+      out << '"'
           << (i.first == "modification" ? "modified" : i.first)
           << "\":\""
           // Date was deleted, do not export parsed empty string
           << (i.second == "" ? "" : d.toISO ())
-          << "\"";
+          << '"';
 
       ++attributes_written;
     }
@@ -883,7 +883,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
 */
     else if (type == "numeric")
     {
-      out << "\""
+      out << '"'
           << i.first
           << "\":"
           << i.second;
@@ -902,12 +902,12 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
       for (auto i : tags)
       {
         if (count++)
-          out << ",";
+          out << ',';
 
-        out << "\"" << i << "\"";
+        out << '"' << i << '"';
       }
 
-      out << "]";
+      out << ']';
       ++attributes_written;
     }
 
@@ -941,23 +941,23 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
       for (auto i : deps)
       {
         if (count++)
-          out << ",";
+          out << ',';
 
-        out << "\"" << i << "\"";
+        out << '"' << i << '"';
       }
 
-      out << "]";
+      out << ']';
       ++attributes_written;
     }
 
     // Everything else is a quoted value.
     else
     {
-      out << "\""
+      out << '"'
           << i.first
           << "\":\""
           << (type == "string" ? json::encode (i.second) : i.second)
-          << "\"";
+          << '"';
 
       ++attributes_written;
     }
@@ -966,7 +966,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
   // Now the annotations, if any.
   if (annotation_count)
   {
-    out << ","
+    out << ','
         << "\"annotations\":[";
 
     int annotations_written = 0;
@@ -975,7 +975,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
       if (! i.first.compare (0, 11, "annotation_", 11))
       {
         if (annotations_written)
-          out << ",";
+          out << ',';
 
         Datetime d (i.first.substr (11));
         out << "{\"entry\":\""
@@ -988,18 +988,18 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
       }
     }
 
-    out << "]";
+    out << ']';
   }
 
 #ifdef PRODUCT_TASKWARRIOR
   // Include urgency.
   if (decorate)
-    out << ","
+    out << ','
         << "\"urgency\":"
         << urgency_c ();
 #endif
 
-  out << "}";
+  out << '}';
   return out.str ();
 }
 
@@ -1106,7 +1106,7 @@ void Task::addDependency (const std::string& uuid)
   {
     // Check for extant dependency.
     if (depends.find (uuid) == std::string::npos)
-      set ("depends", depends + "," + uuid);
+      set ("depends", depends + ',' + uuid);
     else
     {
 #ifdef PRODUCT_TASKWARRIOR
@@ -1171,6 +1171,22 @@ void Task::getDependencies (std::vector <std::string>& all) const
 {
   all = split (get ("depends"), ',');
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void Task::getDependencies (std::vector <Task>& all) const
+{
+  std::vector <std::string> deps;
+  split (deps, get ("depends"), ',');
+
+  all.clear ();
+
+  for (auto& dep : deps)
+  {
+    Task task;
+    context.tdb2.get (dep, task);
+    all.push_back (task);
+  }
+}
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1204,13 +1220,14 @@ bool Task::hasTag (const std::string& tag) const
 #ifdef PRODUCT_TASKWARRIOR
     if (tag == "READY")     return is_ready ();
     if (tag == "DUE")       return is_due ();
-    if (tag == "DUETODAY")  return is_duetoday ();
+    if (tag == "DUETODAY")  return is_duetoday ();          // 2016-03-29: Deprecated in 2.6.0
     if (tag == "TODAY")     return is_duetoday ();
     if (tag == "YESTERDAY") return is_dueyesterday ();
     if (tag == "TOMORROW")  return is_duetomorrow ();
     if (tag == "OVERDUE")   return is_overdue ();
     if (tag == "WEEK")      return is_dueweek ();
     if (tag == "MONTH")     return is_duemonth ();
+    if (tag == "QUARTER")   return is_duequarter ();
     if (tag == "YEAR")      return is_dueyear ();
 #endif
     if (tag == "ACTIVE")    return has ("start");
@@ -1479,6 +1496,10 @@ void Task::validate (bool
   if ((status == Task::completed || status == Task::deleted) &&
       (! has ("end") || get ("end") == ""))
     setAsNow ("end");
+
+  // Pending tasks cannot have an end date, remove if present
+  if ((status == Task::pending) && (get ("end") != ""))
+    remove ("end");
 
   // Provide an entry date unless user already specified one.
   if (! has ("modified") || get ("modified") == "")
@@ -1789,7 +1810,7 @@ float Task::urgency_c () const
         if (end != std::string::npos)
         {
           const std::string uda = var.first.substr (12, end - 12);
-          auto dot = uda.find (".");
+          auto dot = uda.find ('.');
           if (dot == std::string::npos)
           {
             // urgency.uda.<name>.coefficient
@@ -1986,7 +2007,6 @@ float Task::urgency_blocking () const
 // It came from the Command base object, but doesn't really belong there either.
 void Task::modify (modType type, bool text_required /* = false */)
 {
-  context.debug ("Task::modify");
   std::string label = "  [1;37;43mMODIFICATION[0m ";
 
   // Need this for later comparison.
@@ -2068,13 +2088,13 @@ void Task::modify (modType type, bool text_required /* = false */)
 
         if (a.attribute ("sign") == "+")
         {
-          context.debug (label + "tags <-- add '" + tag + "'");
+          context.debug (label + "tags <-- add '" + tag + '\'');
           addTag (tag);
           feedback_special_tags (*this, tag);
         }
         else
         {
-          context.debug (label + "tags <-- remove '" + tag + "'");
+          context.debug (label + "tags <-- remove '" + tag + '\'');
           removeTag (tag);
         }
 
@@ -2100,22 +2120,22 @@ void Task::modify (modType type, bool text_required /* = false */)
     switch (type)
     {
     case modReplace:
-      context.debug (label + "description <-- '" + text + "'");
+      context.debug (label + "description <-- '" + text + '\'');
       set ("description", text);
       break;
 
     case modPrepend:
       context.debug (label + "description <-- '" + text + "' + description");
-      set ("description", text + " " + get ("description"));
+      set ("description", text + ' ' + get ("description"));
       break;
 
     case modAppend:
-      context.debug (label + "description <-- description + '" + text + "'");
-      set ("description", get ("description") + " " + text);
+      context.debug (label + "description <-- description + '" + text + '\'');
+      set ("description", get ("description") + ' ' + text);
       break;
 
     case modAnnotate:
-      context.debug (label + "new annotation <-- '" + text + "'");
+      context.debug (label + "new annotation <-- '" + text + '\'');
       addAnnotation (text);
       break;
     }

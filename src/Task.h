@@ -107,6 +107,7 @@ public:
   bool is_duetomorrow () const;
   bool is_dueweek () const;
   bool is_duemonth () const;
+  bool is_duequarter () const;
   bool is_dueyear () const;
   bool is_overdue () const;
   bool is_udaPresent () const;
@@ -142,6 +143,7 @@ public:
   void removeDependency (const std::string&);
   void getDependencies (std::vector <int>&) const;
   void getDependencies (std::vector <std::string>&) const;
+  void getDependencies (std::vector <Task>&) const;
 
   void getUDAOrphans (std::vector <std::string>&) const;
 
