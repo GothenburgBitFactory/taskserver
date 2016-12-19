@@ -9,6 +9,10 @@ Restart=on-abort
 Type=simple
 User=taskd
 Group=taskd
+WorkingDirectory=/var/lib/taskd
+PrivateTmp=true
+InaccessibleDirectories=/home /root /boot /opt /mnt /media
+ReadOnlyDirectories=/etc /usr
 
 [Install]
 WantedBy=network.target
