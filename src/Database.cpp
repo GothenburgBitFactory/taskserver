@@ -69,15 +69,11 @@ bool Database::authenticate (
 
   // Verify existence of <root>/orgs/<org>
   Directory org_dir (_config->get ("root") + "/orgs/" + org);
-  if (! org_dir.exists ())
-  {
-    if (_log)
-      _log->write (format ("INFO Auth failure: org '{1}' unknown", org));
-
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
+  if (! verifyExistence  (org_dir, response) ||
+      ! verifyExecutable (org_dir, response) ||
+      ! verifyReadable   (org_dir, response) ||
+      ! verifyWritable   (org_dir, response))
     return false;
-  }
 
   // Verify non-existence of <root>/orgs/<org>/suspended
   File org_suspended (_config->get ("root") + "/orgs/" + org + "/suspended");
@@ -93,15 +89,11 @@ bool Database::authenticate (
 
   // Verify existence of <root>/orgs/<org>/users/<key>
   Directory user_dir (_config->get ("root") + "/orgs/" + org + "/users/" + key);
-  if (! user_dir.exists ())
-  {
-    if (_log)
-      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' unknown", org, user));
-
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
+  if (! verifyExistence  (user_dir, response) ||
+      ! verifyExecutable (user_dir, response) ||
+      ! verifyReadable   (user_dir, response) ||
+      ! verifyWritable   (user_dir, response))
     return false;
-  }
 
   // Verify non-existence of <root>/orgs/<org>/users/<key>/suspended
   File user_suspended (_config->get ("root") + "/orgs/" + org + "/users/" + key + "/suspended");
@@ -129,6 +121,62 @@ bool Database::authenticate (
 
   // All checks succeed, user is authenticated.
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyExistence (const Path& path, Msg& response)
+{
+  if (path.exists ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' does not exist", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyReadable (const Path& path, Msg& response)
+{
+  if (path.readable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not readable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyWritable (const Path& path, Msg& response)
+{
+  if (path.writable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not writable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyExecutable (const Path& path, Msg& response)
+{
+  if (path.executable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not executable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
