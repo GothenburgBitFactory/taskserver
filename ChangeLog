@@ -1,6 +1,7 @@
 1.2.0 () -
 
 - TD-3    Harden server against malformed requests
+          (thanks to Anatolij Zelenin).
 - TD-40   Remove user command says user does not exist
           (thanks to Robin Green).
 - TD-49   Log when file management fails
@@ -10,6 +11,8 @@
           (thanks to Rainer Müller).
 - TD-64   sync conflict deleted all annotations of the task
           (thanks to Markus Beppler, Konstantin Vorobyev).
+- TD-69   Log permission errors
+          (thanks to Roman Inflianskas).
 - TD-81   Improve logging features and provide informative error messages.
           (thanks to Renato Alves).
 - TD-96   server_setup.bash won't run on Mac OS X and BSD
