@@ -37,6 +37,8 @@
           (thanks to Dirk Deimeke).
 - TD-115  Throw error when config file is missing or not readable
           (thanks to Jelle van der Waa).
+- TD-116  Provided systemd unit file does not match recommended systemd unit file in docs
+          (thanks to Wade Duvall).
 - TD-117  Wrong systemd target, taskd can fail if multi-user.target is up
           earlier than the network
           (thanks to Sebastian Sonne).
