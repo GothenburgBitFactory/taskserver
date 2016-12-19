@@ -9,6 +9,8 @@
           (thanks to Rainer Müller).
 - TD-64   sync conflict deleted all annotations of the task
           (thanks to Markus Beppler, Konstantin Vorobyev).
+- TD-81   Improve logging features and provide informative error messages.
+          (thanks to Renato Alves).
 - TD-96   server_setup.bash won't run on Mac OS X and BSD
           (thanks to Dafo with the golden hair).
 - TD-99   Manual page of taskd has hyphen instead minus sign "-"
