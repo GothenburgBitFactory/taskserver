@@ -59,6 +59,8 @@
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
           xubuntu15.10
           (thanks to Sunil Joshi).
+- TW-1855 "Well-known" CA certificates not properly auto-loaded
+          (thanks to Flavio Poletti).
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
   which means a confguration setting of server=:::<someport>. Related to TD-51
           (thanks to Johannes Wienke).
@@ -83,6 +85,8 @@
 - Removed references to the unimplemented 'group' features.
 - Renamed 'client.key', 'client.cert' to 'api.key', 'api.cert' to reduce some
   of the confusion around the intended purpose.
+- Improved certificate validation diagnostics
+          (thanks to Jelle van der Waa).
 
 ------- current release ---------------------------
 
