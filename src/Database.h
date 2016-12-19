@@ -55,6 +55,12 @@ public:
 
   std::string key_generate ();
 
+private:
+  bool verifyExistence  (const Path&, Msg&);
+  bool verifyReadable   (const Path&, Msg&);
+  bool verifyWritable   (const Path&, Msg&);
+  bool verifyExecutable (const Path&, Msg&);
+
 public:
   Config* _config {nullptr};
 

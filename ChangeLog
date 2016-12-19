@@ -46,6 +46,8 @@
           (Thanks to Jörg Krause, Ben Boeckel).
 - TD-121  Log time in user's specified timezone
           (Thanks to Jelle van der Waa).
+- TD-125  taskd doesn't check ownership of files in $TASKDDATA, sync fails without error
+          (Thanks to James Duff).
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
           xubuntu15.10
           (thanks to Sunil Joshi).
