@@ -51,6 +51,12 @@
 #define DH_BITS 2048
 #define MAX_BUF 16384
 
+#if GNUTLS_VERSION_NUMBER < 0x030406
+#if GNUTLS_VERSION_NUMBER >= 0x020a00
+static int verify_certificate_callback (gnutls_session_t);
+#endif
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 static void gnutls_log_function (int level, const char* message)
 {
@@ -58,11 +64,15 @@ static void gnutls_log_function (int level, const char* message)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+#if GNUTLS_VERSION_NUMBER < 0x030406
+#if GNUTLS_VERSION_NUMBER >= 0x020a00
 static int verify_certificate_callback (gnutls_session_t session)
 {
   const TLSTransaction* tx = (TLSTransaction*) gnutls_session_get_ptr (session); // All
   return tx->verify_certificate ();
 }
+#endif
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::TLSServer ()
@@ -169,6 +179,13 @@ void TLSServer::init (
   if (ret < 0)
     throw format ("TLS allocation error. {1}", gnutls_strerror (ret)); // All
 
+#if GNUTLS_VERSION_NUMBER >= 0x030014
+  // Automatic loading of system installed CA certificates.
+  ret = gnutls_certificate_set_x509_system_trust (_credentials); // 3.0.20
+  if (ret < 0)
+    throw format ("Bad System Trust. {1}", gnutls_strerror (ret)); // All
+#endif
+
   if (_ca != "" &&
       (ret = gnutls_certificate_set_x509_trust_file (_credentials, _ca.c_str (), GNUTLS_X509_FMT_PEM)) < 0) // All
     throw format ("Bad CA file. {1}", gnutls_strerror (ret)); // All
@@ -202,12 +219,14 @@ void TLSServer::init (
   gnutls_certificate_set_dh_params (_credentials, params); // All
 #endif
 
+#if GNUTLS_VERSION_NUMBER < 0x030406
 #if GNUTLS_VERSION_NUMBER >= 0x020a00
   // The automatic verification for the client certificate with
   // gnutls_certificate_set_verify_function only works with gnutls
   // >=2.10.0. So with older versions we should call the verify function
   // manually after the gnutls handshake.
   gnutls_certificate_set_verify_function (_credentials, verify_certificate_callback); // 2.10.0
+#endif
 #endif
 }
 
@@ -391,8 +410,25 @@ void TLSTransaction::init (TLSServer& server)
     ret = gnutls_handshake (_session); // All
   }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0); // All
+
   if (ret < 0)
+  {
+#if GNUTLS_VERSION_NUMBER >= 0x030406
+    if (ret == GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR)
+    {
+      auto type = gnutls_certificate_type_get (_session); // All
+      auto status = gnutls_session_get_verify_cert_status (_session); // 3.4.6
+      gnutls_datum_t out;
+      gnutls_certificate_verification_status_print (status, type, &out, 0);  // 3.1.4
+      gnutls_free (out.data); // All
+
+      std::string error {(const char*) out.data};
+      throw format ("Handshake failed. {1}", error);
+    }
+#else
     throw format ("Handshake failed. {1}", gnutls_strerror (ret)); // All
+#endif
+  }
 
 #if GNUTLS_VERSION_NUMBER < 0x02090a
   // The automatic verification for the server certificate with
@@ -466,6 +502,11 @@ int TLSTransaction::verify_certificate () const
       std::cout << "s: ERROR Certificate verification peers3 failed. " << gnutls_strerror (ret) << '\n'; // All
     return GNUTLS_E_CERTIFICATE_ERROR;
   }
+
+  // status 16450 == 0100000001000010
+  //   GNUTLS_CERT_INVALID             1<<1
+  //   GNUTLS_CERT_SIGNER_NOT_FOUND    1<<6
+  //   GNUTLS_CERT_UNEXPECTED_OWNER    1<<14  Hostname does not match
 
   if (_debug && status)
     std::cout << "s: ERROR Certificate status=" << status << '\n';
@@ -634,7 +675,12 @@ void TLSTransaction::recv (std::string& data)
     }
 
     // Something happened.
-    if (received < 0)
+    if (received < 0 && gnutls_error_is_fatal (received) == 0) // All
+    {
+      if (_debug)
+        std::cout << "c: WARNING " << gnutls_strerror (received) << '\n'; // All
+    }
+    else if (received < 0)
       throw std::string (gnutls_strerror (received)); // All
 
     buffer [received] = '\0';
