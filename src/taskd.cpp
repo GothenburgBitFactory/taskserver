@@ -79,42 +79,18 @@ int main (int argc, const char** argv)
                 << COMMIT
 #endif
                 << " built for "
-
-#if defined (DARWIN)
-                << "darwin"
-#elif defined (SOLARIS)
-                << "solaris"
-#elif defined (CYGWIN)
-                << "cygwin"
-#elif defined (HAIKU)
-                << "haiku"
-#elif defined (OPENBSD)
-                << "openbsd"
-#elif defined (FREEBSD)
-                << "freebsd"
-#elif defined (NETBSD)
-                << "netbsd"
-#elif defined (LINUX)
-                << "linux"
-#elif defined (KFREEBSD)
-                << "GNU/kFreeBSD"
-#elif defined (GNUHURD)
-                << "GNU/Hurd"
-#else
-                << "unknown"
-#endif
-
-          << '\n'
-          << "Copyright (C) 2010 - 2017 Göteborg Bit Factory."
-          << '\n'
-          << '\n'
-          << "Taskd may be copied only under the terms of the MIT license, "
-          << "which may be found in the taskd source kit."
-          << '\n'
-          << "Documentation for taskd can be found using 'man taskd' or at "
-          << "http://taskwarrior.org"
-          << '\n'
-          << '\n';
+                << osName ()
+                << '\n'
+                << "Copyright (C) 2010 - 2017 Göteborg Bit Factory."
+                << '\n'
+                << '\n'
+                << "Taskd may be copied only under the terms of the MIT license, "
+                << "which may be found in the taskd source kit."
+                << '\n'
+                << "Documentation for taskd can be found using 'man taskd' or at "
+                << "http://taskwarrior.org"
+                << '\n'
+                << '\n';
     }
     else
     {
