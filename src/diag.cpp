@@ -107,18 +107,8 @@ void command_diag (Database& config)
             << '\n';
 
   // Compiler compliance level.
-  std::string compliance = "non-compliant";
-#ifdef __cplusplus
-  int level = __cplusplus;
-  if (level == 199711)
-    compliance = "C++98/03";
-  else if (level == 201103)
-    compliance = "C++11";
-  else
-    compliance = format (level);
-#endif
   std::cout << "  Compliance: "
-            << compliance
+            << cppCompliance ()
             << "\n\n";
 
   std::cout << bold.colorize ("Build Features")
