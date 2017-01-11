@@ -283,10 +283,10 @@ void TLSClient::connect (const std::string& host, const std::string& port)
       gnutls_free (out.data); // All
 
       std::string error {(const char*) out.data};
-      throw format ("Handshake failed. {1}", error);
+      throw format ("Handshake failed.  {1}", error);
     }
 #else
-    throw format ("Handshake failed. {1}", gnutls_strerror (ret)); // All
+    throw format ("Handshake failed.  {1}", gnutls_strerror (ret)); // All
 #endif
   }
 
@@ -300,7 +300,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   {
     if (_debug)
       std::cout << "c: ERROR Certificate verification failed.\n";
-    throw format ("Error Initializing TLS. {1}", gnutls_strerror (ret)); // All
+    throw format ("Error initializing TLS. {1}", gnutls_strerror (ret)); // All
   }
 #endif
 
