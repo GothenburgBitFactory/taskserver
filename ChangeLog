@@ -87,6 +87,8 @@
   of the confusion around the intended purpose.
 - Improved certificate validation diagnostics
           (thanks to Jelle van der Waa).
+- Improved portability for SunOS-like OSes.
+          (thanks to Antonio Huete Jimenez).
 
 ------- current release ---------------------------
 
