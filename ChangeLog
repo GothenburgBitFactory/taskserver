@@ -89,6 +89,8 @@
           (thanks to Jelle van der Waa).
 - Improved portability for SunOS-like OSes.
           (thanks to Antonio Huete Jimenez).
+- pki: Do not use 'which' for finding gnutls certool path
+          (thanks to Antonio Huete Jimenez).
 
 ------- current release ---------------------------
 
