@@ -12,6 +12,7 @@ New Features in Taskserver 1.2.0
   - Integrates libshared.
   - Made the documentation consistently distinguish between user name and UUID.
   - Improved handling for I/O errors.
+  - PKI scripts do not use 'which' for finding gnutls certool path
 
 New configuration options in Taskserver 1.2.0
 
