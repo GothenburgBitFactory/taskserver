@@ -223,7 +223,7 @@ void TLSClient::connect (const std::string& host, const std::string& port)
   }
 
   // Store the TLSClient instance, so that the verification callback can access
-  // it during the handshake below and call the verifcation method.
+  // it during the handshake below and call the verification method.
   gnutls_session_set_ptr (_session, (void*) this); // All
 
   // use IPv4 or IPv6, does not matter.
