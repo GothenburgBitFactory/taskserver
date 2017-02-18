@@ -34,6 +34,7 @@ add_library (libshared libshared/src/Color.cpp         libshared/src/Color.h
                        libshared/src/RX.cpp            libshared/src/RX.h
                        libshared/src/Timer.cpp         libshared/src/Timer.h
                        libshared/src/format.cpp        libshared/src/format.h
+                       libshared/src/ip.cpp
                        libshared/src/shared.cpp        libshared/src/shared.h
                        libshared/src/unicode.cpp       libshared/src/unicode.h
                        libshared/src/utf8.cpp          libshared/src/utf8.h
