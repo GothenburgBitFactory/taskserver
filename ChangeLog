@@ -61,6 +61,8 @@
           (thanks to Sunil Joshi).
 - TW-1855 "Well-known" CA certificates not properly auto-loaded
           (thanks to Flavio Poletti).
+- TW-1885 Task Sync does not send TLS SNI headers
+          (thanks to Dan Callahan).
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
   which means a confguration setting of server=:::<someport>. Related to TD-51
           (thanks to Johannes Wienke).
