@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <errno.h>
 #include <unistd.h>
 #include <syslog.h>
 #include <string.h>
