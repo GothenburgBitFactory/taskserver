@@ -29,7 +29,7 @@ Removed features in 1.2.0
 
 Taskserver has been built and tested on the following configurations:
 
-  * OS X
+  * macOS
   * Fedora
   * Ubuntu
   * Debian
