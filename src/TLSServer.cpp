@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-//#include <string.h>
+#include <string.h>
 #include <TLSServer.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
