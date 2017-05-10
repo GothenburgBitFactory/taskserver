@@ -26,7 +26,7 @@
 
 #include <cmake.h>
 #include <iostream>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <taskd.h>
 #include <i18n.h>
 #include <format.h>
