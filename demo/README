@@ -12,7 +12,7 @@ Build / Install
 
 Follow these commands to build and install taskd.
 
-  $ git clone --recursive https://git.tasktools.org/scm/tm/taskd.git taskd.git
+  $ git clone --recursive https://git.tasktools.org/TM/taskd.git taskd.git
   $ cd taskd.git
   $ cmake .
   $ make
