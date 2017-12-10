@@ -38,6 +38,7 @@
 #cmakedefine FREEBSD
 #cmakedefine OPENBSD
 #cmakedefine NETBSD
+#cmakedefine DRAGONFLY
 #cmakedefine SOLARIS
 #cmakedefine GNUHURD
 #cmakedefine CYGWIN
