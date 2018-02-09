@@ -129,14 +129,14 @@ The official site at
 
 .TP
 The official code repository at
-<https://git.tasktools.org/scm/tm/taskd.git>
+<https://github.com/GothenburgBitFactory/taskserver>
 
 .TP
 You can contact the project by emailing
-<support@taskwarrior.org>
+<support@gothenburgbitfactory.org>
 
 .SH REPORTING BUGS
 .TP
 Bugs in Taskserver may be reported to the issue-tracker at
-<http://taskwarrior.org
+<http://taskwarrior.org>
 
