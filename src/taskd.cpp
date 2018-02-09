@@ -35,6 +35,7 @@
 #else
 #include <sys/time.h>
 #endif
+#include <Datetime.h>
 #include <FS.h>
 #include <Color.h>
 #include <shared.h>
@@ -81,7 +82,9 @@ int main (int argc, const char** argv)
                 << " built for "
                 << osName ()
                 << '\n'
-                << "Copyright (C) 2010 - 2017 Göteborg Bit Factory."
+                << "Copyright (C) 2010 - "
+                << Datetime ().year ()
+                << " Göteborg Bit Factory."
                 << '\n'
                 << '\n'
                 << "Taskd may be copied only under the terms of the MIT license, "
