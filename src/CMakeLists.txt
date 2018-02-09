@@ -12,9 +12,7 @@ add_library (taskd admin.cpp
                    daemon.cpp
                    diag.cpp
                    Database.cpp   Database.h
-                   l10n/eng-USA.h
                    help.cpp
-                   i18n.h
                    init.cpp
                    Server.cpp     Server.h
                    Task.cpp       Task.h

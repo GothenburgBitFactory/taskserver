@@ -20,10 +20,6 @@
 /* Installation details */
 #define TASKD_EXTDIR "${CMAKE_INSTALL_PREFIX}/${TASKD_EXTDIR}"
 
-/* Localization */
-#define PACKAGE_LANGUAGE  ${PACKAGE_LANGUAGE}
-#define LANGUAGE_ENG_USA ${LANGUAGE_ENG_USA}
-
 /* git information */
 #cmakedefine HAVE_COMMIT
 

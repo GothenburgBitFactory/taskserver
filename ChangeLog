@@ -99,6 +99,7 @@
           (thanks to Antonio Huete Jimenez).
 - pki: Do not use 'which' for finding gnutls certool path
           (thanks to Antonio Huete Jimenez).
+- Eliminated locallization (there were none).
 
 ------- current release ---------------------------
 

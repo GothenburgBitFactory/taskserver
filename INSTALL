@@ -8,7 +8,7 @@ source.
 Pre-requisites
 --------------
 
-You will need the CMake build system installed in order to build taskwarrior
+You will need the CMake build system installed in order to build taskserver
 from source. More information on cmake can be obtained at http://cmake.org
 
 You will also need:
@@ -84,25 +84,13 @@ to get absolute installation directoris:
   CMAKE_INSTALL_PREFIX/TASKD_MAN5DIR  /usr/local/share/man/man5
 
 
-Localizations
--------------
-
-To make use of a translation, specify a language number, as found in cmake.h:
-
-  $ cmake -DLANGUAGE=1 .
-
-Currently the defined languages are:
-
-  eng_USA 1
-
-
 Uninstallation
 --------------
 
 There is no uninstall option in CMake makefiles. This ia a manual process.
 
 To uninstall Taskserver, remove the files listed in the install_manifest.txt
-file that was generated when you built Taskwarrior.
+file that was generated when you built Taskserver.
 
 
 Taskserver Build Notes
@@ -136,7 +124,7 @@ CMake with no reported problems, and the build will fail later.  This is
 almost always because CMake is mistaken about some assumption.
 
 If a build does not succeed, please send the contents of the 'CMakeCache.txt' 
-and 'CMakeFiles/CMakeOutput.log' files to support@taskwarrior.org.
+and 'CMakeFiles/CMakeOutput.log' files to support@gothenburgbitfactory.org.
 
 If CMake runs but Taskserver does not build, please send the contents of the
 above files as well as a transcript from the build, which is not written to a
