@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2017, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2018, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@
 #include <Context.h>
 #include <Pig.h>
 #endif
-#include <Datetime.h>
 #include <Duration.h>
+#include <Datetime.h>
 #ifdef PRODUCT_TASKWARRIOR
 #include <RX.h>
 #endif
@@ -50,27 +50,26 @@
 #include <format.h>
 #include <util.h>
 
-#include <i18n.h>
 #ifdef PRODUCT_TASKWARRIOR
 #include <main.h>
 
 #include <Eval.h>
 #include <Variant.h>
 #include <Filter.h>
-#include <Dates.h>
+
 
 #define APPROACHING_INFINITY 1000   // Close enough.  This isn't rocket surgery.
 
-extern Context context;
 extern Task& contextTask;
 
 static const float epsilon = 0.000001;
 #endif
 
-std::string Task::defaultProject  = "";
-std::string Task::defaultDue      = "";
-bool Task::searchCaseSensitive    = true;
-bool Task::regex                  = false;
+std::string Task::defaultProject   = "";
+std::string Task::defaultDue       = "";
+std::string Task::defaultScheduled = "";
+bool Task::searchCaseSensitive     = true;
+bool Task::regex                   = false;
 std::map <std::string, std::string> Task::attributes;
 
 std::map <std::string, float> Task::coefficients;
@@ -150,7 +149,7 @@ Task::status Task::textToStatus (const std::string& input)
   else if (input[0] == 'r') return Task::recurring;
   else if (input[0] == 'w') return Task::waiting;
 
-  throw format (STRING_ERROR_BAD_STATUS, input);
+  throw format ("The status '{1}' is not valid.", input);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,7 +335,7 @@ Task::dateState Task::getDateState (const std::string& name) const
         return dateLaterToday;
     }
 
-    int imminentperiod = context.config.getInteger ("due");
+    int imminentperiod = Context::getContext ().config.getInteger ("due");
     if (imminentperiod == 0)
       return dateAfterToday;
 
@@ -447,8 +446,8 @@ bool Task::is_dueweek () const
         status != Task::deleted)
     {
       Datetime due (get_date ("due"));
-      if (due >= Datetime ("socw") &&
-          due <= Datetime ("eocw"))
+      if (due >= Datetime ("sow") &&
+          due <= Datetime ("eow"))
         return true;
     }
   }
@@ -467,8 +466,28 @@ bool Task::is_duemonth () const
         status != Task::deleted)
     {
       Datetime due (get_date ("due"));
-      if (due >= Datetime ("socm") &&
-          due <= Datetime ("eocm"))
+      if (due >= Datetime ("som") &&
+          due <= Datetime ("eom"))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_duequarter () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      Datetime due (get_date ("due"));
+      if (due >= Datetime ("soq") &&
+          due <= Datetime ("eoq"))
         return true;
     }
   }
@@ -486,9 +505,9 @@ bool Task::is_dueyear () const
     if (status != Task::completed &&
         status != Task::deleted)
     {
-      Datetime now;
       Datetime due (get_date ("due"));
-      if (now.year () == due.year ())
+      if (due >= Datetime ("soy") &&
+          due <= Datetime ("eoy"))
         return true;
     }
   }
@@ -499,7 +518,7 @@ bool Task::is_dueyear () const
 ////////////////////////////////////////////////////////////////////////////////
 bool Task::is_udaPresent () const
 {
-  for (auto& col : context.columns)
+  for (auto& col : Context::getContext ().columns)
     if (col.second->is_uda () &&
         has (col.first))
       return true;
@@ -512,7 +531,7 @@ bool Task::is_orphanPresent () const
 {
   for (auto& att : data)
     if (att.first.compare (0, 11, "annotation_", 11) != 0)
-      if (context.columns.find (att.first) == context.columns.end ())
+      if (Context::getContext ().columns.find (att.first) == Context::getContext ().columns.end ())
         return true;
 
   return false;
@@ -561,24 +580,24 @@ void Task::parse (const std::string& input)
 
     if (input[0] == '[')
     {
-      Pig n (input);
+      Pig pig (input);
       std::string line;
-      if (n.skip     ('[')       &&
-          n.getUntil (']', line) &&
-          n.skip     (']')       &&
-          (n.skip ('\n') || n.eos ()))
+      if (pig.skip     ('[')       &&
+          pig.getUntil (']', line) &&
+          pig.skip     (']')       &&
+          (pig.skip ('\n') || pig.eos ()))
       {
         if (line.length () == 0)
-          throw std::string (STRING_RECORD_EMPTY);
+          throw std::string ("Empty record in input.");
 
-        Pig nl (line);
+        Pig attLine (line);
         std::string name;
         std::string value;
-        while (!nl.eos ())
+        while (!attLine.eos ())
         {
-          if (nl.getUntil (':', name) &&
-              nl.skip (':')           &&
-              nl.getQuoted ('"', value))
+          if (attLine.getUntil (':', name) &&
+              attLine.skip (':')           &&
+              attLine.getQuoted ('"', value))
           {
 #ifdef PRODUCT_TASKWARRIOR
             legacyAttributeMap (name);
@@ -590,19 +609,19 @@ void Task::parse (const std::string& input)
             data[name] = decode (json::decode (value));
           }
 
-          nl.skip (' ');
+          attLine.skip (' ');
         }
 
         std::string remainder;
-        nl.getRemainder (remainder);
+        attLine.getRemainder (remainder);
         if (remainder.length ())
-          throw std::string (STRING_RECORD_JUNK_AT_EOL);
+          throw std::string ("Unrecognized characters at end of line.");
       }
     }
     else if (input[0] == '{')
       parseJSON (input);
     else
-      throw std::string (STRING_RECORD_NOT_FF4);
+      throw std::string ("Record not recognized as format 4.");
   }
 
   catch (const std::string&)
@@ -647,14 +666,17 @@ void Task::parseJSON (const json::object* root_obj)
       // TW-1274 Standardization.
       else if (i.first == "modification")
       {
-        Datetime d (Lexer::dequote (i.second->dump ()));
+        auto text = i.second->dump ();
+        Lexer::dequote (text);
+        Datetime d (text);
         set ("modified", d.toEpochString ());
       }
 
       // Dates are converted from ISO to epoch.
       else if (type == "date")
       {
-        auto text = Lexer::dequote (i.second->dump ());
+        auto text = i.second->dump ();
+        Lexer::dequote (text);
         Datetime d (text);
         set (i.first, text == "" ? "" : d.toEpochString ());
       }
@@ -706,11 +728,19 @@ void Task::parseJSON (const json::object* root_obj)
 
       // Strings are decoded.
       else if (type == "string")
-        set (i.first, json::decode (Lexer::dequote (i.second->dump ())));
+      {
+        auto text = i.second->dump ();
+        Lexer::dequote (text);
+        set (i.first, json::decode (text));
+      }
 
       // Other types are simply added.
       else
-        set (i.first, Lexer::dequote (i.second->dump ()));
+      {
+        auto text = i.second->dump ();
+        Lexer::dequote (text);
+        set (i.first, text);
+      }
     }
 
     // UDA orphans and annotations do not have columns.
@@ -730,10 +760,10 @@ void Task::parseJSON (const json::object* root_obj)
           json::string* what = (json::string*)annotation->_data["description"];
 
           if (! when)
-            throw format (STRING_TASK_NO_ENTRY, root_obj->dump ());
+            throw format ("Annotation is missing an entry date: {1}", root_obj-> dump ());
 
           if (! what)
-            throw format (STRING_TASK_NO_DESC, root_obj->dump ());
+            throw format ("Annotation is missing a description: {1}", root_obj->dump ());
 
           std::string name = "annotation_" + Datetime (when->_data).toEpochString ();
           annos.insert (std::make_pair (name, json::decode (what->_data)));
@@ -752,9 +782,11 @@ void Task::parseJSON (const json::object* root_obj)
                 << "' with value '"
                 << i.second
                 << "' --> preserved\n";
-        context.debug (message.str ());
+        Context::getContext ().debug (message.str ());
 #endif
-        set (i.first, json::decode (Lexer::dequote (i.second->dump ())));
+        auto text = i.second->dump ();
+        Lexer::dequote (text);
+        set (i.first, json::decode (text));
       }
     }
   }
@@ -767,13 +799,13 @@ void Task::parseLegacy (const std::string& line)
   switch (determineVersion (line))
   {
   // File format version 1, from 2006-11-27 - 2007-12-31, v0.x+ - v0.9.3
-  case 1: throw std::string (STRING_TASK_NO_FF1);
+  case 1: throw std::string ("Taskwarrior no longer supports file format 1, originally used between 27 November 2006 and 31 December 2007.");
 
   // File format version 2, from 2008-1-1 - 2009-3-23, v0.9.3 - v1.5.0
-  case 2: throw std::string (STRING_TASK_NO_FF2);
+  case 2: throw std::string ("Taskwarrior no longer supports file format 2, originally used between 1 January 2008 and 12 April 2009.");
 
   // File format version 3, from 2009-3-23 - 2009-05-16, v1.6.0 - v1.7.1
-  case 3: throw std::string (STRING_TASK_NO_FF3);
+  case 3: throw std::string ("Taskwarrior no longer supports file format 3, originally used between 23 March 2009 and 16 May 2009.");
 
   // File format version 4, from 2009-05-16 - today, v1.7.1+
   case 4:
@@ -785,9 +817,9 @@ void Task::parseLegacy (const std::string& line)
     message << "Invalid fileformat at line '"
             << line
             << '\'';
-    context.debug (message.str ());
+    Context::getContext ().debug (message.str ());
 #endif
-    throw std::string (STRING_TASK_PARSE_UNREC_FF);
+    throw std::string ("Unrecognized Taskwarrior file format or blank line in data.");
     break;
   }
 
@@ -929,7 +961,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     //             and Taskserver 1.2.0 is released, the default for
     //             'json.depends.array' can revert to 'on'.
 
-             && context.config.getBoolean ("json.depends.array")
+             && Context::getContext ().config.getBoolean ("json.depends.array")
 #endif
             )
     {
@@ -1004,6 +1036,17 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+int Task::getAnnotationCount () const
+{
+  int count = 0;
+  for (auto& ann : data)
+    if (! ann.first.compare (0, 11, "annotation_", 11))
+      ++count;
+
+  return count;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Task::hasAnnotations () const
 {
   return annotation_count ? true : false;
@@ -1052,13 +1095,14 @@ void Task::removeAnnotations ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getAnnotations (std::map <std::string, std::string>& annotations) const
+std::map <std::string, std::string> Task::getAnnotations () const
 {
-  annotations.clear ();
-
+  std::map <std::string, std::string> a;
   for (auto& ann : data)
     if (! ann.first.compare (0, 11, "annotation_", 11))
-      annotations.insert (ann);
+      a.insert (ann);
+
+  return a;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1079,14 +1123,14 @@ void Task::setAnnotations (const std::map <std::string, std::string>& annotation
 void Task::addDependency (int depid)
 {
   // Check that id is resolvable.
-  std::string uuid = context.tdb2.pending.uuid (depid);
+  std::string uuid = Context::getContext ().tdb2.pending.uuid (depid);
   if (uuid == "")
-    throw format (STRING_TASK_DEPEND_MISS_CREA, depid);
+    throw format ("Could not create a dependency on task {1} - not found.", depid);
 
   std::string depends = get ("depends");
   if (depends.find (uuid) != std::string::npos)
   {
-    context.footnote (format (STRING_TASK_DEPEND_DUP, id, depid));
+    Context::getContext ().footnote (format ("Task {1} already depends on task {2}.", id, depid));
     return;
   }
 
@@ -1098,7 +1142,7 @@ void Task::addDependency (int depid)
 void Task::addDependency (const std::string& uuid)
 {
   if (uuid == get ("uuid"))
-    throw std::string (STRING_TASK_DEPEND_ITSELF);
+    throw std::string ("A task cannot be dependent on itself.");
 
   // Store the dependency.
   std::string depends = get ("depends");
@@ -1110,7 +1154,7 @@ void Task::addDependency (const std::string& uuid)
     else
     {
 #ifdef PRODUCT_TASKWARRIOR
-      context.footnote (format (STRING_TASK_DEPEND_DUP, get ("uuid"), uuid));
+      Context::getContext ().footnote (format ("Task {1} already depends on task {2}.", get ("uuid"), uuid));
 #endif
       return;
     }
@@ -1121,7 +1165,7 @@ void Task::addDependency (const std::string& uuid)
   // Prevent circular dependencies.
 #ifdef PRODUCT_TASKWARRIOR
   if (dependencyIsCircular (*this))
-    throw std::string (STRING_TASK_DEPEND_CIRCULAR);
+    throw std::string ("Circular dependency detected and disallowed.");
 #endif
 
   recalc_urgency = true;
@@ -1141,51 +1185,48 @@ void Task::removeDependency (const std::string& uuid)
     recalc_urgency = true;
   }
   else
-    throw format (STRING_TASK_DEPEND_MISS_DEL, uuid);
+    throw format ("Could not delete a dependency on task {1} - not found.", uuid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Task::removeDependency (int id)
 {
   std::string depends = get ("depends");
-  std::string uuid = context.tdb2.pending.uuid (id);
+  std::string uuid = Context::getContext ().tdb2.pending.uuid (id);
   if (uuid != "" && depends.find (uuid) != std::string::npos)
     removeDependency (uuid);
   else
-    throw format (STRING_TASK_DEPEND_MISS_DEL, id);
+    throw format ("Could not delete a dependency on task {1} - not found.", id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getDependencies (std::vector <int>& all) const
+std::vector <int> Task::getDependencyIDs () const
 {
-  auto deps = split (get ("depends"), ',');
+  std::vector <int> all;
+  for (auto& dep : split (get ("depends"), ','))
+    all.push_back (Context::getContext ().tdb2.pending.id (dep));
 
-  all.clear ();
-
-  for (auto& dep : deps)
-    all.push_back (context.tdb2.pending.id (dep));
+  return all;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getDependencies (std::vector <std::string>& all) const
+std::vector <std::string> Task::getDependencyUUIDs () const
 {
-  all = split (get ("depends"), ',');
+  return split (get ("depends"), ',');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getDependencies (std::vector <Task>& all) const
+std::vector <Task> Task::getDependencyTasks () const
 {
-  std::vector <std::string> deps;
-  split (deps, get ("depends"), ',');
-
-  all.clear ();
-
-  for (auto& dep : deps)
+  std::vector <Task> all;
+  for (auto& dep : split (get ("depends"), ','))
   {
     Task task;
-    context.tdb2.get (dep, task);
+    Context::getContext ().tdb2.get (dep, task);
     all.push_back (task);
   }
+
+  return all;
 }
 #endif
 
@@ -1220,7 +1261,7 @@ bool Task::hasTag (const std::string& tag) const
 #ifdef PRODUCT_TASKWARRIOR
     if (tag == "READY")     return is_ready ();
     if (tag == "DUE")       return is_due ();
-    if (tag == "DUETODAY")  return is_duetoday ();          // 2016-03-29: Deprecated in 2.6.0
+    if (tag == "DUETODAY")  return is_duetoday ();                     // 2016-03-29: Deprecated in 2.6.0
     if (tag == "TODAY")     return is_duetoday ();
     if (tag == "YESTERDAY") return is_dueyesterday ();
     if (tag == "TOMORROW")  return is_duetomorrow ();
@@ -1232,11 +1273,13 @@ bool Task::hasTag (const std::string& tag) const
 #endif
     if (tag == "ACTIVE")    return has ("start");
     if (tag == "SCHEDULED") return has ("scheduled");
-    if (tag == "CHILD")     return has ("parent");
+    if (tag == "CHILD")     return has ("parent") || has ("template"); // 2017-01-07: Deprecated in 2.6.0
+    if (tag == "INSTANCE")  return has ("template") || has ("parent");
     if (tag == "UNTIL")     return has ("until");
     if (tag == "ANNOTATED") return hasAnnotations ();
     if (tag == "TAGGED")    return has ("tags");
-    if (tag == "PARENT")    return has ("mask");
+    if (tag == "PARENT")    return has ("mask") || has ("last");       // 2017-01-07: Deprecated in 2.6.0
+    if (tag == "TEMPLATE")  return has ("last") || has ("mask");
     if (tag == "WAITING")   return get ("status") == "waiting";
     if (tag == "PENDING")   return get ("status") == "pending";
     if (tag == "COMPLETED") return get ("status") == "completed";
@@ -1244,7 +1287,7 @@ bool Task::hasTag (const std::string& tag) const
 #ifdef PRODUCT_TASKWARRIOR
     if (tag == "UDA")       return is_udaPresent ();
     if (tag == "ORPHAN")    return is_orphanPresent ();
-    if (tag == "LATEST")    return id == context.tdb2.latest_id ();
+    if (tag == "LATEST")    return id == Context::getContext ().tdb2.latest_id ();
 #endif
     if (tag == "PROJECT")   return has ("project");
     if (tag == "PRIORITY")  return has ("priority");
@@ -1285,9 +1328,9 @@ void Task::addTags (const std::vector <std::string>& tags)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getTags (std::vector<std::string>& tags) const
+std::vector <std::string> Task::getTags () const
 {
-  tags = split (get ("tags"), ',');
+  return split (get ("tags"), ',');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1308,12 +1351,15 @@ void Task::removeTag (const std::string& tag)
 #ifdef PRODUCT_TASKWARRIOR
 ////////////////////////////////////////////////////////////////////////////////
 // A UDA Orphan is an attribute that is not represented in context.columns.
-void Task::getUDAOrphans (std::vector <std::string>& names) const
+std::vector <std::string> Task::getUDAOrphanUUIDs () const
 {
+  std::vector <std::string> orphans;
   for (auto& it : data)
     if (it.first.compare (0, 11, "annotation_", 11) != 0)
-      if (context.columns.find (it.first) == context.columns.end ())
-        names.push_back (it.first);
+      if (Context::getContext ().columns.find (it.first) == Context::getContext ().columns.end ())
+        orphans.push_back (it.first);
+
+  return orphans;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1326,8 +1372,7 @@ void Task::substitute (
 
   // Get the data to modify.
   std::string description = get ("description");
-  std::map <std::string, std::string> annotations;
-  getAnnotations (annotations);
+  auto annotations = getAnnotations ();
 
   // Count the changes, so we know whether to proceed to annotations, after
   // modifying description.
@@ -1399,7 +1444,7 @@ void Task::substitute (
         done = true;
 
       if (++counter > APPROACHING_INFINITY)
-        throw format (STRING_INFINITE_LOOP, APPROACHING_INFINITY);
+        throw format ("Terminated substitution because more than {1} changes were made - infinite loop protection.", APPROACHING_INFINITY);
     }
 
     if (!done)
@@ -1422,7 +1467,7 @@ void Task::substitute (
             done = true;
 
           if (++counter > APPROACHING_INFINITY)
-            throw format (STRING_INFINITE_LOOP, APPROACHING_INFINITY);
+            throw format ("Terminated substitution because more than {1} changes were made - infinite loop protection.", APPROACHING_INFINITY);
         }
       }
     }
@@ -1443,11 +1488,7 @@ void Task::substitute (
 //   2) To provide suitable warnings about odd states
 //   3) To generate errors when the inconsistencies are not fixable
 //
-void Task::validate (bool
-#ifdef PRODUCT_TASKWARRIOR
-  applyDefault
-#endif
-  )
+void Task::validate (bool applyDefault /* = true */)
 {
   Task::status status = Task::pending;
   if (get ("status") != "")
@@ -1462,17 +1503,31 @@ void Task::validate (bool
     std::string token;
     Lexer::Type type;
     if (! lex.isUUID (token, type, true))
-      throw format (STRING_CMD_IMPORT_UUID_BAD, uid);
+      throw format ("Not a valid UUID '{1}'.", uid);
   }
   else
     set ("uuid", uuid ());
 
+  // TODO Obsolete remove for 2.6.0
   // Recurring tasks get a special status.
+  if (status == Task::pending                     &&
+      has ("due")                                 &&
+      has ("recur")                               &&
+      (! has ("parent") || get ("parent") == "")  &&
+      (! has ("template") || get ("template") == ""))
+  {
+    status = Task::recurring;
+  }
+/*
+  // TODO Add for 2.6.0
   if (status == Task::pending &&
       has ("due")             &&
-      has ("recur")           &&
-      (! has ("parent") || get ("parent") == ""))
+      has ("recur")          &&
+      (! has ("template") || get ("template") == ""))
+  {
     status = Task::recurring;
+  }
+*/
 
   // Tasks with a wait: date get a special status.
   else if (status == Task::pending &&
@@ -1483,6 +1538,13 @@ void Task::validate (bool
   // By default, tasks are pending.
   else if (! has ("status") || get ("status") == "")
     status = Task::pending;
+
+  // Default to 'periodic' type recurrence.
+  if (status == Task::recurring &&
+      (! has ("rtype") || get ("rtype") == ""))
+  {
+    set ("rtype", "periodic");
+  }
 
   // Store the derived status.
   setStatus (status);
@@ -1511,7 +1573,7 @@ void Task::validate (bool
     if (Task::defaultProject != "" &&
         ! has ("project"))
     {
-      if (context.columns["project"]->validate (Task::defaultProject))
+      if (Context::getContext ().columns["project"]->validate (Task::defaultProject))
         set ("project", Task::defaultProject);
     }
 
@@ -1519,13 +1581,27 @@ void Task::validate (bool
     if (Task::defaultDue != "" &&
         ! has ("due"))
     {
-      if (context.columns["due"]->validate (Task::defaultDue))
+      if (Context::getContext ().columns["due"]->validate (Task::defaultDue))
       {
         Duration dur (Task::defaultDue);
-        if ((time_t) dur != 0)
-          set ("due", (Datetime () + dur).toEpoch ());
+        if (dur.toTime_t () != 0)
+          set ("due", (Datetime () + dur.toTime_t ()).toEpoch ());
         else
           set ("due", Datetime (Task::defaultDue).toEpoch ());
+      }
+    }
+
+    // Override with default.scheduled, if not specified.
+    if (Task::defaultScheduled != "" &&
+        ! has ("scheduled"))
+    {
+      if (Context::getContext ().columns["scheduled"]->validate (Task::defaultScheduled))
+      {
+        Duration dur (Task::defaultScheduled);
+        if (dur.toTime_t () != 0)
+          set ("scheduled", (Datetime () + dur.toTime_t ()).toEpoch ());
+        else
+          set ("scheduled", Datetime (Task::defaultScheduled).toEpoch ());
       }
     }
 
@@ -1533,7 +1609,7 @@ void Task::validate (bool
     // override with uda.(uda).default, if not specified.
     // Gather a list of all UDAs with a .default value
     std::vector <std::string> udas;
-    for (auto& var : context.config)
+    for (auto& var : Context::getContext ().config)
     {
       if (! var.first.compare (0, 4, "uda.", 4) &&
           var.first.find (".default") != std::string::npos)
@@ -1550,7 +1626,7 @@ void Task::validate (bool
       // of course only if we don't have one on the command line already
       for (auto& uda : udas)
       {
-        std::string defVal= context.config.get ("uda." + uda + ".default");
+        std::string defVal= Context::getContext ().config.get ("uda." + uda + ".default");
 
         // If the default is empty, or we already have a value, skip it
         if (defVal != "" && get (uda) == "")
@@ -1575,13 +1651,13 @@ void Task::validate (bool
 
   // There is no fixing a missing description.
   if (! has ("description"))
-    throw std::string (STRING_TASK_VALID_DESC);
+    throw std::string ("A task must have a description.");
   else if (get ("description") == "")
-    throw std::string (STRING_TASK_VALID_BLANK);
+    throw std::string ("Cannot add a task that is blank.");
 
   // Cannot have a recur frequency with no due date - when would it recur?
   if (has ("recur") && (! has ("due") || get ("due") == ""))
-    throw std::string (STRING_TASK_VALID_REC_DUE);
+    throw std::string ("A recurring task must also have a 'due' date.");
 
   // Recur durations must be valid.
   if (has ("recur"))
@@ -1589,25 +1665,17 @@ void Task::validate (bool
     std::string value = get ("recur");
     if (value != "")
     {
-      Duration d;
+      Duration p;
       std::string::size_type i = 0;
-      if (! d.parse (value, i))
-        throw format (STRING_TASK_VALID_RECUR, value);
+      if (! p.parse (value, i))
+        // TODO Ideal location to map unsupported old recurrence periods to supported values.
+        throw format ("The recurrence value '{1}' is not valid.", value);
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::validate_before (
-  const std::string&
-#ifdef PRODUCT_TASKWARRIOR
-  left
-#endif
-  , const std::string&
-#ifdef PRODUCT_TASKWARRIOR
-  right
-#endif
-  )
+void Task::validate_before (const std::string& left, const std::string& right)
 {
 #ifdef PRODUCT_TASKWARRIOR
   if (has (left) &&
@@ -1618,7 +1686,7 @@ void Task::validate_before (
 
     // if date is zero, then it is being removed (e.g. "due: wait:1day")
     if (date_left > date_right && date_right.toEpoch () != 0)
-      context.footnote (format (STRING_TASK_VALID_BEFORE, left, right));
+      Context::getContext ().footnote (format ("Warning: You have specified that the '{1}' date is after the '{2}' date.", left, right));
   }
 #endif
 }
@@ -1629,12 +1697,8 @@ void Task::validate_before (
 //   ]  -> &close;
 const std::string Task::encode (const std::string& value) const
 {
-  std::string modified = value;
-
-  str_replace (modified, "[",  "&open;");
-  str_replace (modified, "]",  "&close;");
-
-  return modified;
+  auto modified = str_replace (value,    "[", "&open;");
+  return          str_replace (modified, "]", "&close;");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1647,18 +1711,11 @@ const std::string Task::encode (const std::string& value) const
 //   :  <- &colon;
 const std::string Task::decode (const std::string& value) const
 {
-  if (value.find ('&') != std::string::npos)
-  {
-    std::string modified = value;
+  if (value.find ('&') == std::string::npos)
+    return value;
 
-    // Supported encodings.
-    str_replace (modified, "&open;",  "[");
-    str_replace (modified, "&close;", "]");
-
-    return modified;
-  }
-
-  return value;
+  auto modified = str_replace (value,    "&open;",  "[");
+  return          str_replace (modified, "&close;", "]");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1828,7 +1885,7 @@ float Task::urgency_c () const
     }
   }
 
-  if (is_blocking && context.config.getBoolean ("urgency.inherit"))
+  if (is_blocking && Context::getContext ().config.getBoolean ("urgency.inherit"))
   {
     float prev = value;
     value = std::max (value, urgency_inherit ());
@@ -1860,19 +1917,16 @@ float Task::urgency ()
 ////////////////////////////////////////////////////////////////////////////////
 float Task::urgency_inherit () const
 {
+  float v = FLT_MIN;
+#ifdef PRODUCT_TASKWARRIOR
   // Calling dependencyGetBlocked is rather expensive.
   // It is called recursively for each dependency in the chain here.
-  std::vector <Task> blocked;
-#ifdef PRODUCT_TASKWARRIOR
-  dependencyGetBlocked (*this, blocked);
-#endif
-
-  float v = FLT_MIN;
-  for (auto& task : blocked)
+  for (auto& task : dependencyGetBlocked (*this))
   {
     // Find highest urgency in all blocked tasks.
     v = std::max (v, task.urgency ());
   }
+#endif
 
   return v;
 }
@@ -2014,7 +2068,7 @@ void Task::modify (modType type, bool text_required /* = false */)
 
   std::string text = "";
   bool mods = false;
-  for (auto& a : context.cli2._args)
+  for (auto& a : Context::getContext ().cli2._args)
   {
     if (a.hasTag ("MODIFICATION"))
     {
@@ -2031,24 +2085,25 @@ void Task::modify (modType type, bool text_required /* = false */)
           // ::composeF4 will skip if the value is blank, but the presence of
           // the attribute will prevent ::validate from applying defaults.
           if ((has (name) && get (name) != "") ||
-              (name == "due"     && context.config.has ("default.due")) ||
-              (name == "project" && context.config.has ("default.project")))
+              (name == "due"       && Context::getContext ().config.has ("default.due")) ||
+              (name == "scheduled" && Context::getContext ().config.has ("default.scheduled")) ||
+              (name == "project"   && Context::getContext ().config.has ("default.project")))
           {
             mods = true;
             set (name, "");
           }
 
-          context.debug (label + name + " <-- ''");
+          Context::getContext ().debug (label + name + " <-- ''");
         }
         else
         {
-          value = Lexer::dequote (value);
+          Lexer::dequote (value);
 
           // Get the column info. Some columns are not modifiable.
-          Column* column = context.columns[name];
+          Column* column = Context::getContext ().columns[name];
           if (! column ||
               ! column->modifiable ())
-            throw format (STRING_INVALID_MOD, name, value);
+            throw format ("The '{1}' attribute does not allow a value of '{2}'.", name, value);
 
           // Delegate modification to the column object or their base classes.
           if (name == "depends"             ||
@@ -2064,14 +2119,14 @@ void Task::modify (modType type, bool text_required /* = false */)
           }
 
           else
-            throw format (STRING_TASK_INVALID_COL_TYPE, column->type (), name);
+            throw format ("Unrecognized column type '{1}' for column '{2}'", column->type (), name);
         }
       }
 
       // Perform description/annotation substitution.
       else if (a._lextype == Lexer::Type::substitution)
       {
-        context.debug (label + "substitute " + a.attribute ("raw"));
+        Context::getContext ().debug (label + "substitute " + a.attribute ("raw"));
         substitute (a.attribute ("from"),
                     a.attribute ("to"),
                     a.attribute ("flags"));
@@ -2088,13 +2143,13 @@ void Task::modify (modType type, bool text_required /* = false */)
 
         if (a.attribute ("sign") == "+")
         {
-          context.debug (label + "tags <-- add '" + tag + '\'');
+          Context::getContext ().debug (label + "tags <-- add '" + tag + '\'');
           addTag (tag);
           feedback_special_tags (*this, tag);
         }
         else
         {
-          context.debug (label + "tags <-- remove '" + tag + '\'');
+          Context::getContext ().debug (label + "tags <-- remove '" + tag + '\'');
           removeTag (tag);
         }
 
@@ -2115,33 +2170,33 @@ void Task::modify (modType type, bool text_required /* = false */)
   //  any.
   if (text != "")
   {
-    text = Lexer::dequote (text);
+    Lexer::dequote (text);
 
     switch (type)
     {
     case modReplace:
-      context.debug (label + "description <-- '" + text + '\'');
+      Context::getContext ().debug (label + "description <-- '" + text + '\'');
       set ("description", text);
       break;
 
     case modPrepend:
-      context.debug (label + "description <-- '" + text + "' + description");
+      Context::getContext ().debug (label + "description <-- '" + text + "' + description");
       set ("description", text + ' ' + get ("description"));
       break;
 
     case modAppend:
-      context.debug (label + "description <-- description + '" + text + '\'');
+      Context::getContext ().debug (label + "description <-- description + '" + text + '\'');
       set ("description", get ("description") + ' ' + text);
       break;
 
     case modAnnotate:
-      context.debug (label + "new annotation <-- '" + text + '\'');
+      Context::getContext ().debug (label + "new annotation <-- '" + text + '\'');
       addAnnotation (text);
       break;
     }
   }
   else if (! mods && text_required)
-    throw std::string (STRING_CMD_MODIFY_NEED_TEXT);
+    throw std::string ("Additional text must be provided.");
 
   // Modifying completed/deleted tasks generates a message, if the modification
   // does not change status.
@@ -2149,7 +2204,7 @@ void Task::modify (modType type, bool text_required /* = false */)
       getStatus () == originalStatus)
   {
     auto uuid = get ("uuid").substr (0, 8);
-    context.footnote (format (STRING_CMD_MODIFY_INACTIVE, uuid, get ("status"), uuid));
+    Context::getContext ().footnote (format ("Note: Modified task {1} is {2}.  You may wish to make this task pending with: task {3} modify status:pending", uuid, get ("status"), uuid));
   }
 }
 #endif
