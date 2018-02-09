@@ -45,7 +45,6 @@
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <i18n.h>
 
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
@@ -113,7 +112,7 @@ int main (int argc, const char** argv)
           {
             ++arg;
             if (arg == args.end () || (*arg)[0] == '-')
-              throw std::string (STRING_TASKD_DATA);
+              throw std::string ("ERROR: The '--data' option requireѕ an argument.");
 
             config.set ("root", *arg);
           }
@@ -141,7 +140,7 @@ int main (int argc, const char** argv)
         else if (closeEnough ("api",         args[0], 3)) command_api      (db, positionals);
         else if (closeEnough ("validate",    args[0], 3)) command_validate (    positionals);
         else
-          throw format (STRING_TASKD_BAD_COMMAND, args[0]);
+          throw format ("ERROR: Did not recognize command '{1}'.", args[0]);
       }
 
       catch (std::string& error)
@@ -164,8 +163,7 @@ int main (int argc, const char** argv)
 
       catch (...)
       {
-        std::cerr << STRING_ERROR_UNKNOWN
-                  << '\n';
+        std::cerr << "Unknown error\n";
         status = -2;
       }
     }
