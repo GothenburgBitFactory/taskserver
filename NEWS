@@ -27,26 +27,14 @@ Removed features in 1.2.0
 
 ---
 
-Taskserver has been built and tested on the following configurations:
+While Taskserver has undergone testing on multiple platforms, bugs are sure to
+remain.  If you encounter a bug, please enter a new issue at:
 
-  * macOS
-  * Fedora
-  * Ubuntu
-  * Debian
-  * Arch
-  * FreeBSD
-  * Cygwin
-
----
-
-While Taskserver has undergone testing, bugs are sure to remain.  If you
-encounter a bug, please enter a new issue at:
-
-  https://bug.tasktools.org
+  https://github.com/GothenburgBitFactory/taskserver/issues
 
 Or just send a message to:
 
-  support@taskwarrior.org
+  support@gothenburgbitfactory.org
 
 Thank you.
 
