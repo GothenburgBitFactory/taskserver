@@ -3,7 +3,7 @@
 ################################################################################
 ## taskd = Taskserver
 ##
-## Copyright 2010 - 2017, Göteborg Bit Factory.
+## Copyright 2010 - 2018, Göteborg Bit Factory.
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy
 ## of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ import datetime
 # 2015-09-09 13:49:55 [107] ERROR: Could not find common ancestor for 006349d3-b7d2-458f-bf64-81c765602934
 # ?
 
-timestamp       = re.compile('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')                                      
+timestamp       = re.compile('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 bounce          = re.compile('==== taskd')
 sync1           = re.compile("\'sync\' from ([^/]+)/(.+) at")
 sync2           = re.compile("\'sync\' from '([^/]+)/(.+)' using '([^']+)' at")
@@ -74,9 +74,9 @@ def scan_log(file, data):
   with open(file) as fh:
     for line in fh.readlines():
 
-      # Capture every timestamp seen.                                                                    
-      matches = timestamp.match(line)                                                                             
-      if matches:                                                                                                 
+      # Capture every timestamp seen.
+      matches = timestamp.match(line)
+      if matches:
         dt = datetime.datetime.strptime(matches.group(1), '%Y-%m-%d %H:%M:%S')
         if data['oldest'] == 0:
           data['oldest'] = dt
