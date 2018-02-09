@@ -51,7 +51,7 @@ We use the following branching model:
   from the latest tarball, or installing a binary package. No development is
   done on the `master` branch.
 
-* `1.3.0` is the current development branch. All work is done here, and upon
+* `1.2.0` is the current development branch. All work is done here, and upon
   release it will be merged to `master`. This development branch is not stable,
   may not even build or pass tests, and should be treated accordingly.
   Make backups.
