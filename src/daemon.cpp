@@ -47,7 +47,6 @@
 #endif
 #include <util.h>
 #include <taskd.h>
-#include <i18n.h>
 
 // Indicates that signals were caught.
 extern bool _sighup;
@@ -582,7 +581,7 @@ void Daemon::extract_subset (
 
   catch (const std::string& e)
   {
-    throw e + format (STRING_RECORD_LINE, i);
+    throw e + format (" at line {1}", i);
   }
 
   _log->write (format ("[{1}] Subset {2} tasks", _txn_count, subset.size ()));
