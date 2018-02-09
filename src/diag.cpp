@@ -43,7 +43,6 @@
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <i18n.h>
 
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
@@ -248,7 +247,7 @@ void command_validate (const std::vector <std::string>& args)
   {
     if (args.size () < 2)
     {
-      std::cout << STRING_JSON_VALIDATE << '\n';
+      std::cout << "You must specify either a JSON string or a JSON file.\n";
       return;
     }
 
@@ -265,8 +264,7 @@ void command_validate (const std::vector <std::string>& args)
 
     if (root)
     {
-      std::cout << STRING_JSON_SYNTAX_OK
-                << "\n\n"
+      std::cout << "JSON syntax ok.\n\n"
                 << root->dump ()
                 << '\n';
     }
@@ -274,8 +272,8 @@ void command_validate (const std::vector <std::string>& args)
     delete root;
   }
 
-  catch (const std::string& e) { std::cout << e << '\n';                    }
-  catch (...)                  { std::cout << STRING_ERROR_UNKNOWN << '\n'; }
+  catch (const std::string& e) { std::cout << e << '\n';         }
+  catch (...)                  { std::cout << "Unknown error\n"; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
