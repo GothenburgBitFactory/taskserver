@@ -76,6 +76,11 @@ Or clone this repository:
     $ git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
     $ cd taskserver
 
+In case of errors with libshared (URL pointing to git.tasktools.org):
+
+    $ sed -i 's/git.tasktools.org\/TM/github.com\/GothenburgBitFactory/' .git/config
+    $ git submodule update
+
 Then build:
 
     $ cmake -DCMAKE_BUILD_TYPE=release .
