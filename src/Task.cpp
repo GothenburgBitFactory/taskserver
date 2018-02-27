@@ -504,9 +504,9 @@ bool Task::is_dueyear () const
     if (status != Task::completed &&
         status != Task::deleted)
     {
-      Datetime now;
       Datetime due (get_date ("due"));
-      if (now.year () == due.year ())
+      if (due >= Datetime ("soy") &&
+          due <= Datetime ("eoy"))
         return true;
     }
   }
