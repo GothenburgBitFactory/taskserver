@@ -445,8 +445,8 @@ bool Task::is_dueweek () const
         status != Task::deleted)
     {
       Datetime due (get_date ("due"));
-      if (due >= Datetime ("socw") &&
-          due <= Datetime ("eocw"))
+      if (due >= Datetime ("sow") &&
+          due <= Datetime ("eow"))
         return true;
     }
   }
@@ -465,8 +465,28 @@ bool Task::is_duemonth () const
         status != Task::deleted)
     {
       Datetime due (get_date ("due"));
-      if (due >= Datetime ("socm") &&
-          due <= Datetime ("eocm"))
+      if (due >= Datetime ("som") &&
+          due <= Datetime ("eom"))
+        return true;
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Task::is_duequarter () const
+{
+  if (has ("due"))
+  {
+    Task::status status = getStatus ();
+
+    if (status != Task::completed &&
+        status != Task::deleted)
+    {
+      Datetime due (get_date ("due"));
+      if (due >= Datetime ("soq") &&
+          due <= Datetime ("eoq"))
         return true;
     }
   }
