@@ -143,11 +143,11 @@ public:
 #ifdef PRODUCT_TASKWARRIOR
   void removeDependency (int);
   void removeDependency (const std::string&);
-  void getDependencies (std::vector <int>&) const;
-  void getDependencies (std::vector <std::string>&) const;
-  void getDependencies (std::vector <Task>&) const;
+  std::vector <int>         getDependencyIDs () const;
+  std::vector <std::string> getDependencyUUIDs () const;
+  std::vector <Task>        getDependencyTasks () const;
 
-  void getUDAOrphans (std::vector <std::string>&) const;
+  std::vector <std::string> getUDAOrphanUUIDs () const;
 
   void substitute (const std::string&, const std::string&, const std::string&);
 #endif
@@ -172,17 +172,17 @@ private:
   const std::string decode (const std::string&) const;
 
 public:
-  float urgency_project () const;
-  float urgency_active () const;
-  float urgency_scheduled () const;
-  float urgency_waiting () const;
-  float urgency_blocked () const;
-  float urgency_inherit () const;
+  float urgency_project     () const;
+  float urgency_active      () const;
+  float urgency_scheduled   () const;
+  float urgency_waiting     () const;
+  float urgency_blocked     () const;
+  float urgency_inherit     () const;
   float urgency_annotations () const;
-  float urgency_tags () const;
-  float urgency_due () const;
-  float urgency_blocking () const;
-  float urgency_age () const;
+  float urgency_tags        () const;
+  float urgency_due         () const;
+  float urgency_blocking    () const;
+  float urgency_age         () const;
 };
 
 #endif
