@@ -129,6 +129,7 @@ public:
   std::vector <std::string> getTags () const;
   void removeTag (const std::string&);
 
+  int getAnnotationCount () const;
   bool hasAnnotations () const;
   void getAnnotations (std::map <std::string, std::string>&) const;
   void setAnnotations (const std::map <std::string, std::string>&);
