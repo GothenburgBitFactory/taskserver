@@ -1654,12 +1654,8 @@ void Task::validate_before (
 //   ]  -> &close;
 const std::string Task::encode (const std::string& value) const
 {
-  std::string modified = value;
-
-  str_replace (modified, "[",  "&open;");
-  str_replace (modified, "]",  "&close;");
-
-  return modified;
+  auto modified = str_replace (value,    "[", "&open;");
+  return          str_replace (modified, "]", "&close;");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1672,18 +1668,11 @@ const std::string Task::encode (const std::string& value) const
 //   :  <- &colon;
 const std::string Task::decode (const std::string& value) const
 {
-  if (value.find ('&') != std::string::npos)
-  {
-    std::string modified = value;
+  if (value.find ('&') == std::string::npos)
+    return value;
 
-    // Supported encodings.
-    str_replace (modified, "&open;",  "[");
-    str_replace (modified, "&close;", "]");
-
-    return modified;
-  }
-
-  return value;
+  auto modified = str_replace (value,    "&open;",  "[");
+  return          str_replace (modified, "&close;", "]");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
