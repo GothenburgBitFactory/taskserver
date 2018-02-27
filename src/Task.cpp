@@ -559,24 +559,24 @@ void Task::parse (const std::string& input)
 
     if (input[0] == '[')
     {
-      Pig n (input);
+      Pig pig (input);
       std::string line;
-      if (n.skip     ('[')       &&
-          n.getUntil (']', line) &&
-          n.skip     (']')       &&
-          (n.skip ('\n') || n.eos ()))
+      if (pig.skip     ('[')       &&
+          pig.getUntil (']', line) &&
+          pig.skip     (']')       &&
+          (pig.skip ('\n') || pig.eos ()))
       {
         if (line.length () == 0)
           throw std::string ("Empty record in input.");
 
-        Pig nl (line);
+        Pig attLine (line);
         std::string name;
         std::string value;
-        while (!nl.eos ())
+        while (!attLine.eos ())
         {
-          if (nl.getUntil (':', name) &&
-              nl.skip (':')           &&
-              nl.getQuoted ('"', value))
+          if (attLine.getUntil (':', name) &&
+              attLine.skip (':')           &&
+              attLine.getQuoted ('"', value))
           {
 #ifdef PRODUCT_TASKWARRIOR
             legacyAttributeMap (name);
@@ -588,11 +588,11 @@ void Task::parse (const std::string& input)
             data[name] = decode (json::decode (value));
           }
 
-          nl.skip (' ');
+          attLine.skip (' ');
         }
 
         std::string remainder;
-        nl.getRemainder (remainder);
+        attLine.getRemainder (remainder);
         if (remainder.length ())
           throw std::string ("Unrecognized characters at end of line.");
       }
