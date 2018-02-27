@@ -1061,13 +1061,14 @@ void Task::removeAnnotations ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Task::getAnnotations (std::map <std::string, std::string>& annotations) const
+std::map <std::string, std::string> Task::getAnnotations () const
 {
-  annotations.clear ();
-
+  std::map <std::string, std::string> a;
   for (auto& ann : data)
     if (! ann.first.compare (0, 11, "annotation_", 11))
-      annotations.insert (ann);
+      a.insert (ann);
+
+  return a;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
