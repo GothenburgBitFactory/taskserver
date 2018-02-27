@@ -50,7 +50,6 @@
 #include <format.h>
 #include <util.h>
 
-#include <i18n.h>
 #ifdef PRODUCT_TASKWARRIOR
 #include <main.h>
 
@@ -150,7 +149,7 @@ Task::status Task::textToStatus (const std::string& input)
   else if (input[0] == 'r') return Task::recurring;
   else if (input[0] == 'w') return Task::waiting;
 
-  throw format (STRING_ERROR_BAD_STATUS, input);
+  throw format ("The status '{1}' is not valid.", input);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -569,7 +568,7 @@ void Task::parse (const std::string& input)
           (n.skip ('\n') || n.eos ()))
       {
         if (line.length () == 0)
-          throw std::string (STRING_RECORD_EMPTY);
+          throw std::string ("Empty record in input.");
 
         Pig nl (line);
         std::string name;
@@ -596,13 +595,13 @@ void Task::parse (const std::string& input)
         std::string remainder;
         nl.getRemainder (remainder);
         if (remainder.length ())
-          throw std::string (STRING_RECORD_JUNK_AT_EOL);
+          throw std::string ("Unrecognized characters at end of line.");
       }
     }
     else if (input[0] == '{')
       parseJSON (input);
     else
-      throw std::string (STRING_RECORD_NOT_FF4);
+      throw std::string ("Record not recognized as format 4.");
   }
 
   catch (const std::string&)
@@ -730,10 +729,10 @@ void Task::parseJSON (const json::object* root_obj)
           json::string* what = (json::string*)annotation->_data["description"];
 
           if (! when)
-            throw format (STRING_TASK_NO_ENTRY, root_obj->dump ());
+            throw format ("Annotation is missing an entry date: {1}", root_obj-> dump ());
 
           if (! what)
-            throw format (STRING_TASK_NO_DESC, root_obj->dump ());
+            throw format ("Annotation is missing a description: {1}", root_obj->dump ());
 
           std::string name = "annotation_" + Datetime (when->_data).toEpochString ();
           annos.insert (std::make_pair (name, json::decode (what->_data)));
@@ -767,13 +766,13 @@ void Task::parseLegacy (const std::string& line)
   switch (determineVersion (line))
   {
   // File format version 1, from 2006-11-27 - 2007-12-31, v0.x+ - v0.9.3
-  case 1: throw std::string (STRING_TASK_NO_FF1);
+  case 1: throw std::string ("Taskwarrior no longer supports file format 1, originally used between 27 November 2006 and 31 December 2007.");
 
   // File format version 2, from 2008-1-1 - 2009-3-23, v0.9.3 - v1.5.0
-  case 2: throw std::string (STRING_TASK_NO_FF2);
+  case 2: throw std::string ("Taskwarrior no longer supports file format 2, originally used between 1 January 2008 and 12 April 2009.");
 
   // File format version 3, from 2009-3-23 - 2009-05-16, v1.6.0 - v1.7.1
-  case 3: throw std::string (STRING_TASK_NO_FF3);
+  case 3: throw std::string ("Taskwarrior no longer supports file format 3, originally used between 23 March 2009 and 16 May 2009.");
 
   // File format version 4, from 2009-05-16 - today, v1.7.1+
   case 4:
@@ -787,7 +786,7 @@ void Task::parseLegacy (const std::string& line)
             << '\'';
     context.debug (message.str ());
 #endif
-    throw std::string (STRING_TASK_PARSE_UNREC_FF);
+    throw std::string ("Unrecognized Taskwarrior file format or blank line in data.");
     break;
   }
 
@@ -1081,12 +1080,12 @@ void Task::addDependency (int depid)
   // Check that id is resolvable.
   std::string uuid = context.tdb2.pending.uuid (depid);
   if (uuid == "")
-    throw format (STRING_TASK_DEPEND_MISS_CREA, depid);
+    throw format ("Could not create a dependency on task {1} - not found.", depid);
 
   std::string depends = get ("depends");
   if (depends.find (uuid) != std::string::npos)
   {
-    context.footnote (format (STRING_TASK_DEPEND_DUP, id, depid));
+    Context::getContext ().footnote (format ("Task {1} already depends on task {2}.", id, depid));
     return;
   }
 
@@ -1098,7 +1097,7 @@ void Task::addDependency (int depid)
 void Task::addDependency (const std::string& uuid)
 {
   if (uuid == get ("uuid"))
-    throw std::string (STRING_TASK_DEPEND_ITSELF);
+    throw std::string ("A task cannot be dependent on itself.");
 
   // Store the dependency.
   std::string depends = get ("depends");
@@ -1110,7 +1109,7 @@ void Task::addDependency (const std::string& uuid)
     else
     {
 #ifdef PRODUCT_TASKWARRIOR
-      context.footnote (format (STRING_TASK_DEPEND_DUP, get ("uuid"), uuid));
+      Context::getContext ().footnote (format ("Task {1} already depends on task {2}.", get ("uuid"), uuid));
 #endif
       return;
     }
@@ -1121,7 +1120,7 @@ void Task::addDependency (const std::string& uuid)
   // Prevent circular dependencies.
 #ifdef PRODUCT_TASKWARRIOR
   if (dependencyIsCircular (*this))
-    throw std::string (STRING_TASK_DEPEND_CIRCULAR);
+    throw std::string ("Circular dependency detected and disallowed.");
 #endif
 
   recalc_urgency = true;
@@ -1141,7 +1140,7 @@ void Task::removeDependency (const std::string& uuid)
     recalc_urgency = true;
   }
   else
-    throw format (STRING_TASK_DEPEND_MISS_DEL, uuid);
+    throw format ("Could not delete a dependency on task {1} - not found.", uuid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1152,7 +1151,7 @@ void Task::removeDependency (int id)
   if (uuid != "" && depends.find (uuid) != std::string::npos)
     removeDependency (uuid);
   else
-    throw format (STRING_TASK_DEPEND_MISS_DEL, id);
+    throw format ("Could not delete a dependency on task {1} - not found.", id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1399,7 +1398,7 @@ void Task::substitute (
         done = true;
 
       if (++counter > APPROACHING_INFINITY)
-        throw format (STRING_INFINITE_LOOP, APPROACHING_INFINITY);
+        throw format ("Terminated substitution because more than {1} changes were made - infinite loop protection.", APPROACHING_INFINITY);
     }
 
     if (!done)
@@ -1422,7 +1421,7 @@ void Task::substitute (
             done = true;
 
           if (++counter > APPROACHING_INFINITY)
-            throw format (STRING_INFINITE_LOOP, APPROACHING_INFINITY);
+            throw format ("Terminated substitution because more than {1} changes were made - infinite loop protection.", APPROACHING_INFINITY);
         }
       }
     }
@@ -1462,7 +1461,7 @@ void Task::validate (bool
     std::string token;
     Lexer::Type type;
     if (! lex.isUUID (token, type, true))
-      throw format (STRING_CMD_IMPORT_UUID_BAD, uid);
+      throw format ("Not a valid UUID '{1}'.", uid);
   }
   else
     set ("uuid", uuid ());
@@ -1575,13 +1574,13 @@ void Task::validate (bool
 
   // There is no fixing a missing description.
   if (! has ("description"))
-    throw std::string (STRING_TASK_VALID_DESC);
+    throw std::string ("A task must have a description.");
   else if (get ("description") == "")
-    throw std::string (STRING_TASK_VALID_BLANK);
+    throw std::string ("Cannot add a task that is blank.");
 
   // Cannot have a recur frequency with no due date - when would it recur?
   if (has ("recur") && (! has ("due") || get ("due") == ""))
-    throw std::string (STRING_TASK_VALID_REC_DUE);
+    throw std::string ("A recurring task must also have a 'due' date.");
 
   // Recur durations must be valid.
   if (has ("recur"))
@@ -1592,7 +1591,8 @@ void Task::validate (bool
       Duration d;
       std::string::size_type i = 0;
       if (! d.parse (value, i))
-        throw format (STRING_TASK_VALID_RECUR, value);
+        // TODO Ideal location to map unsupported old recurrence periods to supported values.
+        throw format ("The recurrence value '{1}' is not valid.", value);
     }
   }
 }
@@ -1618,7 +1618,7 @@ void Task::validate_before (
 
     // if date is zero, then it is being removed (e.g. "due: wait:1day")
     if (date_left > date_right && date_right.toEpoch () != 0)
-      context.footnote (format (STRING_TASK_VALID_BEFORE, left, right));
+      Context::getContext ().footnote (format ("Warning: You have specified that the '{1}' date is after the '{2}' date.", left, right));
   }
 #endif
 }
@@ -2048,7 +2048,7 @@ void Task::modify (modType type, bool text_required /* = false */)
           Column* column = context.columns[name];
           if (! column ||
               ! column->modifiable ())
-            throw format (STRING_INVALID_MOD, name, value);
+            throw format ("The '{1}' attribute does not allow a value of '{2}'.", name, value);
 
           // Delegate modification to the column object or their base classes.
           if (name == "depends"             ||
@@ -2064,7 +2064,7 @@ void Task::modify (modType type, bool text_required /* = false */)
           }
 
           else
-            throw format (STRING_TASK_INVALID_COL_TYPE, column->type (), name);
+            throw format ("Unrecognized column type '{1}' for column '{2}'", column->type (), name);
         }
       }
 
@@ -2141,7 +2141,7 @@ void Task::modify (modType type, bool text_required /* = false */)
     }
   }
   else if (! mods && text_required)
-    throw std::string (STRING_CMD_MODIFY_NEED_TEXT);
+    throw std::string ("Additional text must be provided.");
 
   // Modifying completed/deleted tasks generates a message, if the modification
   // does not change status.
@@ -2149,7 +2149,7 @@ void Task::modify (modType type, bool text_required /* = false */)
       getStatus () == originalStatus)
   {
     auto uuid = get ("uuid").substr (0, 8);
-    context.footnote (format (STRING_CMD_MODIFY_INACTIVE, uuid, get ("status"), uuid));
+    Context::getContext ().footnote (format ("Note: Modified task {1} is {2}.  You may wish to make this task pending with: task {3} modify status:pending", uuid, get ("status"), uuid));
   }
 }
 #endif
