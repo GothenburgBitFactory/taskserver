@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2017, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2018, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@
 #include <Context.h>
 #include <Pig.h>
 #endif
-#include <Datetime.h>
 #include <Duration.h>
+#include <Datetime.h>
 #ifdef PRODUCT_TASKWARRIOR
 #include <RX.h>
 #endif
@@ -56,20 +56,19 @@
 #include <Eval.h>
 #include <Variant.h>
 #include <Filter.h>
-#include <Dates.h>
 
 #define APPROACHING_INFINITY 1000   // Close enough.  This isn't rocket surgery.
 
-extern Context context;
 extern Task& contextTask;
 
 static const float epsilon = 0.000001;
 #endif
 
-std::string Task::defaultProject  = "";
-std::string Task::defaultDue      = "";
-bool Task::searchCaseSensitive    = true;
-bool Task::regex                  = false;
+std::string Task::defaultProject   = "";
+std::string Task::defaultDue       = "";
+std::string Task::defaultScheduled = "";
+bool Task::searchCaseSensitive     = true;
+bool Task::regex                   = false;
 std::map <std::string, std::string> Task::attributes;
 
 std::map <std::string, float> Task::coefficients;
@@ -335,7 +334,7 @@ Task::dateState Task::getDateState (const std::string& name) const
         return dateLaterToday;
     }
 
-    int imminentperiod = context.config.getInteger ("due");
+    int imminentperiod = Context::getContext ().config.getInteger ("due");
     if (imminentperiod == 0)
       return dateAfterToday;
 
@@ -498,7 +497,7 @@ bool Task::is_dueyear () const
 ////////////////////////////////////////////////////////////////////////////////
 bool Task::is_udaPresent () const
 {
-  for (auto& col : context.columns)
+  for (auto& col : Context::getContext ().columns)
     if (col.second->is_uda () &&
         has (col.first))
       return true;
@@ -511,7 +510,7 @@ bool Task::is_orphanPresent () const
 {
   for (auto& att : data)
     if (att.first.compare (0, 11, "annotation_", 11) != 0)
-      if (context.columns.find (att.first) == context.columns.end ())
+      if (Context::getContext ().columns.find (att.first) == Context::getContext ().columns.end ())
         return true;
 
   return false;
@@ -751,7 +750,7 @@ void Task::parseJSON (const json::object* root_obj)
                 << "' with value '"
                 << i.second
                 << "' --> preserved\n";
-        context.debug (message.str ());
+        Context::getContext ().debug (message.str ());
 #endif
         set (i.first, json::decode (Lexer::dequote (i.second->dump ())));
       }
@@ -784,7 +783,7 @@ void Task::parseLegacy (const std::string& line)
     message << "Invalid fileformat at line '"
             << line
             << '\'';
-    context.debug (message.str ());
+    Context::getContext ().debug (message.str ());
 #endif
     throw std::string ("Unrecognized Taskwarrior file format or blank line in data.");
     break;
@@ -928,7 +927,7 @@ std::string Task::composeJSON (bool decorate /*= false*/) const
     //             and Taskserver 1.2.0 is released, the default for
     //             'json.depends.array' can revert to 'on'.
 
-             && context.config.getBoolean ("json.depends.array")
+             && Context::getContext ().config.getBoolean ("json.depends.array")
 #endif
             )
     {
@@ -1078,7 +1077,7 @@ void Task::setAnnotations (const std::map <std::string, std::string>& annotation
 void Task::addDependency (int depid)
 {
   // Check that id is resolvable.
-  std::string uuid = context.tdb2.pending.uuid (depid);
+  std::string uuid = Context::getContext ().tdb2.pending.uuid (depid);
   if (uuid == "")
     throw format ("Could not create a dependency on task {1} - not found.", depid);
 
@@ -1147,7 +1146,7 @@ void Task::removeDependency (const std::string& uuid)
 void Task::removeDependency (int id)
 {
   std::string depends = get ("depends");
-  std::string uuid = context.tdb2.pending.uuid (id);
+  std::string uuid = Context::getContext ().tdb2.pending.uuid (id);
   if (uuid != "" && depends.find (uuid) != std::string::npos)
     removeDependency (uuid);
   else
@@ -1182,7 +1181,7 @@ void Task::getDependencies (std::vector <Task>& all) const
   for (auto& dep : deps)
   {
     Task task;
-    context.tdb2.get (dep, task);
+    Context::getContext ().tdb2.get (dep, task);
     all.push_back (task);
   }
 }
@@ -1243,7 +1242,7 @@ bool Task::hasTag (const std::string& tag) const
 #ifdef PRODUCT_TASKWARRIOR
     if (tag == "UDA")       return is_udaPresent ();
     if (tag == "ORPHAN")    return is_orphanPresent ();
-    if (tag == "LATEST")    return id == context.tdb2.latest_id ();
+    if (tag == "LATEST")    return id == Context::getContext ().tdb2.latest_id ();
 #endif
     if (tag == "PROJECT")   return has ("project");
     if (tag == "PRIORITY")  return has ("priority");
@@ -1311,8 +1310,10 @@ void Task::getUDAOrphans (std::vector <std::string>& names) const
 {
   for (auto& it : data)
     if (it.first.compare (0, 11, "annotation_", 11) != 0)
-      if (context.columns.find (it.first) == context.columns.end ())
-        names.push_back (it.first);
+      if (Context::getContext ().columns.find (it.first) == Context::getContext ().columns.end ())
+        orphans.push_back (it.first);
+
+  return orphans;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1510,7 +1511,7 @@ void Task::validate (bool
     if (Task::defaultProject != "" &&
         ! has ("project"))
     {
-      if (context.columns["project"]->validate (Task::defaultProject))
+      if (Context::getContext ().columns["project"]->validate (Task::defaultProject))
         set ("project", Task::defaultProject);
     }
 
@@ -1518,7 +1519,7 @@ void Task::validate (bool
     if (Task::defaultDue != "" &&
         ! has ("due"))
     {
-      if (context.columns["due"]->validate (Task::defaultDue))
+      if (Context::getContext ().columns["due"]->validate (Task::defaultDue))
       {
         Duration dur (Task::defaultDue);
         if ((time_t) dur != 0)
@@ -1528,11 +1529,25 @@ void Task::validate (bool
       }
     }
 
+    // Override with default.scheduled, if not specified.
+    if (Task::defaultScheduled != "" &&
+        ! has ("scheduled"))
+    {
+      if (Context::getContext ().columns["scheduled"]->validate (Task::defaultScheduled))
+      {
+        Duration dur (Task::defaultScheduled);
+        if (dur.toTime_t () != 0)
+          set ("scheduled", (Datetime () + dur.toTime_t ()).toEpoch ());
+        else
+          set ("scheduled", Datetime (Task::defaultScheduled).toEpoch ());
+      }
+    }
+
     // If a UDA has a default value in the configuration,
     // override with uda.(uda).default, if not specified.
     // Gather a list of all UDAs with a .default value
     std::vector <std::string> udas;
-    for (auto& var : context.config)
+    for (auto& var : Context::getContext ().config)
     {
       if (! var.first.compare (0, 4, "uda.", 4) &&
           var.first.find (".default") != std::string::npos)
@@ -1549,7 +1564,7 @@ void Task::validate (bool
       // of course only if we don't have one on the command line already
       for (auto& uda : udas)
       {
-        std::string defVal= context.config.get ("uda." + uda + ".default");
+        std::string defVal= Context::getContext ().config.get ("uda." + uda + ".default");
 
         // If the default is empty, or we already have a value, skip it
         if (defVal != "" && get (uda) == "")
@@ -1828,7 +1843,7 @@ float Task::urgency_c () const
     }
   }
 
-  if (is_blocking && context.config.getBoolean ("urgency.inherit"))
+  if (is_blocking && Context::getContext ().config.getBoolean ("urgency.inherit"))
   {
     float prev = value;
     value = std::max (value, urgency_inherit ());
@@ -2014,7 +2029,7 @@ void Task::modify (modType type, bool text_required /* = false */)
 
   std::string text = "";
   bool mods = false;
-  for (auto& a : context.cli2._args)
+  for (auto& a : Context::getContext ().cli2._args)
   {
     if (a.hasTag ("MODIFICATION"))
     {
@@ -2031,21 +2046,22 @@ void Task::modify (modType type, bool text_required /* = false */)
           // ::composeF4 will skip if the value is blank, but the presence of
           // the attribute will prevent ::validate from applying defaults.
           if ((has (name) && get (name) != "") ||
-              (name == "due"     && context.config.has ("default.due")) ||
-              (name == "project" && context.config.has ("default.project")))
+              (name == "due"       && Context::getContext ().config.has ("default.due")) ||
+              (name == "scheduled" && Context::getContext ().config.has ("default.scheduled")) ||
+              (name == "project"   && Context::getContext ().config.has ("default.project")))
           {
             mods = true;
             set (name, "");
           }
 
-          context.debug (label + name + " <-- ''");
+          Context::getContext ().debug (label + name + " <-- ''");
         }
         else
         {
-          value = Lexer::dequote (value);
+          Lexer::dequote (value);
 
           // Get the column info. Some columns are not modifiable.
-          Column* column = context.columns[name];
+          Column* column = Context::getContext ().columns[name];
           if (! column ||
               ! column->modifiable ())
             throw format ("The '{1}' attribute does not allow a value of '{2}'.", name, value);
@@ -2071,7 +2087,7 @@ void Task::modify (modType type, bool text_required /* = false */)
       // Perform description/annotation substitution.
       else if (a._lextype == Lexer::Type::substitution)
       {
-        context.debug (label + "substitute " + a.attribute ("raw"));
+        Context::getContext ().debug (label + "substitute " + a.attribute ("raw"));
         substitute (a.attribute ("from"),
                     a.attribute ("to"),
                     a.attribute ("flags"));
@@ -2088,13 +2104,13 @@ void Task::modify (modType type, bool text_required /* = false */)
 
         if (a.attribute ("sign") == "+")
         {
-          context.debug (label + "tags <-- add '" + tag + '\'');
+          Context::getContext ().debug (label + "tags <-- add '" + tag + '\'');
           addTag (tag);
           feedback_special_tags (*this, tag);
         }
         else
         {
-          context.debug (label + "tags <-- remove '" + tag + '\'');
+          Context::getContext ().debug (label + "tags <-- remove '" + tag + '\'');
           removeTag (tag);
         }
 
@@ -2115,27 +2131,27 @@ void Task::modify (modType type, bool text_required /* = false */)
   //  any.
   if (text != "")
   {
-    text = Lexer::dequote (text);
+    Lexer::dequote (text);
 
     switch (type)
     {
     case modReplace:
-      context.debug (label + "description <-- '" + text + '\'');
+      Context::getContext ().debug (label + "description <-- '" + text + '\'');
       set ("description", text);
       break;
 
     case modPrepend:
-      context.debug (label + "description <-- '" + text + "' + description");
+      Context::getContext ().debug (label + "description <-- '" + text + "' + description");
       set ("description", text + ' ' + get ("description"));
       break;
 
     case modAppend:
-      context.debug (label + "description <-- description + '" + text + '\'');
+      Context::getContext ().debug (label + "description <-- description + '" + text + '\'');
       set ("description", get ("description") + ' ' + text);
       break;
 
     case modAnnotate:
-      context.debug (label + "new annotation <-- '" + text + '\'');
+      Context::getContext ().debug (label + "new annotation <-- '" + text + '\'');
       addAnnotation (text);
       break;
     }
