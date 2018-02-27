@@ -1532,8 +1532,8 @@ void Task::validate (bool
       if (Context::getContext ().columns["due"]->validate (Task::defaultDue))
       {
         Duration dur (Task::defaultDue);
-        if ((time_t) dur != 0)
-          set ("due", (Datetime () + dur).toEpoch ());
+        if (dur.toTime_t () != 0)
+          set ("due", (Datetime () + dur.toTime_t ()).toEpoch ());
         else
           set ("due", Datetime (Task::defaultDue).toEpoch ());
       }
@@ -1613,9 +1613,9 @@ void Task::validate (bool
     std::string value = get ("recur");
     if (value != "")
     {
-      Duration d;
+      Duration p;
       std::string::size_type i = 0;
-      if (! d.parse (value, i))
+      if (! p.parse (value, i))
         // TODO Ideal location to map unsupported old recurrence periods to supported values.
         throw format ("The recurrence value '{1}' is not valid.", value);
     }
