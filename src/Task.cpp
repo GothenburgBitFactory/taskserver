@@ -1338,8 +1338,7 @@ void Task::substitute (
 
   // Get the data to modify.
   std::string description = get ("description");
-  std::map <std::string, std::string> annotations;
-  getAnnotations (annotations);
+  auto annotations = getAnnotations ();
 
   // Count the changes, so we know whether to proceed to annotations, after
   // modifying description.
