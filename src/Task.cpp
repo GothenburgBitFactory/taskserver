@@ -1477,12 +1477,26 @@ void Task::validate (bool
   else
     set ("uuid", uuid ());
 
+  // TODO Obsolete remove for 2.6.0
   // Recurring tasks get a special status.
+  if (status == Task::pending                     &&
+      has ("due")                                 &&
+      has ("recur")                               &&
+      (! has ("parent") || get ("parent") == "")  &&
+      (! has ("template") || get ("template") == ""))
+  {
+    status = Task::recurring;
+  }
+/*
+  // TODO Add for 2.6.0
   if (status == Task::pending &&
       has ("due")             &&
-      has ("recur")           &&
-      (! has ("parent") || get ("parent") == ""))
+      has ("recur")          &&
+      (! has ("template") || get ("template") == ""))
+  {
     status = Task::recurring;
+  }
+*/
 
   // Tasks with a wait: date get a special status.
   else if (status == Task::pending &&
@@ -1493,6 +1507,13 @@ void Task::validate (bool
   // By default, tasks are pending.
   else if (! has ("status") || get ("status") == "")
     status = Task::pending;
+
+  // Default to 'periodic' type recurrence.
+  if (status == Task::recurring &&
+      (! has ("rtype") || get ("rtype") == ""))
+  {
+    set ("rtype", "periodic");
+  }
 
   // Store the derived status.
   setStatus (status);
