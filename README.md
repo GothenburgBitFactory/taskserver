@@ -10,8 +10,7 @@ best with the latest Taskwarrior.
 
 ## Setup
 
-Taskserver setup is complex.
-Be very careful when following instructions.
+Taskserver setup is complex. Be very careful when following instructions.
 Here is the only supported Taskserver setup guide. Ignore all others.
 
 [taskserver-setup.pdf](https://github.com/GothenburgBitFactory/guides/blob/master/taskserver-setup/taskserver-setup.pdf)
