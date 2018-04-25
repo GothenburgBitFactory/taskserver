@@ -86,12 +86,12 @@ TLSServer::~TLSServer ()
 {
   if (_credentials)
     gnutls_certificate_free_credentials (_credentials);
-  
+
   if(_priorities && _priorities_init)
     gnutls_priority_deinit (_priorities);
-  
+
 #if GNUTLS_VERSION_NUMBER < 0x030300
-//not needed from gnutls 3.3.0 (handled automatically by library)
+  // Not needed after v3.3.0, handled automatically by library.
   gnutls_global_deinit ();
 #endif
 
@@ -217,16 +217,17 @@ void TLSServer::init (
   if ( ret < 0 )
       throw format("couldn't initialize priorities: {1}", gnutls_strerror(ret));
   _priorities_init = true;
+
 #if GNUTLS_VERSION_NUMBER >= 0x030506
   gnutls_certificate_set_known_dh_params (_credentials, GNUTLS_SEC_PARAM_HIGH); // 3.5.6
 #else
   gnutls_dh_params_t params;
   ret = gnutls_dh_params_init (&params); // All
-  if( ret < 0 )
-     throw format("couldn't initialize DH parameters: {1}", gnutls_strerror(ret));
+  if (ret < 0)
+    throw format ("couldn't initialize DH parameters: {1}", gnutls_strerror (ret));
   ret = gnutls_dh_params_generate2 (params, _dh_bits); // All
-  if( ret < 0  )
-     throw format("couldn't generate DH parameters: {1}", gnutls_strerror(ret));
+  if (ret < 0)
+    throw format ("couldn't generate DH parameters: {1}", gnutls_strerror (ret));
   gnutls_certificate_set_dh_params (_credentials, params); // All
 #endif
 
