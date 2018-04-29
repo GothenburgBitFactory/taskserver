@@ -75,15 +75,23 @@ TLSServer::TLSServer ()
 , _queue (5)
 , _debug (false)
 , _trust (TLSServer::strict)
+, _priorities_init(false)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::~TLSServer ()
 {
-  gnutls_certificate_free_credentials (_credentials);
-  gnutls_priority_deinit (_priorities);
+  if (_credentials)
+    gnutls_certificate_free_credentials (_credentials);
+  
+  if(_priorities && _priorities_init)
+    gnutls_priority_deinit (_priorities);
+  
+#if GNUTLS_VERSION_NUMBER < 0x030300
+//not needed from gnutls 3.3.0 (handled automatically by library)
   gnutls_global_deinit ();
+#endif
 
   if (_socket)
   {
@@ -177,12 +185,20 @@ void TLSServer::init (
 #else
   unsigned int bits = DH_BITS;
 #endif
-  gnutls_dh_params_init (&_params);
-  gnutls_dh_params_generate2 (_params, bits);
+  ret = gnutls_dh_params_init (&_params);
+  if( ret < 0 )
+     throw format("couldn't initialize DH parameters: {1}", gnutls_strerror(ret));
+  ret = gnutls_dh_params_generate2 (_params, bits);
+  if( ret < 0  )
+     throw format("couldn't generate DH parameters: {1}", gnutls_strerror(ret));
 
   if (_ciphers == "")
     _ciphers = "NORMAL";
   gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL);
+  if ( ret < 0 )
+      throw format("couldn't initialize priorities: {1}", gnutls_strerror(ret));
+  _priorities_init = true;
+  
   gnutls_certificate_set_dh_params (_credentials, _params);
 
 #if GNUTLS_VERSION_NUMBER >= 0x02090a
