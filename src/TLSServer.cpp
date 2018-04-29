@@ -84,10 +84,15 @@ TLSServer::TLSServer ()
 ////////////////////////////////////////////////////////////////////////////////
 TLSServer::~TLSServer ()
 {
-  gnutls_certificate_free_credentials (_credentials); // All
-  gnutls_priority_deinit (_priorities); // All
+  if (_credentials)
+    gnutls_certificate_free_credentials (_credentials);
+  
+  if(_priorities && _priorities_init)
+    gnutls_priority_deinit (_priorities);
+  
 #if GNUTLS_VERSION_NUMBER < 0x030300
-  gnutls_global_deinit (); // All
+//not needed from gnutls 3.3.0 (handled automatically by library)
+  gnutls_global_deinit ();
 #endif
 
   if (_socket)
@@ -208,14 +213,20 @@ void TLSServer::init (
       ":-3DES-CBC"                  // 3DES is broken with CBC
       ":-ARCFOUR-128:-ARCFOUR-40"   // RC4 is broken
       ":-MD5";                      // MD5 is not good enough anymore
-  gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL); // All
-
+  ret = gnutls_priority_init (&_priorities, _ciphers.c_str (), NULL); // All
+  if ( ret < 0 )
+      throw format("couldn't initialize priorities: {1}", gnutls_strerror(ret));
+  _priorities_init = true;
 #if GNUTLS_VERSION_NUMBER >= 0x030506
   gnutls_certificate_set_known_dh_params (_credentials, GNUTLS_SEC_PARAM_HIGH); // 3.5.6
 #else
   gnutls_dh_params_t params;
-  gnutls_dh_params_init (&params); // All
-  gnutls_dh_params_generate2 (params, _dh_bits); // All
+  ret = gnutls_dh_params_init (&params); // All
+  if( ret < 0 )
+     throw format("couldn't initialize DH parameters: {1}", gnutls_strerror(ret));
+  ret = gnutls_dh_params_generate2 (params, _dh_bits); // All
+  if( ret < 0  )
+     throw format("couldn't generate DH parameters: {1}", gnutls_strerror(ret));
   gnutls_certificate_set_dh_params (_credentials, params); // All
 #endif
 

@@ -66,6 +66,7 @@ private:
   int                              _queue       {5};
   bool                             _debug       {false};
   enum trust_level                 _trust       {TLSServer::strict};
+  bool                             _priorities_init {false};
 };
 
 class TLSTransaction
