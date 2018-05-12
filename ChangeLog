@@ -100,6 +100,8 @@
 - pki: Do not use 'which' for finding gnutls certool path
           (thanks to Antonio Huete Jimenez).
 - Eliminated locallization (there were none).
+- Fixed segfault/SSABRT on invalid cert files
+          (thanks to Dan Weatherill).
 
 ------- current release ---------------------------
 
