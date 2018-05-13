@@ -65,7 +65,6 @@ private:
   int                              _queue;
   bool                             _debug;
   enum trust_level                 _trust;
-  bool                             _priorities_init;
 };
 
 class TLSTransaction
