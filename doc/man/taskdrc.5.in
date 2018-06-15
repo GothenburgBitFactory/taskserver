@@ -86,7 +86,7 @@ Fully qualified path to the server certificate.
 
 .TP
 .B server.crl=/path/to/server.crl.pem
-Fully qualified path to the server certificate revocation list.
+Fully qualified path to the server certificate revocation list. Optional.
 
 .TP
 .B server.key=/path/to/server.key.pem
@@ -139,4 +139,3 @@ You can contact the project by emailing
 .TP
 Bugs in Taskserver may be reported to the issue-tracker at
 <http://taskwarrior.org>
-

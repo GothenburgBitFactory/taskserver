@@ -190,10 +190,10 @@ void command_diag (Database& config)
         // Load the config file.
         config._config->load (config_file._data);
 
+        std::string crlPath = config._config->get ("server.crl");
         File ca_cert     (config._config->get ("ca.cert"));
         File server_cert (config._config->get ("server.cert"));
         File server_key  (config._config->get ("server.key"));
-        File server_crl  (config._config->get ("server.crl"));
 
         std::cout << "          CA: "
                   << ca_cert._data << (ca_cert.readable () ? ", readable, " : ", ")
@@ -207,10 +207,13 @@ void command_diag (Database& config)
                   << server_key._data << (server_key.readable () ? ", readable, " : ", missing, ")
                   << server_key.size ()
                   << " bytes\n";
-        std::cout << "         CRL: "
-                  << server_crl._data << (server_crl.readable () ? ", readable, " : "")
-                  << server_crl.size ()
-                  << " bytes\n";
+        if (crlPath != "") {
+          File server_crl (crlPath);
+          std::cout << "         CRL: "
+                    << server_crl._data << (server_crl.readable () ? ", readable, " : "")
+                    << server_crl.size ()
+                    << " bytes\n";
+        }
 
         File log (config._config->get ("log"));
         std::cout << "         Log: "
