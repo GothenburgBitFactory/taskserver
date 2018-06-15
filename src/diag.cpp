@@ -232,7 +232,8 @@ void command_diag (Database& config)
         // Show trust level.
         std::string trust_value = config._config->get ("trust");
         if (trust_value == "strict" ||
-            trust_value == "allow all")
+            trust_value == "allow all" ||
+            trust_value == "skip")
           std::cout << "       Trust: " << trust_value << '\n';
         else
           std::cout << "       Trust: Bad value - see 'man taskdrc'\n";

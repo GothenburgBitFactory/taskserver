@@ -132,10 +132,17 @@ void TLSServer::trust (const enum trust_level value)
   _trust = value;
   if (_debug)
   {
-    if (_trust == allow_all)
-      std::cout << "s: INFO Client certificate will be trusted automatically.\n";
-    else
-      std::cout << "s: INFO Client certificate will be verified.\n";
+    switch (_trust) {
+      case allow_all:
+        std::cout << "s: INFO Client certificate will be trusted automatically.\n";
+        break;
+      case skip:
+        std::cout << "c: INFO Client certificate will not be required.\n";
+        break;
+      default:
+        std::cout << "s: INFO Client certificate will be verified.\n";
+        break;
+    }
   }
 }
 
@@ -379,8 +386,10 @@ void TLSTransaction::init (TLSServer& server)
   // access it during the handshake below and call the verifcation method.
   gnutls_session_set_ptr (_session, (void*) this); // All
 
-  // Require client certificate.
-  gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE); // All
+  if (_trust != TLSServer::skip) {
+    // Require client certificate.
+    gnutls_certificate_server_set_request (_session, GNUTLS_CERT_REQUIRE); // All
+  }
 
 /*
   // Set maximum compatibility mode. This is only suggested on public

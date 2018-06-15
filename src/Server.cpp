@@ -221,6 +221,8 @@ void Server::beginServer ()
       server.trust (TLSServer::allow_all);
     else if (trust == "strict")
       server.trust (TLSServer::strict);
+    else if (trust == "skip")
+      server.trust (TLSServer::skip);
     else if (_log)
       _log->write (format ("Invalid 'trust' setting value of '{1}'", trust));
 
