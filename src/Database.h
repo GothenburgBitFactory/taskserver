@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #define INCLUDED_DATABASE
 
 #include <ConfigFile.h>
-#include <Directory.h>
+#include <FS.h>
 #include <Msg.h>
 #include <Log.h>
 
@@ -47,21 +47,25 @@ public:
   bool redirect (const std::string&, Msg&);
 
   bool add_org (const std::string&);
-  bool add_group (const std::string&, const std::string&);
   bool add_user (const std::string&, const std::string&);
   bool remove_org (const std::string&);
-  bool remove_group (const std::string&, const std::string&);
   bool remove_user (const std::string&, const std::string&);
   bool suspend (const Directory&);
   bool resume (const Directory&);
 
   std::string key_generate ();
 
+private:
+  bool verifyExistence  (const Path&, Msg&);
+  bool verifyReadable   (const Path&, Msg&);
+  bool verifyWritable   (const Path&, Msg&);
+  bool verifyExecutable (const Path&, Msg&);
+
 public:
-  Config* _config;
+  Config* _config {nullptr};
 
 private:
-  Log* _log;
+  Log* _log       {nullptr};
 };
 
 #endif

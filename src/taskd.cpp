@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,15 +35,16 @@
 #else
 #include <sys/time.h>
 #endif
-#include <Directory.h>
+#include <Datetime.h>
+#include <FS.h>
 #include <Color.h>
+#include <shared.h>
+#include <format.h>
 #include <Database.h>
-#include <text.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <i18n.h>
 
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
@@ -71,49 +72,27 @@ int main (int argc, const char** argv)
     else if (args[0] == "-v" || closeEnough ("--version", args[0], 3))
     {
       Color bold ("bold");
-      std::cout << "\n"
+      std::cout << '\n'
                 << bold.colorize (PACKAGE_STRING)
 #ifdef HAVE_COMMIT
                 << " "
                 << COMMIT
 #endif
                 << " built for "
-
-#if defined (DARWIN)
-                << "darwin"
-#elif defined (SOLARIS)
-                << "solaris"
-#elif defined (CYGWIN)
-                << "cygwin"
-#elif defined (HAIKU)
-                << "haiku"
-#elif defined (OPENBSD)
-                << "openbsd"
-#elif defined (FREEBSD)
-                << "freebsd"
-#elif defined (NETBSD)
-                << "netbsd"
-#elif defined (LINUX)
-                << "linux"
-#elif defined (KFREEBSD)
-                << "GNU/kFreeBSD"
-#elif defined (GNUHURD)
-                << "GNU/Hurd"
-#else
-                << "unknown"
-#endif
-
-          << "\n"
-          << "Copyright (C) 2010 - 2015 Göteborg Bit Factory."
-          << "\n"
-          << "\n"
-          << "Taskd may be copied only under the terms of the MIT license, "
-          << "which may be found in the taskd source kit."
-          << "\n"
-          << "Documentation for taskd can be found using 'man taskd' or at "
-          << "http://taskwarrior.org"
-          << "\n"
-          << "\n";
+                << osName ()
+                << '\n'
+                << "Copyright (C) 2010 - "
+                << Datetime ().year ()
+                << " Göteborg Bit Factory."
+                << '\n'
+                << '\n'
+                << "Taskd may be copied only under the terms of the MIT license, "
+                << "which may be found in the taskd source kit."
+                << '\n'
+                << "Documentation for taskd can be found using 'man taskd' or at "
+                << "http://taskwarrior.org"
+                << '\n'
+                << '\n';
     }
     else
     {
@@ -133,7 +112,7 @@ int main (int argc, const char** argv)
           {
             ++arg;
             if (arg == args.end () || (*arg)[0] == '-')
-              throw std::string (STRING_TASKD_DATA);
+              throw std::string ("ERROR: The '--data' option requireѕ an argument.");
 
             config.set ("root", *arg);
           }
@@ -149,20 +128,19 @@ int main (int argc, const char** argv)
         Database db (&config);
 
         // The highest-level commands are hard-coded:
-             if (closeEnough ("init",        args[0], 3)) command_init     (db, positionals);
+             if (closeEnough ("init",        args[0], 3)) command_init     (db             );
         else if (closeEnough ("config",      args[0], 3)) command_config   (db, positionals);
-        else if (closeEnough ("status",      args[0], 3)) command_status   (db, positionals);
         else if (closeEnough ("help",        args[0], 3)) command_help     (    positionals);
-        else if (closeEnough ("diagnostics", args[0], 3)) command_diag     (db, positionals);
-        else if (closeEnough ("server",      args[0], 3)) command_server   (db, positionals);
+        else if (closeEnough ("diagnostics", args[0], 3)) command_diag     (db             );
+        else if (closeEnough ("server",      args[0], 3)) command_server   (db             );
         else if (closeEnough ("add",         args[0], 3)) command_add      (db, positionals);
         else if (closeEnough ("remove",      args[0], 3)) command_remove   (db, positionals);
         else if (closeEnough ("suspend",     args[0], 3)) command_suspend  (db, positionals);
         else if (closeEnough ("resume",      args[0], 3)) command_resume   (db, positionals);
-        else if (closeEnough ("client",      args[0], 3)) command_client   (db, positionals);
-        else if (closeEnough ("validate",    args[0], 3)) command_validate (db, positionals);
+        else if (closeEnough ("api",         args[0], 3)) command_api      (db, positionals);
+        else if (closeEnough ("validate",    args[0], 3)) command_validate (    positionals);
         else
-          throw format (STRING_TASKD_BAD_COMMAND, args[0]);
+          throw format ("ERROR: Did not recognize command '{1}'.", args[0]);
       }
 
       catch (std::string& error)
@@ -173,20 +151,19 @@ int main (int argc, const char** argv)
           command_help (no_args);
         }
         else
-          std::cout << error << "\n";
+          std::cerr << error << '\n';
         status = -1;
       }
 
       catch (std::bad_alloc& error)
       {
-        std::cerr << "Error: Memory allocation failed: " << error.what () << "\n";
+        std::cerr << "Error: Memory allocation failed: " << error.what () << '\n';
         status = -3;
       }
 
       catch (...)
       {
-        std::cerr << STRING_ERROR_UNKNOWN
-                  << "\n";
+        std::cerr << "Unknown error\n";
         status = -2;
       }
     }

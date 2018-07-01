@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Take the correct binary to create the certificates
-CERTTOOL=$(which gnutls-certtool || which certtool)
+CERTTOOL=$(command -v gnutls-certtool 2>/dev/null || command -v certtool 2>/dev/null)
 if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
@@ -11,35 +11,44 @@ fi
 . ./vars
 
 NAME=client
-if [ $# -gt 0 ] ; then
+if [ $# -gt 0 ]
+then
   NAME=$1
 fi
 
-# Create a client key.
-$CERTTOOL \
-  --generate-privkey \
-  --bits $BITS \
-  --outfile ${NAME}.key.pem
+if ! [ -f ${NAME}.key.pem ]
+then
+  # Create a client key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile ${NAME}.key.pem
+fi
 
-# Sign a client cert with the key.
 chmod 600 ${NAME}.key.pem
-cat <<EOF >client.info
+
+if ! [ -f ${NAME}.template ]
+then
+  # Sign a client cert with the key.
+  cat <<EOF >${NAME}.template
 organization = $ORGANIZATION
 cn = $CN
+expiration_days = $EXPIRATION_DAYS
 tls_www_client
 encryption_key
 signing_key
 EOF
+fi
 
-$CERTTOOL \
-  --generate-certificate \
-  --load-privkey ${NAME}.key.pem \
-  --load-ca-certificate ca.cert.pem \
-  --load-ca-privkey ca.key.pem \
-  --template client.info \
-  --outfile ${NAME}.cert.pem
+if ! [ -f ${NAME}.cert.pem ] || [ ${NAME}.template -nt ${NAME}.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-certificate \
+    --load-privkey ${NAME}.key.pem \
+    --load-ca-certificate ca.cert.pem \
+    --load-ca-privkey ca.key.pem \
+    --template ${NAME}.template \
+    --outfile ${NAME}.cert.pem
+fi
 
 chmod 600 ${NAME}.cert.pem
-rm client.info
-exit 0
-

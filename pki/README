@@ -10,6 +10,7 @@ the following:
   GoDaddy
   GlobalSign
 
+That cert would need the 'encryption_key' and 'signing_key' attributes.
 Using that server cert, you would then issue a server CRL and client keys.
 
 If you are developing, testing, or running your own private server, you may
@@ -27,10 +28,10 @@ There is a 'generate' script here that will perform the above steps.  Take a
 look at it to see the individual steps it takes to generate the proper set of
 keys and certs.
 
-Note that you should modify the 'vars' file to provide your own identity and
+Note that you need to modify the 'vars' file to provide your own identity and
 chosen parameters.
 
-VAlidate a certificate with:
+Validate a certificate with:
 
   $ gnutls-certtool --verify --infile client.cert.pem --load-ca-certificate ca.cert.pem
 

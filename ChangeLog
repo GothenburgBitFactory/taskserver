@@ -1,4 +1,111 @@
-1.1.0 (2015-05-10) -
+1.2.0 () -
+
+- TD-3    Harden server against malformed requests
+          (thanks to Anatolij Zelenin).
+- TD-40   Remove user command says user does not exist
+          (thanks to Robin Green).
+- TD-49   Log when file management fails
+          (thanks to Ben Boeckel).
+- TD-52   No errors in log in case of "No space left on device", but task data
+          corrupted
+          (thanks to Rainer Müller).
+- TD-64   sync conflict deleted all annotations of the task
+          (thanks to Markus Beppler, Konstantin Vorobyev).
+- TD-69   Log permission errors
+          (thanks to Roman Inflianskas).
+- TD-81   Improve logging features and provide informative error messages.
+          (thanks to Renato Alves).
+- TD-96   server_setup.bash won't run on Mac OS X and BSD
+          (thanks to Dafo with the golden hair).
+- TD-99   Manual page of taskd has hyphen instead minus sign "-"
+          (thanks to Sebastien Badia).
+- TD-100  Log taskd messages to stdout if launched by systemd
+          (thanks to Sebastien Badia).
+- TD-101  taskdrc man page says "trust" defaults to "strict", but server
+          complains if none set
+          (thanks to Jack).
+- TD-102  After creating a user aparently successful taskd says: User does not
+          exists
+          (thanks to Olaf H B).
+- TD-103  Incorrect Error Message when Org does not exist
+          (thanks to Jack, Jelle van der Waa).
+- TD-104  Unrecognized taskwarrior file format
+          (thanks to Jeremy John Reeder, Reg).
+- TD-106  The recurrence value '2m' is not valid
+          (thanks to Roman Golovin).
+- TD-107  Bash dependency not documented
+          (thanks to Michael Eichorn).
+- TD-110  Question: About src/tls/*
+          (thanks to Sebastien Badia).
+- TD-112  warning: missing initializer for member
+          (thanks to Dirk Deimeke).
+- TD-115  Throw error when config file is missing or not readable
+          (thanks to Jelle van der Waa).
+- TD-116  Provided systemd unit file does not match recommended systemd unit file in docs
+          (thanks to Wade Duvall).
+- TD-117  Wrong systemd target, taskd can fail if multi-user.target is up
+          earlier than the network
+          (thanks to Sebastian Sonne).
+- TD-118  Shebang issue
+          (thanks to Slava, Daniel Shahaf).
+- TD-119  Build fails on Debian (no C++11 support)
+          (thanks to Samathy Barratt).
+- TD-120  Missing cmakedefine for HAVE_GET_CURRENT_DIR_NAME
+          (Thanks to Jörg Krause, Ben Boeckel).
+- TD-121  Log time in user's specified timezone
+          (Thanks to Jelle van der Waa).
+- TD-125  taskd doesn't check ownership of files in $TASKDDATA, sync fails without error
+          (Thanks to James Duff).
+- TD-136  systemd service: logging to standard out with --log=- no longer works
+          (Thanks to Alexei).
+- TI-91   Timewarrior does not compile on DragonFly
+          (thanks to Michael Neumann).
+- TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
+          xubuntu15.10
+          (thanks to Sunil Joshi).
+- TW-1855 "Well-known" CA certificates not properly auto-loaded
+          (thanks to Flavio Poletti).
+- TW-1885 Task Sync does not send TLS SNI headers
+          (thanks to Dan Callahan).
+- TW-1936 Tweak tests to have fuller TAP compliance
+          (thanks to Paul J. Fenwick)
+- Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
+  which means a confguration setting of server=:::<someport>. Related to TD-51
+          (thanks to Johannes Wienke).
+- Added "diag" command details regarding file sizes.
+- Improved error messages for users who skip the 'task sync init' requirement
+          (thanks to Komasa).
+- New 2048-bit default size for the Diff-Hellman key exchange, with a new
+  'dh_bits' configuration setting to override this
+          (thanks to Ben Boeckel).
+- New default cipher set that imposes server-side cipher selection, preventing
+  the client from switching to less-secure communication
+          (thanks to Ben Boeckel).
+- Removed broken SSLv3 and TLSv1.0 (POODLE), 3DES in CBC mode, RC4, and MD5,
+  ciphers from default
+          (thanks to Ben Boeckel).
+- Improved OpenBSD support
+          (thanks to Kent R. Spillner).
+- Taskd source now builds into a static library, which makes the test builds
+  signifacntly faster.
+          (thanks to aszlig).
+- Integrated libshared.
+- Removed references to the unimplemented 'group' features.
+- Renamed 'client.key', 'client.cert' to 'api.key', 'api.cert' to reduce some
+  of the confusion around the intended purpose.
+- Improved certificate validation diagnostics
+          (thanks to Jelle van der Waa).
+- Improved portability for SunOS-like OSes.
+          (thanks to Antonio Huete Jimenez).
+- pki: Do not use 'which' for finding gnutls certool path
+          (thanks to Antonio Huete Jimenez).
+- Eliminated locallization (there were none).
+- Fixed segfault/SSABRT on invalid cert files
+          (thanks to Dan Weatherill).
+
+------- current release ---------------------------
+
+1.1.0 (2015-05-10) 6c431da4f3c3e9fb2b9cb7dd37a32d4822777071
 
 - #1497 taskd ignores the host definition and always listens on 0.0.0.0
 - #1503 build failure with musl libc due to undefined GLOB_BRACE and GLOB_TILDE
@@ -83,7 +190,7 @@
 - Fixed several issues with scripts/setup_server.bash when folders contain
   spaces or relative paths are used
 
-------- current release ---------------------------
+------- old release ---------------------------
 
 1.0.0 (2014-01-15) 3a2142f2708bad9ffad9f70ab4b163de2068e6c7
 
@@ -96,8 +203,6 @@
 - Removed need for PATH_MAX (thanks to Jakub Wilk).
 - Changed name to 'Taskserver'.
 - Minor documentation corrections.
-
-------- old release ---------------------------
 
 1.0.0.beta2 (2013-11-03)
 
@@ -160,7 +265,7 @@
 - Supports 'client.allow' and 'client.deny' lists.
 - Client interface now an optional feature.
 
-0.12.0 (2013-06-03
+0.12.0 (2013-06-03)
 
 - Added IP logging option.
 - JSON support.

@@ -1,56 +1,40 @@
 
-New Features in Taskserver 1.1.0
+New Features in Taskserver 1.2.0
 
-  - Configurable client certificate verification.
-  - When hosting, the configured server name is no longer ignored.
-  - Systemd script: taskd.service.
-  - Improved pki scripts.
-  - Can log to STDOUT.
-  - Improved 'diagnostics' output.
-  - 'validate' command will parse/validate a JSON string or file.  Used for
-    debugging Taskserver clients.
-  - The 'statistics' request is now supported.
-  - See http://taskwarrior.org/docs/taskserver/upgrade.html for instructions to
-    upgrade your server.
+  - When the server specified is ::, can use dual-stack IPv4/IPv6.
+  - New default 2048 bits for Diffie-Hellman key exchange.
+  - Server-side cipher selection is now preferred, preventing the client from
+    switching to less-secure communication.
+  - Removed broken SSLv3 and TLSv1.0 ciphers (POODLE) from default.
+  - Removed broken 3DES cipher in CBC mode from default.
+  - Removed broken RC4 cipher from default.
+  - Removed broken MD5 cipher from default.
+  - Integrates libshared.
+  - Made the documentation consistently distinguish between user name and UUID.
+  - Improved handling for I/O errors.
+  - PKI scripts do not use 'which' for finding gnutls certool path
 
-  Please refer to the ChangeLog file for full details.  There are too many to
-  list here.
+New configuration options in Taskserver 1.2.0
 
-New configuration options in Taskserver 1.1.0
+  - New 'dh_bits' setting allows an override to the 2048 bit default
+    for the Diffie-Hellman key exchange.
+  - Renamed 'client.cert' and 'client.key' to 'api.cert' and 'api.key', because
+    the word 'client' implied it was to be used for all clients.
 
-  - Server CRL is now optional.
-  - New 'trust' setting can be either 'strict' or 'allow all', and defaults to
-    'strict'.
-  - New 'family' setting can specify whether 'IPv4' or 'IPv6' are used to bind
-    to the host/port.
+Removed features in 1.2.0
 
-Removed features in 1.1.0
-
-  - Configuration using 'client.allow' and 'client.deny' removed.
-  - Extension commands and hook script support removed.
+  - Removed the stubbed 'group' features.
 
 ---
 
-Taskserver has been built and tested on the following configurations:
+While Taskserver has undergone testing on multiple platforms, bugs are sure to
+remain.  If you encounter a bug, please enter a new issue at:
 
-  * OS X
-  * Fedora
-  * Ubuntu
-  * Debian
-  * Arch
-  * FreeBSD
-  * Cygwin
-
----
-
-While Taskserver has undergone testing, bugs are sure to remain.  If you
-encounter a bug, please enter a new issue at:
-
-  https://bug.tasktools.org
+  https://github.com/GothenburgBitFactory/taskserver/issues
 
 Or just send a message to:
 
-  support@taskwarrior.org
+  support@gothenburgbitfactory.org
 
 Thank you.
 

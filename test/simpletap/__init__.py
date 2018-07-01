@@ -1,7 +1,7 @@
 ###############################################################################
 # taskwarrior - a command line task list manager.
 #
-# Copyright 2006-2015, Paul Beckingham, Federico Hernandez.
+# Copyright 2006 - 2018, Paul Beckingham, Federico Hernandez.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,12 @@
 
 # Original version by Renato Alves
 
+import os
 import sys
 import unittest
 import warnings
 import traceback
+import inspect
 
 
 def color(text, c):
@@ -64,7 +66,12 @@ class TAPTestResult(unittest.result.TestResult):
         if self.descriptions and doc_first_line:
             return doc_first_line
         else:
-            return str(test)
+            try:
+                method = test._testMethodName
+            except AttributeError:
+                return "Preparation error on: {0}".format(test.description)
+            else:
+                return "{0} ({1})".format(method, test.__class__.__name__)
 
     def startTestRun(self, total="unk"):
         self.stream.writeln("1..{0}".format(total))
@@ -121,42 +128,51 @@ class TAPTestResult(unittest.result.TestResult):
         self._restoreStdout()
 
         desc = self.getDescription(test)
-        trace_msg = None
 
         try:
-            exception, msg, _ = err
+            exception, msg, tb = err
         except (TypeError, ValueError):
             exception_name = ""
             msg = err
+            tb = None
         else:
             exception_name = exception.__name__
             msg = str(msg)
 
-            # Extract line where error happened for easier debugging
-            _, _, tb = sys.exc_info()
-            trace = traceback.extract_tb(tb)
-            for t in trace:
-                # t = (filename, line_number, function_name, raw_line)
-                if t[2].startswith("test"):
-                    trace_msg = "on file {0} line {1} in {2}: '{3}'".format(*t)
-                    break
+        trace_msg = ""
+
+        # Extract line where error happened for easier debugging
+        trace = traceback.extract_tb(tb)
+        for t in trace:
+            # t = (filename, line_number, function_name, raw_line)
+            if t[2].startswith("test"):
+                trace_msg = " on file {0} line {1} in {2}: '{3}'".format(*t)
+                break
+
+        # Retrieve the name of the file containing the test
+        filename = os.path.basename(inspect.getfile(test.__class__))
 
         if status:
+
             if status == "SKIP":
-                self.stream.writeln("{0} {1} - {2}".format(
-                    color("skip", "yellow"), self.testsRun, desc)
+                self.stream.writeln("{0} {1} - {2}: {3} # skip".format(
+                    color("ok", "yellow"), self.testsRun, filename, desc)
                 )
             elif status == "EXPECTED_FAILURE":
-                self.stream.writeln("{0} {1} - {2}".format(
-                    color("ok", "green"), self.testsRun, desc)
+                self.stream.writeln("{0} {1} - {2}: {3} # TODO".format(
+                    color("not ok", "yellow"), self.testsRun, filename, desc)
                 )
             else:
-                self.stream.writeln("{0} {1} - {2}".format(
-                    color("not ok", "red"), self.testsRun, desc)
+                self.stream.writeln("{0} {1} - {2}: {3}".format(
+                    color("not ok", "red"), self.testsRun, filename, desc)
                 )
-            self.stream.writeln("# {0}: {1} {2}:".format(
-                status, exception_name, trace_msg)
-            )
+
+            if exception_name:
+                self.stream.writeln("# {0}: {1}{2}:".format(
+                    status, exception_name, trace_msg)
+                )
+            else:
+                self.stream.writeln("# {0}:".format(status))
 
             # Magic 3 is just for pretty indentation
             padding = " " * (len(status) + 3)
@@ -166,8 +182,8 @@ class TAPTestResult(unittest.result.TestResult):
                 line = line.replace("\\n", "\n# ")
                 self.stream.writeln("#{0}{1}".format(padding, line))
         else:
-            self.stream.writeln("{0} {1} - {2}".format(
-                color("ok", "green"), self.testsRun, desc)
+            self.stream.writeln("{0} {1} - {2}: {3}".format(
+                color("ok", "green"), self.testsRun, filename, desc)
             )
 
         # Flush all buffers to stdout
@@ -193,6 +209,10 @@ class TAPTestResult(unittest.result.TestResult):
         super(TAPTestResult, self).addExpectedFailure(test, err)
         self.report(test, "EXPECTED_FAILURE", err)
 
+    def addUnexpectedSuccess(self, test):
+        super(TAPTestResult, self).addUnexpectedSuccess(test)
+        self.report(test, "UNEXPECTED_SUCCESS", str(test))
+
 
 class TAPTestRunner(unittest.runner.TextTestRunner):
     """A test runner that displays results using the Test Anything Protocol
@@ -206,6 +226,10 @@ class TAPTestRunner(unittest.runner.TextTestRunner):
         result = self._makeResult()
         unittest.signals.registerResult(result)
         result.failfast = self.failfast
+
+        # TAP requires output is on STDOUT.
+        # TODO: Define this at __init__ time
+        result.stream = unittest.runner._WritelnDecorator(sys.stdout)
 
         with warnings.catch_warnings():
             if getattr(self, "warnings", None):

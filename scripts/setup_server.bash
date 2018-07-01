@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################################
 #
-# Copyright 2010 - 2015, Göteborg Bit Factory.
+# Copyright 2010 - 2018, Göteborg Bit Factory.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -99,13 +99,28 @@ makedir()
   fi
 }
 
+setpkipath()
+{
+    if [ "${OSTYPE:0:6}" = "darwin" ]; then
+        local _script_name=$(basename $2)
+        local _script_path=$(pwd)/$2
+        local _pki_path=${_script_path:0:${#_script_path}-${#_script_name}}$3
+        eval "$1=$_pki_path"
+    elif [[ "${OSTYPE}" =~ \w*bsd.* ]]; then
+        eval "$1=$(realpath $(dirname $2))/$3"
+    else
+        eval "$1=$(readlink -f $(dirname $2))/$3"
+    fi
+
+}
+
 ################################################################################
 # Taskserver defaults.
 DEFAULT_SETUP="$0"
-DEFAULT_PKI=$(readlink -f $(dirname $DEFAULT_SETUP)/../pki)
 DEFAULT_TASKDDATA="${TASKDDATA:-/var/taskd}"
 DEFAULT_HOST=localhost
 DEFAULT_PORT=53589
+setpkipath DEFAULT_PKI $DEFAULT_SETUP ../pki
 
 # Explain what is going to happen.
 log
@@ -126,7 +141,7 @@ log_ok $DEFAULT_SETUP
 # Look for pki scripts, relative to $0, which assumes this script is in the
 # $REPO/scripts/ directory.
 log_line "Checking for pki script directory"
-if [ -d $DEFAULT_PKI ]; then
+if [ -n "$DEFAULT_PKI" -a -d $DEFAULT_PKI ]; then
   log_ok "Found $DEFAULT_PKI"
 else
   log_error "error"
@@ -362,12 +377,12 @@ else
 fi
 
 log_line "Generating API key/cert pair"
-OUTPUT=$($DEFAULT_PKI/generate.client client 2>&1)
+OUTPUT=$($DEFAULT_PKI/generate.client api 2>&1)
 if [ $? -eq 0 ]; then
   log_ok "Ok"
 
-  log_line "Installing client.cert.pem"
-  cp $DEFAULT_PKI/client.cert.pem $TASKDDATA/cert/client.cert.pem
+  log_line "Installing api.cert.pem"
+  cp $DEFAULT_PKI/api.cert.pem $TASKDDATA/cert/api.cert.pem
   if [ $? -eq 0 ]; then
     log_ok "Ok"
   else
@@ -375,8 +390,8 @@ if [ $? -eq 0 ]; then
     exit 1
   fi
 
-  log_line "Installing client.key.pem"
-  cp $DEFAULT_PKI/client.key.pem $TASKDDATA/cert/client.key.pem
+  log_line "Installing api.key.pem"
+  cp $DEFAULT_PKI/api.key.pem $TASKDDATA/cert/api.key.pem
   if [ $? -eq 0 ]; then
     log_ok "Ok"
   else
@@ -384,8 +399,8 @@ if [ $? -eq 0 ]; then
     exit 1
   fi
 
-  configure "Configuring client.cert" client.cert $TASKDDATA/cert/client.cert.pem
-  configure "Configuring client.key"  client.key  $TASKDDATA/cert/client.key.pem
+  configure "Configuring api.cert" api.cert $TASKDDATA/cert/api.cert.pem
+  configure "Configuring api.key"  api.key  $TASKDDATA/cert/api.key.pem
 else
   log_error "Failed"
   log

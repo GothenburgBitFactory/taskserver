@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Take the correct binary to create the certificates
-CERTTOOL=$(which gnutls-certtool || which certtool)
+CERTTOOL=$(command -v gnutls-certtool 2>/dev/null || command -v certtool 2>/dev/null)
 if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
@@ -10,31 +10,38 @@ fi
 
 . ./vars
 
-# Create a CA key.
-$CERTTOOL \
-  --generate-privkey \
-  --bits $BITS \
-  --outfile ca.key.pem
+if ! [ -f ca.key.pem ]
+then
+  # Create a CA key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile ca.key.pem
+fi
 
 chmod 600 ca.key.pem
 
-# Sign a CA cert.
-cat <<EOF >ca.info
+if ! [ -f ca.template ]
+then
+  # Sign a CA cert.
+  cat <<EOF >ca.template
 organization = $ORGANIZATION
-cn = $CN
+cn = $CN CA
 country = $COUNTRY
 state = $STATE
 locality = $LOCALITY
+expiration_days = $EXPIRATION_DAYS
 ca
-cert_signing_key
 EOF
+fi
 
-$CERTTOOL \
-  --generate-self-signed \
-  --load-privkey ca.key.pem \
-  --template ca.info \
-  --outfile ca.cert.pem
+if ! [ -f ca.cert.pem ] || [ ca.template -nt ca.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-self-signed \
+    --load-privkey ca.key.pem \
+    --template ca.template \
+    --outfile ca.cert.pem
+fi
 
 chmod 600 ca.cert.pem
-rm ca.info
-exit 0

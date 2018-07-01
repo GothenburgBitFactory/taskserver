@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Take the correct binary to create the certificates
-CERTTOOL=$(which gnutls-certtool || which certtool)
+CERTTOOL=$(command -v gnutls-certtool 2>/dev/null || command -v certtool 2>/dev/null)
 if [ -z "$CERTTOOL" ]
 then
   echo "ERROR: No certtool found" >&2
@@ -10,21 +10,25 @@ fi
 
 . ./vars
 
-# CRL - Certificate Revocation List
-cat <<EOF >crl.info
+if ! [ -f crl.template ]
+then
+  # CRL - Certificate Revocation List
+  cat <<EOF >crl.template
 expiration_days = $EXPIRATION_DAYS
 EOF
+fi
 
-$CERTTOOL \
-  --generate-crl \
-  --load-ca-privkey ca.key.pem \
-  --load-ca-certificate ca.cert.pem \
-  --template crl.info \
-  --outfile server.crl.pem
+if ! [ -f server.crl.pem ] || [ crl.template -nt server.crl.pem ]
+then
+  $CERTTOOL \
+    --generate-crl \
+    --load-ca-privkey ca.key.pem \
+    --load-ca-certificate ca.cert.pem \
+    --template crl.template \
+    --outfile server.crl.pem
+fi
 
 chmod 600 server.crl.pem
-rm crl.info
-exit 0
 
 # To create a CRL that contains some revoked certificates, place the
 # certificates in a file and use --load-certificate as follows:
@@ -36,4 +40,3 @@ exit 0
 
 # To verify a CRL:
 #   $CERTTOOL --verify-crl --load-ca-certificate ca.cert.pem --infile server.crl.pem
-

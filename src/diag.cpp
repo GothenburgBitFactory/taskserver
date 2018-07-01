@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2012 - 2015, Göteborg Bit Factory.
+// Copyright 2012 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,57 +35,33 @@
 #include <ConfigFile.h>
 #include <Color.h>
 #include <Msg.h>
-#include <File.h>
-#include <Directory.h>
+#include <FS.h>
 #include <JSON.h>
-#include <text.h>
+#include <shared.h>
+#include <format.h>
 #include <taskd.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <i18n.h>
 
 #ifdef HAVE_LIBGNUTLS
 #include <gnutls/gnutls.h>
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_diag (Database& config, const std::vector <std::string>& args)
+void command_diag (Database& config)
 {
   // No argument processing.
 
   Color bold ("bold");
 
-  std::cout << "\n"
+  std::cout << '\n'
             << bold.colorize (PACKAGE_STRING)
-            << "\n";
+            << '\n';
 
   std::cout << "    Platform: "
-            <<
-#if defined (DARWIN)
-               "Darwin"
-#elif defined (SOLARIS)
-               "Solaris"
-#elif defined (CYGWIN)
-               "Cygwin"
-#elif defined (HAIKU)
-               "Haiku"
-#elif defined (OPENBSD)
-               "OpenBSD"
-#elif defined (FREEBSD)
-               "FreeBSD"
-#elif defined (NETBSD)
-               "NetBSD"
-#elif defined (LINUX)
-               "Linux"
-#elif defined (KFREEBSD)
-               "GNU/kFreeBSD"
-#elif defined (GNUHURD)
-               "GNU/Hurd"
-#else
-               "unknown"
-#endif
-            << "\n";
+            << osName ()
+            << '\n';
 
   char hostname[128] = {0};
   gethostname (hostname, 128);
@@ -95,10 +71,10 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 
   // Compiler.
   std::cout << bold.colorize ("Compiler")
-            << "\n"
+            << '\n'
 #ifdef __VERSION__
             << "     Version: "
-            << __VERSION__ << "\n"
+            << __VERSION__ << '\n'
 #endif
             << "        Caps:"
 #ifdef __STDC__
@@ -127,32 +103,22 @@ void command_diag (Database& config, const std::vector <std::string>& args)
             << " +l"      << 8 * sizeof (long)
             << " +vp"     << 8 * sizeof (void*)
             << " +time_t" << 8 * sizeof (time_t)
-            << "\n";
+            << '\n';
 
   // Compiler compliance level.
-  std::string compliance = "non-compliant";
-#ifdef __cplusplus
-  int level = __cplusplus;
-  if (level == 199711)
-    compliance = "C++98/03";
-  else if (level == 201103)
-    compliance = "C++11";
-  else
-    compliance = format (level);
-#endif
   std::cout << "  Compliance: "
-            << compliance
+            << cppCompliance ()
             << "\n\n";
 
   std::cout << bold.colorize ("Build Features")
-            << "\n"
+            << '\n'
 
   // Build date.
-            << "       Built: " << __DATE__ << " " << __TIME__ << "\n"
+            << "       Built: " << __DATE__ << " " << __TIME__ << '\n'
 #ifdef HAVE_COMMIT
-            << "      Commit: " << COMMIT << "\n"
+            << "      Commit: " << COMMIT << '\n'
 #endif
-            << "       CMake: " << CMAKE_VERSION << "\n";
+            << "       CMake: " << CMAKE_VERSION << '\n';
 
   std::cout << "     libuuid: "
 #ifdef HAVE_UUID_UNPARSE_LOWER
@@ -160,7 +126,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #else
             << "libuuid, no uuid_unparse_lower"
 #endif
-            << "\n";
+            << '\n';
 
   std::cout << "   libgnutls: "
 #ifdef HAVE_LIBGNUTLS
@@ -172,7 +138,7 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 #else
             << "n/a"
 #endif
-            << "\n";
+            << '\n';
 
   std::cout << "  Build type: "
 #ifdef CMAKE_BUILD_TYPE
@@ -185,11 +151,11 @@ void command_diag (Database& config, const std::vector <std::string>& args)
   // Configuration details, if possible.
   char* root_env = getenv ("TASKDDATA");
   std::cout << bold.colorize ("Configuration")
-            << "\n"
-            << "   TASKDDATA: " << (root_env ? root_env : "") << "\n";
+            << '\n'
+            << "   TASKDDATA: " << (root_env ? root_env : "") << '\n';
 
   // Verify that root exists.
-  std::string root = config._config->get ("root");
+  auto root = config._config->get ("root");
   if (root == "")
   {
     std::cout << "\nBy specifying the '--data' location, more diagnostics can be generated.\n";
@@ -202,60 +168,69 @@ void command_diag (Database& config, const std::vector <std::string>& args)
     else
     {
       std::cout << "        root: "
-                << root_dir._data << (root_dir.readable ()
-                    ? " (readable)"
-                    : " (not readable)")
-                << "\n";
+                << root_dir._data
+                << (root_dir.readable ()
+                     ? ", readable"
+                     : ", not readable")
+                << (root_dir.writable ()
+                     ? ", writable"
+                     : ", not writable")
+                << '\n';
 
       File config_file (root_dir._data + "/config");
       std::cout << "      config: "
-                << config_file._data << (config_file.readable () ? " (readable)" : " (missing)")
-                << "\n";
+                << config_file._data
+                << (config_file.readable () ? ", readable" : ", missing")
+                << (config_file.writable () ? ", writable" : ", not writable")
+                << config_file.size ()
+                << " bytes\n";
 
       if (config_file.readable ())
       {
         // Load the config file.
         config._config->load (config_file._data);
 
-        File ca_cert (config._config->get ("ca.cert"));
+        File ca_cert     (config._config->get ("ca.cert"));
         File server_cert (config._config->get ("server.cert"));
-        File server_key (config._config->get ("server.key"));
-        File server_crl (config._config->get ("server.crl"));
-        File client_cert (config._config->get ("client.cert"));
-        File client_key (config._config->get ("client.key"));
+        File server_key  (config._config->get ("server.key"));
+        File server_crl  (config._config->get ("server.crl"));
 
         std::cout << "          CA: "
-                  << ca_cert._data << (ca_cert.readable () ? " (readable)" : "")
-                  << "\n";
+                  << ca_cert._data << (ca_cert.readable () ? ", readable, " : ", ")
+                  << ca_cert.size ()
+                  << " bytes\n";
         std::cout << " Certificate: "
-                  << server_cert._data << (server_cert.readable () ? " (readable)" : " (missing)")
-                  << "\n";
+                  << server_cert._data << (server_cert.readable () ? ", readable, " : ", missing, ")
+                  << server_cert.size ()
+                  << " bytes\n";
         std::cout << "         Key: "
-                  << server_key._data << (server_key.readable () ? " (readable)" : " (missing)")
-                  << "\n";
+                  << server_key._data << (server_key.readable () ? ", readable, " : ", missing, ")
+                  << server_key.size ()
+                  << " bytes\n";
         std::cout << "         CRL: "
-                  << server_crl._data << (server_crl.readable () ? " (readable)" : "")
-                  << "\n";
+                  << server_crl._data << (server_crl.readable () ? ", readable, " : "")
+                  << server_crl.size ()
+                  << " bytes\n";
 
         File log (config._config->get ("log"));
         std::cout << "         Log: "
                   << log._data << (log.exists () ? " (found)" : " (missing)")
-                  << "\n";
+                  << '\n';
 
         File pid (config._config->get ("pid.file"));
         std::cout << "    PID File: "
                   << pid._data << (pid.exists () ? " (found)" : " (missing)")
-                  << "\n";
+                  << '\n';
 
-        std::cout << "      Server: " << config._config->get ("server") << "\n";
+        std::cout << "      Server: " << config._config->get ("server") << '\n';
         std::cout << " Max Request: " << config._config->get ("request.limit") << " bytes\n";
-        std::cout << "     Ciphers: " << config._config->get ("ciphers") << "\n";
+        std::cout << "     Ciphers: " << config._config->get ("ciphers") << '\n';
 
         // Show trust level.
         std::string trust_value = config._config->get ("trust");
         if (trust_value == "strict" ||
             trust_value == "allow all")
-          std::cout << "       Trust: " << trust_value << "\n";
+          std::cout << "       Trust: " << trust_value << '\n';
         else
           std::cout << "       Trust: Bad value - see 'man taskdrc'\n";
       }
@@ -266,13 +241,13 @@ void command_diag (Database& config, const std::vector <std::string>& args)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_validate (Database& config, const std::vector <std::string>& args)
+void command_validate (const std::vector <std::string>& args)
 {
   try
   {
     if (args.size () < 2)
     {
-      std::cout << STRING_JSON_VALIDATE << "\n";
+      std::cout << "You must specify either a JSON string or a JSON file.\n";
       return;
     }
 
@@ -289,17 +264,16 @@ void command_validate (Database& config, const std::vector <std::string>& args)
 
     if (root)
     {
-      std::cout << STRING_JSON_SYNTAX_OK
-                << "\n\n"
+      std::cout << "JSON syntax ok.\n\n"
                 << root->dump ()
-                << "\n";
+                << '\n';
     }
 
     delete root;
   }
 
-  catch (const std::string& e) { std::cout << e << "\n";                    }
-  catch (...)                  { std::cout << STRING_ERROR_UNKNOWN << "\n"; }
+  catch (const std::string& e) { std::cout << e << '\n';         }
+  catch (...)                  { std::cout << "Unknown error\n"; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

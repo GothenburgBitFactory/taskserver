@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,18 +29,16 @@
 #include <sstream>
 #include <algorithm>
 #include <utf8.h>
-#include <Path.h>
-#include <Directory.h>
-#include <File.h>
-#include <text.h>
+#include <FS.h>
 #include <util.h>
 #include <taskd.h>
+#include <shared.h>
+#include <format.h>
 #include <Database.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 Database::Database (Config* config)
 : _config (config)
-, _log (NULL)
 {
 }
 
@@ -65,30 +63,24 @@ bool Database::authenticate (
   const Msg& request,
   Msg& response)
 {
-  std::string org  = request.get ("org");
-  std::string user = request.get ("user");
-  std::string key  = request.get ("key");
+  auto org  = request.get ("org");
+  auto user = request.get ("user");
+  auto key  = request.get ("key");
 
   // Verify existence of <root>/orgs/<org>
   Directory org_dir (_config->get ("root") + "/orgs/" + org);
-  if (! org_dir.exists ())
-  {
-    if (_log)
-      _log->format ("INFO Auth failure: org '%s' unknown",
-                    org.c_str ());
-
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
+  if (! verifyExistence  (org_dir, response) ||
+      ! verifyExecutable (org_dir, response) ||
+      ! verifyReadable   (org_dir, response) ||
+      ! verifyWritable   (org_dir, response))
     return false;
-  }
 
   // Verify non-existence of <root>/orgs/<org>/suspended
   File org_suspended (_config->get ("root") + "/orgs/" + org + "/suspended");
   if (org_suspended.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' suspended",
-                    org.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' suspended", org));
 
     response.set ("code", 431);
     response.set ("status", taskd_error (431));
@@ -97,26 +89,18 @@ bool Database::authenticate (
 
   // Verify existence of <root>/orgs/<org>/users/<key>
   Directory user_dir (_config->get ("root") + "/orgs/" + org + "/users/" + key);
-  if (! user_dir.exists ())
-  {
-    if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' unknown",
-                    org.c_str (),
-                    user.c_str ());
-
-    response.set ("code", 430);
-    response.set ("status", taskd_error (430));
+  if (! verifyExistence  (user_dir, response) ||
+      ! verifyExecutable (user_dir, response) ||
+      ! verifyReadable   (user_dir, response) ||
+      ! verifyWritable   (user_dir, response))
     return false;
-  }
 
   // Verify non-existence of <root>/orgs/<org>/users/<key>/suspended
   File user_suspended (_config->get ("root") + "/orgs/" + org + "/users/" + key + "/suspended");
   if (user_suspended.exists ())
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' suspended",
-                    org.c_str (),
-                    user.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' suspended", org, user));
 
     response.set ("code", 431);
     response.set ("status", taskd_error (431));
@@ -128,9 +112,7 @@ bool Database::authenticate (
   if (!user.empty () && user_rc.get ("user") != user)
   {
     if (_log)
-      _log->format ("INFO Auth failure: org '%s' user '%s' bad key",
-                    org.c_str (),
-                    user.c_str ());
+      _log->write (format ("INFO Auth failure: org '{1}' user '{2}' bad key", org, user));
 
     response.set ("code", 430);
     response.set ("status", taskd_error (430));
@@ -139,6 +121,62 @@ bool Database::authenticate (
 
   // All checks succeed, user is authenticated.
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyExistence (const Path& path, Msg& response)
+{
+  if (path.exists ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' does not exist", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyReadable (const Path& path, Msg& response)
+{
+  if (path.readable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not readable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyWritable (const Path& path, Msg& response)
+{
+  if (path.writable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not writable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Database::verifyExecutable (const Path& path, Msg& response)
+{
+  if (path.executable ())
+    return true;
+
+  if (_log)
+    _log->write (format ("INFO Auth failure: directory '{1}' not executable", path._data));
+
+  response.set ("code", 430);
+  response.set ("status", taskd_error (430));
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,9 +196,7 @@ bool Database::redirect (const std::string& org, Msg& response)
     response.set ("info", trim (server, " \n"));
 
     if (_log)
-      _log->format ("INFO Redirecting org '%s' to '%s'",
-                    org.c_str (),
-                    response.get ("info").c_str ());
+      _log->write (format ("INFO Redirecting org '{1}' to '{2}'", org, response.get ("info")));
 
     return true;
   }
@@ -176,29 +212,11 @@ bool Database::add_org (const std::string& org)
   new_org += "orgs";
   new_org += org;
 
-  Directory groups (new_org);
-  groups += "groups";
-
   Directory users (new_org);
   users += "users";
 
   return new_org.create (0700) &&
-         groups.create (0700) &&
          users.create (0700);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Database::add_group (
-  const std::string& org,
-  const std::string& group)
-{
-  Directory new_group (_config->get ("root"));
-  new_group += "orgs";
-  new_group += org;
-  new_group += "groups";
-  new_group += group;
-
-  return new_group.create (0700);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +225,7 @@ bool Database::add_user (
   const std::string& user)
 {
   // Generate new KEY
-  std::string key = key_generate ();
+  auto key = key_generate ();
 
   Directory new_user (_config->get ("root"));
   new_user += "orgs";
@@ -226,7 +244,7 @@ bool Database::add_user (
     conf.save ();
 
     // User will need this key.
-    std::cout << "New user key: " << key << "\n";
+    std::cout << "New user key: " << key << '\n';
     return true;
   }
 
@@ -241,26 +259,8 @@ bool Database::remove_org (const std::string& org)
   org_dir += org;
 
   // TODO Remove users?
-  // TODO Remove groups?
-  // TODO Revoke user group membership.
 
   return org_dir.remove ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Database::remove_group (
-  const std::string& org,
-  const std::string& group)
-{
-  Directory group_dir (_config->get ("root"));
-  group_dir += "orgs";
-  group_dir += org;
-  group_dir += "groups";
-  group_dir += group;
-
-  // TODO Revoke user group membership.
-
-  return group_dir.remove ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,8 +274,6 @@ bool Database::remove_user (
   user_dir += "users";
   user_dir += key;
 
-  // TODO Revoke group memberships.
-
   return user_dir.remove ();
 }
 
@@ -283,6 +281,9 @@ bool Database::remove_user (
 bool Database::suspend (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
+  if (semaphore.exists ())
+    throw std::string ("Already suspended.");
+
   return semaphore.create (0600);
 }
 
@@ -290,6 +291,9 @@ bool Database::suspend (const Directory& node)
 bool Database::resume (const Directory& node)
 {
   File semaphore (node._data + "/suspended");
+  if (! semaphore.exists ())
+    throw std::string ("Not suspended.");
+
   return semaphore.remove ();
 }
 
