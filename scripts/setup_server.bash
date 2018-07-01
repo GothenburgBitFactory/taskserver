@@ -103,7 +103,7 @@ makedir()
 # Taskserver defaults.
 DEFAULT_SETUP="$0"
 DEFAULT_PKI=$(readlink -f $(dirname $DEFAULT_SETUP)/../pki)
-DEFAULT_TASKDDATA=/var/taskd
+DEFAULT_TASKDDATA="${TASKDDATA:-/var/taskd}"
 DEFAULT_HOST=localhost
 DEFAULT_PORT=53589
 
