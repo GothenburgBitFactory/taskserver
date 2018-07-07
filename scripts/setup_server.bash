@@ -117,7 +117,7 @@ setpkipath()
 ################################################################################
 # Taskserver defaults.
 DEFAULT_SETUP="$0"
-DEFAULT_TASKDDATA=/var/taskd
+DEFAULT_TASKDDATA="${TASKDDATA:-/var/taskd}"
 DEFAULT_HOST=localhost
 DEFAULT_PORT=53589
 setpkipath DEFAULT_PKI $DEFAULT_SETUP ../pki
