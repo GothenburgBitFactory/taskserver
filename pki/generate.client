@@ -21,7 +21,7 @@ then
   # Create a client key.
   $CERTTOOL \
     --generate-privkey \
-    --bits $BITS \
+    --sec-param $SEC_PARAM \
     --outfile ${NAME}.key.pem
 fi
 

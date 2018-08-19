@@ -15,7 +15,7 @@ then
   # Create a CA key.
   $CERTTOOL \
     --generate-privkey \
-    --bits $BITS \
+    --sec-param $SEC_PARAM \
     --outfile ca.key.pem
 fi
 

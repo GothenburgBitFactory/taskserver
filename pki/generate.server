@@ -15,7 +15,7 @@ then
   # Create a server key.
   $CERTTOOL \
     --generate-privkey \
-    --bits $BITS \
+    --sec-param $SEC_PARAM \
     --outfile server.key.pem
 fi
 
