@@ -58,6 +58,8 @@
           (Thanks to James Duff).
 - TD-136  systemd service: logging to standard out with --log=- no longer works
           (Thanks to Alexei).
+- TD #143 Use --sec-param High instead of --bits 4096
+          (Thanks to Jelle van der Waa).
 - TI-91   Timewarrior does not compile on DragonFly
           (thanks to Michael Neumann).
 - TW-1741 Warning "ignoring return value of ‘int ftruncate" while doing make on
