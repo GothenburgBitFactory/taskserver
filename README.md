@@ -15,7 +15,7 @@ Here is the only supported Taskserver setup guide. Ignore all others.
 
 [taskserver-setup.pdf](https://github.com/GothenburgBitFactory/guides/blob/master/taskserver-setup/taskserver-setup.pdf)
 
-For torubleshooting, here is the only supoprted Taskserver troubleshooting guide. Ignore all others.
+For troubleshooting, here is the only supported Taskserver troubleshooting guide. Ignore all others.
 
 [taskserver-troubleshooting.pdf](https://github.com/GothenburgBitFactory/guides/blob/master/taskserver-troubleshooting/taskserver-troubleshooting.pdf)
 
