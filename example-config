@@ -1,0 +1,22 @@
+ciphers=NORMAL
+confirmation=on
+debug.tls=0
+# asoeuh
+debug=on
+extensions=/usr/libexec/taskd
+family=IPv4
+ip.log=on
+log=/dev/stdout
+pid.file=/tmp/taskd.pid
+queue.size=10
+request.limit=1048576
+root=/data
+trust=allow all
+verbose=1
+
+server=0.0.0.0:53589
+ca.cert=/certificates/ca.cert.pem
+client.cert=/certificates/client.cert.pem
+server.cert=/certificates/server.cert.pem
+server.crl=/certificates/server.crl.pem
+server.key=/certificates/server.key.pem
