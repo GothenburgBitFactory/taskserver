@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,25 +29,16 @@
 
 #include <string>
 #include <vector>
-#ifdef FREEBSD
+#if defined(FREEBSD) || defined(OPENBSD)
 #include <uuid.h>
 #else
 #include <uuid/uuid.h>
 #endif
 
-bool confirm (const std::string&);
-std::string formatBytes (size_t);
-std::string formatTime (time_t);
-int autoComplete (const std::string&, const std::vector<std::string>&, std::vector<std::string>&, int minimum = 1);
-
 #ifndef HAVE_UUID_UNPARSE_LOWER
 void uuid_unparse_lower (uuid_t uu, char *out);
 #endif
 const std::string uuid ();
-
-const std::string encode (const std::string&);
-const std::string decode (const std::string&);
-const std::string escape (const std::string&, char);
 
 #ifndef HAVE_TIMEGM
   time_t timegm (struct tm *tm);

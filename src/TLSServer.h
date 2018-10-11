@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2006 - 2015, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2018, Paul Beckingham, Federico Hernandez.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ public:
   enum trust_level trust () const;
   void trust (const enum trust_level);
   void ciphers (const std::string&);
+  void dh_bits (unsigned int dh_bits);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
   void bind (const std::string&, const std::string&, const std::string&);
   void listen ();
@@ -53,24 +54,25 @@ public:
   friend class TLSTransaction;
 
 private:
-  std::string                      _ca;
-  std::string                      _crl;
-  std::string                      _cert;
-  std::string                      _key;
-  std::string                      _ciphers;
-  gnutls_certificate_credentials_t _credentials;
-  gnutls_dh_params_t               _params;
-  gnutls_priority_t                _priorities;
-  int                              _socket;
-  int                              _queue;
-  bool                             _debug;
-  enum trust_level                 _trust;
+  std::string                      _ca          {""};
+  std::string                      _crl         {""};
+  std::string                      _cert        {""};
+  std::string                      _key         {""};
+  std::string                      _ciphers     {""};
+  unsigned int                     _dh_bits     {0};
+  gnutls_certificate_credentials_t _credentials {};
+  gnutls_priority_t                _priorities  {};
+  int                              _socket      {0};
+  int                              _queue       {5};
+  bool                             _debug       {false};
+  enum trust_level                 _trust       {TLSServer::strict};
+  bool                             _priorities_init {false};
 };
 
 class TLSTransaction
 {
 public:
-  TLSTransaction ();
+  TLSTransaction () = default;
   ~TLSTransaction ();
   void init (TLSServer&);
   void bye ();
@@ -83,13 +85,13 @@ public:
   void getClient (std::string&, int&);
 
 private:
-  int                         _socket;
-  gnutls_session_t            _session;
-  int                         _limit;
-  bool                        _debug;
-  std::string                 _address;
-  int                         _port;
-  enum TLSServer::trust_level _trust;
+  int                         _socket  {0};
+  gnutls_session_t            _session {};
+  int                         _limit   {0};
+  bool                        _debug   {false};
+  std::string                 _address {""};
+  int                         _port    {0};
+  enum TLSServer::trust_level _trust   {TLSServer::strict};
 };
 
 #endif

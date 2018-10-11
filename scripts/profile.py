@@ -3,7 +3,7 @@
 ################################################################################
 ## taskd = Taskserver
 ##
-## Copyright 2010 - 2015, Göteborg Bit Factory.
+## Copyright 2010 - 2018, Göteborg Bit Factory.
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy
 ## of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,29 @@ import re
 import argparse
 import datetime
 
-timestamp       = re.compile('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')                                      
+# Log format samples
+#
+# 1.0.0
+# 2013-07-04 22:16:13 [4] 'sync' from GBF/Paul Beckingham at 24.34.73.106:41233
+# 2013-07-04 22:16:38 [5] Sync key '8d8a6b48-04fa-455f-9bf1-5d4e6c616726' still valid
+# 2013-07-04 22:16:13 [4] New sync key '8d8a6b48-04fa-455f-9bf1-5d4e6c616726'
+# 2013-07-04 22:16:13 [4] Loaded 0
+# 2013-07-04 22:16:13 [4] Stored 216, merged 0
+# 2013-07-04 22:03:27 [1] ERROR 430 Access denied
+# 2013-07-10 19:43:39 [14] ERROR: Could not find common ancestor for 0fdf95d6-52a9-433a-9313-f52559733de9
+# 2013-07-04 22:03:27 WARNING client 'taskd 1.0.0' neither denied nor allowed.
+#
+# 1.1.0
+# 2015-10-11 01:46:53 [133] 'sync' from 'GBF/Paul Beckingham' using 'task 2.5.0.beta2' at 98.217.152.192:41366
+# 2015-10-09 16:43:44 [131] Sync key '991bf825-7034-41d9-9b3f-3f4d5778fa5a' still valid
+# 2015-10-11 01:46:53 [133] New sync key '01f4928e-47d7-4e84-9902-9482f221a3db'
+# 2015-10-11 01:46:53 [133] Loaded 1501 records
+# 2015-10-11 01:46:53 [133] Stored 4 tasks, merged 0 tasks
+# ?
+# 2015-09-09 13:49:55 [107] ERROR: Could not find common ancestor for 006349d3-b7d2-458f-bf64-81c765602934
+# ?
+
+timestamp       = re.compile('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 bounce          = re.compile('==== taskd')
 sync1           = re.compile("\'sync\' from ([^/]+)/(.+) at")
 sync2           = re.compile("\'sync\' from '([^/]+)/(.+)' using '([^']+)' at")
@@ -52,9 +74,9 @@ def scan_log(file, data):
   with open(file) as fh:
     for line in fh.readlines():
 
-      # Capture every timestamp seen.                                                                    
-      matches = timestamp.match(line)                                                                             
-      if matches:                                                                                                 
+      # Capture every timestamp seen.
+      matches = timestamp.match(line)
+      if matches:
         dt = datetime.datetime.strptime(matches.group(1), '%Y-%m-%d %H:%M:%S')
         if data['oldest'] == 0:
           data['oldest'] = dt
@@ -249,8 +271,8 @@ def main(args):
            'warnings'        : 0 }
 
   for log in args.log:
-    log_file = log[0]
-    scan_log(log_file, data)
+    for log_file in log:
+      scan_log(log_file, data)
 
   if args.data:
     scan_root(args.data, data)

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use Case 6: Client accidentally deletes all data, then runs a sync.
 

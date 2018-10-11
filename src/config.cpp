@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,18 +28,18 @@
 #include <iostream>
 #include <stdlib.h>
 #include <ConfigFile.h>
-#include <Directory.h>
+#include <FS.h>
+#include <format.h>
 #include <taskd.h>
-#include <text.h>
+#include <shared.h>
 #include <util.h>
-#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // taskd config --data <root> [<name> [<value>]]
 void command_config (Database& db, const std::vector <std::string>& args)
 {
-  bool verbose      = db._config->getBoolean ("verbose");
-  bool confirmation = db._config->getBoolean ("confirmation");
+  auto verbose      = db._config->getBoolean ("verbose");
+  auto confirmation = db._config->getBoolean ("confirmation");
 
   std::string name;
   std::string value;
@@ -61,10 +61,10 @@ void command_config (Database& db, const std::vector <std::string>& args)
     }
   }
 
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string (STRING_CONFIG_NO_PATH);
+    throw std::string ("ERROR: The '--data' path does not exist.");
 
   // Load the config file.
   Config config;
@@ -76,35 +76,34 @@ void command_config (Database& db, const std::vector <std::string>& args)
   if (name != "" && nonNull)
   {
     if (! config._original_file.writable ())
-      throw std::string (STRING_CONFIG_READ_ONLY);
+      throw std::string ("Configuration file is read-only, no changes possible.");
 
-    bool change = false;
+    auto change = false;
 
     // Read .taskd/config
     std::vector <std::string> contents;
     File::read (config._original_file, contents);
 
-    bool found = false;
-    std::vector <std::string>::iterator line;
-    for (line = contents.begin (); line != contents.end (); ++line)
+    auto found = false;
+    for (auto& line : contents)
     {
       // If there is a comment on the line, it must follow the pattern.
-      std::string::size_type comment = line->find ("#");
-      std::string::size_type pos     = line->find (name + "=");
+      auto comment = line.find ("#");
+      auto pos     = line.find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
            comment > pos) &&
-          trim (*line, " \t").find (name + "=") == 0)
+          trim (line, " \t").find (name + "=") == 0)
       {
         found = true;
         if (!confirmation ||
-            confirm (format (STRING_CONFIG_OVERWRITE, name, config.get (name), value)))
+            confirm (format ("Are you sure you want to change the value of '{1}' from '{2}' to '{3}'?", name, config.get (name), value)))
         {
           if (comment != std::string::npos)
-            *line = name + "=" + value + " " + line->substr (comment);
+            line = name + "=" + value + " " + line.substr (comment);
           else
-            *line = name + "=" + value;
+            line = name + "=" + value;
 
           change = true;
         }
@@ -112,9 +111,9 @@ void command_config (Database& db, const std::vector <std::string>& args)
     }
 
     // Not found, so append instead.
-    if (!found &&
-        (!confirmation ||
-         confirm (format (STRING_CONFIG_ADD, name, value))))
+    if (! found &&
+        (! confirmation ||
+         confirm (format ("Are you sure you want to add '{1}' with a value of '{2}'?", name, value))))
     {
       contents.push_back (name + "=" + value);
       change = true;
@@ -125,13 +124,12 @@ void command_config (Database& db, const std::vector <std::string>& args)
     {
       File::write (config._original_file, contents);
       if (verbose)
-        std::cout << format (STRING_CONFIG_MODIFIED, config._original_file._data)
-                  << "\n";
+        std::cout << format ("Config file {1} modified.\n", config._original_file._data);
     }
     else
     {
       if (verbose)
-        std::cout << STRING_CONFIG_NO_CHANGE << "\n";
+        std::cout << "No changes made.\n";
     }
   }
 
@@ -140,7 +138,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
   else if (name != "")
   {
     if (! config._original_file.writable ())
-      throw std::string (STRING_CONFIG_READ_ONLY);
+      throw std::string ("Configuration file is read-only, no changes possible.");
 
     // Read .taskd/config
     std::vector <std::string> contents;
@@ -148,12 +146,11 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
     bool change = false;
     bool found = false;
-    std::vector <std::string>::iterator line;
-    for (line = contents.begin (); line != contents.end (); ++line)
+    for (auto& line : contents)
     {
       // If there is a comment on the line, it must follow the pattern.
-      std::string::size_type comment = line->find ("#");
-      std::string::size_type pos     = line->find (name + "=");
+      auto comment = line.find ("#");
+      auto pos     = line.find (name + "=");
 
       if (pos != std::string::npos &&
           (comment == std::string::npos ||
@@ -163,16 +160,16 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
         // Remove name
         if (!confirmation ||
-            confirm (format (STRING_CONFIG_REMOVE, name)))
+            confirm (format ("Are you sure you want to remove '{1}'?", name)))
         {
-          *line = "";
+          line = "";
           change = true;
         }
       }
     }
 
     if (!found)
-      throw format (STRING_CONFIG_NOT_FOUND, name);
+      throw format ("ERROR: No entry named '{1}' found.", name);
 
     // Write .taskd (or equivalent)
     if (change)
@@ -182,15 +179,13 @@ void command_config (Database& db, const std::vector <std::string>& args)
 
       File::write (config._original_file, contents);
       if (verbose)
-        std::cout << format (STRING_CONFIG_MODIFIED,
-                             config._original_file._data)
-                  << "\n";
+        std::cout << format ("Config file {1} modified.", config._original_file._data)
+                  << '\n';
     }
     else
     {
       if (verbose)
-        std::cout << STRING_CONFIG_NO_CHANGE
-                  << "\n";
+        std::cout << "No changes made.\n";
     }
   }
 
@@ -199,9 +194,7 @@ void command_config (Database& db, const std::vector <std::string>& args)
   else
   {
     if (verbose)
-      std::cout << "\n"
-                << format (STRING_CONFIG_SOURCE, config._original_file._data)
-                << "\n\n";
+      std::cout << format ("\nConfiguration read from {1}\n\n", config._original_file._data);
     taskd_renderMap (config, "Variable", "Value");
   }
 }

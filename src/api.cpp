@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,23 +32,16 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <TLSClient.h>
-#include <Directory.h>
-#include <Date.h>
+#include <FS.h>
 #include <Color.h>
-#include <Log.h>
 #include <Task.h>
 #include <RX.h>
-#include <text.h>
+#include <format.h>
 #include <util.h>
 #include <taskd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-static struct
-{
-  int code;
-  std::string error;
-} errors[] =
-{
+std::map <int, std::string> errors {
   // 2xx Success.
   { 200, "Ok" },
   { 201, "No change"},
@@ -76,23 +69,21 @@ static struct
   { 504, "Request too big"},
 };
 
-#define NUM_ERRORS (sizeof (errors) / sizeof (errors[0]))
-
 ////////////////////////////////////////////////////////////////////////////////
 bool taskd_applyOverride (Config& config, const std::string& arg)
 {
   // If the arg looks like '--NAME=VALUE' or '--NAME:VALUE', apply it to config.
   if (arg.substr (0, 2) == "--")
   {
-    std::string::size_type equal = arg.find ('=', 2);
+    auto equal = arg.find ('=', 2);
     if (equal == std::string::npos)
       equal = arg.find (':', 2);
 
     if (equal != std::string::npos &&
         equal > 2)
     {
-      std::string name  = arg.substr (2, equal - 2);
-      std::string value = arg.substr (equal + 1);
+      auto name  = arg.substr (2, equal - 2);
+      auto value = arg.substr (equal + 1);
 
       config.set (name, value);
       return true;
@@ -132,7 +123,7 @@ void taskd_requireHeader (
 // Tests left >= right, where left and right are version number strings.
 // Assumes all versions are Major.Minor.Patch[other], such as '1.0.0' or
 // '1.0.0beta1'
-bool taskd_at_least (const std::string& left, const std::string& right)
+bool taskd_at_least (const std::string&, const std::string&)
 {
   // TODO Implement this.
 
@@ -147,7 +138,7 @@ bool taskd_createDirectory (Directory& d, bool verbose)
     if (verbose)
       std::cout << Color ("green").colorize (
                      "- Created directory " + std::string (d))
-                << "\n";
+                << '\n';
 
     return true;
   }
@@ -162,25 +153,25 @@ bool taskd_sendMessage (
   const Msg& out,
   Msg& in)
 {
-  std::string destination = config.get (to);
-  std::string::size_type colon = destination.rfind (':');
+  auto destination = config.get (to);
+  auto colon = destination.rfind (':');
   if (colon == std::string::npos)
     throw std::string ("ERROR: Malformed configuration setting '") + destination + "'";
 
-  std::string server      = destination.substr (0, colon);
-  std::string port        = destination.substr (colon + 1);
+  auto server      = destination.substr (0, colon);
+  auto port        = destination.substr (colon + 1);
 
-  std::string ca          = config.get ("ca.cert");
-  std::string certificate = config.get ("client.cert");
-  std::string key         = config.get ("client.key");
-  std::string ciphers     = config.get ("ciphers");
+  auto ca          = config.get ("ca.cert");
+  auto certificate = config.get ("api.cert");
+  auto key         = config.get ("api.key");
+  auto ciphers     = config.get ("ciphers");
 
   try
   {
     TLSClient client;
     client.debug (config.getInteger ("debug.tls"));
 
-    std::string trust_level = config.get ("trust");
+    auto trust_level = config.get ("trust");
     client.trust (trust_level == "allow all"       ? TLSClient::allow_all       :
                   trust_level == "ignore hostname" ? TLSClient::ignore_hostname :
                                                      TLSClient::strict);
@@ -215,37 +206,36 @@ void taskd_renderMap (
 {
   if (data.size ())
   {
-    unsigned int max1 = title1.length ();
-    unsigned int max2 = title2.length ();
+    auto max1 = title1.length ();
+    auto max2 = title2.length ();
 
-    std::map <std::string, std::string>::const_iterator i;
-    for (i = data.begin (); i != data.end (); ++i)
+    for (auto& i : data)
     {
-      if (i->first.length () > max1)  max1 = i->first.length ();
-      if (i->second.length () > max2) max2 = i->second.length ();
+      if (i.first.length ()  > max1) max1 = i.first.length ();
+      if (i.second.length () > max2) max2 = i.second.length ();
     }
 
-    std::cout << std::left 
+    std::cout << std::left
               << std::setfill (' ')
               << std::setw (max1) << title1
               << "  "
               << std::setw (max2) << title2
-              << "\n"
+              << '\n'
               << std::setfill ('-')
               << std::setw (max1) << ""
               << "  "
               << std::setw (max2) << ""
-              << "\n";
+              << '\n';
 
-    for (i = data.begin (); i != data.end (); ++i)
+    for (auto& i : data)
       std::cout << std::left
                 << std::setfill (' ')
-                << std::setw (max1) << i->first
+                << std::setw (max1) << i.first
                 << "  "
-                << std::setw (max2) << i->second
-                << "\n";
+                << std::setw (max2) << i.second
+                << '\n';
 
-    std::cout << "\n";
+    std::cout << '\n';
   }
 }
 
@@ -261,39 +251,49 @@ bool taskd_is_org (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool taskd_is_group (
-  const Directory& root,
-  const std::string& org,
-  const std::string& group)
-{
-  Directory d (root);
-  d += "orgs";
-  d += org;
-  d += "groups";
-  d += group;
-  return d.exists ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 bool taskd_is_user (
   const Directory& root,
   const std::string& org,
-  const std::string& password)
+  const std::string& user)
 {
   Directory d (root);
   d += "orgs";
   d += org;
   d += "users";
-  d += password;
+
+  for (auto& u : d.list ())
+  {
+    Path cfg (u);
+    cfg += "config";
+
+    Config conf (cfg._data);
+    if (conf.get ("user") == user)
+      return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool taskd_is_user_key (
+  const Directory& root,
+  const std::string& org,
+  const std::string& key)
+{
+  Directory d (root);
+  d += "orgs";
+  d += org;
+  d += "users";
+  d += key;
   return d.exists ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string taskd_error (const int code)
 {
-  for (unsigned int i = 0; i < NUM_ERRORS; ++i)
-    if (code == errors[i].code)
-      return errors[i].error;
+  auto e = errors.find (code);
+  if (e != errors.end ())
+    return e->second;
 
   return "[Missing error code]";
 }

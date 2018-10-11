@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,26 +27,27 @@
 #ifndef INCLUDED_TASKD
 #define INCLUDED_TASKD
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <ConfigFile.h>
 #include <Msg.h>
 #include <Log.h>
-#include <Directory.h>
+#include <FS.h>
 #include <Database.h>
 
-void command_init     (Database&, const std::vector <std::string>&);
+void command_init     (Database&                                  );
 void command_config   (Database&, const std::vector <std::string>&);
-void command_status   (Database&, const std::vector <std::string>&);
+void command_status   (                                           );
 void command_help     (           const std::vector <std::string>&);
-void command_diag     (Database&, const std::vector <std::string>&);
-void command_server   (Database&, const std::vector <std::string>&);
+void command_diag     (Database&                                  );
+void command_server   (Database&                                  );
 void command_add      (Database&, const std::vector <std::string>&);
 void command_remove   (Database&, const std::vector <std::string>&);
 void command_suspend  (Database&, const std::vector <std::string>&);
 void command_resume   (Database&, const std::vector <std::string>&);
-void command_client   (Database&, const std::vector <std::string>&);
-void command_validate (Database&, const std::vector <std::string>&);
+void command_api      (Database&, const std::vector <std::string>&);
+void command_validate (           const std::vector <std::string>&);
 
 // api.cpp
 bool taskd_applyOverride (Config&, const std::string&);
@@ -59,84 +60,27 @@ bool taskd_createDirectory (Directory&, bool);
 bool taskd_sendMessage (Config&, const std::string&, const Msg&, Msg&);
 void taskd_renderMap (const std::map <std::string, std::string>&, const std::string&, const std::string&);
 
-bool taskd_is_org   (const Directory&, const std::string&);
-bool taskd_is_group (const Directory&, const std::string&, const std::string&);
-bool taskd_is_user  (const Directory&root, const std::string&, const std::string&);
+bool taskd_is_org      (const Directory&, const std::string&);
+bool taskd_is_user     (const Directory&root, const std::string&, const std::string&);
+bool taskd_is_user_key (const Directory&root, const std::string&, const std::string&);
 
 std::string taskd_error (const int);
 
 void taskd_staticInitialize ();
 
 // list template
-///////////////////////////////////////////////////////////////////////////////
-template <class T> bool listDiff (const T& left, const T& right)
-{
-  if (left.size () != right.size ())
-    return true;
-
-  for (unsigned int i = 0; i < left.size (); ++i)
-    if (left[i] != right[i])
-      return true;
-
-  return false;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <class T> void listDiff (
-  const T& left, const T& right, T& leftOnly, T& rightOnly)
-{
-  leftOnly.clear ();
-  rightOnly.clear ();
-
-  for (unsigned int l = 0; l < left.size (); ++l)
-  {
-    bool found = false;
-    for (unsigned int r = 0; r < right.size (); ++r)
-    {
-      if (left[l] == right[r])
-      {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found)
-      leftOnly.push_back (left[l]);
-  }
-
-  for (unsigned int r = 0; r < right.size (); ++r)
-  {
-    bool found = false;
-    for (unsigned int l = 0; l < left.size (); ++l)
-    {
-      if (left[l] == right[r])
-      {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found)
-      rightOnly.push_back (right[r]);
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 template <class T> void listIntersect (const T& left, const T& right, T& join)
 {
   join.clear ();
 
-  for (unsigned int l = 0; l < left.size (); ++l)
-  {
-    for (unsigned int r = 0; r < right.size (); ++r)
-    {
-      if (left[l] == right[r])
+  for (auto& l : left)
+    for (auto& r : right)
+      if (l == r)
       {
-        join.push_back (left[l]);
+        join.push_back (l);
         break;
       }
-    }
-  }
 }
 
 #endif

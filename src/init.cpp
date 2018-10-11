@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,32 +28,31 @@
 #include <iostream>
 #include <stdlib.h>
 #include <taskd.h>
-#include <text.h>
-#include <i18n.h>
+#include <format.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_init (Database& db, const std::vector <std::string>& args)
+void command_init (Database& db)
 {
   // Verify that root exists.
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   if (root == "")
-    throw std::string (STRING_INIT_DATA_REQUIRED);
+    throw std::string ("ERROR: The '--data' option is required.");
 
   Directory root_dir (root);
   if (!root_dir.exists ())
-    throw std::string (STRING_INIT_PATH_MISSING);
+    throw std::string ("ERROR: The '--data' path does not exist.");
 
   if (!root_dir.is_directory ())
-    throw std::string (STRING_INIT_PATH_NOT_DIR);
+    throw std::string ("ERROR: The '--data' path is not a directory.");
 
   if (!root_dir.readable ())
-    throw std::string (STRING_INIT_PATH_NOT_READ);
+    throw std::string ("ERROR: The '--data' directory is not readable.");
 
   if (!root_dir.writable ())
-    throw std::string (STRING_INIT_PATH_NOT_WRITE);
+    throw std::string ("ERROR: The '--data' directory is not writable.");
 
   if (!root_dir.executable ())
-    throw std::string (STRING_INIT_PATH_NOT_EXE);
+    throw std::string ("ERROR: The '--data' directory is not executable.");
 
   // Provide some defaults and overrides.
   db._config->set ("extensions", TASKD_EXTDIR);
@@ -68,10 +67,9 @@ void command_init (Database& db, const std::vector <std::string>& args)
 
   // Suggestions for missing items.
   if (db._config->get ("server") == "")
-    std::cout << STRING_INIT_SERVER
-              << "\n"
+    std::cout << "You must specify the 'server' variable before attempting a server start, for example:\n"
               << "  taskd config server localhost:53589\n"
-              << "\n";
+              << '\n';
 
   // Create the data structure.
   Directory sub (root_dir);
@@ -79,7 +77,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
   sub += "orgs";
   if (!sub.exists ())
     if (!sub.create (0700))
-      throw format (STRING_INIT_COULD_NOT_CREATE, sub._data);
+      throw format ("ERROR: Could not create '{1}'.", sub._data);
 
   // Dump the config file?
   db._config->_original_file = root_dir._data + "/config";
@@ -91,8 +89,7 @@ void command_init (Database& db, const std::vector <std::string>& args)
   {
     db._config->save ();
     if (db._config->getBoolean ("verbose"))
-      std::cout << format (STRING_INIT_CREATED, db._config->_original_file)
-                << "\n";
+      std::cout << format ("Created {1}\n", db._config->_original_file._data);
   }
 }
 

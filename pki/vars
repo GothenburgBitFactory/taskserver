@@ -1,4 +1,4 @@
-BITS=4096
+SEC_PARAM=high
 EXPIRATION_DAYS=365
 ORGANIZATION="Göteborg Bit Factory"
 CN=localhost

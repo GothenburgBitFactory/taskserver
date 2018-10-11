@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,19 +35,18 @@
 #include <errno.h>
 #include <Server.h>
 #include <Timer.h>
+#include <shared.h>
+#include <Datetime.h>
 #include <Database.h>
+#include <format.h>
 #include <Log.h>
-#include <Date.h>
-#include <Duration.h>
 #include <Color.h>
 #include <Task.h>
 #ifdef HAVE_COMMIT
 #include <commit.h>
 #endif
-#include <text.h>
 #include <util.h>
 #include <taskd.h>
-#include <i18n.h>
 
 // Indicates that signals were caught.
 extern bool _sighup;
@@ -87,26 +86,19 @@ public:
 
 private:
   Config& _config;
-  Date _start;
-  long _txn_count;
-  long _error_count;
-  double _busy;
-  double _max_time;
-  long _bytes_in;
-  long _bytes_out;
+  Datetime _start    {Datetime ()};
+  long _txn_count    {0};
+  long _error_count  {0};
+  double _busy       {0.0};
+  double _max_time   {0.0};
+  long _bytes_in     {0};
+  long _bytes_out    {0};
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 Daemon::Daemon (Config& settings)
 : _db (&settings)
 , _config (settings)
-, _start (Date ())
-, _txn_count (0)
-, _error_count (0)
-, _busy (0.0)
-, _max_time (0.0)
-, _bytes_in (0)
-, _bytes_out (0)
 {
 }
 
@@ -133,10 +125,10 @@ void Daemon::handler (const std::string& input, std::string& output)
     //           xx 00 xx 00  UTF-16LE
     //           xx xx xx xx  UTF-8
     if (input.length () >= 4 &&
-        (!input[0]           ||
-         !input[1]           ||
-         !input[2]           ||
-         !input[3]))
+        (! input[0]           ||
+         ! input[1]           ||
+         ! input[2]           ||
+         ! input[3]))
       throw 401;
 
     // A trapped SIGUSR1 results in a config reload.  Original command line
@@ -144,12 +136,12 @@ void Daemon::handler (const std::string& input, std::string& output)
     if (_sigusr1)
     {
       if (_log)
-        _log->format ("[%d] SIGUSR1 triggered reload of %s", _txn_count, _config._original_file._data.c_str ());
+        _log->write (format ("[{1}] SIGUSR1 triggered reload of {2}", _txn_count, _config._original_file._data));
 
       _config.load (_config._original_file._data);
-      Config::iterator i;
-      for (i = _overrides.begin (); i != _overrides.end (); ++i)
-        _config[i->first] = i->second;
+
+      for (auto& i : _overrides)
+        _config[i.first] = i.second;
 
       _sigusr1 = false;
     }
@@ -159,7 +151,7 @@ void Daemon::handler (const std::string& input, std::string& output)
         input.length () >= request_limit)
       throw 504;
 
-    HighResTimer timer;
+    Timer timer;
     timer.start ();
 
     // Request-specific processing here.
@@ -168,13 +160,13 @@ void Daemon::handler (const std::string& input, std::string& output)
     Msg out;
 
     // Handle or reject all message types.
-    std::string type = in.get ("type");
+    auto type = in.get ("type");
          if (type == "statistics") handle_statistics (in, out);
     else if (type == "sync")       handle_sync       (in, out);
     else
     {
       if (_log)
-        _log->format ("[%d] ERROR: Unrecognized message type '%s'", _txn_count, type.c_str ());
+        _log->write (format ("[{1}] ERROR: Unrecognized message type '{2}'", _txn_count, type));
 
       throw 500;
     }
@@ -183,7 +175,7 @@ void Daemon::handler (const std::string& input, std::string& output)
 
     // Record response time.
     timer.stop ();
-    double total = timer.total ();
+    auto total = timer.total_s ();
     _busy += total;
 
     // Record high-water mark.
@@ -201,7 +193,7 @@ void Daemon::handler (const std::string& input, std::string& output)
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] ERROR: %d %s", _txn_count, e, taskd_error (e).c_str ());
+      _log->write (format ("[{1}] ERROR: {2} {3}", _txn_count, e, taskd_error (e)));
   }
 
   // Handlers can throw a string, for a 500 code with specific text.
@@ -214,14 +206,14 @@ void Daemon::handler (const std::string& input, std::string& output)
     output = err.serialize ();
 
     if (_log)
-      _log->format ("[%d] %s", _txn_count, e.c_str ());
+      _log->write (format ("[{1}] {2}", _txn_count, e));
   }
 
   // Mystery errors.
   catch (...)
   {
     if (_log)
-      _log->format ("[%d] Unknown error", _txn_count);
+      _log->write (format ("[{1}] Unknown error", _txn_count));
   }
 
   _bytes_in  += input.length ();
@@ -239,10 +231,10 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   taskd_requireHeader (in, "protocol", "v1");
 
   if (_log)
-    _log->format ("[%d] 'statistics' from %s:%d",
-                  _txn_count,
-                  _client_address.c_str (),
-                  _client_port);
+    _log->write (format ("[{1}] 'statistics' from {2}:{3}",
+                         _txn_count,
+                         _client_address,
+                         _client_port));
 
   // Stats about the data.
   long total_orgs = 0;
@@ -251,7 +243,7 @@ void Daemon::handle_statistics (const Msg& in, Msg& out)
   get_totals (total_orgs, total_users, total_bytes);
 
   // Stats about the server.
-  time_t uptime = Date () - _start;
+  time_t uptime = Datetime () - _start;
   double idle = 0.0;
   if (uptime != 0)
     idle = 1.0 - (_busy / (double) uptime);
@@ -301,27 +293,29 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   taskd_requireHeader (in, "protocol", "v1");
 
   // Note: org/user already validated during authentication.
-  std::string org      = in.get ("org");
-  std::string user     = in.get ("user");
-  std::string password = in.get ("key");
+  auto org      = in.get ("org");
+  auto user     = in.get ("user");
+  auto password = in.get ("key");
+  auto subtype  = in.get ("subtype");
 
   if (_log)
-    _log->format ("[%d] 'sync' from '%s/%s' using '%s' at %s:%d",
-                  _txn_count,
-                  org.c_str (),
-                  user.c_str (),
-                  in.get ("client").c_str (),
-                  _client_address.c_str (),
-                  _client_port);
+    _log->write (format ("[{1}] 'sync{2}' from '{3}/{4}' using '{5}' at {6}:{7}",
+                         _txn_count,
+                         (subtype == "init" ? "+init" : ""),
+                         org,
+                         user,
+                         in.get ("client"),
+                         _client_address,
+                         _client_port));
 
   // Redirect if instructed.
   if (_db.redirect (org, out))
     return;
 
-  // Separate payload into client_data and client_key.
+  // Separate payload into client_data and sync_key.
   std::vector <std::string> client_data;               // Incoming client data.
-  std::string client_key;                              // Incoming client key.
-  parse_payload (in.getPayload (), client_data, client_key);
+  std::string sync_key;                                // Incoming client key.
+  parse_payload (in.getPayload (), client_data, sync_key);
 
   // Load all user data.
   std::vector <std::string> server_data;               // Data loaded on server.
@@ -331,7 +325,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   std::vector <std::string> new_client_data;           // New tasks for client.
 
   // Find branch point and extract subset.
-  unsigned int branch_point = find_branch_point (server_data, client_key);
+  unsigned int branch_point = find_branch_point (server_data, sync_key);
   std::vector <Task> server_subset;
   extract_subset (server_data, branch_point, server_subset);
 
@@ -341,16 +335,12 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   int merge_count = 0;
 
   // For each incoming task...
-  std::vector <std::string>::iterator client_task;
-  for (client_task = client_data.begin ();
-       client_task != client_data.end ();
-       ++client_task)
+  for (auto& client_task : client_data)
   {
     // Validate task.
-    Task task (*client_task);
+    Task task (client_task);
     std::string uuid = task.get ("uuid");
     task.validate ();
-    task.upgradeLegacyValues ();
 
     // If task is in subset
     if (contains (server_subset, uuid))
@@ -381,7 +371,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
       std::string combined_JSON = combined.composeJSON ();
 
       // Append combined task to client and server data, if not already there.
-      new_server_data.push_back (combined_JSON);
+      new_server_data.push_back (combined_JSON + "\n");
       new_client_data.push_back (combined_JSON);
       ++merge_count;
     }
@@ -389,24 +379,24 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     {
       // Task not in subset, therefore can be stored unmodified.  Does not get
       // returned to client.
-      new_server_data.push_back (*client_task);
+      new_server_data.push_back (client_task + "\n");
       ++store_count;
     }
   }
 
-  _log->format ("[%d] Stored %d tasks, merged %d tasks",
-                _txn_count,
-                store_count,
-                merge_count);
+  _log->write (format ("[{1}] Stored {2} tasks, merged {3} tasks",
+                       _txn_count,
+                       store_count,
+                       merge_count));
 
   // New server data means a new sync key must be generated.  No new server data
   // means the most recent sync key is reused.
-  std::string new_client_key = "";
+  std::string new_sync_key = "";
   if (new_server_data.size ())
   {
-    new_client_key = uuid ();
-    new_server_data.push_back (new_client_key);
-    _log->format ("[%d] New sync key '%s'", _txn_count, new_client_key.c_str ());
+    new_sync_key = uuid ();
+    new_server_data.push_back (new_sync_key + "\n");
+    _log->write (format ("[{1}] New sync key '{2}'", _txn_count, new_sync_key));
 
     // Append new_server_data to file.
     append_server_data (org, password, new_server_data);
@@ -417,11 +407,11 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
     for (i = server_data.rbegin (); i != server_data.rend (); ++i)
       if ((*i)[0] != '{')
       {
-        new_client_key = *i;
+        new_sync_key = *i;
         break;
       }
 
-    _log->format ("[%d] Sync key '%s' still valid", _txn_count, new_client_key.c_str ());
+    _log->write (format ("[{1}] Sync key '{2}' still valid", _txn_count, new_sync_key));
   }
 
   // If there is outgoing data, generate payload + key.
@@ -431,13 +421,13 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   {
     payload = generate_payload (server_subset,
                                 new_client_data,
-                                new_client_key);
+                                new_sync_key);
   }
 
   // No outgoing data, just sent the latest key.
   else
   {
-    payload = new_client_key + "\n";
+    payload = new_sync_key + "\n";
   }
 
   out.setPayload (payload);
@@ -452,7 +442,7 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
   }
   else
   {
-    _log->format ("[%d] No change", _txn_count);
+    _log->write (format ("[{1}] No change", _txn_count));
     out.set ("code",   201);
     out.set ("status", taskd_error (201));
   }
@@ -462,30 +452,28 @@ void Daemon::handle_sync (const Msg& in, Msg& out)
 void Daemon::parse_payload (
   const std::string& payload,
   std::vector <std::string>& data,
-  std::string& key) const
+  std::string& sync_key) const
 {
   // Break payload into lines.
-  std::vector <std::string> lines;
-  split (lines, payload, '\n');
+  auto lines = split (payload, '\n');
 
   // Separate into data and key.
   // TODO Some syntax checking would be nice.
-  std::vector <std::string>::iterator i;
-  for (i = lines.begin (); i != lines.end (); ++i)
+  for (auto& i : lines)
   {
-    if (*i != "")
+    if (i != "")
     {
-      if ((*i)[0] == '{')
-        data.push_back (*i);
+      if (i[0] == '{')
+        data.push_back (i);
       else
-        key = *i;
+        sync_key = i;
     }
   }
 
-  _log->format ("[%d] Client key '%s' + %u txns",
-                _txn_count,
-                key.c_str (),
-                data.size ());
+  _log->write (format ("[{1}] Client key '{2}' + {3} txns",
+                       _txn_count,
+                       sync_key,
+                       data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -506,7 +494,7 @@ void Daemon::load_server_data (
   else
     user_data.create (0600);
 
-  _log->format ("[%d] Loaded %u records", _txn_count, data.size ());
+  _log->write (format ("[{1}] Loaded {2} records", _txn_count, data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -520,34 +508,46 @@ void Daemon::append_server_data (
   user_dir += org;
   user_dir += "users";
   user_dir += password;
-  File user_data (user_dir._data + "/tx.data");
 
-  if (!user_data.exists ())
-    user_data.create (0600);
+  // Write to a tmp copy of the data, then renamed afterwards. This guarantees
+  // that there are no partial writes to the real data file, which may occur
+  // in situations where there is no disk space.
+  File user_data     (user_dir._data     + "/tx.data");
+  File user_tmp_data (user_dir._data + "/tx.tmp.data");
 
-  user_data.append (data);
+  // Create or copy, as necessary.
+  if (user_data.exists ())
+    File::copy (user_data._data, user_tmp_data._data);
+  else
+    user_tmp_data.create (0600);
 
-  _log->format ("[%d] Wrote %u", _txn_count, data.size ());
+  // Store the data in the temporary file.
+  user_tmp_data.append (data);
+
+  // Move the temp file to the real file, after closing it.
+  user_tmp_data.close ();
+  File::move (user_tmp_data._data, user_data._data);
+
+  _log->write (format ("[{1}] Wrote {2}", _txn_count, data.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Note: A missing client_key implies first-time sync, which means the earliest
+// Note: A missing sync_key implies first-time sync, which means the earliest
 //       possible branch point is used.
 unsigned int Daemon::find_branch_point (
   const std::vector <std::string>& data,
-  const std::string& key) const
+  const std::string& sync_key) const
 {
   unsigned int branch = 0;
 
   // A missing key is either a first-time sync, or a request to get all data.
-  if (key == "")
+  if (sync_key == "")
     return branch;
 
   bool found = false;
-  std::vector <std::string>::const_iterator i;
-  for (i = data.begin (); i != data.end (); ++i)
+  for (auto& i : data)
   {
-    if (*i == key)
+    if (i == sync_key)
     {
       found = true;
       break;
@@ -556,10 +556,10 @@ unsigned int Daemon::find_branch_point (
       ++branch;
   }
 
-  if (!found)
-    throw std::string ("Client sync key not found.");
+  if (! found)
+    throw std::string ("Could not find the last sync transaction. Did you skip the 'task sync init' requirement?");
 
-  _log->format ("[%d] Branch point: %s --> %u", _txn_count, key.c_str (), branch);
+  _log->write (format ("[{1}] Branch point: {2} --> {3}", _txn_count, sync_key, branch));
   return branch;
 }
 
@@ -581,10 +581,10 @@ void Daemon::extract_subset (
 
   catch (const std::string& e)
   {
-    throw e + format (STRING_RECORD_LINE, i);
+    throw e + format (" at line {1}", i);
   }
 
-  _log->format ("[%d] Subset %u tasks", _txn_count, subset.size ());
+  _log->write (format ("[{1}] Subset {2} tasks", _txn_count, subset.size ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -592,9 +592,8 @@ bool Daemon::contains (
   const std::vector <Task>& subset,
   const std::string& uuid) const
 {
-  std::vector <Task>::const_iterator i;
-  for (i = subset.begin (); i != subset.end (); ++i)
-    if (uuid == i->get ("uuid"))
+  for (auto& i : subset)
+    if (uuid == i.get ("uuid"))
       return true;
 
   return false;
@@ -608,13 +607,11 @@ std::string Daemon::generate_payload (
 {
   std::string payload;
 
-  std::vector <Task>::const_iterator t;
-  for (t = subset.begin (); t != subset.end (); ++t)
-    payload += t->composeJSON () + "\n";
+  for (auto& s : subset)
+    payload += s.composeJSON () + "\n";
 
-  std::vector <std::string>::const_iterator s;
-  for (s = additions.begin (); s != additions.end (); ++s)
-    payload += *s + "\n";
+  for (auto& a : additions)
+    payload += a + "\n";
 
   payload += key + "\n";
 
@@ -639,7 +636,7 @@ unsigned int Daemon::find_common_ancestor (
     }
   }
 
-  throw std::string ("ERROR: Could not find common ancestor for ") + uuid;
+  throw std::string ("ERROR: Could not find common ancestor for ") + uuid + ". Did you skip the 'task sync init' requirement?";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -650,12 +647,11 @@ void Daemon::get_client_mods (
   const std::vector <std::string>& data,
   const std::string& uuid) const
 {
-  std::vector <std::string>::const_iterator line;
-  for (line = data.begin (); line != data.end (); ++line)
+  for (auto& line : data)
   {
-    if ((*line)[0] == '{')
+    if (line[0] == '{')
     {
-      Task t (*line);
+      Task t (line);
       if (t.get ("uuid") == uuid)
         mods.push_back (t);
     }
@@ -706,7 +702,7 @@ void Daemon::merge_sort (
     time_t mod_r = last_modification (*iter_r);
     if (mod_l < mod_r)
     {
-      _log->format ("[%d] applying left %d < %d", _txn_count, mod_l, mod_r);
+      _log->write (format ("[{1}] applying left {2} < {3}", _txn_count, mod_l, mod_r));
       patch (combined, *prev_l, *iter_l);
       combined.set ("modified", (int) mod_l);
       prev_l = iter_l;
@@ -714,7 +710,7 @@ void Daemon::merge_sort (
     }
     else
     {
-      _log->format ("[%d] applying right %d >= %d", _txn_count, mod_l, mod_r);
+      _log->write (format ("[{1}] applying right {2} >= {3}", _txn_count, mod_l, mod_r));
       patch (combined, *prev_r, *iter_r);
       combined.set ("modified", (int) mod_r);
       prev_r = iter_r;
@@ -738,7 +734,7 @@ void Daemon::merge_sort (
     ++iter_r;
   }
 
-  _log->format ("[%d] Merge result %s", _txn_count, combined.composeJSON ().c_str ());
+  _log->write (format ("[{1}] Merge result {2}", _txn_count, combined.composeJSON ()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -763,13 +759,12 @@ void Daemon::patch (
 {
   // Determine the different attribute names between from and to.
   std::vector <std::string> from_atts;
-  Task::const_iterator att;
-  for (att = from.begin (); att != from.end (); ++att)
-    from_atts.push_back (att->first);
+  for (auto& att: from.data)
+    from_atts.push_back (att.first);
 
   std::vector <std::string> to_atts;
-  for (att = to.begin (); att != to.end (); ++att)
-    to_atts.push_back (att->first);
+  for (auto& att: to.data)
+    to_atts.push_back (att.first);
 
   std::vector <std::string> from_only;
   std::vector <std::string> to_only;
@@ -782,24 +777,26 @@ void Daemon::patch (
   std::vector <std::string>::iterator i;
   for (i = from_only.begin (); i != from_only.end (); ++i)
   {
-    _log->format ("[%d] patch remove %s", _txn_count, i->c_str ());
+    _log->write (format ("[{1}] patch remove {2}", _txn_count, *i));
     base.remove (*i);
   }
 
   // The to-only attributes must be added to base.
-  for (i = to_only.begin (); i != to_only.end (); ++i)
+  for (auto& i : to_only)
   {
-    _log->format ("[%d] patch add %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
-    base.set (*i, to.get (*i));
+    _log->write (format ("[{1}] patch add {2}={3}", _txn_count, i, to.get (i)));
+    base.set (i, to.get (i));
   }
 
   // The intersecting attributes, if the values differ, are applied.
-  for (i = common_atts.begin (); i != common_atts.end (); ++i)
-    if (from.get (*i) != to.get (*i))
+  for (auto& i : common_atts)
+  {
+    if (from.get (i) != to.get (i))
     {
-      _log->format ("[%d] patch modify %s=%s", _txn_count, i->c_str (), to.get (*i).c_str ());
-      base.set (*i, to.get (*i));
+      _log->write (format ("[{1}] patch modify {2}={3}", _txn_count, i, to.get (i)));
+      base.set (i, to.get (i));
     }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -813,35 +810,34 @@ void Daemon::get_totals (
 
   Directory orgs_dir (_config.get ("root"));
   orgs_dir += "orgs";
-  std::vector <std::string> orgs = orgs_dir.list ();
-  std::vector <std::string>::iterator org;
-  for (org = orgs.begin (); org != orgs.end (); ++org)
+
+  for (auto& org : orgs_dir.list ())
   {
     ++total_orgs;
 
-    Directory users_dir (*org);
+    Directory users_dir (org);
     users_dir += "users";
-    std::vector <std::string> users = users_dir.list ();
-    std::vector <std::string>::iterator user;
-    for (user = users.begin (); user != users.end (); ++user)
+
+    for (auto& user : users_dir.list ())
     {
       ++total_users;
 
-      File data (*user);
+      File data (user);
       data += "tx.data";
-      total_bytes += (long) data.size ();
+      if (data.exists ())
+        total_bytes += (long) data.size ();
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void command_server (Database& db, const std::vector <std::string>& args)
+void command_server (Database& db)
 {
   _overrides = *db._config;
-  bool daemon = db._config->getBoolean ("daemon");
+  auto daemon = db._config->getBoolean ("daemon");
 
   // Verify that root exists.
-  std::string root = db._config->get ("root");
+  auto root = db._config->get ("root");
   if (root == "")
     throw std::string ("ERROR: The '--data' option is required.");
 
@@ -853,9 +849,8 @@ void command_server (Database& db, const std::vector <std::string>& args)
   db._config->load (root_dir._data + "/config");
 
   // Apply overrides to db._config
-  Config::iterator i;
-  for (i = _overrides.begin (); i != _overrides.end (); ++i)
-    db._config->set (i->first, i->second);
+  for (auto& i : _overrides)
+    db._config->set (i.first, i.second);
 
   // Provide a set of attribute types.
   taskd_staticInitialize ();
@@ -864,7 +859,7 @@ void command_server (Database& db, const std::vector <std::string>& args)
 
   try
   {
-    log.setFile (db._config->get ("log"));
+    log.file (db._config->get ("log"));
     log.write (std::string ("==== ")
                + PACKAGE_STRING
                + " "
@@ -874,21 +869,21 @@ void command_server (Database& db, const std::vector <std::string>& args)
                + " ===="
               );
 
-    log.format ("Serving from %s", root.c_str ());
+    log.write (format("Serving from {1}", root));
 
     if (db._config->getBoolean ("debug"))
       log.write ("Debug mode");
 
     // It is important that the ':' found should be the *last* one, in order
     // to accomodate IPv6 addresses.
-    std::string serverDetails = db._config->get ("server");
-    std::string::size_type colon = serverDetails.rfind (':');
+    auto serverDetails = db._config->get ("server");
+    auto colon = serverDetails.rfind (':');
     if (colon == std::string::npos)
       throw std::string ("ERROR: Malformed configuration setting 'server'.  Value should resemble 'host:port'.");
 
-    std::string host = serverDetails.substr (0, colon);
-    std::string port = serverDetails.substr (colon + 1);
-    std::string family = db._config->get ("family");
+    auto host = serverDetails.substr (0, colon);
+    auto port = serverDetails.substr (colon + 1);
+    auto family = db._config->get ("family");
 
     // Create a taskd server object.
     Daemon server        (*db._config);
@@ -935,9 +930,9 @@ void command_server (Database& db, const std::vector <std::string>& args)
   catch (...)
   {
     if (errno)
-      log.format ("errno=%d %s", errno, strerror (errno));
+      log.write (format ("errno={1} {2}", errno, strerror (errno)));
     else
-    log.write ("Unknown error");
+      log.write ("Unknown error");
   }
 }
 

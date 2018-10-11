@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Use Case 7: Recurring task added, then child tasks created in separate places,
+#             followed by a sync, which creates duplicates.
+#
+# TD-44: Syncing a new recurring task without task instances creates duplicates
+#
+echo '--- add 1, sync ---------------------------------------------------------'
+task rc:tw1/rc add Recurring due:today recur:daily
+task rc:tw1/rc sync   # Sync template
+task rc:tw2/rc sync   # Sync template
+
+echo '--- list 1, sync --------------------------------------------------------'
+task rc:tw1/rc list   # Generate local instances
+task rc:tw1/rc sync   # Sync instances
+
+echo '--- list 2, sync --------------------------------------------------------'
+task rc:tw2/rc list   # Generate local instances
+task rc:tw2/rc sync   # Sync to creates duplicates
+
+# tw2/pending.data
+# - Contains two instances for imask 0
+# - Contains two instances for imask 1
+# - Contains floating point imask values for the second set of instances

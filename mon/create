@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 DATA=./taskd.rrd
 rm -f $DATA

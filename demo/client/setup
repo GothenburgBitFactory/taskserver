@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TW1=$PWD/tw1
 TW2=$PWD/tw2
@@ -19,16 +19,17 @@ mkdir $TW1
 echo "data.location=$TW1"                      > $TW1/rc
 echo "taskd.server=localhost:53589"           >> $TW1/rc
 echo "taskd.credentials=Public/USER/$KEY"     >> $TW1/rc
-echo "taskd.certificate=$TW1/client.cert.pem" >> $TW1/rc
-echo "taskd.key=$TW1/client.key.pem"          >> $TW1/rc
+echo "taskd.certificate=$TW1/api.cert.pem"    >> $TW1/rc
+echo "taskd.key=$TW1/api.key.pem"             >> $TW1/rc
 echo "taskd.ca=$TW1/ca.cert.pem"              >> $TW1/rc
 echo "taskd.trust=strict"                     >> $TW1/rc
 #echo "taskd.trust=ignore hostname"            >> $TW1/rc
 #echo "taskd.trust=allow all"                  >> $TW1/rc
 echo "confirmation=off"                       >> $TW1/rc
 echo "verbose=sync"                           >> $TW1/rc
-cp ../../pki/client.cert.pem $TW1
-cp ../../pki/client.key.pem $TW1
+#echo "debug.tls=4"                            >> $TW1/rc
+cp ../../pki/api.cert.pem $TW1
+cp ../../pki/api.key.pem $TW1
 cp ../../pki/ca.cert.pem $TW1
 echo
 ${TREE} $TW1
@@ -39,31 +40,32 @@ mkdir $TW2
 echo "data.location=$TW2"                      > $TW2/rc
 echo "taskd.server=localhost:53589"           >> $TW2/rc
 echo "taskd.credentials=Public/USER/$KEY"     >> $TW2/rc
-echo "taskd.certificate=$TW2/client.cert.pem" >> $TW2/rc
-echo "taskd.key=$TW2/client.key.pem"          >> $TW2/rc
+echo "taskd.certificate=$TW2/api.cert.pem"    >> $TW2/rc
+echo "taskd.key=$TW2/api.key.pem"             >> $TW2/rc
 echo "taskd.ca=$TW2/ca.cert.pem"              >> $TW2/rc
 echo "taskd.trust=strict"                     >> $TW2/rc
 #echo "taskd.trust=ignore hostname"            >> $TW2/rc
 #echo "taskd.trust=allow all"                  >> $TW2/rc
 echo "confirmation=off"                       >> $TW2/rc
 echo "verbose=sync"                           >> $TW2/rc
-cp ../../pki/client.cert.pem $TW2
-cp ../../pki/client.key.pem $TW2
+#echo "debug.tls=4"                            >> $TW2/rc
+cp ../../pki/api.cert.pem $TW2
+cp ../../pki/api.key.pem $TW2
 cp ../../pki/ca.cert.pem $TW2
 echo
 ${TREE} $TW2
 
 echo
 echo "# Create negative testing requests"
-printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.0
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"  > bad.0
 
 echo "# Payload"
-printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n"      > bad.10
-printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\r\r\r"  > bad.11
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n"      > bad.10
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\r\r\r"  > bad.11
 
 echo "# Protocol"
-printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v10\n\n\n" > bad.20
-printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\n\n\n"                > bad.21
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v10\n\n\n" > bad.20
+printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\n\n\n"                > bad.21
 
 echo "# Client"
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient: NOPE\nprotocol: v1\n\n\n"         > bad.30
@@ -71,38 +73,38 @@ printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nclient:\nprotocol: v1\n\
 printf "type: sync\norg: Public\nuser: USER\nkey: $KEY\nprotocol: v1\n\n\n"                       > bad.32
 
 echo "# Type"
-printf "type: Sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.40
-printf "type: sync \norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.41
-printf "type:sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"   > bad.42
-printf "type: \norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.43
-printf "type:\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.44
-printf "\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"            > bad.45
-printf "org: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"              > bad.46
+printf "type: Sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"  > bad.40
+printf "type: sync \norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n" > bad.41
+printf "type:sync\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"   > bad.42
+printf "type: \norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"      > bad.43
+printf "type:\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"       > bad.44
+printf "\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"            > bad.45
+printf "org: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"              > bad.46
 
 echo "# Org"
-printf "type: sync\norg: Foo\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"     > bad.50
-printf "type: sync\norg:\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"         > bad.51
-printf "type: sync\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"               > bad.52
+printf "type: sync\norg: Foo\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"     > bad.50
+printf "type: sync\norg:\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"         > bad.51
+printf "type: sync\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"               > bad.52
 
 echo "# User"
-printf "type: sync\norg: Public\nuser: USERX\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.60
-printf "type: sync\norg: Public\nuser: USE\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"   > bad.60
-printf "type: sync\norg: Public\nuser:\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.60
-printf "type: sync\norg: Public\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"              > bad.60
+printf "type: sync\norg: Public\nuser: USERX\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n" > bad.60
+printf "type: sync\norg: Public\nuser: USE\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"   > bad.60
+printf "type: sync\norg: Public\nuser:\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"       > bad.60
+printf "type: sync\norg: Public\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"              > bad.60
 
 echo "# Key"
-printf "type: sync\norg: Public\nuser: USER\nkey: 00000000-0000-0000-0000-000000000000\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > bad.70
-printf "type: sync\norg: Public\nuser: USER\nkey: 0000000-000-000-000-00000000000\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.71
-printf "type: sync\norg: Public\nuser: USER\nkey:0\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"      > bad.72
-printf "type: sync\norg: Public\nuser: USER\nkey:\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"       > bad.73
-printf "type: sync\norg: Public\nuser: USER\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"             > bad.74
+printf "type: sync\norg: Public\nuser: USER\nkey: 00000000-0000-0000-0000-000000000000\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n" > bad.70
+printf "type: sync\norg: Public\nuser: USER\nkey: 0000000-000-000-000-00000000000\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"      > bad.71
+printf "type: sync\norg: Public\nuser: USER\nkey:0\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"      > bad.72
+printf "type: sync\norg: Public\nuser: USER\nkey:\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"       > bad.73
+printf "type: sync\norg: Public\nuser: USER\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"             > bad.74
 
 echo "# Garbage"
-printf "type: sync\norg: Public\nuser: USER\nhello: there\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n"  > bad.80
+printf "type: sync\norg: Public\nuser: USER\nhello: there\nkey: $KEY\nclient: taskwarrior 2.5.1\nprotocol: v1\n\n\n"  > bad.80
 printf "\n\n\n"  > bad.81
 printf "Ice cream and candy floss.  Parents with dosh."  > bad.82
 printf ""  > bad.83
 
 echo "# Stats"
-printf "type: statistics\norg: Public\nuser: USER\nkey: $KEY\nclient: taskd 1.0.0\nprotocol: v1\n\n\n" > stats.0
+printf "type: statistics\norg: Public\nuser: USER\nkey: $KEY\nclient: taskwarrior 2.6.0\nprotocol: v1\n\n\n" > stats.0
 

@@ -4,7 +4,7 @@
 #define PRODUCT_TASKSERVER 1
 
 /* Feature enable/disabled */
-#define FEATURE_CLIENT_INTERFACE
+#define FEATURE_API_INTERFACE
 
 /* Package information */
 #define PACKAGE           "${PACKAGE}"
@@ -20,10 +20,6 @@
 /* Installation details */
 #define TASKD_EXTDIR "${CMAKE_INSTALL_PREFIX}/${TASKD_EXTDIR}"
 
-/* Localization */
-#define PACKAGE_LANGUAGE  ${PACKAGE_LANGUAGE}
-#define LANGUAGE_ENG_USA ${LANGUAGE_ENG_USA}
-
 /* git information */
 #cmakedefine HAVE_COMMIT
 
@@ -34,14 +30,14 @@
 /* Compiling platform */
 #cmakedefine LINUX
 #cmakedefine DARWIN
-#cmakedefine CYGWIN
+#cmakedefine KFREEBSD
 #cmakedefine FREEBSD
 #cmakedefine OPENBSD
 #cmakedefine NETBSD
-#cmakedefine HAIKU
+#cmakedefine DRAGONFLY
 #cmakedefine SOLARIS
-#cmakedefine KFREEBSD
 #cmakedefine GNUHURD
+#cmakedefine CYGWIN
 #cmakedefine UNKNOWN
 
 /* Found tm.tm_gmtoff struct member */
@@ -51,6 +47,7 @@
 #cmakedefine HAVE_ST_BIRTHTIME
 
 /* Functions */
+#cmakedefine HAVE_GET_CURRENT_DIR_NAME
 #cmakedefine HAVE_TIMEGM
 #cmakedefine HAVE_UUID_UNPARSE_LOWER
 

@@ -48,7 +48,7 @@ Taskdctl requires that the TAKSDDATA environment variable be properly set. This
 is because the root data structure is accessed.
 
 .SH "CREDITS & COPYRIGHTS"
-Copyright (C) 2010 \- 2015, Göteborg Bit Factory.
+Copyright (C) 2010 \- 2018, Göteborg Bit Factory.
 
 Taskserver is distributed under the MIT license. See
 http://www.opensource.org/licenses/mit-license.php for more information.
@@ -64,14 +64,14 @@ The official site at
 
 .TP
 The official code repository at
-<https://git.tasktools.org/scm/tm/taskd.git>
+<https://github.com/GothenburgBitFactory/taskserver>
 
 .TP
 You can contact the project by emailing
-<support@taskwarrior.org>
+<support@gothenburgbitfactory.org>
 
 .SH REPORTING BUGS
 .TP
 Bugs in Taskserver may be reported to the issue-tracker at
-<http://taskwarrior.org
+<http://taskwarrior.org>
 

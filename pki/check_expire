@@ -1,0 +1,7 @@
+#!/bin/sh
+
+for cert in *.cert.pem; do
+	echo $cert
+	openssl x509 -noout -in $cert -dates
+	echo
+done

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,22 +28,20 @@
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>
-#include <Date.h>
-#include <File.h>
-#include <text.h>
+#include <FS.h>
+#include <Datetime.h>
 #include <util.h>
 #include <taskd.h>
-#include <i18n.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // This is a debugging-only command that uploads a file to the server, and then
 // displays the result.
-void command_client (Database& db, const std::vector <std::string>& args)
+void command_api (Database& db, const std::vector <std::string>& args)
 {
-#ifdef FEATURE_CLIENT_INTERFACE
+#ifdef FEATURE_API_INTERFACE
   // Parse arguments.
   if (args.size () < 3)
-    throw std::string (STRING_CLIENT_USAGE);
+    throw std::string ("ERROR: Usage:  taskd api [options] <host:post> <file> [<file> ...]");
 
   db._config->set ("server", args[1]);
 
@@ -53,21 +51,21 @@ void command_client (Database& db, const std::vector <std::string>& args)
     File file (args[i]);
     std::string contents;
     file.read (contents);
-    std::cout << ">>> " << args[i] << "\n";
+    std::cout << ">>> " << args[i] << '\n';
 
     Msg request;
     request.parse (contents);
-    request.set ("time", Date ().toISO ());
+    request.set ("time", Datetime ().toISO ());
 
     Msg response;
     if (! taskd_sendMessage (*db._config, "server", request, response))
-      throw std::string (STRING_SERVER_DOWN);
+      throw std::string ("ERROR: Taskserver not responding.");
 
     std::cout << "<<<\n"
               << response.serialize ();
   }
 #else
-  throw std::string (STRING_CLIENT_DISABLED);
+  throw std::string ("ERROR: API feature not enabled.");
 #endif
 }
 

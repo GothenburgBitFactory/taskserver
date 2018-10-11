@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,18 +29,10 @@
 #include <sstream>
 #include <stdlib.h>
 #include <inttypes.h>
-#include <Date.h>
 #include <ConfigFile.h>
-#include <text.h>
+#include <shared.h>
+#include <format.h>
 #include <taskd.h>
-
-////////////////////////////////////////////////////////////////////////////////
-// In all real use cases, Config::load is called.
-Config::Config ()
-: _original_file ()
-, _dirty (false)
-{
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 Config::Config (const std::string& file)
@@ -83,7 +75,15 @@ void Config::load (const std::string& file, int nest /* = 1 */)
 
   // First time in, load the default values.
   if (nest == 1)
+  {
     _original_file = File (file);
+
+    if (! _original_file.exists ())
+      throw std::string ("ERROR: Configuration file not found.");
+
+    if (! _original_file.readable ())
+      throw std::string ("ERROR: Configuration file cannot be read (insufficient privileges).");
+  }
 
   // Read the file, then parse the contents.
   std::string contents;
@@ -96,9 +96,8 @@ void Config::load (const std::string& file, int nest /* = 1 */)
 void Config::save ()
 {
   std::string contents;
-  std::map <std::string, std::string>::iterator i;
-  for (i = this->begin (); i != this->end (); ++i)
-    contents += i->first + "=" + i->second + "\n";
+  for (const auto& i : *this)
+    contents += i.first + "=" + i.second + '\n';
 
   File::write (_original_file, contents);
   _dirty = false;
@@ -112,17 +111,10 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
     return;
 
   // Split the input into lines.
-  std::vector <std::string> lines;
-  split (lines, input, "\n");
-
-  // Parse each line.
-  std::vector <std::string>::iterator it;
-  for (it = lines.begin (); it != lines.end (); ++it)
+  for (auto& line : split (input, '\n'))
   {
-    std::string line = *it;
-
     // Remove comments.
-    std::string::size_type pound = line.find ("#"); // no i18n
+    auto pound = line.find ("#"); // no i18n
     if (pound != std::string::npos)
       line = line.substr (0, pound);
 
@@ -131,17 +123,17 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
     // Skip empty lines.
     if (line.length () > 0)
     {
-      std::string::size_type equal = line.find ("="); // no i18n
+      auto equal = line.find ("="); // no i18n
       if (equal != std::string::npos)
       {
-        std::string key   = trim (line.substr (0, equal), " \t"); // no i18n
-        std::string value = trim (line.substr (equal+1, line.length () - equal), " \t"); // no i18n
+        auto key   = trim (line.substr (0, equal), " \t"); // no i18n
+        auto value = trim (line.substr (equal+1, line.length () - equal), " \t"); // no i18n
 
         (*this)[key] = value;
       }
       else
       {
-        std::string::size_type include = line.find ("include"); // no i18n.
+        auto include = line.find ("include"); // no i18n.
         if (include != std::string::npos)
         {
           Path included (trim (line.substr (include + 7), " \t"));
@@ -166,33 +158,33 @@ void Config::parse (const std::string& input, int nest /* = 1 */)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the configuration value given the specified key.
-const std::string Config::get (const std::string& key)
+std::string Config::get (const std::string& key)
 {
   return (*this)[key];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Config::getInteger (const std::string& key)
+int Config::getInteger (const std::string& key)
 {
-  if ((*this).find (key) != (*this).end ())
+  if (find (key) != end ())
     return strtoimax ((*this)[key].c_str (), NULL, 10);
 
   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const double Config::getReal (const std::string& key)
+double Config::getReal (const std::string& key)
 {
-  if ((*this).find (key) != (*this).end ())
+  if (find (key) != end ())
     return strtod ((*this)[key].c_str (), NULL);
 
   return 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const bool Config::getBoolean (const std::string& key)
+bool Config::getBoolean (const std::string& key)
 {
-  if ((*this).find (key) != (*this).end ())
+  if (find (key) != end ())
   {
     std::string value = lowerCase ((*this)[key]);
     if (value == "true"   ||
@@ -242,9 +234,8 @@ void Config::setIfBlank (const std::string& key, const std::string& value)
 // Provide a vector of all configuration keys.
 void Config::all (std::vector<std::string>& items) const
 {
-  std::map <std::string, std::string>::const_iterator it;
-  for (it = this->begin (); it != this->end (); ++it)
-    items.push_back (it->first);
+  for (auto& i : *this)
+    items.push_back (i.first);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

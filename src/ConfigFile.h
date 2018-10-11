@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2010 - 2015, Göteborg Bit Factory.
+// Copyright 2010 - 2018, Göteborg Bit Factory.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,25 +30,24 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <File.h>
+#include <FS.h>
 
 class Config : public std::map <std::string, std::string>
 {
 public:
-  Config ();
-  Config (const std::string&);
-
-  Config (const Config&);
+  Config () = default;
+  explicit Config (const std::string&);
+  explicit Config (const Config&);
   Config& operator= (const Config&);
 
   void load (const std::string&, int nest = 1);
   void save ();
   void parse (const std::string&, int nest = 1);
 
-  const std::string get        (const std::string&);
-  const int         getInteger (const std::string&);
-  const double      getReal    (const std::string&);
-  const bool        getBoolean (const std::string&);
+  std::string get        (const std::string&);
+  int         getInteger (const std::string&);
+  double      getReal    (const std::string&);
+  bool        getBoolean (const std::string&);
 
   void set (const std::string&, const int);
   void set (const std::string&, const double);
@@ -61,10 +60,10 @@ public:
   bool dirty ();
 
 public:
-  File _original_file;
+  File _original_file {};
 
 private:
-  bool _dirty;
+  bool _dirty         {false};
 };
 
 #endif

@@ -8,22 +8,20 @@ source.
 Pre-requisites
 --------------
 
-You will need the CMake build system installed in order to build taskwarrior
+You will need the CMake build system installed in order to build taskserver
 from source. More information on cmake can be obtained at http://cmake.org
 
 You will also need:
   - make
+  - bash
 
 You will need a C++ compiler that supports full C++11, which includes:
-  - gcc 4.7   (released 2012-03-23)
-  - clang 3.3 (released 2013-01-07)
+  - gcc 4.9   (released 2014-04-22)
+  - clang 3.4 (released 2014-01-02)
 
 You will need the following libraries:
   - libuuid
   - gnutls
-
-It is HIGHLY RECOMMENDED that you build with a library that provides uuid_*
-functions, such as libuuid.
 
 
 Basic Installation
@@ -33,10 +31,9 @@ Briefly, these shell commands will unpack, build and install Taskserver:
 
   $ tar xzf taskd-X.Y.Z.tar.gz                  [1]
   $ cd taskd-X.Y.Z                              [2]
-  $ cmake .                                     [3]
+  $ cmake . -DCMAKE_BUILD_TYPE=Release          [3]
   $ make                                        [4]
   $ sudo make install                           [5]
-  $ cd .. ; rm -r taskd-X.Y.Z                   [6]
 
 These commands are explained below:
 
@@ -51,8 +48,6 @@ These commands are explained below:
   4. Builds Taskserver.  This may take a minute.
 
   5. Installs the program, documentation and other data files.
-
-  6. Removes the temporary directory.
 
 
 Build and configurations options
@@ -89,25 +84,13 @@ to get absolute installation directoris:
   CMAKE_INSTALL_PREFIX/TASKD_MAN5DIR  /usr/local/share/man/man5
 
 
-Localizations
--------------
-
-To make use of a translation, specify a language number, as found in cmake.h:
-
-  $ cmake -DLANGUAGE=1 .
-
-Currently the defined languages are:
-
-  eng_USA 1
-
-
 Uninstallation
 --------------
 
 There is no uninstall option in CMake makefiles. This ia a manual process.
 
 To uninstall Taskserver, remove the files listed in the install_manifest.txt
-file that was generated when you built Taskwarrior.
+file that was generated when you built Taskserver.
 
 
 Taskserver Build Notes
@@ -141,8 +124,7 @@ CMake with no reported problems, and the build will fail later.  This is
 almost always because CMake is mistaken about some assumption.
 
 If a build does not succeed, please send the contents of the 'CMakeCache.txt' 
-and 'CMakeFiles/CMakeOutput.log' files to support@taskwarrior.org, or post a
-message in the support forums at taskwarrior.org along with the information.
+and 'CMakeFiles/CMakeOutput.log' files to support@gothenburgbitfactory.org.
 
 If CMake runs but Taskserver does not build, please send the contents of the
 above files as well as a transcript from the build, which is not written to a
