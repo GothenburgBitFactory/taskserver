@@ -253,7 +253,7 @@ void Server::beginServer ()
     }
 
     catch (std::string& e) { if (_log) _log->write (std::string ("Error: ") + e); }
-    catch (char* e)        { if (_log) _log->write (std::string ("Error: ") + e); }
+    catch (const char* e)  { if (_log) _log->write (std::string ("Error: ") + e); }
     catch (...)            { if (_log) _log->write ("Error: Unknown exception"); }
   }
 }
