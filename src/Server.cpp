@@ -191,7 +191,7 @@ void Server::setConfig (Config* c)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::beginServer ()
+void Server::configureTLSServer ()
 {
   if (_config)
   {
@@ -200,6 +200,12 @@ void Server::beginServer ()
     setKeyFile (_config->get ("server.key"));
     setCRLFile (_config->get ("server.crl"));
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Server::beginServer ()
+{
+  configureTLSServer ();
 
   if (_log) _log->write ("Server starting");
 
@@ -217,6 +223,36 @@ void Server::beginServer ()
     throw std::string ("Failed to register handler for SIGUSR2... Exiting.");
 
   TLSServer server;
+  initTLSServer (server);
+  server.queue (_queue_size);
+  server.bind (_host, _port, _family);
+  server.listen ();
+
+  if (_log) _log->write ("Server ready");
+
+  _request_count = 0;
+  while (1)
+  {
+    try
+    {
+      if (_sighup)
+        throw "SIGHUP shutdown.";
+
+      Timer timer;
+      processTLSTransaction (server, timer);
+
+      if (_log) _log->write (format ("[{1}] Serviced in {2}s", _request_count, (timer.total_us () / 1e6)));
+    }
+
+    catch (std::string& e) { if (_log) _log->write (std::string ("Error: ") + e); }
+    catch (char* e)        { if (_log) _log->write (std::string ("Error: ") + e); }
+    catch (...)            { if (_log) _log->write ("Error: Unknown exception"); }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Server::initTLSServer (TLSServer& server)
+{
   if (_config)
   {
     server.debug (_config->getInteger ("debug.tls"));
@@ -251,55 +287,35 @@ void Server::beginServer ()
                _crl_file,       // CRL
                _cert_file,      // Cert
                _key_file);      // Key
-  server.queue (_queue_size);
-  server.bind (_host, _port, _family);
-  server.listen ();
+}
 
-  if (_log) _log->write ("Server ready");
+////////////////////////////////////////////////////////////////////////////////
+void Server::processTLSTransaction (TLSServer& server, Timer& timer)
+{
+  TLSTransaction tx;
+  tx.trust (server.trust ());
+  server.accept (tx);
 
-  _request_count = 0;
-  while (1)
-  {
-    try
-    {
-      TLSTransaction tx;
-      tx.trust (server.trust ());
-      server.accept (tx);
+  // Get client address and port, for logging.
+  if (_log_clients)
+    tx.getClient (_client_address, _client_port);
 
-      if (_sighup)
-        throw "SIGHUP shutdown.";
+  // Metrics.
+  timer.start ();
 
-      // Get client address and port, for logging.
-      if (_log_clients)
-        tx.getClient (_client_address, _client_port);
+  std::string input;
+  tx.recv (input);
 
-      // Metrics.
-      Timer timer;
-      timer.start ();
+  // Handle the request.
+  ++_request_count;
 
-      std::string input;
-      tx.recv (input);
+  // Call the derived class handler.
+  std::string output;
+  handler (input, output);
+  if (output.length ())
+    tx.send (output);
 
-      // Handle the request.
-      ++_request_count;
-
-      // Call the derived class handler.
-      std::string output;
-      handler (input, output);
-      if (output.length ())
-        tx.send (output);
-
-      if (_log)
-      {
-        timer.stop ();
-        _log->write (format ("[{1}] Serviced in {2}s", _request_count, (timer.total_us () / 1e6)));
-      }
-    }
-
-    catch (std::string& e) { if (_log) _log->write (std::string ("Error: ") + e); }
-    catch (char* e)        { if (_log) _log->write (std::string ("Error: ") + e); }
-    catch (...)            { if (_log) _log->write ("Error: Unknown exception"); }
-  }
+  timer.stop ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

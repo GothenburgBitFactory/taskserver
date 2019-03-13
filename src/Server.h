@@ -31,6 +31,9 @@
 #include <ConfigFile.h>
 #include <Log.h>
 
+class Timer;
+class TLSServer;
+
 class Server
 {
 public:
@@ -71,6 +74,9 @@ private:
   void setCertFile (const std::string&);
   void setKeyFile (const std::string&);
   void setCRLFile (const std::string&);
+  void configureTLSServer ();
+  void initTLSServer (TLSServer& server);
+  void processTLSTransaction (TLSServer& server, Timer& timer);
 
   std::string _host            {"::"};
   std::string _port            {"53589"};
