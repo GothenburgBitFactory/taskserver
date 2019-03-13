@@ -130,9 +130,11 @@ void Server::setLimit (int max)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCAFile (const std::string& file)
 {
+  File cert (file);
+  if (! cert.exists ())
+    return;
   if (_log) _log->write (format ("CA          {1}", file));
   _ca_file = file;
-  File cert (file);
   if (! cert.readable ())
     throw format ("CA Certificate not readable: '{1}'", file);
 }
@@ -160,9 +162,11 @@ void Server::setKeyFile (const std::string& file)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::setCRLFile (const std::string& file)
 {
+  File crl (file);
+  if (! crl.exists ())
+    return;
   if (_log) _log->write (format ("CRL         {1}", file));
   _crl_file = file;
-  File crl (file);
   if (! crl.readable ())
     throw format ("CRL Certificate not readable: '{1}'", file);
 }
@@ -189,6 +193,14 @@ void Server::setConfig (Config* c)
 ////////////////////////////////////////////////////////////////////////////////
 void Server::beginServer ()
 {
+  if (_config)
+  {
+    setCAFile (_config->get ("ca.cert"));
+    setCertFile (_config->get ("server.cert"));
+    setKeyFile (_config->get ("server.key"));
+    setCRLFile (_config->get ("server.crl"));
+  }
+
   if (_log) _log->write ("Server starting");
 
   if (_daemon)

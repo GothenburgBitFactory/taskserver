@@ -48,10 +48,6 @@ public:
   void setLog (Log*);
   void setConfig (Config*);
   void setLimit (int);
-  void setCAFile (const std::string&);
-  void setCertFile (const std::string&);
-  void setKeyFile (const std::string&);
-  void setCRLFile (const std::string&);
   void setLogClients (bool);
   void start ();
 
@@ -71,6 +67,11 @@ protected:
   int _client_port             {0};
 
 private:
+  void setCAFile (const std::string&);
+  void setCertFile (const std::string&);
+  void setKeyFile (const std::string&);
+  void setCRLFile (const std::string&);
+
   std::string _host            {"::"};
   std::string _port            {"53589"};
   std::string _family          {"IPv6"};
