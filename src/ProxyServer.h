@@ -36,6 +36,8 @@ public:
   void accept (int , struct sockaddr *) override;
 
 private:
+  bool recv_line(char *, size_t);
+  bool process_proxy_v1 (struct sockaddr *, char *);
   bool process_proxy_v2 (struct sockaddr *, char *);
 };
 

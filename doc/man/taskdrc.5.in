@@ -86,7 +86,8 @@ Offloads SSL connection handling to a reverse proxy.  Connections are accepted
 unencrypted and wrapped with PROXYv2 protocol.
 
 This is appropriate for service behind haproxy configured with
-"send-proxy-v2" server option. Optional SSL information is ignored.
+"send-proxy-v2" server option or behind stunnel with "protocol = proxy".
+Optional SSL information is ignored.
 
 Defaults to off.
 
