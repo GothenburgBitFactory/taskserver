@@ -8,7 +8,9 @@ several graphs from it.  There are three scripts, named:
   update
   graph
 
-The create script is run once to create the taskd.rrd file.
+The create script is run once to create the taskd.rrd file. It needs
+the stats.request file with the fields filled in using valid values (can be found
+in ~/.taskrc).
 
 The update script and graph script are run hourly, at staggered times, and
 update the taskd.rrd file.  They are run from cron like this:
