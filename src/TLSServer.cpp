@@ -435,10 +435,10 @@ void TLSTransaction::init (TLSServer& server)
       gnutls_free (out.data); // All
 
       std::string error {(const char*) out.data};
-      throw format ("Handshake failed. {1}", error);
+      throw format ("Handshake failed for host '{2}'. {1}", error, _address);
     }
 #else
-    throw format ("Handshake failed. {1}", gnutls_strerror (ret)); // All
+    throw format ("Handshake failed for host '{2}'. {1}", gnutls_strerror (ret), _address); // All
 #endif
   }
 
