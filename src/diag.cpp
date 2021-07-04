@@ -180,12 +180,12 @@ void command_diag (Database& config)
       File config_file (root_dir._data + "/config");
       std::cout << "      config: "
                 << config_file._data
-                << (config_file.readable () ? ", readable" : ", missing")
-                << (config_file.writable () ? ", writable" : ", not writable")
-                << config_file.size ()
+                << (config_file.exists () && config_file.readable () ? ", readable" : ", missing")
+                << (config_file.exists () && config_file.writable () ? ", writable" : ", not writable")
+                << (config_file.exists () ? config_file.size () : 0)
                 << " bytes\n";
 
-      if (config_file.readable ())
+      if (config_file.exists () && config_file.readable ())
       {
         // Load the config file.
         config._config->load (config_file._data);
@@ -196,20 +196,20 @@ void command_diag (Database& config)
         File server_crl  (config._config->get ("server.crl"));
 
         std::cout << "          CA: "
-                  << ca_cert._data << (ca_cert.readable () ? ", readable, " : ", ")
-                  << ca_cert.size ()
+                  << ca_cert._data << (ca_cert.exists () && ca_cert.readable () ? ", readable, " : ", ")
+                  << (ca_cert.exists () ? ca_cert.size () : 0)
                   << " bytes\n";
         std::cout << " Certificate: "
-                  << server_cert._data << (server_cert.readable () ? ", readable, " : ", missing, ")
-                  << server_cert.size ()
+                  << server_cert._data << (server_cert.exists () && server_cert.readable () ? ", readable, " : ", missing, ")
+                  << (server_cert.exists () ? server_cert.size () : 0)
                   << " bytes\n";
         std::cout << "         Key: "
-                  << server_key._data << (server_key.readable () ? ", readable, " : ", missing, ")
-                  << server_key.size ()
+                  << server_key._data << (server_key.exists () && server_key.readable () ? ", readable, " : ", missing, ")
+                  << (server_key.exists () ? server_key.size () : 0)
                   << " bytes\n";
         std::cout << "         CRL: "
-                  << server_crl._data << (server_crl.readable () ? ", readable, " : "")
-                  << server_crl.size ()
+                  << server_crl._data << (server_crl.exists () && server_crl.readable () ? ", readable, " : "")
+                  << (server_crl.exists () ? server_crl.size () : 0)
                   << " bytes\n";
 
         File log (config._config->get ("log"));

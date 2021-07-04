@@ -49,7 +49,6 @@
 #include <format.h>
 
 #define DH_BITS 2048
-#define MAX_BUF 16384
 
 #if GNUTLS_VERSION_NUMBER < 0x030406
 #if GNUTLS_VERSION_NUMBER >= 0x020a00
@@ -94,18 +93,6 @@ TLSServer::~TLSServer ()
   // Not needed after v3.3.0, handled automatically by library.
   gnutls_global_deinit ();
 #endif
-
-  if (_socket)
-  {
-    shutdown (_socket, SHUT_RDWR);
-    close (_socket);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TLSServer::queue (int depth)
-{
-  _queue = depth;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,8 +100,7 @@ void TLSServer::queue (int depth)
 // std::cout, labelled with 's: ...'.
 void TLSServer::debug (int level)
 {
-  if (level)
-    _debug = true;
+  TCPServer::debug (level);
 
   gnutls_global_set_log_function (gnutls_log_function); // All
   gnutls_global_set_log_level (level); // All
@@ -243,124 +229,13 @@ void TLSServer::init (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSServer::bind (
-  const std::string& host,
-  const std::string& port,
-  const std::string& family)
-{
-  // use IPv4 or IPv6, does not matter.
-  struct addrinfo hints {};
-  hints.ai_family   = (family == "IPv6" ? AF_INET6 :
-                       family == "IPv4" ? AF_INET  :
-                                          AF_UNSPEC);
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags    = AI_PASSIVE; // use my IP
-
-  struct addrinfo* res;
-  int ret = ::getaddrinfo (host.c_str (), port.c_str (), &hints, &res);
-  if (ret != 0)
-    throw std::string (::gai_strerror (ret));
-
-  for (struct addrinfo* p = res; p != NULL; p = p->ai_next)
-  {
-    // IPv4
-    void *addr;
-    int ipver;
-    if (p->ai_family == AF_INET)
-    {
-      struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-      addr = &(ipv4->sin_addr);
-      ipver = 4;
-    }
-    // IPv6
-    else
-    {
-      struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
-      addr = &(ipv6->sin6_addr);
-      ipver = 6;
-    }
-
-    // Convert the IP to a string and print it:
-    char ipstr[INET6_ADDRSTRLEN];
-    inet_ntop (p->ai_family, addr, ipstr, sizeof ipstr);
-    if (_debug)
-      std::cout << "s: INFO IPv" << ipver << ": " << ipstr << '\n';
-  }
-
-  if ((_socket = ::socket (res->ai_family,
-                           res->ai_socktype,
-                           res->ai_protocol)) == -1)
-    throw std::string ("Can not bind to  ") + host + port;
-
-  // When a socket is closed, it remains unavailable for a while (netstat -an).
-  // Setting SO_REUSEADDR allows this program to assume control of a closed, but
-  // unavailable socket.
-  int on = 1;
-  if (::setsockopt (_socket,
-                    SOL_SOCKET,
-                    SO_REUSEADDR,
-                    (const void*) &on,
-                    sizeof (on)) == -1)
-    throw std::string (::strerror (errno));
-
-  // Also listen to IPv4 with IPv6 in dual-stack situations
-  if (res->ai_family == AF_INET6)
-  {
-    int off = 0;
-    if (::setsockopt (_socket,
-                      IPPROTO_IPV6,
-                      IPV6_V6ONLY,
-                      (const void*) &off,
-                      sizeof (off)) == -1)
-      if (_debug)
-        std::cout << "s: Unable to use IPv6 dual stack\n";
-  }
-
-  if (::bind (_socket, res->ai_addr, res->ai_addrlen) == -1)
-  {
-    // TODO This is research to determine whether this is the right location to
-    //      inject a helpful log message, such as
-    //
-    //      "Check to see if the server is already running."
-    std::cout << "### bind failed\n";
-    throw std::string (::strerror (errno));
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TLSServer::listen ()
-{
-  if (::listen (_socket, _queue) < 0)
-    throw std::string (::strerror (errno));
-
-  if (_debug)
-    std::cout << "s: INFO Server listening.\n";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TLSServer::accept (TLSTransaction& tx)
-{
-  if (_debug)
-    tx.debug ();
-
-  tx.init (*this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 TLSTransaction::~TLSTransaction ()
 {
-  if (_socket)
-  {
-    shutdown (_socket, SHUT_RDWR);
-    close (_socket);
-    _socket = 0;
-  }
-
   gnutls_deinit (_session); // All
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSTransaction::init (TLSServer& server)
+TLSTransaction::TLSTransaction (TLSServer& server)
 {
   int ret = gnutls_init (&_session, GNUTLS_SERVER); // All
   if (ret < 0)
@@ -388,27 +263,13 @@ void TLSTransaction::init (TLSServer& server)
   gnutls_session_enable_compatibility_mode (_session);
 */
 
-  struct sockaddr_in sa_cli {};
-  socklen_t client_len = sizeof sa_cli;
-  do
-  {
-    _socket = accept (server._socket, (struct sockaddr *) &sa_cli, &client_len);
-  }
-  while (errno == EINTR);
+  trust (server.trust ());
+}
 
-  if (_socket < 0)
-    throw std::string (::strerror (errno));
-
-  // Obtain client info.
-  char topbuf[512];
-  _address = inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf, sizeof (topbuf));
-  _port    = ntohs (sa_cli.sin_port);
-  if (_debug)
-    std::cout << "s: INFO connection from "
-              << _address
-              << " port "
-              << _port
-              << '\n';
+////////////////////////////////////////////////////////////////////////////////
+void TLSTransaction::accept (int socket, struct sockaddr *sa_remote)
+{
+  TCPTransaction::accept (socket, sa_remote);
 
 #if GNUTLS_VERSION_NUMBER >= 0x030109
   gnutls_transport_set_int (_session, _socket); // 3.1.9
@@ -417,6 +278,7 @@ void TLSTransaction::init (TLSServer& server)
 #endif
 
   // Perform the TLS handshake
+  int ret;
   do
   {
     ret = gnutls_handshake (_session); // All
@@ -475,23 +337,9 @@ void TLSTransaction::bye ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Calling this method results in all subsequent socket traffic being sent to
-// std::cout, labelled with 's: ...'.
-void TLSTransaction::debug ()
-{
-  _debug = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void TLSTransaction::trust (const enum TLSServer::trust_level value)
 {
   _trust = value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TLSTransaction::limit (int max)
-{
-  _limit = max;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -596,127 +444,37 @@ int TLSTransaction::verify_certificate () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSTransaction::send (const std::string& data)
+ssize_t TLSTransaction::do_send (const void *buf, size_t len)
 {
-  std::string packet = "XXXX" + data;
-
-  // Encode the length.
-  unsigned long l = packet.length ();
-  packet[0] = l >>24;
-  packet[1] = l >>16;
-  packet[2] = l >>8;
-  packet[3] = l;
-
-  unsigned int total = 0;
-  unsigned int remaining = packet.length ();
-
-  while (total < packet.length ())
+  ssize_t status;
+  do
   {
-    int status;
-    do
-    {
-      status = gnutls_record_send (_session, packet.c_str () + total, remaining); // All
-    }
-    while (errno == GNUTLS_E_INTERRUPTED ||
-           errno == GNUTLS_E_AGAIN);
-
-    if (status == -1)
-      break;
-
-    total     += (unsigned int) status;
-    remaining -= (unsigned int) status;
+    status = gnutls_record_send (_session, buf, len); // All
   }
+  while (status < 0 && gnutls_error_is_fatal (status) == 0); // All
 
-  if (_debug)
-    std::cout << "s: INFO Sending 'XXXX"
-              << data.c_str ()
-              << "' (" << total << " bytes)"
-              << std::endl;
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TLSTransaction::recv (std::string& data)
+ssize_t TLSTransaction::do_recv (void *buf, size_t len)
 {
-  data = "";          // No appending of data.
-  int received = 0;
+  ssize_t received;
 
-  // Get the encoded length.
-  unsigned char header[4] {};
   do
   {
-    received = gnutls_record_recv (_session, header, 4); // All
-  }
-  while (received > 0 &&
-         (errno == GNUTLS_E_INTERRUPTED ||
-          errno == GNUTLS_E_AGAIN));
-
-  int total = received;
-
-  // Decode the length.
-  unsigned long expected = (header[0]<<24) |
-                           (header[1]<<16) |
-                           (header[2]<<8) |
-                            header[3];
-  if (_debug)
-    std::cout << "s: INFO expecting " << expected << " bytes.\n";
-
-  // TODO This would be a good place to assert 'expected < _limit'.
-
-  // Arbitrary buffer size.
-  char buffer[MAX_BUF];
-
-  // Keep reading until no more data.  Concatenate chunks of data if a) the
-  // read was interrupted by a signal, and b) if there is more data than
-  // fits in the buffer.
-  do
-  {
-    do
-    {
-      received = gnutls_record_recv (_session, buffer, MAX_BUF - 1); // All
-    }
-    while (received > 0 &&
-           (errno == GNUTLS_E_INTERRUPTED ||
-            errno == GNUTLS_E_AGAIN));
-
-    // Other end closed the connection.
-    if (received == 0)
-    {
-      if (_debug)
-        std::cout << "s: INFO Peer has closed the TLS connection\n";
-      break;
-    }
-
-    // Something happened.
+    received = gnutls_record_recv (_session, buf, len); // All
     if (received < 0 && gnutls_error_is_fatal (received) == 0) // All
     {
-      if (_debug)
+      if (_debug && received != GNUTLS_E_INTERRUPTED && received != GNUTLS_E_AGAIN)
         std::cout << "c: WARNING " << gnutls_strerror (received) << '\n'; // All
     }
     else if (received < 0)
       throw std::string (gnutls_strerror (received)); // All
-
-    buffer [received] = '\0';
-    data += buffer;
-    total += received;
-
-    // Stop at defined limit.
-    if (_limit && total > _limit)
-      break;
   }
-  while (received > 0 && total < (int) expected);
+  while (received < 0);
 
-  if (_debug)
-    std::cout << "s: INFO Receiving 'XXXX"
-              << data.c_str ()
-              << "' (" << total << " bytes)"
-              << std::endl;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TLSTransaction::getClient (std::string& address, int& port)
-{
-  address = _address;
-  port = _port;
+  return received;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

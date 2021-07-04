@@ -18,6 +18,8 @@ add_library (taskd admin.cpp
                    Task.cpp       Task.h
                    TLSClient.cpp  TLSClient.h
                    TLSServer.cpp  TLSServer.h
+                   TCPServer.cpp  TCPServer.h
+                   ProxyServer.cpp  ProxyServer.h
                    util.cpp       util.h)
 
 add_library (libshared libshared/src/Color.cpp         libshared/src/Color.h
