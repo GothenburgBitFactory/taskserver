@@ -875,7 +875,7 @@ void command_server (Database& db)
       log.write ("Debug mode");
 
     // It is important that the ':' found should be the *last* one, in order
-    // to accomodate IPv6 addresses.
+    // to accommodate IPv6 addresses.
     auto serverDetails = db._config->get ("server");
     auto colon = serverDetails.rfind (':');
     if (colon == std::string::npos)

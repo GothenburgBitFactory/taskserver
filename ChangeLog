@@ -24,7 +24,7 @@
 - TD-101  taskdrc man page says "trust" defaults to "strict", but server
           complains if none set
           (thanks to Jack).
-- TD-102  After creating a user aparently successful taskd says: User does not
+- TD-102  After creating a user apparently successful taskd says: User does not
           exists
           (thanks to Olaf H B).
 - TD-103  Incorrect Error Message when Org does not exist
@@ -72,7 +72,7 @@
 - TW-1936 Tweak tests to have fuller TAP compliance
           (thanks to Paul J. Fenwick)
 - Added dual-stack IPv4/IPv6 support, when the IPv6 address is specified as ::
-  which means a confguration setting of server=:::<someport>. Related to TD-51
+  which means a configuration setting of server=:::<someport>. Related to TD-51
           (thanks to Johannes Wienke).
 - Added "diag" command details regarding file sizes.
 - Improved error messages for users who skip the 'task sync init' requirement
@@ -131,7 +131,7 @@
         (thanks to Anton Khirnov, Renato Alves).
 - TD-46 gnutls: -54 Error in the pull function.
 - TD-48 Empty username is not an error (thanks to Ben Boeckel).
-- TD-51 Taskd should listen on all matching adresses and interfaces (thanks to
+- TD-51 Taskd should listen on all matching addresses and interfaces (thanks to
         Anatolij Zelenin).
 - TD-53 Log message when server is ready for action (thanks to Renato Alves).
 - TD-54 Usage of flock() prevents compilation on Solaris (thanks to Tatjana

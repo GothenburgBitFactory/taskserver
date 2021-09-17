@@ -307,7 +307,7 @@ class LoggedHook(Hook):
         self.hooklog_in = self.wrappedfile + ".log.in"
         self.hooklog_out = self.wrappedfile + ".log.out"
 
-        # Cache is used to avoid parsing the logfiles everytime it's needed
+        # Cache is used to avoid parsing the logfiles every time it's needed
         self._cache = {}
 
         # Setup wrapper pointing to the correct hook name

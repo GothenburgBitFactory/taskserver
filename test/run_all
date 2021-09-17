@@ -118,7 +118,7 @@ class TestRunner(object):
         if cmd_args.serial:
             return False
 
-        # This is a pretty weird way to do it, and not realiable.
+        # This is a pretty weird way to do it, and not reliable.
         # We are dealing with some binary tests though.
         with open(test, 'rb') as fh:
             header = fh.read(100).split(b"\n")
