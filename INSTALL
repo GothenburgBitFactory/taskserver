@@ -76,7 +76,7 @@ lists them and their defaults plus the CMAKE_INSTALL_PREFIX:
   TASKD_MAN5DIR          share/man/man5
 
 The corresponding TASKD_* variables will be combined with CMAKE_INSTALL_PREFIX
-to get absolute installation directoris:
+to get absolute installation directories:
 
   CMAKE_INSTALL_PREFIX/TASKD_BINDIR   /usr/local/bin
   CMAKE_INSTALL_PREFIX/TASKD_DOCDIR   /usr/local/share/doc/taskd

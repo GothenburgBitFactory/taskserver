@@ -687,7 +687,7 @@ void Task::parseJSON (const json::object* root_obj)
           addTag (tag->_data);
         }
       }
-      // This is a temporary measure to accomodate a malformed JSON message from
+      // This is a temporary measure to accommodate a malformed JSON message from
       // Mirakel sync.
       //
       // 2016-02-21 Mirakel dropped sync support in late 2015. This can be
@@ -2042,7 +2042,7 @@ float Task::urgency_blocking () const
 ////////////////////////////////////////////////////////////////////////////////
 // Arguably does not belong here. This method reads the parse tree and calls
 // Task methods. It could be a standalone function with no loss in access, as
-// well as reducing the object depdendencies of Task.
+// well as reducing the object dependencies of Task.
 //
 // It came from the Command base object, but doesn't really belong there either.
 void Task::modify (modType type, bool text_required /* = false */)
