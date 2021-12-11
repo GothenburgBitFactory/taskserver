@@ -1,6 +1,7 @@
 [Unit]
 Description=Secure server providing multi-user, multi-client access to task data
-After=network.target
+Wants=network-online.target
+After=network-online.target
 Documentation=http://taskwarrior.org/docs/
 
 [Service]
