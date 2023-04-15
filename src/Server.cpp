@@ -239,7 +239,7 @@ void Server::beginServer ()
         throw "SIGHUP shutdown.";
 
       Timer timer;
-      processTLSTransaction (server, timer);
+      processTransaction (server, timer);
 
       if (_log) _log->write (format ("[{1}] Serviced in {2}s", _request_count, (timer.total_us () / 1e6)));
     }
@@ -290,10 +290,9 @@ void Server::initTLSServer (TLSServer& server)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::processTLSTransaction (TLSServer& server, Timer& timer)
+void Server::processTransaction (TLSServer& server, Timer& timer)
 {
-  TLSTransaction tx;
-  tx.trust (server.trust ());
+  TLSTransaction tx (server);
   server.accept (tx);
 
   // Get client address and port, for logging.

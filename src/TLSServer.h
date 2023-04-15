@@ -30,26 +30,23 @@
 
 #include <string>
 #include <gnutls/gnutls.h>
+#include "TCPServer.h"
 
 class TLSTransaction;
 
-class TLSServer
+class TLSServer : public TCPServer
 {
 public:
   enum trust_level { strict, allow_all };
 
   TLSServer ();
   ~TLSServer ();
-  void queue (int);
-  void debug (int);
+  void debug (int) override;
   enum trust_level trust () const;
   void trust (const enum trust_level);
   void ciphers (const std::string&);
   void dh_bits (unsigned int dh_bits);
   void init (const std::string&, const std::string&, const std::string&, const std::string&);
-  void bind (const std::string&, const std::string&, const std::string&);
-  void listen ();
-  void accept (TLSTransaction&);
 
   friend class TLSTransaction;
 
@@ -62,35 +59,26 @@ private:
   unsigned int                     _dh_bits     {0};
   gnutls_certificate_credentials_t _credentials {};
   gnutls_priority_t                _priorities  {};
-  int                              _socket      {0};
-  int                              _queue       {5};
-  bool                             _debug       {false};
   enum trust_level                 _trust       {TLSServer::strict};
   bool                             _priorities_init {false};
 };
 
-class TLSTransaction
+class TLSTransaction : public TCPTransaction
 {
 public:
-  TLSTransaction () = default;
+  TLSTransaction (TLSServer&);
   ~TLSTransaction ();
-  void init (TLSServer&);
+  void accept (int, struct sockaddr *) override;
   void bye ();
-  void debug ();
   void trust (const enum TLSServer::trust_level);
-  void limit (int);
   int verify_certificate () const;
-  void send (const std::string&);
-  void recv (std::string&);
-  void getClient (std::string&, int&);
+
+protected:
+  size_t do_send (const void *, size_t) override;
+  size_t do_recv (void *, size_t) override;
 
 private:
-  int                         _socket  {0};
   gnutls_session_t            _session {};
-  int                         _limit   {0};
-  bool                        _debug   {false};
-  std::string                 _address {""};
-  int                         _port    {0};
   enum TLSServer::trust_level _trust   {TLSServer::strict};
 };
 
