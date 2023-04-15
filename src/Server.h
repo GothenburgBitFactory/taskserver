@@ -76,7 +76,8 @@ private:
   void setCRLFile (const std::string&);
   void configureTLSServer ();
   void initTLSServer (TLSServer& server);
-  void processTransaction (TLSServer& server, Timer& timer);
+  template <typename TTx, typename TServer>
+  void processTransaction (TServer& server, Timer& timer);
 
   std::string _host            {"::"};
   std::string _port            {"53589"};

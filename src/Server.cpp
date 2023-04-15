@@ -40,6 +40,7 @@
 #include <assert.h>
 #include <Server.h>
 #include <TLSServer.h>
+#include <ProxyServer.h>
 #include <Timer.h>
 #include <format.h>
 
@@ -205,7 +206,10 @@ void Server::configureTLSServer ()
 ////////////////////////////////////////////////////////////////////////////////
 void Server::beginServer ()
 {
-  configureTLSServer ();
+  bool behind_proxy = _config && _config->getBoolean ("server.behind_proxy");
+
+  if (! behind_proxy)
+    configureTLSServer ();
 
   if (_log) _log->write ("Server starting");
 
@@ -223,7 +227,8 @@ void Server::beginServer ()
     throw std::string ("Failed to register handler for SIGUSR2... Exiting.");
 
   TLSServer server;
-  initTLSServer (server);
+  if (! behind_proxy)
+    initTLSServer (server);
   server.queue (_queue_size);
   server.bind (_host, _port, _family);
   server.listen ();
@@ -239,7 +244,10 @@ void Server::beginServer ()
         throw "SIGHUP shutdown.";
 
       Timer timer;
-      processTransaction (server, timer);
+      if (behind_proxy)
+        processTransaction<ProxyTransaction> (server, timer);
+      else
+        processTransaction<TLSTransaction> (server, timer);
 
       if (_log) _log->write (format ("[{1}] Serviced in {2}s", _request_count, (timer.total_us () / 1e6)));
     }
@@ -290,9 +298,10 @@ void Server::initTLSServer (TLSServer& server)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Server::processTransaction (TLSServer& server, Timer& timer)
+template <typename TTx, typename TServer>
+void Server::processTransaction (TServer& server, Timer& timer)
 {
-  TLSTransaction tx (server);
+  TTx tx (server);
   server.accept (tx);
 
   // Get client address and port, for logging.

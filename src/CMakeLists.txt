@@ -14,6 +14,7 @@ add_library (taskd admin.cpp
                    Database.cpp   Database.h
                    help.cpp
                    init.cpp
+                   ProxyServer.cpp  ProxyServer.h
                    Server.cpp     Server.h
                    Task.cpp       Task.h
                    TCPServer.cpp  TCPServer.h

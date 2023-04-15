@@ -81,6 +81,16 @@ The address (IPv4, IPv6 or DNS) of the Taskserver, followed by a colon and the
 port number.
 
 .TP
+.B server.proxy=on
+Offloads SSL connection handling to a reverse proxy.  Connections are accepted
+unencrypted and wrapped with PROXYv2 protocol.
+
+This is appropriate for service behind haproxy configured with
+"send-proxy-v2" server option. Optional SSL information is ignored.
+
+Defaults to off.
+
+.TP
 .B server.cert=/path/to/server.cert.pem
 Fully qualified path to the server certificate.
 
