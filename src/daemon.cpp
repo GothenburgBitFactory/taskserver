@@ -905,20 +905,6 @@ void command_server (Database& db)
     }
 
     // It just runs until you kill it.
-    File ca (db._config->get ("ca.cert"));
-    if (ca.exists ())
-      server.setCAFile (ca._data);
-
-    File cert (db._config->get ("server.cert"));
-    server.setCertFile (cert._data);
-
-    File key (db._config->get ("server.key"));
-    server.setKeyFile (key._data);
-
-    File crl (db._config->get ("server.crl"));
-    if (crl.exists ())
-      server.setCRLFile (crl._data);
-
     server.beginServer ();
   }
 
